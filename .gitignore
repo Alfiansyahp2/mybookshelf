@@ -1,0 +1,312 @@
+# ====================================================
+# MyBookshelf - Laravel + React Project
+# Comprehensive .gitignore for full-stack application
+# ====================================================
+
+# ===================
+# Laravel - Backend
+# ===================
+
+# Laravel core files
+/vendor/
+/node_modules/
+/public/css/
+/public/js/
+/public/hot/
+/public/storage/
+/storage/*.key
+/storage/pail/
+/bootstrap/cache/
+
+# Laravel environment & config
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+/auth.json
+Homestead.json
+Homestead.yaml
+
+# Laravel testing & cache
+.phpunit.result.cache
+/.phpunit.cache
+/.fleet
+
+# ===================
+# React/Vite - Frontend
+# ===================
+
+# Node modules & dependencies
+/frontend/node_modules/
+/node_modules/
+
+# Build output
+/frontend/dist/
+/frontend/dist-ssr/
+/frontend/build/
+/public/build/
+
+# Vite cache
+/frontend/.vite/
+
+# React logs
+/frontend/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# React environment files
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.*.local
+*.local
+
+# ===================
+# PHP & Composer
+# ===================
+
+# Composer
+composer.lock
+composer.phar
+
+# PHP tools
+.phpactor.json
+.phpcs.cache
+.phpunit.result.cache
+
+# ===================
+# IDE & Editor
+# ===================
+
+# VSCode
+/.vscode/
+/.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.code-workspace
+
+# JetBrains IDEs (PHPStorm, IntelliJ, WebStorm)
+/.idea/
+*.iml
+*.ipr
+*.iws
+/.idea/
+
+# Other editors
+/.nova/
+/.zed/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# NetBeans
+/nbproject/
+/nbproject/private/
+build/
+nbbuild/
+
+# ===================
+# Operating System Files
+# ===================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ===================
+# Build & Compilation
+# ===================
+
+# General build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# Cache directories
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port/
+
+# ===================
+# Logs & Temporary Files
+# ===================
+
+# Log files
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===================
+# Database
+# ===================
+
+# SQLite databases (if used)
+*.sqlite
+*.sqlite3
+*.db
+
+# MySQL dumps (if any)
+*.sql
+*.sql.gz
+
+# ===================
+# Documentation & Assets
+# ===================
+
+# Generated documentation
+/docs/api/
+/coverage/
+
+# Asset optimization
+/public/css/*.css
+/public/js/*.js
+/public/mix-manifest.json
+
+# ===================
+# Testing & Coverage
+# ===================
+
+# Code coverage reports
+/coverage/
+*.lcov
+.nyc_output/
+
+# PHPUnit
+/.phpunit.cache
+/.phpunit.result.cache
+
+# ===================
+# Deployment & CI/CD
+# ===================
+
+# Deployment files
+.serverless/
+.vercel/
+.netlify/
+
+# CI/CD
+.gitlab-ci-local
+.github/workflows/*.local.yaml
+
+# ===================
+# Security & Sensitive Files
+# ===================
+
+# API keys and secrets
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# ===================
+# Project Specific
+# ===================
+
+# Local configuration files
+/config/local.*
+/.fleet
+/.phpactor.json
+
+# Session files
+*.session
+sessions/
+
+# ===================
+# Package Manager Lock Files
+# ===================
+
+# Keep package-lock.json for npm
+# Keep composer.lock for composer
+# But ignore others if needed
+
+# Yarn (if using yarn instead of npm)
+# yarn.lock
+
+# ===================
+# Misc
+# ===================
+
+# npm
+package-lock.json
+
+# Keep these for consistency
+# frontend/package-lock.json
+# composer.lock
+
+# End of .gitignore
