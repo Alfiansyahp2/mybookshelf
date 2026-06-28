@@ -1,6 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { ReactQueryProvider } from './lib/ReactQueryProvider'
 import AppLayout from './components/AppLayout'
+import ProtectedRoute from './components/ProtectedRoute'
+import CatchAll from './components/CatchAll'
+import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Library from './pages/Library'
 import ExploreLibrary from './pages/ExploreLibrary'
@@ -12,21 +15,20 @@ import Collections from './pages/Collections'
 import Achievements from './pages/Achievements'
 import Notes from './pages/Notes'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-})
-
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <ReactQueryProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<AppLayout />}>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Protected Routes */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
             <Route index element={<Dashboard />} />
             <Route path="library" element={<Library />} />
             <Route path="explore" element={<ExploreLibrary />} />
@@ -38,9 +40,12 @@ function App() {
             <Route path="achievements" element={<Achievements />} />
             <Route path="notes" element={<Notes />} />
           </Route>
+
+          {/* Catch-all route for unmatched paths */}
+          <Route path="*" element={<CatchAll />} />
         </Routes>
       </BrowserRouter>
-    </QueryClientProvider>
+    </ReactQueryProvider>
   )
 }
 

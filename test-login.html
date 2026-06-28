@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login - MyBookshelf</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            color: #17a2b8;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .step.running {
+            background-color: #fff3cd;
+        }
+        .step.success {
+            background-color: #d4edda;
+        }
+        .step.error {
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Login Authentication</h1>
+
+        <div class="test-section">
+            <h2>Test Configuration</h2>
+            <p><strong>Email:</strong> test@example.com</p>
+            <p><strong>Password:</strong> password</p>
+            <p><strong>API Base URL:</strong> http://localhost:8000</p>
+        </div>
+
+        <div class="test-section">
+            <button class="button" onclick="runFullTest()">🚀 Run Full Authentication Test</button>
+            <button class="button" onclick="clearResults()">🗑️ Clear Results</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        const TEST_CREDENTIALS = {
+            email: 'test@example.com',
+            password: 'password'
+        };
+
+        function log(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const step = document.createElement('div');
+            step.className = `step ${type}`;
+            step.innerHTML = `<span class="${type}">[${new Date().toLocaleTimeString()}]</span> ${message}`;
+            resultsDiv.appendChild(step);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testCsrfCookie() {
+            log('🍪 Testing CSRF Cookie Request...', 'running');
+
+            try {
+                // IMPORTANT: CSRF cookie endpoint must be called WITHOUT /api prefix
+                const response = await fetch(`http://localhost:8000/sanctum/csrf-cookie`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    log(`✅ CSRF Cookie received (Status: ${response.status})`, 'success');
+
+                    // Check cookies
+                    const cookies = document.cookie;
+                    if (cookies.includes('XSRF-TOKEN') || cookies.includes('laravel_session')) {
+                        log(`🍪 Cookies set: ${cookies.substring(0, 100)}...`, 'success');
+                    } else {
+                        log('⚠️ No CSRF cookies detected in browser', 'error');
+                    }
+
+                    return true;
+                } else {
+                    log(`❌ CSRF Cookie request failed (Status: ${response.status})`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ CSRF Cookie request error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testLogin() {
+            log('🔐 Testing Login Request...', 'running');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/auth/login`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(TEST_CREDENTIALS)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Login successful! (Status: ${response.status})`, 'success');
+                    log(`👤 User: ${data.data?.user?.name || data.data?.user?.email || 'Unknown'}`, 'success');
+                    log(`📧 Email: ${data.data?.user?.email}`, 'success');
+
+                    // Store user data in localStorage like the real app does
+                    if (data.data?.user) {
+                        localStorage.setItem('user', JSON.stringify(data.data.user));
+                        log('💾 User data stored in localStorage', 'success');
+                    }
+
+                    return true;
+                } else {
+                    log(`❌ Login failed (Status: ${response.status})`, 'error');
+                    log(`📄 Error response: ${JSON.stringify(data)}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Login request error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testAuthenticatedRequest() {
+            log('🔒 Testing Authenticated Request (GET /api/v1/auth/me)...', 'running');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/auth/me`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    log(`✅ Authenticated request successful!`, 'success');
+                    log(`👤 Current user: ${data.data?.user?.name || data.data?.user?.email}`, 'success');
+                    return true;
+                } else {
+                    log(`❌ Authenticated request failed (Status: ${response.status})`, 'error');
+                    log(`📄 Error response: ${JSON.stringify(data)}`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Authenticated request error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testLogout() {
+            log('🚪 Testing Logout Request...', 'running');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/v1/auth/logout`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    log(`✅ Logout successful!`, 'success');
+                    localStorage.removeItem('user');
+                    log('💾 User data removed from localStorage', 'success');
+                    return true;
+                } else {
+                    log(`❌ Logout failed (Status: ${response.status})`, 'error');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Logout request error: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function runFullTest() {
+            clearResults();
+            log('🚀 Starting Full Authentication Test...', 'info');
+            log('=====================================', 'info');
+
+            // Test 1: CSRF Cookie
+            const csrfSuccess = await testCsrfCookie();
+            if (!csrfSuccess) {
+                log('⚠️ CSRF cookie test failed, but continuing...', 'error');
+            }
+
+            // Wait a bit
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Test 2: Login
+            const loginSuccess = await testLogin();
+            if (!loginSuccess) {
+                log('❌ Login failed - stopping test', 'error');
+                return;
+            }
+
+            // Wait a bit
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Test 3: Authenticated Request
+            await testAuthenticatedRequest();
+
+            // Wait a bit
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Test 4: Logout
+            await testLogout();
+
+            log('=====================================', 'info');
+            log('✨ Test completed! Check results above.', 'info');
+        }
+
+        // Auto-run test on page load (optional)
+        // window.onload = () => runFullTest();
+    </script>
+</body>
+</html>

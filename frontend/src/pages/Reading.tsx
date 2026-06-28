@@ -1,29 +1,70 @@
+import { useBooks } from '../hooks/useBooks'
+import { useShelves } from '../hooks/useShelves'
+import { useNavigate } from 'react-router-dom'
 import { useBookstore } from '../store/useBookstore'
 import Bookshelf from '../components/Bookshelf'
+import type { Book } from '../types'
 import { motion } from 'framer-motion'
 import {
   BookOpen,
   TrendingUp,
   Clock,
   Target,
-  Bookmark
+  Bookmark,
+  Plus
 } from 'lucide-react'
 
 export default function Reading() {
-  const { getBooksByStatus, getReadingTime } = useBookstore()
+  const navigate = useNavigate()
+  const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
 
-  const readingBooks = getBooksByStatus('reading')
+  // Fetch all books and shelves from API
+  const { data: allBooksResponse, isLoading } = useBooks({})
+  const { data: shelves = [], isLoading: shelvesLoading } = useShelves()
+
+  const allBooks = allBooksResponse?.data?.data || []
+  const readingBooks = allBooks.filter((book: Book) => book.status === 'reading')
 
   // Calculate reading statistics
   const totalReadingBooks = readingBooks.length
-  const totalPagesRead = readingBooks.reduce((sum, book) => sum + (book.currentPage || 0), 0)
-  const totalPages = readingBooks.reduce((sum, book) => sum + (book.pages || 0), 0)
+  const totalPagesRead = readingBooks.reduce((sum: number, book: Book) => sum + (book.currentPage || 0), 0)
+  const totalPages = readingBooks.reduce((sum: number, book: Book) => sum + (book.pages || 0), 0)
   const averageProgress = totalReadingBooks > 0
-    ? Math.round(readingBooks.reduce((sum, book) => sum + (book.progress || 0), 0) / totalReadingBooks)
+    ? Math.round(readingBooks.reduce((sum: number, book: Book) => sum + (book.progress || 0), 0) / totalReadingBooks)
     : 0
 
-  const handleAddBook = (shelfId: string) => {
-    console.log('Add book to shelf:', shelfId)
+  const getReadingTime = (bookId: string) => {
+    // Calculate reading time from startedDate if available
+    const book = readingBooks.find(b => b.id === bookId)
+    if (!book || !book.startedDate) return null
+
+    const startDate = new Date(book.startedDate)
+    const now = new Date()
+    const diffMs = now.getTime() - startDate.getTime()
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+    return { days: diffDays, hours: diffHours, minutes: diffMinutes }
+  }
+
+  const handleBookClick = (book: any) => {
+    setSelectedBookId(book.id)
+    toggleBookDetail(book.id)
+  }
+
+  const handleAddBook = (shelfId: string, shelfName?: string) => {
+    console.log('Add book to shelf:', shelfId, shelfName)
+    // TODO: Implement add book functionality
+  }
+
+  // Loading state
+  if (isLoading || shelvesLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-walnut">Loading reading progress...</div>
+      </div>
+    )
   }
 
   return (
@@ -127,7 +168,7 @@ export default function Reading() {
             Active Reading Sessions
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {readingBooks.map((book, index) => {
+            {readingBooks.map((book: Book, index: number) => {
               const readingTime = getReadingTime(book.id)
               return (
                 <motion.div
@@ -192,8 +233,36 @@ export default function Reading() {
         </motion.div>
       )}
 
-      {/* Virtual Bookshelf */}
-      <Bookshelf onAddBook={handleAddBook} filterStatus="reading" />
+      {/* Reading Bookshelf - Only show if there are reading books */}
+      {totalReadingBooks > 0 && (
+        <Bookshelf
+          books={allBooks}
+          shelves={shelves}
+          onAddBook={handleAddBook}
+          filterStatus="reading"
+          selectedBookId={selectedBookId}
+          isDrawerOpen={isBookDetailOpen}
+          onBookClick={handleBookClick}
+        />
+      )}
+
+      {/* Action Buttons */}
+      {totalReadingBooks > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex justify-center mt-8"
+        >
+          <button
+            onClick={() => navigate('/library')}
+            className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            Browse Library
+          </button>
+        </motion.div>
+      )}
 
       {/* Empty State */}
       {totalReadingBooks === 0 && (
@@ -211,6 +280,15 @@ export default function Reading() {
           <p className="text-walnut/70 mb-6">
             Start a new reading journey from your library
           </p>
+          <div className="flex justify-center">
+            <button
+              onClick={() => navigate('/library')}
+              className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              Browse Library
+            </button>
+          </div>
         </motion.div>
       )}
     </div>

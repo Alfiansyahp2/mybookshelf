@@ -2,9 +2,22 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Star, Bookmark, BookOpen, Play, Square, Edit3, Send, Check } from 'lucide-react'
 import { useBookstore } from '../store/useBookstore'
+import { useBook, useUpdateProgress, useToggleFavorite, useUpdateBook, useStartReading, useUpdateNotes, useUpdateRating } from '../hooks/useBooks'
+import { useReadAgain } from '../hooks/useReadingSessions'
 
 export default function BookDetailDrawer() {
-  const { selectedBook, isBookDetailOpen, closeBookDetail, getReadingTime, toggleFavorite, updateProgress, startReading, updatePersonalNotes, updatePersonalRating, borrowBook, returnBook } = useBookstore()
+  const { selectedBookId, isBookDetailOpen, closeBookDetail } = useBookstore()
+  const updateProgress = useUpdateProgress()
+  const toggleFavorite = useToggleFavorite()
+  const updateBook = useUpdateBook()
+  const startReading = useStartReading()
+  const updateNotes = useUpdateNotes()
+  const updateRating = useUpdateRating()
+  const readAgain = useReadAgain()
+
+  // Fetch book details by ID
+  const { data: selectedBook, isLoading } = useBook(selectedBookId || '')
+
   const [liveTime, setLiveTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
   const [isReadingSession, setIsReadingSession] = useState(false)
   const [sessionDuration, setSessionDuration] = useState(0)
@@ -26,15 +39,24 @@ export default function BookDetailDrawer() {
     if (!selectedBook || selectedBook.status !== 'reading') return
 
     const updateTime = () => {
-      const time = getReadingTime(selectedBook.id)
-      setLiveTime(time)
+      if (!selectedBook.startedDate) return
+      const start = new Date(selectedBook.startedDate)
+      const now = new Date()
+      const diff = now.getTime() - start.getTime()
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+      setLiveTime({ days, hours, minutes, seconds })
     }
 
     updateTime()
     const interval = setInterval(updateTime, 1000)
 
     return () => clearInterval(interval)
-  }, [selectedBook, getReadingTime])
+  }, [selectedBook])
 
   // Reading session timer
   useEffect(() => {
@@ -50,7 +72,6 @@ export default function BookDetailDrawer() {
   // Load user rating and notes when book changes
   useEffect(() => {
     if (selectedBook) {
-      // TODO: Load from store or local storage
       setUserRating(selectedBook.personalRating || 0)
       setUserNotes(selectedBook.personalNotes || '')
     }
@@ -68,7 +89,7 @@ export default function BookDetailDrawer() {
     if (selectedBook) {
       setStartingPage(selectedBook.currentPage || 0)
       if (selectedBook.status === 'unread') {
-        startReading(selectedBook.id)
+        startReading.mutate(selectedBook.id)
       }
       setIsReadingSession(true)
     }
@@ -79,12 +100,77 @@ export default function BookDetailDrawer() {
     // Save session logic would go here
     if (selectedBook && sessionDuration > 0) {
       const newPage = startingPage + Math.floor(sessionDuration / 60) // Rough estimate
-      updateProgress(selectedBook.id, newPage)
+      updateProgress.mutate({
+        id: selectedBook.id,
+        currentPage: newPage
+      })
     }
     setSessionDuration(0)
   }
 
-  if (!selectedBook) return null
+  const handleToggleFavorite = () => {
+    if (selectedBook) {
+      toggleFavorite.mutate(selectedBook.id)
+    }
+  }
+
+  const handleUpdateProgress = (currentPage: number) => {
+    if (selectedBook) {
+      updateProgress.mutate({
+        id: selectedBook.id,
+        currentPage: currentPage
+      })
+    }
+  }
+
+  const handleUpdateNotes = () => {
+    if (selectedBook) {
+      updateNotes.mutate({
+        id: selectedBook.id,
+        notes: tempNotes
+      })
+      setUserNotes(tempNotes)
+      setIsEditingNotes(false)
+    }
+  }
+
+  const handleUpdateRating = (rating: number) => {
+    if (selectedBook) {
+      updateRating.mutate({
+        id: selectedBook.id,
+        rating: rating
+      })
+      setUserRating(rating)
+    }
+  }
+
+  const handleBorrowBook = () => {
+    if (selectedBook && borrowerName && dueDate) {
+      updateBook.mutate({
+        id: selectedBook.id,
+        updates: {
+          status: 'borrowed',
+          borrowedBy: borrowerName,
+          borrowedDate: new Date().toISOString(),
+          dueDate: dueDate
+        }
+      })
+      setIsBorrowModalOpen(false)
+      setBorrowerName('')
+      setDueDate('')
+    }
+  }
+
+  const handleReturnBook = () => {
+    if (selectedBook) {
+      updateBook.mutate({
+        id: selectedBook.id,
+        updates: { status: 'unread' }
+      })
+    }
+  }
+
+  if (isLoading || !selectedBook) return null
 
   const isReading = selectedBook.status === 'reading'
   const isFinished = selectedBook.status === 'finished'
@@ -135,7 +221,7 @@ export default function BookDetailDrawer() {
                   transition={{ delay: 0.3, duration: 0.6 }}
                   className="w-full h-72 rounded-lg shadow-2xl flex items-center justify-center relative overflow-hidden"
                   style={{
-                    background: `linear-gradient(135deg, ${selectedBook.spineColors[0]} 0%, ${selectedBook.spineColors[2]} 100%)`
+                    background: `linear-gradient(135deg, ${selectedBook.spineColors?.[0] || '#8B7355'} 0%, ${selectedBook.spineColors?.[2] || '#5C4532'} 100%)`
                   }}
                 >
                   <div className="text-white text-center p-4 z-10">
@@ -162,17 +248,18 @@ export default function BookDetailDrawer() {
 
                 {/* Favorite Button */}
                 <button
-                  onClick={() => toggleFavorite(selectedBook.id)}
-                  className="mb-6 w-12 h-12 flex items-center justify-center rounded-lg transition-all hover:scale-110"
+                  onClick={handleToggleFavorite}
+                  disabled={toggleFavorite.isPending}
+                  className="mb-6 w-12 h-12 flex items-center justify-center rounded-lg transition-all hover:scale-110 disabled:opacity-50"
                   style={{
-                    backgroundColor: selectedBook.favorite ? 'rgba(251, 191, 36, 0.1)' : 'rgba(122, 92, 66, 0.1)',
-                    color: selectedBook.favorite ? '#D97706' : '#7A5C42'
+                    backgroundColor: selectedBook.isFavorite ? 'rgba(251, 191, 36, 0.1)' : 'rgba(122, 92, 66, 0.1)',
+                    color: selectedBook.isFavorite ? '#D97706' : '#7A5C42'
                   }}
-                  title={selectedBook.favorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                  title={selectedBook.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
                 >
                   <Star
                     size={24}
-                    fill={selectedBook.favorite ? 'currentColor' : 'none'}
+                    fill={selectedBook.isFavorite ? 'currentColor' : 'none'}
                   />
                 </button>
 
@@ -184,58 +271,21 @@ export default function BookDetailDrawer() {
                   </div>
                   <div>
                     <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">Genre</div>
-                    <div className="font-medium text-darkBrown">{selectedBook.genre}</div>
-                  </div>
-                  <div>
-                    <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">Publisher</div>
-                    <div className="font-medium text-darkBrown">{selectedBook.publisher}</div>
+                    <div className="font-medium text-darkBrown">{selectedBook.genre || 'N/A'}</div>
                   </div>
                   <div>
                     <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">Year</div>
-                    <div className="font-medium text-darkBrown">{selectedBook.publishYear}</div>
+                    <div className="font-medium text-darkBrown">{selectedBook.publishedYear}</div>
                   </div>
                   <div>
                     <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">Pages</div>
-                    <div className="font-medium text-darkBrown">{selectedBook.pages}</div>
-                  </div>
-                  <div>
-                    <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">Format</div>
-                    <div className="font-medium text-darkBrown capitalize">{selectedBook.format}</div>
+                    <div className="font-medium text-darkBrown">{selectedBook.totalPages || selectedBook.pages || 'N/A'}</div>
                   </div>
                   <div className="col-span-2">
                     <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">ISBN</div>
-                    <div className="font-medium text-darkBrown font-mono text-xs">{selectedBook.isbn}</div>
+                    <div className="font-medium text-darkBrown font-mono text-xs">{selectedBook.isbn || 'N/A'}</div>
                   </div>
                 </div>
-
-                {/* Purchase Info */}
-                {selectedBook.purchaseDate && (
-                  <div className="pt-4 border-t border-walnut/10">
-                    <div className="text-xs text-walnut/60 uppercase tracking-wide mb-3">Purchase Information</div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-walnut/60">Date</span>
-                        <span className="font-medium text-darkBrown">
-                          {new Date(selectedBook.purchaseDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                      {selectedBook.purchasePrice && (
-                        <div className="flex justify-between">
-                          <span className="text-walnut/60">Price</span>
-                          <span className="font-medium text-darkBrown">
-                            ${selectedBook.purchasePrice}
-                          </span>
-                        </div>
-                      )}
-                      {selectedBook.purchaseLocation && (
-                        <div className="flex justify-between">
-                          <span className="text-walnut/60">Location</span>
-                          <span className="font-medium text-darkBrown">{selectedBook.purchaseLocation}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 {/* Personal Rating Section */}
                 <div className="pt-4 border-t border-walnut/10">
@@ -244,13 +294,9 @@ export default function BookDetailDrawer() {
                     {[1, 2, 3, 4, 5].map((rating) => (
                       <button
                         key={rating}
-                        onClick={() => {
-                          setUserRating(rating)
-                          if (selectedBook) {
-                            updatePersonalRating(selectedBook.id, rating)
-                          }
-                        }}
-                        className="transition-transform hover:scale-110"
+                        onClick={() => handleUpdateRating(rating)}
+                        disabled={updateBook.isPending}
+                        className="transition-transform hover:scale-110 disabled:opacity-50"
                       >
                         <Star
                           size={20}
@@ -288,14 +334,9 @@ export default function BookDetailDrawer() {
                     ) : (
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => {
-                            setUserNotes(tempNotes)
-                            setIsEditingNotes(false)
-                            if (selectedBook) {
-                              updatePersonalNotes(selectedBook.id, tempNotes)
-                            }
-                          }}
-                          className="text-xs text-green-600 hover:text-green-700 font-medium"
+                          onClick={handleUpdateNotes}
+                          disabled={updateBook.isPending}
+                          className="text-xs text-green-600 hover:text-green-700 font-medium disabled:opacity-50"
                         >
                           Save
                         </button>
@@ -349,7 +390,7 @@ export default function BookDetailDrawer() {
                       <div>
                         <div className="font-semibold text-darkBrown">Currently Reading</div>
                         <div className="text-sm text-walnut/60">
-                          Since {new Date(selectedBook.startedDate!).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          Since {selectedBook.startedDate ? new Date(selectedBook.startedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recently'}
                         </div>
                       </div>
                     </div>
@@ -404,7 +445,7 @@ export default function BookDetailDrawer() {
                           </div>
                           <div>
                             <div className="text-walnut/60 text-xs">Current Page</div>
-                            <div className="font-medium text-darkBrown">{selectedBook.currentPage}</div>
+                            <div className="font-medium text-darkBrown">{selectedBook.currentPage || 0}</div>
                           </div>
                         </div>
                       )}
@@ -414,25 +455,25 @@ export default function BookDetailDrawer() {
                     <div className="bg-white rounded-2xl p-6 mb-6 border border-walnut/10 shadow-sm">
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-medium text-darkBrown">Reading Progress</span>
-                        <span className="text-sm font-bold text-walnut">{selectedBook.progress}%</span>
+                        <span className="text-sm font-bold text-walnut">{Math.round((selectedBook.currentPage || 0) / (selectedBook.totalPages || selectedBook.pages || 1) * 100)}%</span>
                       </div>
 
                       <div className="h-3 bg-walnut/20 rounded-full overflow-hidden mb-3">
                         <motion.div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
-                            width: `${selectedBook.progress}%`,
-                            background: `linear-gradient(90deg, ${selectedBook.spineColors[0]}, ${selectedBook.spineColors[2]})`
+                            width: `${Math.round((selectedBook.currentPage || 0) / (selectedBook.totalPages || selectedBook.pages || 1) * 100)}%`,
+                            background: `linear-gradient(90deg, ${selectedBook.spineColors?.[0] || '#8B7355'}, ${selectedBook.spineColors?.[2] || '#5C4532'})`
                           }}
                           initial={{ width: 0 }}
-                          animate={{ width: `${selectedBook.progress}%` }}
+                          animate={{ width: `${Math.round((selectedBook.currentPage || 0) / (selectedBook.totalPages || selectedBook.pages || 1) * 100)}%` }}
                           transition={{ duration: 0.5 }}
                         />
                       </div>
 
                       <div className="flex items-center justify-between text-xs text-walnut/60">
-                        <span>Page {selectedBook.currentPage}</span>
-                        <span>of {selectedBook.pages}</span>
+                        <span>Page {selectedBook.currentPage || 0}</span>
+                        <span>of {selectedBook.totalPages || selectedBook.pages || 'N/A'}</span>
                       </div>
 
                       {/* Progress Slider */}
@@ -441,10 +482,11 @@ export default function BookDetailDrawer() {
                         <input
                           type="range"
                           min="0"
-                          max={selectedBook.pages}
+                          max={selectedBook.totalPages || selectedBook.pages || 0}
                           value={selectedBook.currentPage || 0}
-                          onChange={(e) => updateProgress(selectedBook.id, parseInt(e.target.value))}
-                          className="w-full"
+                          onChange={(e) => handleUpdateProgress(parseInt(e.target.value))}
+                          disabled={updateProgress.isPending}
+                          className="w-full disabled:opacity-50"
                         />
                       </div>
                     </div>
@@ -476,14 +518,14 @@ export default function BookDetailDrawer() {
                       <div>
                         <div className="font-semibold text-xl text-darkBrown">Finished</div>
                         <div className="text-sm text-walnut/60">
-                          {new Date(selectedBook.finishedDate!).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          {selectedBook.finishedDate ? new Date(selectedBook.finishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recently'}
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-4">
                       <div className="text-sm text-walnut/70">
-                        You completed this {selectedBook.pages}-page journey.
+                        You completed this {selectedBook.totalPages || selectedBook.pages || 0}-page journey.
                       </div>
 
                       {/* Reading Time Summary */}
@@ -499,8 +541,16 @@ export default function BookDetailDrawer() {
                     </div>
 
                     <div className="flex gap-3 mt-6">
-                      <button className="flex-1 py-4 bg-walnut text-white rounded-xl hover:bg-darkBrown transition-all hover:scale-105 flex items-center justify-center" title="Read Again">
+                      <button
+                        onClick={() => selectedBook && readAgain.mutate(selectedBook.id)}
+                        disabled={readAgain.isPending}
+                        className="flex-1 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Read Again"
+                      >
                         <BookOpen size={24} />
+                        <span className="text-sm font-medium">
+                          {readAgain.isPending ? 'Starting...' : 'Read Again'}
+                        </span>
                       </button>
                       <button
                         onClick={() => setIsBorrowModalOpen(true)}
@@ -527,13 +577,13 @@ export default function BookDetailDrawer() {
                       </div>
                       <div>
                         <div className="font-semibold text-xl text-darkBrown">Start Reading</div>
-                        <div className="text-sm text-walnut/60">{selectedBook.pages} pages waiting</div>
+                        <div className="text-sm text-walnut/60">{selectedBook.totalPages || selectedBook.pages || 0} pages waiting</div>
                       </div>
                     </div>
 
                     <div className="flex gap-3">
                       <button
-                        onClick={() => startReading(selectedBook.id)}
+                        onClick={handleStartReading}
                         className="flex-1 py-4 bg-walnut text-white rounded-xl hover:bg-darkBrown transition-all hover:scale-105 flex items-center justify-center"
                         title="Start Reading"
                       >
@@ -572,13 +622,13 @@ export default function BookDetailDrawer() {
                       <div className="flex justify-between">
                         <span className="text-walnut/60">Borrowed</span>
                         <span className="font-medium text-darkBrown">
-                          {new Date(selectedBook.borrowedDate!).toLocaleDateString()}
+                          {selectedBook.borrowedDate ? new Date(selectedBook.borrowedDate).toLocaleDateString() : 'N/A'}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-walnut/60">Due Date</span>
                         <span className="font-medium text-darkBrown">
-                          {new Date(selectedBook.dueDate!).toLocaleDateString()}
+                          {selectedBook.dueDate ? new Date(selectedBook.dueDate).toLocaleDateString() : 'N/A'}
                         </span>
                       </div>
                     </div>
@@ -588,12 +638,9 @@ export default function BookDetailDrawer() {
                         <Send size={22} />
                       </button>
                       <button
-                        onClick={() => {
-                          if (selectedBook) {
-                            returnBook(selectedBook.id)
-                          }
-                        }}
-                        className="flex-1 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all hover:scale-105 flex items-center justify-center"
+                        onClick={handleReturnBook}
+                        disabled={updateBook.isPending}
+                        className="flex-1 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all hover:scale-105 flex items-center justify-center disabled:opacity-50"
                         title="Mark Returned"
                       >
                         <Check size={22} />
@@ -672,15 +719,8 @@ export default function BookDetailDrawer() {
                           Cancel
                         </button>
                         <button
-                          onClick={() => {
-                            if (selectedBook && borrowerName && dueDate) {
-                              borrowBook(selectedBook.id, borrowerName, dueDate)
-                              setIsBorrowModalOpen(false)
-                              setBorrowerName('')
-                              setDueDate('')
-                            }
-                          }}
-                          disabled={!borrowerName || !dueDate}
+                          onClick={handleBorrowBook}
+                          disabled={!borrowerName || !dueDate || updateBook.isPending}
                           className="flex-1 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Confirm Borrow

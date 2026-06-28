@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Upload, BookOpen, Calendar, Hash, FileText, Globe, Package } from 'lucide-react'
 import { useState } from 'react'
+import { useCreateBook } from '../hooks/useBooks'
 
 interface AddBookModalProps {
   isOpen: boolean
@@ -10,6 +11,8 @@ interface AddBookModalProps {
 }
 
 export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: AddBookModalProps) {
+  const createBook = useCreateBook()
+
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -30,26 +33,50 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
     giftFrom: ''
   })
 
-  // Predefined color palettes
-  const colorPalettes = [
-    { name: 'Classic Brown', colors: ['#8B7355', '#6B5344', '#5C4532'] },
-    { name: 'Navy Blue', colors: ['#1E3A5F', '#2A4A7F', '#3D5A8F'] },
-    { name: 'Forest Green', colors: ['#2D5A3D', '#3A7B4F', '#4A8B5F'] },
-    { name: 'Burgundy Red', colors: ['#7A1C1C', '#9B2C2C', '#BF3E3E'] },
-    { name: 'Royal Purple', colors: ['#4A2374', '#6B3491', '#8B45AB'] },
-    { name: 'Charcoal Gray', colors: ['#2C3E50', '#34495E', '#4A5A6A'] },
-    { name: 'Ocean Blue', colors: ['#1A5F7A', '#2E86AB', '#4793AF'] },
-    { name: 'Sunset Orange', colors: ['#D4621A', '#E67E22', '#F39C12'] },
-    { name: 'Forest Green', colors: ['#27AE60', '#2ECC71', '#58D68D'] },
-    { name: 'Custom', colors: ['#8B7355', '#6B5344', '#5C4532'] }
-  ]
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Add book:', formData, 'to shelf:', shelfId)
-    // TODO: Implement actual add book logic
-    alert(`Book added to ${shelfName || 'library'}!`)
+
+    if (!shelfId) {
+      alert('Please select a shelf first')
+      return
+    }
+
+    // Create book object for API
+    const bookData = {
+      title: formData.title,
+      author: formData.author,
+      shelfId: shelfId,
+      status: 'unread' as const,
+      totalPages: formData.pages,
+      currentPage: 0,
+      isbn: formData.isbn,
+      publishedYear: formData.publishYear,
+      notes: `${formData.publisher ? `Publisher: ${formData.publisher}` : ''}\n${formData.isGift ? `Gift from: ${formData.giftFrom}` : `Purchased for: $${formData.purchasePrice}`}`,
+    }
+
+    createBook.mutate(bookData)
+    console.log('Book added successfully')
     onClose()
+    // Reset form
+    setFormData({
+      title: '',
+      author: '',
+      isbn: '',
+      genre: '',
+      publisher: '',
+      publishYear: new Date().getFullYear(),
+      pages: 0,
+      format: 'paperback',
+      height: 'medium',
+      thickness: 'regular',
+      color1: '#8B7355',
+      color2: '#6B5344',
+      color3: '#5C4532',
+      purchaseDate: new Date().toISOString().split('T')[0],
+      purchasePrice: '',
+      isGift: false,
+      giftFrom: ''
+    })
   }
 
   if (!isOpen) return null
@@ -441,10 +468,17 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                 <button
                   type="submit"
                   onClick={handleSubmit}
-                  className="px-6 py-2.5 bg-walnut text-white rounded-xl text-sm font-medium hover:bg-darkBrown transition-colors flex items-center gap-2"
+                  disabled={createBook.isPending}
+                  className="px-6 py-2.5 bg-walnut text-white rounded-xl text-sm font-medium hover:bg-darkBrown transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <BookOpen className="w-4 h-4" />
-                  Add Book
+                  {createBook.isPending ? (
+                    <>Adding...</>
+                  ) : (
+                    <>
+                      <BookOpen className="w-4 h-4" />
+                      Add Book
+                    </>
+                  )}
                 </button>
               </div>
             </motion.div>
@@ -454,3 +488,17 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
     </AnimatePresence>
   )
 }
+
+// Predefined color palettes
+const colorPalettes = [
+  { name: 'Classic Brown', colors: ['#8B7355', '#6B5344', '#5C4532'] },
+  { name: 'Navy Blue', colors: ['#1E3A5F', '#2A4A7F', '#3D5A8F'] },
+  { name: 'Forest Green', colors: ['#2D5A3D', '#3A7B4F', '#4A8B5F'] },
+  { name: 'Burgundy Red', colors: ['#7A1C1C', '#9B2C2C', '#BF3E3E'] },
+  { name: 'Royal Purple', colors: ['#4A2374', '#6B3491', '#8B45AB'] },
+  { name: 'Charcoal Gray', colors: ['#2C3E50', '#34495E', '#4A5A6A'] },
+  { name: 'Ocean Blue', colors: ['#1A5F7A', '#2E86AB', '#4793AF'] },
+  { name: 'Sunset Orange', colors: ['#D4621A', '#E67E22', '#F39C12'] },
+  { name: 'Emerald Green', colors: ['#27AE60', '#2ECC71', '#58D68D'] },
+  { name: 'Custom', colors: ['#8B7355', '#6B5344', '#5C4532'] }
+]

@@ -1,33 +1,33 @@
-import { useState, useEffect } from 'react'
-import { useBookstore } from '../store/useBookstore'
 import Shelf from './Shelf'
-import type { Book } from '../types'
-import { mockShelves } from '../utils/mockData'
-
-// Get the type from the component props
-type ShelfType = React.ComponentProps<typeof Shelf>['shelf']
+import type { Book, Shelf as ShelfType } from '../types'
 
 interface BookshelfProps {
+  books: Book[]
+  shelves: ShelfType[]
   onAddBook?: (shelfId: string, shelfName?: string) => void
+  onEditShelf?: (shelfId: string) => void
+  onDeleteShelf?: (shelfId: string) => void
   filterStatus?: string
+  selectedBookId?: string | null
+  isDrawerOpen?: boolean
+  onBookClick?: (book: Book) => void
 }
 
-export default function Bookshelf({ onAddBook, filterStatus }: BookshelfProps) {
-  const { books, toggleBookDetail, isBookDetailOpen, selectedBookId, shelves, moveBookToShelf } = useBookstore()
-  const [localShelves, setLocalShelves] = useState(shelves.length > 0 ? shelves : mockShelves)
-
-  // Update local shelves when store shelves change
-  useEffect(() => {
-    if (shelves.length > 0) {
-      setLocalShelves(shelves)
-    }
-  }, [shelves])
+export default function Bookshelf({
+  books,
+  shelves,
+  onAddBook,
+  filterStatus,
+  selectedBookId,
+  isDrawerOpen = false,
+  onBookClick
+}: BookshelfProps) {
 
   // Distribute books across shelves
   const distributeBooksAcrossShelves = (): Map<string, Book[]> => {
     const distribution = new Map<string, Book[]>()
 
-    localShelves.forEach((shelf) => {
+    shelves.forEach((shelf) => {
       distribution.set(shelf.id, [])
     })
 
@@ -55,12 +55,17 @@ export default function Bookshelf({ onAddBook, filterStatus }: BookshelfProps) {
 
   const booksDistribution = distributeBooksAcrossShelves()
 
-  console.log('Bookshelf rendered - Total books:', books.length)
-  console.log('Books distribution:', Array.from(booksDistribution.entries()))
+  // Filter shelves to only show those with books when filterStatus is active
+  const visibleShelves = filterStatus
+    ? shelves.filter((shelf) => {
+        const booksOnShelf = booksDistribution.get(shelf.id) || []
+        return booksOnShelf.length > 0
+      })
+    : shelves
 
   const handleBookClick = (book: Book) => {
     console.log('Book clicked:', book.title)
-    toggleBookDetail(book.id)
+    onBookClick?.(book)
   }
 
   const handleAddBook = (shelfId: string) => {
@@ -69,15 +74,13 @@ export default function Bookshelf({ onAddBook, filterStatus }: BookshelfProps) {
   }
 
   const handleEditShelf = (shelfId: string) => {
-    console.log('Edit shelf:', shelfId)
-    // TODO: Implement edit shelf functionality
-    alert(`Edit shelf: ${shelfId}\n\nThis will open the edit shelf form.`)
+    // Dispatch custom event for AppLayout to handle
+    window.dispatchEvent(new CustomEvent('editShelf', { detail: { shelfId } }))
   }
 
   const handleDeleteShelf = (shelfId: string) => {
-    console.log('Delete shelf:', shelfId)
-    // TODO: Implement delete shelf functionality
-    alert(`Delete shelf: ${shelfId}\n\nThis will delete the shelf and move all books to another shelf.`)
+    // Dispatch custom event for AppLayout to handle
+    window.dispatchEvent(new CustomEvent('deleteShelf', { detail: { shelfId } }))
   }
 
   return (
@@ -105,7 +108,7 @@ export default function Bookshelf({ onAddBook, filterStatus }: BookshelfProps) {
         }}
       />
 
-      {localShelves.map((shelf) => (
+      {visibleShelves.map((shelf) => (
         <Shelf
           key={shelf.id}
           shelf={shelf}
@@ -114,7 +117,7 @@ export default function Bookshelf({ onAddBook, filterStatus }: BookshelfProps) {
           onAddBook={handleAddBook}
           onEditShelf={handleEditShelf}
           onDeleteShelf={handleDeleteShelf}
-          isDrawerOpen={isBookDetailOpen}
+          isDrawerOpen={isDrawerOpen}
           selectedBookId={selectedBookId}
         />
       ))}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useBookstore } from '../store/useBookstore'
+import { useBooks } from '../hooks/useBooks'
 import { motion } from 'framer-motion'
 import {
   Trophy,
@@ -31,7 +31,10 @@ interface Achievement {
 }
 
 export default function Achievements() {
-  const { books, getBooksByStatus } = useBookstore()
+  // Fetch all books from API
+  const { data: allBooksResponse, isLoading } = useBooks({})
+  const { data: finishedBooksResponse } = useBooks({ status: 'finished' })
+
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [stats, setStats] = useState({
     totalBooks: 0,
@@ -42,13 +45,15 @@ export default function Achievements() {
     genresRead: new Set<string>()
   })
 
+  const allBooks = allBooksResponse?.data?.data || []
+  const finishedBooks = finishedBooksResponse?.data?.data || []
+
   useEffect(() => {
     // Calculate statistics
-    const finishedBooks = getBooksByStatus('finished')
-    const totalBooks = books.length
+    const totalBooks = allBooks.length
     const totalPagesRead = finishedBooks.reduce((sum, book) => sum + (book.pages || 0), 0)
-    const favoriteBooks = books.filter(b => b.favorite).length
-    const genresRead = new Set(books.map(b => b.genre))
+    const favoriteBooks = allBooks.filter(b => b.favorite).length
+    const genresRead = new Set(allBooks.map(b => b.genre))
 
     setStats({
       totalBooks,
@@ -186,7 +191,16 @@ export default function Achievements() {
     }
 
     setAchievements(generateAchievements())
-  }, [books, getBooksByStatus])
+  }, [allBooks, finishedBooks])
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-walnut">Loading achievements...</div>
+      </div>
+    )
+  }
 
   const unlockedCount = achievements.filter(a => a.unlocked).length
   const lockedCount = achievements.length - unlockedCount

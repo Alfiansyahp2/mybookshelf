@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyBookshelf API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .info { background: #d1ecf1; border-color: #bee5eb; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .book-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .book-title { font-weight: bold; margin-bottom: 5px; }
+        .book-author { color: #666; font-size: 14px; }
+        .book-rating { color: #ffc107; }
+        .book-notes {
+            font-size: 12px;
+            color: #555;
+            margin-top: 8px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚚 MyBookshelf API Test</h1>
+
+    <div class="section info">
+        <h3>📡 Connection Info</h3>
+        <p><strong>Backend API:</strong> http://127.0.0.1:8000/api</p>
+        <p><strong>Frontend:</strong> http://localhost:5175</p>
+        <p><strong>Status:</strong> <span id="connectionStatus">Testing...</span></p>
+    </div>
+
+    <div class="section">
+        <h3>🔑 Authentication</h3>
+        <input type="email" id="email" value="test@example.com" placeholder="Email">
+        <input type="password" id="password" value="password" placeholder="Password">
+        <button class="btn-primary" onclick="login()">Login</button>
+        <div id="authResult"></div>
+    </div>
+
+    <div class="section" id="booksSection" style="display: none;">
+        <h3>📚 Books API</h3>
+        <button class="btn-success" onclick="fetchBooks()">Fetch Books</button>
+        <div id="booksResult"></div>
+        <div id="booksGrid" class="book-grid"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+        let authToken = null;
+
+        // Test connection
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    document.getElementById('connectionStatus').innerHTML = '✅ Connected';
+                    document.getElementById('connectionStatus').style.color = 'green';
+                } else {
+                    throw new Error('Connection failed');
+                }
+            } catch (error) {
+                document.getElementById('connectionStatus').innerHTML = '❌ Failed: ' + error.message;
+                document.getElementById('connectionStatus').style.color = 'red';
+            }
+        }
+
+        // Login
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authToken = data.data.token;
+                    localStorage.setItem('auth_token', authToken);
+
+                    document.getElementById('authResult').innerHTML = `
+                        <div class="success">
+                            <p>✅ Login Successful!</p>
+                            <pre>${JSON.stringify(data.data.user, null, 2)}</pre>
+                            <p><strong>Token:</strong> ${authToken.substring(0, 20)}...</p>
+                        </div>
+                    `;
+                    document.getElementById('booksSection').style.display = 'block';
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                document.getElementById('authResult').innerHTML = `
+                    <div class="error">
+                        <p>❌ Login Failed: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Fetch books
+        async function fetchBooks() {
+            if (!authToken) {
+                alert('Please login first!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/v1/books`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const books = data.data.data || data.data;
+
+                    document.getElementById('booksResult').innerHTML = `
+                        <div class="success">
+                            <p>✅ Found ${books.length} books!</p>
+                            <p><strong>Page:</strong> ${data.data.current_page || 1}</p>
+                            <p><strong>Total:</strong> ${data.data.meta?.total || books.length}</p>
+                        </div>
+                    `;
+
+                    // Display books as cards
+                    const booksGrid = document.getElementById('booksGrid');
+                    booksGrid.innerHTML = books.map(book => `
+                        <div class="book-card">
+                            <div class="book-title">${book.title}</div>
+                            <div class="book-author">by ${book.author}</div>
+                            <div style="margin: 8px 0;">
+                                <strong>Status:</strong> ${book.status}
+                                ${book.favorite ? ' ❤️' : ''}
+                            </div>
+                            ${book.personal_rating ? `
+                                <div class="book-rating">
+                                    Rating: ${'★'.repeat(Math.floor(book.personal_rating))}${'☆'.repeat(5 - Math.floor(book.personal_rating))} (${book.personal_rating})
+                                </div>
+                            ` : ''}
+                            ${book.personal_notes ? `
+                                <div class="book-notes">
+                                    <strong>Notes:</strong> ${book.personal_notes.substring(0, 150)}...
+                                </div>
+                            ` : ''}
+                            <div style="margin-top: 8px; font-size: 12px; color: #999;">
+                                📖 ${book.pages} pages | 📅 ${book.publish_year} | 🏷️ ${book.genre || 'N/A'}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                document.getElementById('booksResult').innerHTML = `
+                    <div class="error">
+                        <p>❌ Failed to fetch books: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-test connection on load
+        testConnection();
+
+        // Check if already logged in
+        const savedToken = localStorage.getItem('auth_token');
+        if (savedToken) {
+            authToken = savedToken;
+            document.getElementById('authResult').innerHTML = `
+                <div class="success">
+                    <p>✅ Using saved token: ${savedToken.substring(0, 20)}...</p>
+                </div>
+            `;
+            document.getElementById('booksSection').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

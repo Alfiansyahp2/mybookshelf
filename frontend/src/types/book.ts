@@ -25,6 +25,7 @@ export interface Book {
   // Status & Progress
   status: BookStatus
   favorite: boolean
+  isFavorite: boolean // Alias for favorite
   currentPage?: number
   progress?: number
 

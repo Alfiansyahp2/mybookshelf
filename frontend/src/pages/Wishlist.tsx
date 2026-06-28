@@ -1,5 +1,10 @@
+import { useBooks } from '../hooks/useBooks'
+import { useShelves } from '../hooks/useShelves'
+import { useStartReading } from '../hooks/useBooks'
+import { useNavigate } from 'react-router-dom'
 import { useBookstore } from '../store/useBookstore'
 import Bookshelf from '../components/Bookshelf'
+import type { Book } from '../types'
 import { motion } from 'framer-motion'
 import {
   ShoppingCart,
@@ -7,25 +12,48 @@ import {
   Clock,
   BookOpen,
   Target,
-  Gift
+  Gift,
+  Plus
 } from 'lucide-react'
 
 export default function Wishlist() {
-  const { getBooksByStatus, startReading } = useBookstore()
+  const navigate = useNavigate()
+  const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
 
-  const wishlistBooks = getBooksByStatus('wishlist')
+  // Fetch all books and shelves from API
+  const { data: allBooksResponse, isLoading } = useBooks({})
+  const { data: shelves = [], isLoading: shelvesLoading } = useShelves()
+  const startReadingMutation = useStartReading()
+
+  const allBooks = allBooksResponse?.data?.data || []
+  const wishlistBooks = allBooks.filter((book: Book) => book.status === 'wishlist')
 
   // Calculate wishlist statistics
   const totalWishlist = wishlistBooks.length
-  const estimatedPages = wishlistBooks.reduce((sum, book) => sum + (book.pages || 0), 0)
+  const estimatedPages = wishlistBooks.reduce((sum: number, book: Book) => sum + (book.pages || 0), 0)
   const estimatedHours = Math.round(estimatedPages / 30) // Assuming 30 pages per hour
 
-  const handleAddBook = (shelfId: string) => {
-    console.log('Add book to shelf:', shelfId)
+  const handleStartReading = (bookId: string) => {
+    startReadingMutation.mutate(bookId)
   }
 
-  const handleStartReading = (bookId: string) => {
-    startReading(bookId)
+  const handleBookClick = (book: any) => {
+    setSelectedBookId(book.id)
+    toggleBookDetail(book.id)
+  }
+
+  const handleAddBook = (shelfId: string, shelfName?: string) => {
+    console.log('Add book to shelf:', shelfId, shelfName)
+    // TODO: Implement add book functionality
+  }
+
+  // Loading state
+  if (isLoading || shelvesLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-walnut">Loading wishlist...</div>
+      </div>
+    )
   }
 
   return (
@@ -129,7 +157,7 @@ export default function Wishlist() {
             Your Reading Queue
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {wishlistBooks.map((book, index) => {
+            {wishlistBooks.map((book: Book, index: number) => {
               const estimatedTime = Math.round((book.pages || 0) / 30)
               return (
                 <motion.div
@@ -189,8 +217,36 @@ export default function Wishlist() {
         </motion.div>
       )}
 
-      {/* Virtual Bookshelf */}
-      <Bookshelf onAddBook={handleAddBook} filterStatus="wishlist" />
+      {/* Wishlist Bookshelf - Only show if there are wishlist books */}
+      {totalWishlist > 0 && (
+        <Bookshelf
+          books={allBooks}
+          shelves={shelves}
+          onAddBook={handleAddBook}
+          filterStatus="wishlist"
+          selectedBookId={selectedBookId}
+          isDrawerOpen={isBookDetailOpen}
+          onBookClick={handleBookClick}
+        />
+      )}
+
+      {/* Action Buttons */}
+      {totalWishlist > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex justify-center mt-8"
+        >
+          <button
+            onClick={() => navigate('/library')}
+            className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            Browse Library
+          </button>
+        </motion.div>
+      )}
 
       {/* Empty State */}
       {totalWishlist === 0 && (
@@ -209,10 +265,16 @@ export default function Wishlist() {
             Save books you want to read later
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors">
+            <button
+              onClick={() => navigate('/library')}
+              className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors"
+            >
               Browse Library
             </button>
-            <button className="px-6 py-3 bg-white text-walnut rounded-xl font-medium hover:bg-walnut/10 transition-colors border border-walnut/20">
+            <button
+              onClick={() => navigate('/library')}
+              className="px-6 py-3 bg-white text-walnut rounded-xl font-medium hover:bg-walnut/10 transition-colors border border-walnut/20"
+            >
               Add to Wishlist
             </button>
           </div>

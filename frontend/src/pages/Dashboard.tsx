@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { useBookstore } from '../store/useBookstore'
+import { useBooks } from '../hooks/useBooks'
 import {
   BookOpen,
   Library,
@@ -35,7 +35,9 @@ import {
 } from 'recharts'
 
 export default function Dashboard() {
-  const { books, getBooksByStatus } = useBookstore()
+  const { data: booksResponse, isLoading } = useBooks()
+  const books = booksResponse?.data?.data || []
+
   const [stats, setStats] = useState({
     totalBooks: 0,
     reading: 0,
@@ -61,17 +63,19 @@ export default function Dashboard() {
   })
 
   useEffect(() => {
+    if (!books.length) return
+
     // Calculate all statistics
-    const readingBooks = getBooksByStatus('reading')
-    const finishedBooks = getBooksByStatus('finished')
-    const unreadBooks = getBooksByStatus('unread')
-    const wishlistBooks = getBooksByStatus('wishlist')
-    const borrowedBooks = getBooksByStatus('borrowed')
-    const favoriteBooks = books.filter(b => b.favorite)
+    const readingBooks = books.filter(b => b.status === 'reading')
+    const finishedBooks = books.filter(b => b.status === 'finished')
+    const unreadBooks = books.filter(b => b.status === 'unread')
+    const wishlistBooks = books.filter(b => b.status === 'wishlist')
+    const borrowedBooks = books.filter(b => b.status === 'borrowed')
+    const favoriteBooks = books.filter(b => b.isFavorite)
 
     // Calculate total pages and pages read
-    const totalPages = books.reduce((sum, book) => sum + (book.pages || 0), 0)
-    const pagesRead = finishedBooks.reduce((sum, book) => sum + (book.pages || 0), 0) +
+    const totalPages = books.reduce((sum, book) => sum + (book.totalPages || book.pages || 0), 0)
+    const pagesRead = finishedBooks.reduce((sum, book) => sum + (book.totalPages || book.pages || 0), 0) +
                       readingBooks.reduce((sum, book) => sum + (book.currentPage || 0), 0)
 
     // Calculate books added this month
@@ -139,31 +143,47 @@ export default function Dashboard() {
         .slice(0, 6),
 
       // Area Chart Data - Reading Progress Over Time
-      readingProgress: books.slice(0, 8).map((book) => ({
-        name: book.title.substring(0, 10) + '...',
-        progress: book.progress || 0,
-        pages: book.pages || 0,
-        currentPage: book.currentPage || 0
-      })),
+      readingProgress: books.slice(0, 8).map((book) => {
+        const totalPages = book.totalPages || book.pages || 1
+        const currentPage = book.currentPage || 0
+        const progress = Math.round((currentPage / totalPages) * 100)
+        return {
+          name: book.title.substring(0, 10) + '...',
+          progress,
+          pages: totalPages,
+          currentPage
+        }
+      }),
 
       // Scatter Plot Data - Pages vs Rating
       pageVsRating: books.filter(b => b.personalRating).map(book => ({
-        pages: book.pages,
+        pages: book.totalPages || book.pages || 0,
         rating: book.personalRating,
         title: book.title.substring(0, 15)
       })),
 
       // Candlestick Data - Price vs Pages (Mock trading-like data)
-      priceVsPages: books.slice(0, 6).map((book) => ({
-        name: book.title.substring(0, 8),
-        high: book.pages * 1.2,
-        low: book.pages * 0.8,
-        open: book.pages * 0.9,
-        close: book.pages,
-        volume: Math.floor(Math.random() * 100)
-      }))
+      priceVsPages: books.slice(0, 6).map((book) => {
+        const pages = book.totalPages || book.pages || 0
+        return {
+          name: book.title.substring(0, 8),
+          high: pages * 1.2,
+          low: pages * 0.8,
+          open: pages * 0.9,
+          close: pages,
+          volume: Math.floor(Math.random() * 100)
+        }
+      })
     })
-  }, [books, getBooksByStatus])
+  }, [books])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-walnut">Loading dashboard...</div>
+      </div>
+    )
+  }
 
   const statCards = [
     {

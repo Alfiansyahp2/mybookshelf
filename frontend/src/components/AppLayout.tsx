@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -12,9 +12,14 @@ import {
   LogOut,
   Award
 } from 'lucide-react'
-import BookDetailDrawer from './BookDetailDrawer'
-import AddShelfModal from './AddShelfModal'
+import BookDetailModal from './modals/BookDetailModal'
+import EditBookModal from './modals/EditBookModal'
+import EditShelfModal from './modals/EditShelfModal'
+import AddShelfModal from './modals/AddShelfModal'
 import { useBookstore } from '../store/useBookstore'
+import { useLogout } from '../hooks/useAuth'
+import { useBook, useDeleteBook } from '../hooks/useBooks'
+import { useDeleteShelf, useShelves } from '../hooks/useShelves'
 
 const navItems = [
   { path: '/library', icon: Library, label: 'My Library' },
@@ -24,12 +29,41 @@ const navItems = [
 
 export default function AppLayout() {
   const location = useLocation()
-  const { addShelf } = useBookstore()
+  const navigate = useNavigate()
+  const { selectedBookId, isBookDetailOpen, closeBookDetail } = useBookstore()
+  const logout = useLogout()
+  const deleteBook = useDeleteBook()
+  const deleteShelf = useDeleteShelf()
+
+  // Get shelves data for edit functionality
+  const { data: shelves } = useShelves()
+
+  // Get selected book details for animation
+  const { data: selectedBook } = useBook(selectedBookId || '')
+
+  // Modal states
+  const [isEditBookModalOpen, setIsEditBookModalOpen] = useState(false)
+  const [isEditShelfModalOpen, setIsEditShelfModalOpen] = useState(false)
+  const [selectedShelfForEdit, setSelectedShelfForEdit] = useState<any>(null)
+
   const [isHeaderVisible, setIsHeaderVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isAddShelfModalOpen, setIsAddShelfModalOpen] = useState(false)
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+
+  // Handlers
+  const handleEditBook = () => {
+    setIsEditBookModalOpen(true)
+  }
+
+  const handleDeleteBook = (bookId: string) => {
+    deleteBook.mutate(bookId, {
+      onSuccess: () => {
+        closeBookDetail()
+      }
+    })
+  }
 
   // Handle scroll behavior
   useEffect(() => {
@@ -64,9 +98,46 @@ export default function AppLayout() {
 
   const handleAddShelf = (shelf: any) => {
     console.log('New shelf added:', shelf)
-    // Add shelf to store
-    addShelf(shelf)
     setIsAddShelfModalOpen(false)
+  }
+
+  const handleEditShelf = (shelfId: string) => {
+    const shelf = shelves?.find(s => s.id === shelfId)
+    if (shelf) {
+      setSelectedShelfForEdit(shelf)
+      setIsEditShelfModalOpen(true)
+    }
+  }
+
+  const handleDeleteShelf = (shelfId: string) => {
+    deleteShelf.mutate(shelfId)
+  }
+
+  // Listen for custom edit shelf event from child components
+  useEffect(() => {
+    const handleEditShelfEvent = (event: any) => {
+      handleEditShelf(event.detail.shelfId)
+    }
+
+    const handleDeleteShelfEvent = (event: any) => {
+      handleDeleteShelf(event.detail.shelfId)
+    }
+
+    window.addEventListener('editShelf', handleEditShelfEvent)
+    window.addEventListener('deleteShelf', handleDeleteShelfEvent)
+
+    return () => {
+      window.removeEventListener('editShelf', handleEditShelfEvent)
+      window.removeEventListener('deleteShelf', handleDeleteShelfEvent)
+    }
+  }, [handleEditShelf, handleDeleteShelf])
+
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSuccess: () => {
+        navigate('/login', { replace: true })
+      }
+    })
   }
 
   return (
@@ -263,7 +334,9 @@ export default function AppLayout() {
                         <div className="w-12 h-px bg-walnut/20 my-1"></div>
 
                         <button
-                          className="w-12 h-12 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-all duration-200"
+                          onClick={handleLogout}
+                          disabled={logout.isPending}
+                          className="w-12 h-12 rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-all duration-200 disabled:opacity-50"
                         >
                           <motion.div
                             whileHover={{ rotate: 360, scale: 1.1 }}
@@ -323,8 +396,29 @@ export default function AppLayout() {
         <Outlet />
       </main>
 
-      {/* Book Detail Drawer */}
-      <BookDetailDrawer />
+      {/* Book Detail Modal */}
+      <BookDetailModal
+        book={selectedBook || null}
+        isOpen={isBookDetailOpen}
+        onClose={closeBookDetail}
+        onEdit={handleEditBook}
+        onDelete={handleDeleteBook}
+      />
+
+      {/* Edit Book Modal */}
+      <EditBookModal
+        book={selectedBook || null}
+        isOpen={isEditBookModalOpen}
+        onClose={() => setIsEditBookModalOpen(false)}
+        onDelete={handleDeleteBook}
+      />
+
+      {/* Edit Shelf Modal */}
+      <EditShelfModal
+        shelf={selectedShelfForEdit}
+        isOpen={isEditShelfModalOpen}
+        onClose={() => setIsEditShelfModalOpen(false)}
+      />
 
       {/* Add Shelf Modal */}
       <AddShelfModal

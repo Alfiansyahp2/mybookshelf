@@ -1,19 +1,55 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useBooks } from '../hooks/useBooks'
+import { useShelves } from '../hooks/useShelves'
 import { useBookstore } from '../store/useBookstore'
+import type { Book } from '../types'
 import Bookshelf from '../components/Bookshelf'
 import AddBookModal from '../components/AddBookModal'
-import { mockBooks } from '../utils/mockData'
 
 export default function Library() {
-  console.log('Library component rendering...')
+  // Zustand - UI state only
+  const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
 
-  const { books, addBook, activeFilter, getFilteredBooks } = useBookstore()
+  // API hooks - data fetching
+  const [activeFilter, setActiveFilter] = useState<string>('all')
   const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false)
   const [selectedShelfId, setSelectedShelfId] = useState<string | undefined>()
   const [selectedShelfName, setSelectedShelfName] = useState<string | undefined>()
 
-  console.log('Books:', books.length)
-  console.log('Active filter:', activeFilter)
+  // Fetch books from API based on filter
+  const filterParams = activeFilter === 'all'
+    ? {}
+    : { status: activeFilter as any }
+
+  const { data: booksResponse, isLoading, error } = useBooks(filterParams)
+  const { data: shelves = [], isLoading: shelvesLoading } = useShelves()
+
+  if (isLoading || shelvesLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-walnut">Loading library...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="text-6xl mb-4">⚠️</div>
+        <h3 className="text-xl font-serif text-darkBrown mb-2">Error loading library</h3>
+        <p className="text-walnut/70">Failed to connect to the library. Please try again.</p>
+      </div>
+    )
+  }
+
+  const books = booksResponse?.data?.data || []
+
+  // Calculate counts for each status
+  const allCount = books.length
+  const readingCount = books.filter((b: Book) => b.status === 'reading').length
+  const finishedCount = books.filter((b: Book) => b.status === 'finished').length
+  const unreadCount = books.filter((b: Book) => b.status === 'unread').length
+  const borrowedCount = books.filter((b: Book) => b.status === 'borrowed').length
 
   const handleAddBook = (shelfId: string, shelfName?: string) => {
     setSelectedShelfId(shelfId)
@@ -21,46 +57,44 @@ export default function Library() {
     setIsAddBookModalOpen(true)
   }
 
-  // Initialize mock data on first load
-  useEffect(() => {
-    console.log('useEffect running, books.length:', books.length)
-    if (books.length === 0) {
-      console.log('Adding mock books...')
-      // Add all mock books
-      mockBooks.forEach(book => {
-        addBook(book)
-      })
-    }
-  }, [books.length, addBook])
+  // Shelf edit and delete handlers - these will be handled by Bookshelf component
+  const handleEditShelf = (shelfId: string) => {
+    // Bookshelf component will dispatch the event
+    console.log('Edit shelf triggered from Library:', shelfId)
+  }
 
-  const filteredBooks = getFilteredBooks()
+  const handleDeleteShelf = (shelfId: string) => {
+    // Bookshelf component will dispatch the event
+    console.log('Delete shelf triggered from Library:', shelfId)
+  }
 
-  // Calculate counts for each status
-  const readingCount = books.filter(b => b.status === 'reading').length
-  const finishedCount = books.filter(b => b.status === 'finished').length
-  const unreadCount = books.filter(b => b.status === 'unread').length
-  const borrowedCount = books.filter(b => b.status === 'borrowed').length
+  const handleFilterChange = (filter: string) => {
+    setActiveFilter(filter)
+  }
 
-  console.log('Filtered books:', filteredBooks.length)
+  const handleBookClick = (book: any) => {
+    setSelectedBookId(book.id)
+    toggleBookDetail(book.id)
+  }
 
   return (
     <div className="p-2 md:p-4">
       {/* Filter Buttons */}
       <div className="flex items-center gap-1.5 md:gap-2 mb-3 md:mb-4 overflow-x-auto pb-2">
         <button
-          onClick={() => useBookstore.getState().setActiveFilter('all')}
+          onClick={() => handleFilterChange('all')}
           className={`px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-medium transition-all whitespace-nowrap ${
             activeFilter === 'all'
               ? 'bg-walnut text-white shadow'
               : 'bg-white text-walnut/70 hover:bg-walnut/10 border border-walnut/20'
           }`}
         >
-          All ({books.length})
+          All ({allCount})
         </button>
 
         {/* Reading Filter - Always show */}
         <button
-          onClick={() => useBookstore.getState().setActiveFilter('reading')}
+          onClick={() => handleFilterChange('reading')}
           className={`px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-medium transition-all whitespace-nowrap ${
             activeFilter === 'reading'
               ? 'bg-walnut text-white shadow'
@@ -72,7 +106,7 @@ export default function Library() {
 
         {/* Finished Filter - Always show */}
         <button
-          onClick={() => useBookstore.getState().setActiveFilter('finished')}
+          onClick={() => handleFilterChange('finished')}
           className={`px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-medium transition-all whitespace-nowrap ${
             activeFilter === 'finished'
               ? 'bg-walnut text-white shadow'
@@ -84,7 +118,7 @@ export default function Library() {
 
         {/* Unread Filter - Always show */}
         <button
-          onClick={() => useBookstore.getState().setActiveFilter('unread')}
+          onClick={() => handleFilterChange('unread')}
           className={`px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-medium transition-all whitespace-nowrap ${
             activeFilter === 'unread'
               ? 'bg-walnut text-white shadow'
@@ -97,7 +131,7 @@ export default function Library() {
         {/* Borrowed Filter - Only show if there are borrowed books */}
         {borrowedCount > 0 && (
           <button
-            onClick={() => useBookstore.getState().setActiveFilter('borrowed')}
+            onClick={() => handleFilterChange('borrowed')}
             className={`px-2 md:px-3 py-1.5 md:py-2 rounded-lg text-[10px] md:text-xs font-medium transition-all whitespace-nowrap ${
               activeFilter === 'borrowed'
                 ? 'bg-red-500 text-white shadow'
@@ -110,10 +144,20 @@ export default function Library() {
       </div>
 
       {/* Virtual Bookshelf */}
-      <Bookshelf onAddBook={handleAddBook} />
+      <Bookshelf
+        books={books}
+        shelves={shelves}
+        onAddBook={handleAddBook}
+        onEditShelf={handleEditShelf}
+        onDeleteShelf={handleDeleteShelf}
+        filterStatus={activeFilter === 'all' ? undefined : activeFilter}
+        selectedBookId={selectedBookId}
+        isDrawerOpen={isBookDetailOpen}
+        onBookClick={handleBookClick}
+      />
 
       {/* Empty State */}
-      {filteredBooks.length === 0 && (
+      {books.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16">
           <div className="text-6xl mb-4">📚</div>
           <h3 className="text-xl font-serif text-darkBrown mb-2">No books found</h3>
