@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Play, Pause, Clock, BookOpen, Check, X } from 'lucide-react'
+import { Play, Pause, Clock, BookOpen, Check, X, History } from 'lucide-react'
 import type { Book } from '../../types'
 import { useStartReadingSession, useEndReadingSession, useBookReadingSessions } from '../../hooks/useReadingSessions'
+import ReadingSessionsModal from './ReadingSessionsModal'
 
 interface ReadingSessionTimerProps {
   book: Book
@@ -20,6 +21,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
   const [notes, setNotes] = useState<string>('')
   
   const [hasInitializedSession, setHasInitializedSession] = useState(false)
+  const [isSessionsModalOpen, setIsSessionsModalOpen] = useState(false)
 
   // Mutations/Queries
   const startSessionMutation = useStartReadingSession()
@@ -144,18 +146,35 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
   const readingSpeed = sessionDuration > 0 ? (pagesRead / (sessionDuration / 3600)).toFixed(2) : '0.00'
 
   return (
+    <>
+    <ReadingSessionsModal
+      isOpen={isSessionsModalOpen}
+      onClose={() => setIsSessionsModalOpen(false)}
+      sessionData={sessionData}
+      bookTitle={book.title}
+    />
     <div className="p-3 bg-white rounded-xl border border-walnut/10 shadow-sm">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold text-darkBrown flex items-center gap-2">
           <Clock className="w-4 h-4 text-walnut" />
           Reading Session
         </h3>
-        {isReadingSession && (
-          <div className="text-xs text-walnut/70">
-            <BookOpen className="w-3 h-3 inline mr-1" />
-            {pagesRead} pages
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {isReadingSession && (
+            <div className="text-xs text-walnut/70">
+              <BookOpen className="w-3 h-3 inline mr-1" />
+              {pagesRead} pages
+            </div>
+          )}
+          <button
+            onClick={() => setIsSessionsModalOpen(true)}
+            className="flex items-center gap-1 text-xs text-walnut/70 hover:text-walnut px-2 py-1 rounded-lg hover:bg-walnut/10 transition-all"
+            title="Lihat riwayat sesi membaca"
+          >
+            <History className="w-3.5 h-3.5" />
+            Riwayat
+          </button>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -260,5 +279,6 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
         )}
       </div>
     </div>
+    </>
   )
 }

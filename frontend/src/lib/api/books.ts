@@ -171,7 +171,13 @@ export const booksApi = {
       status: bookData.status || 'unread',
       favorite: false,
       cover_image: bookData.coverImage,
-      position: bookData.position || 0
+      position: bookData.position || 0,
+      // Purchase information
+      purchase_date: bookData.purchaseDate || null,
+      purchase_price: bookData.purchasePrice ?? null,
+      purchase_location: bookData.purchaseLocation || null,
+      // Personal info
+      personal_notes: bookData.personalNotes || null,
     };
 
     const response = await apiClient.post('/v1/books', apiData);
@@ -192,7 +198,7 @@ export const booksApi = {
     if (updates.author) apiData.author = updates.author;
     if (updates.isbn) apiData.isbn = updates.isbn;
     if (updates.genre) apiData.genre = updates.genre;
-    if (updates.publisher) apiData.publisher = updates.publisher;
+    if (updates.publisher !== undefined) apiData.publisher = updates.publisher;
     if (updates.publishYear) apiData.publish_year = updates.publishYear;
     if (updates.pages) apiData.pages = updates.pages;
     if (updates.format) apiData.format = updates.format;
@@ -207,6 +213,16 @@ export const booksApi = {
     if (updates.borrowedDate) apiData.borrowed_date = updates.borrowedDate;
     if (updates.dueDate) apiData.due_date = updates.dueDate;
     if (updates.shelfId) apiData.shelf_id = updates.shelfId;
+    // Purchase information
+    if (updates.purchaseDate !== undefined) apiData.purchase_date = updates.purchaseDate || null;
+    if (updates.purchasePrice !== undefined) apiData.purchase_price = updates.purchasePrice ?? null;
+    if (updates.purchaseLocation !== undefined) apiData.purchase_location = updates.purchaseLocation || null;
+    // Spine colors
+    if (updates.spineColors) {
+      apiData.spine_color_light = updates.spineColors[0];
+      apiData.spine_color_medium = updates.spineColors[1];
+      apiData.spine_color_dark = updates.spineColors[2];
+    }
 
     const response = await apiClient.patch(`/v1/books/${id}`, apiData);
     return {

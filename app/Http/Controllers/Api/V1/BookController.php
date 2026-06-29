@@ -119,6 +119,8 @@ class BookController extends Controller
             'finished_date' => 'nullable|date|after:started_date',
             'purchase_date' => 'nullable|date',
             'purchase_price' => 'nullable|numeric|min:0',
+            'purchase_location' => 'nullable|string|max:255',
+            'personal_notes' => 'nullable|string',
             'rating' => 'nullable|integer|min:1|max:5',
             'notes' => 'nullable|string',
             'shelf_id' => 'nullable|exists:shelves,id',
