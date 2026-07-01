@@ -20,6 +20,9 @@ import { useBookstore } from '../store/useBookstore'
 import { useLogout } from '../hooks/useAuth'
 import { useBook, useDeleteBook } from '../hooks/useBooks'
 import { useDeleteShelf, useShelves } from '../hooks/useShelves'
+import NotificationCenter from './NotificationCenter'
+import ToastContainer from './ui/ToastContainer'
+import { useAchievementTracker } from '../hooks/useAchievementTracker'
 
 const navItems = [
   { path: '/library', icon: Library, label: 'My Library' },
@@ -40,6 +43,9 @@ export default function AppLayout() {
 
   // Get selected book details for animation
   const { data: selectedBook } = useBook(selectedBookId || '')
+
+  // Initialize background achievement tracking
+  useAchievementTracker()
 
   // Modal states
   const [isEditBookModalOpen, setIsEditBookModalOpen] = useState(false)
@@ -228,23 +234,10 @@ export default function AppLayout() {
                 </motion.div>
               </motion.button>
 
-              {/* Notifications - Hide on smallest screens */}
-              <motion.button
-                className="hidden sm:flex relative w-10 h-10 bg-white border border-walnut/20 rounded-xl items-center justify-center hover:border-walnut/40 transition-colors shadow-sm"
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-              >
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                >
-                  <Bell className="w-5 h-5 text-walnut" />
-                </motion.div>
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                  3
-                </span>
-              </motion.button>
+              {/* Notification Center */}
+              <div className="hidden sm:block mt-1.5">
+                <NotificationCenter />
+              </div>
 
               {/* User Profile Dropdown */}
               <div className="relative" ref={profileRef}>
@@ -420,12 +413,16 @@ export default function AppLayout() {
         onClose={() => setIsEditShelfModalOpen(false)}
       />
 
-      {/* Add Shelf Modal */}
-      <AddShelfModal
-        isOpen={isAddShelfModalOpen}
-        onClose={() => setIsAddShelfModalOpen(false)}
-        onShelfAdded={handleAddShelf}
-      />
+      {isAddShelfModalOpen && (
+        <AddShelfModal
+          isOpen={isAddShelfModalOpen}
+          onClose={() => setIsAddShelfModalOpen(false)}
+          onShelfAdded={handleAddShelf}
+        />
+      )}
+
+      {/* Global Toast Notifications */}
+      <ToastContainer />
     </div>
   )
 }

@@ -1,20 +1,11 @@
-import { useEffect, useState } from 'react'
-import { useBooks } from '../hooks/useBooks'
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
+import { useBooks } from '../hooks/useBooks'
+import { useShelves } from '../hooks/useShelves'
+import { useAchievementStore } from '../hooks/useAchievementTracker'
 import {
-  Trophy,
-  Target,
-  BookOpen,
-  Star,
-  Award,
-  Flame,
-  Zap,
-  Heart,
-  Bookmark,
-  BookMarked,
-  Medal,
-  Crown,
-  Sparkles
+  Trophy, BookOpen, Star, Crown, Heart, Sparkles, Layers,
+  Bookmark, CheckCircle, Flame, Shield, Map
 } from 'lucide-react'
 
 interface Achievement {
@@ -22,375 +13,229 @@ interface Achievement {
   title: string
   description: string
   icon: any
-  color: string
+  category: 'milestone' | 'collection' | 'special'
+  target: number
+  progress: number
   unlocked: boolean
-  progress?: number
-  target?: number
-  category: 'milestone' | 'streak' | 'special' | 'goal'
-  unlockedDate?: string
+  color: string
+}
+
+const BRAND = {
+  cream:     '#F8F5F0',
+  walnut:    '#7A5C42',
+  darkBrown: '#4A3B2F',
+  gold:      '#D4A574',
+  beige:     '#E8E0D5',
 }
 
 export default function Achievements() {
-  // Fetch all books from API
-  const { data: allBooksResponse, isLoading } = useBooks({})
-  const { data: finishedBooksResponse } = useBooks({ status: 'finished' })
+  const { data: booksResponse, isLoading } = useBooks()
+  const { data: shelves = [] } = useShelves()
+  const { unlockedIds } = useAchievementStore()
 
-  const [achievements, setAchievements] = useState<Achievement[]>([])
-  const [stats, setStats] = useState({
-    totalBooks: 0,
-    booksRead: 0,
-    totalPagesRead: 0,
-    favoriteBooks: 0,
-    readingStreak: 0,
-    genresRead: new Set<string>()
-  })
+  const books = booksResponse?.data?.data || []
 
-  const allBooks = allBooksResponse?.data?.data || []
-  const finishedBooks = finishedBooksResponse?.data?.data || []
+  // Compute stats
+  const stats = useMemo(() => {
+    const finished = books.filter(b => b.status === 'finished')
+    const wishlist = books.filter(b => b.status === 'wishlist')
+    const favs = books.filter(b => b.favorite || b.isFavorite)
+    const rated = books.filter(b => b.personalRating > 0)
+    const fiveStar = books.filter(b => b.personalRating === 5)
+    const pages = finished.reduce((sum, b) => sum + (b.pages || b.totalPages || 0), 0)
+    const genres = new Set(books.filter(b => b.genre).map(b => b.genre))
 
-  useEffect(() => {
-    // Calculate statistics
-    const totalBooks = allBooks.length
-    const totalPagesRead = finishedBooks.reduce((sum, book) => sum + (book.pages || 0), 0)
-    const favoriteBooks = allBooks.filter(b => b.favorite).length
-    const genresRead = new Set(allBooks.map(b => b.genre))
-
-    setStats({
-      totalBooks,
-      booksRead: finishedBooks.length,
-      totalPagesRead,
-      favoriteBooks,
-      readingStreak: 0, // TODO: Calculate from reading sessions
-      genresRead
-    })
-
-    // Generate achievements based on stats
-    const generateAchievements = (): Achievement[] => {
-      const achievementsList: Achievement[] = []
-
-      // Milestone Achievements
-      achievementsList.push({
-        id: 'first-book',
-        title: 'First Book',
-        description: 'Add your first book to the library',
-        icon: BookOpen,
-        color: 'from-green-500 to-green-600',
-        unlocked: totalBooks >= 1,
-        category: 'milestone'
-      })
-
-      achievementsList.push({
-        id: 'book-collector-10',
-        title: 'Book Collector',
-        description: 'Collect 10 books in your library',
-        icon: Trophy,
-        color: 'from-blue-500 to-blue-600',
-        unlocked: totalBooks >= 10,
-        progress: totalBooks,
-        target: 10,
-        category: 'milestone'
-      })
-
-      achievementsList.push({
-        id: 'book-collector-50',
-        title: 'Serious Collector',
-        description: 'Collect 50 books in your library',
-        icon: Crown,
-        color: 'from-purple-500 to-purple-600',
-        unlocked: totalBooks >= 50,
-        progress: totalBooks,
-        target: 50,
-        category: 'milestone'
-      })
-
-      achievementsList.push({
-        id: 'first-finish',
-        title: 'First Completion',
-        description: 'Finish reading your first book',
-        icon: Target,
-        color: 'from-green-500 to-green-600',
-        unlocked: finishedBooks.length >= 1,
-        category: 'milestone'
-      })
-
-      achievementsList.push({
-        id: 'page-master-1000',
-        title: 'Page Master',
-        description: 'Read 1,000 pages total',
-        icon: BookMarked,
-        color: 'from-indigo-500 to-indigo-600',
-        unlocked: totalPagesRead >= 1000,
-        progress: totalPagesRead,
-        target: 1000,
-        category: 'milestone'
-      })
-
-      achievementsList.push({
-        id: 'page-master-10000',
-        title: 'Reading Marathon',
-        description: 'Read 10,000 pages total',
-        icon: Zap,
-        color: 'from-red-500 to-red-600',
-        unlocked: totalPagesRead >= 10000,
-        progress: totalPagesRead,
-        target: 10000,
-        category: 'milestone'
-      })
-
-      // Special Achievements
-      achievementsList.push({
-        id: 'fan-favorite',
-        title: 'Fan Favorite',
-        description: 'Have 5 books marked as favorites',
-        icon: Heart,
-        color: 'from-pink-500 to-pink-600',
-        unlocked: favoriteBooks >= 5,
-        progress: favoriteBooks,
-        target: 5,
-        category: 'special'
-      })
-
-      achievementsList.push({
-        id: 'genre-explorer',
-        title: 'Genre Explorer',
-        description: 'Read books from 5 different genres',
-        icon: Sparkles,
-        color: 'from-amber-500 to-amber-600',
-        unlocked: genresRead.size >= 5,
-        progress: genresRead.size,
-        target: 5,
-        category: 'special'
-      })
-
-      // Reading Streaks (placeholder for future implementation)
-      achievementsList.push({
-        id: 'reading-streak-7',
-        title: 'Week Warrior',
-        description: 'Read for 7 days in a row',
-        icon: Flame,
-        color: 'from-orange-500 to-orange-600',
-        unlocked: false,
-        progress: stats.readingStreak,
-        target: 7,
-        category: 'streak'
-      })
-
-      achievementsList.push({
-        id: 'reading-streak-30',
-        title: 'Monthly Master',
-        description: 'Read for 30 days in a row',
-        icon: Medal,
-        color: 'from-yellow-500 to-yellow-600',
-        unlocked: false,
-        progress: stats.readingStreak,
-        target: 30,
-        category: 'streak'
-      })
-
-      return achievementsList
+    return {
+      total: books.length,
+      finished: finished.length,
+      wishlist: wishlist.length,
+      favs: favs.length,
+      rated: rated.length,
+      fiveStar: fiveStar.length,
+      pages,
+      genres: genres.size,
+      shelves: shelves.length
     }
+  }, [books, shelves])
 
-    setAchievements(generateAchievements())
-  }, [allBooks, finishedBooks])
+  // Define achievements matching useAchievementTracker
+  const achievementsList: Achievement[] = useMemo(() => [
+    {
+      id: 'first-book', title: 'Langkah Pertama',
+      description: 'Menambahkan buku pertama ke perpustakaan.',
+      icon: BookOpen, category: 'milestone', target: 1, progress: stats.total,
+      unlocked: unlockedIds.includes('first-book'), color: '#3b82f6'
+    },
+    {
+      id: 'kutu-buku-1', title: 'Kutu Buku Pemula',
+      description: 'Menyelesaikan 5 buku.',
+      icon: CheckCircle, category: 'milestone', target: 5, progress: stats.finished,
+      unlocked: unlockedIds.includes('kutu-buku-1'), color: '#10b981'
+    },
+    {
+      id: 'kutu-buku-2', title: 'Kutu Buku Pro',
+      description: 'Menyelesaikan 20 buku.',
+      icon: Trophy, category: 'milestone', target: 20, progress: stats.finished,
+      unlocked: unlockedIds.includes('kutu-buku-2'), color: '#8b5cf6'
+    },
+    {
+      id: 'marathon', title: 'Marathon Membaca',
+      description: 'Membaca lebih dari 1.000 halaman.',
+      icon: Flame, category: 'milestone', target: 1000, progress: stats.pages,
+      unlocked: unlockedIds.includes('marathon'), color: '#ef4444'
+    },
+    {
+      id: 'marathon-ultra', title: 'Ultra Marathon',
+      description: 'Membaca lebih dari 5.000 halaman!',
+      icon: Shield, category: 'milestone', target: 5000, progress: stats.pages,
+      unlocked: unlockedIds.includes('marathon-ultra'), color: '#dc2626'
+    },
+    {
+      id: 'kolektor', title: 'Kolektor',
+      description: 'Perpustakaanmu memiliki 20 buku.',
+      icon: Bookmark, category: 'collection', target: 20, progress: stats.total,
+      unlocked: unlockedIds.includes('kolektor'), color: '#f59e0b'
+    },
+    {
+      id: 'kolektor-master', title: 'Master Kolektor',
+      description: 'Luar biasa, kamu memiliki 50 buku!',
+      icon: Crown, category: 'collection', target: 50, progress: stats.total,
+      unlocked: unlockedIds.includes('kolektor-master'), color: '#d97706'
+    },
+    {
+      id: 'arsitek-rak', title: 'Arsitek Rak',
+      description: 'Membuat 3 rak berbeda untuk koleksimu.',
+      icon: Layers, category: 'collection', target: 3, progress: stats.shelves,
+      unlocked: unlockedIds.includes('arsitek-rak'), color: '#6366f1'
+    },
+    {
+      id: 'ahli-genre', title: 'Eksplorator Genre',
+      description: 'Membaca buku dari 3 genre berbeda.',
+      icon: Map, category: 'special', target: 3, progress: stats.genres,
+      unlocked: unlockedIds.includes('ahli-genre'), color: '#ec4899'
+    },
+    {
+      id: 'kurator', title: 'Kurator Sempurna',
+      description: 'Memberikan rating bintang 5 pada sebuah buku.',
+      icon: Star, category: 'special', target: 1, progress: stats.fiveStar,
+      unlocked: unlockedIds.includes('kurator'), color: '#eab308'
+    },
+    {
+      id: 'penggemar', title: 'Penggemar Setia',
+      description: 'Menandai 5 buku sebagai favorit.',
+      icon: Heart, category: 'special', target: 5, progress: stats.favs,
+      unlocked: unlockedIds.includes('penggemar'), color: '#f43f5e'
+    },
+    {
+      id: 'pemimpi', title: 'Sang Pemimpi',
+      description: 'Menambahkan 5 buku ke Wishlist.',
+      icon: Sparkles, category: 'special', target: 5, progress: stats.wishlist,
+      unlocked: unlockedIds.includes('pemimpi'), color: '#8b5cf6'
+    }
+  ], [stats, unlockedIds])
 
-  // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-walnut">Loading achievements...</div>
+      <div className="flex items-center justify-center py-24">
+        <p style={{ color: BRAND.walnut, fontSize: 13 }}>Memuat pencapaian…</p>
       </div>
     )
   }
 
-  const unlockedCount = achievements.filter(a => a.unlocked).length
-  const lockedCount = achievements.length - unlockedCount
+  const unlockedCount = achievementsList.filter(a => a.unlocked).length
+  const completionPct = Math.round((unlockedCount / achievementsList.length) * 100)
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
+    <div style={{ padding: '20px 20px 40px', maxWidth: 1000, margin: '0 auto' }}>
+      
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
-          Achievements
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 28, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown, margin: '0 0 8px' }}>
+          Pencapaian
         </h1>
-        <p className="text-walnut/70">
-          Track your reading milestones and celebrate your progress
+        <p style={{ margin: 0, color: BRAND.walnut, opacity: 0.8 }}>
+          Lacak progres dan koleksi medali membaca kamu.
         </p>
-      </div>
 
-      {/* Overview Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center">
-              <Trophy className="w-6 h-6 text-white" />
+        {/* Progress Overview */}
+        <div style={{ marginTop: 20, padding: 20, background: 'white', borderRadius: 16, border: '1px solid rgba(139,99,56,0.1)', display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: BRAND.beige, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Trophy size={32} color={BRAND.walnut} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: BRAND.darkBrown }}>Total Pencapaian</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: BRAND.walnut }}>{unlockedCount} / {achievementsList.length}</span>
             </div>
-            <div>
-              <div className="text-2xl font-bold text-darkBrown">{unlockedCount}</div>
-              <div className="text-sm text-walnut/70">Unlocked</div>
+            <div style={{ height: 8, background: 'rgba(139,99,56,0.1)', borderRadius: 4, overflow: 'hidden' }}>
+              <motion.div 
+                initial={{ width: 0 }} animate={{ width: `${completionPct}%` }} transition={{ duration: 1, delay: 0.2 }}
+                style={{ height: '100%', background: BRAND.walnut, borderRadius: 4 }} 
+              />
             </div>
           </div>
-        </motion.div>
+        </div>
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-walnut to-darkBrown flex items-center justify-center">
-              <Target className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-darkBrown">{lockedCount}</div>
-              <div className="text-sm text-walnut/70">Locked</div>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-              <Award className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-darkBrown">
-                {achievements.length > 0 ? Math.round((unlockedCount / achievements.length) * 100) : 0}%
-              </div>
-              <div className="text-sm text-walnut/70">Complete</div>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-        >
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-              <Star className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-darkBrown">{stats.totalBooks}</div>
-              <div className="text-sm text-walnut/70">Total Books</div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Achievements Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {achievements.map((achievement, index) => {
-          const Icon = achievement.icon
-          const progress = achievement.target && achievement.progress
-            ? Math.min((achievement.progress / achievement.target) * 100, 100)
-            : 0
-
+      {/* Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
+        {achievementsList.map((ach, i) => {
+          const Icon = ach.icon
+          const progressPct = Math.min((ach.progress / ach.target) * 100, 100)
+          
           return (
             <motion.div
-              key={achievement.id}
+              key={ach.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`bg-white rounded-2xl p-6 border shadow-sm relative overflow-hidden ${
-                achievement.unlocked
-                  ? 'border-walnut/10 shadow-md'
-                  : 'border-walnut/20 opacity-75'
-              }`}
+              transition={{ delay: i * 0.05 }}
+              style={{
+                background: ach.unlocked ? 'white' : 'rgba(255,255,255,0.4)',
+                borderRadius: 16,
+                border: `1px solid ${ach.unlocked ? 'rgba(139,99,56,0.15)' : 'rgba(139,99,56,0.05)'}`,
+                padding: 16,
+                display: 'flex',
+                gap: 16,
+                position: 'relative',
+                overflow: 'hidden'
+              }}
             >
-              {/* Background Gradient for Unlocked */}
-              {achievement.unlocked && (
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${achievement.color} opacity-10`}
-                />
-              )}
-
               {/* Icon */}
-              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 relative z-10 ${
-                achievement.unlocked
-                  ? `bg-gradient-to-br ${achievement.color}`
-                  : 'bg-walnut/20'
-              }`}>
-                <Icon
-                  className={`w-8 h-8 ${
-                    achievement.unlocked ? 'text-white' : 'text-walnut/40'
-                  }`}
-                />
+              <div style={{
+                width: 48, height: 48, borderRadius: 12, flexShrink: 0,
+                background: ach.unlocked ? `${ach.color}15` : 'rgba(139,99,56,0.05)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <Icon size={24} color={ach.unlocked ? ach.color : 'rgba(139,99,56,0.3)'} />
               </div>
 
               {/* Content */}
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className={`text-lg font-semibold ${
-                    achievement.unlocked ? 'text-darkBrown' : 'text-walnut/70'
-                  }`}>
-                    {achievement.title}
-                  </h3>
-                  {achievement.unlocked && (
-                    <div className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                      Unlocked
-                    </div>
-                  )}
-                </div>
-
-                <p className={`text-sm mb-4 ${
-                  achievement.unlocked ? 'text-walnut/80' : 'text-walnut/60'
-                }`}>
-                  {achievement.description}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h3 style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: ach.unlocked ? BRAND.darkBrown : 'rgba(74,59,47,0.5)' }}>
+                  {ach.title}
+                </h3>
+                <p style={{ margin: '0 0 12px', fontSize: 11, color: ach.unlocked ? BRAND.walnut : 'rgba(122,92,66,0.5)', lineHeight: 1.4 }}>
+                  {ach.description}
                 </p>
 
-                {/* Progress Bar */}
-                {achievement.target && !achievement.unlocked && (
-                  <div className="mb-2">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-walnut/60">Progress</span>
-                      <span className="font-medium text-darkBrown">
-                        {achievement.progress}/{achievement.target}
-                      </span>
+                {/* Progress Bar (only if not unlocked) */}
+                {!ach.unlocked && (
+                  <div style={{ marginTop: 'auto' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>Progres</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(122,92,66,0.7)' }}>{ach.progress} / {ach.target}</span>
                     </div>
-                    <div className="h-2 bg-walnut/20 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          achievement.unlocked
-                            ? 'bg-green-500'
-                            : `bg-gradient-to-r ${achievement.color}`
-                        }`}
-                        style={{ width: `${progress}%` }}
-                      />
+                    <div style={{ height: 4, background: 'rgba(139,99,56,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${progressPct}%`, background: 'rgba(139,99,56,0.3)', borderRadius: 2 }} />
                     </div>
-                  </div>
-                )}
-
-                {/* Category Badge */}
-                <div className="inline-flex items-center gap-1 px-2 py-1 bg-walnut/10 rounded-full text-xs text-walnut/70">
-                  <span className="capitalize">{achievement.category}</span>
-                </div>
-
-                {/* Unlocked Date */}
-                {achievement.unlockedDate && (
-                  <div className="mt-3 text-xs text-walnut/60">
-                    Unlocked: {new Date(achievement.unlockedDate).toLocaleDateString()}
                   </div>
                 )}
               </div>
 
-              {/* Locked Overlay */}
-              {!achievement.unlocked && (
-                <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-20">
-                  <div className="w-12 h-12 rounded-full bg-walnut/10 flex items-center justify-center">
-                    <Bookmark className="w-6 h-6 text-walnut/40" />
-                  </div>
+              {/* Unlocked Badge / Date */}
+              {ach.unlocked && (
+                <div style={{ position: 'absolute', top: 12, right: 12 }}>
+                  <CheckCircle size={16} color={BRAND.gold} />
                 </div>
               )}
             </motion.div>
@@ -398,24 +243,6 @@ export default function Achievements() {
         })}
       </div>
 
-      {/* Empty State */}
-      {achievements.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-16"
-        >
-          <div className="w-20 h-20 bg-walnut/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Trophy className="w-10 h-10 text-walnut/30" />
-          </div>
-          <h3 className="text-xl font-serif text-darkBrown mb-2">
-            No achievements yet
-          </h3>
-          <p className="text-walnut/70">
-            Start reading to unlock achievements and track your progress
-          </p>
-        </motion.div>
-      )}
     </div>
   )
 }

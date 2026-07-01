@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Layers, Package, FileText } from 'lucide-react'
+import { X, Layers, Package, FileText, Save } from 'lucide-react'
 import { useUpdateShelf } from '../../hooks/useShelves'
 import type { Shelf } from '../../types'
 
@@ -149,17 +149,19 @@ export default function EditShelfModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-6 py-2.5 bg-white border border-walnut/20 rounded-xl text-sm font-medium text-walnut hover:bg-walnut/5 transition-colors"
+                  title="Cancel"
+                  className="px-4 py-2 bg-transparent text-walnut/60 hover:bg-walnut/10 rounded-xl transition-colors"
                 >
-                  Cancel
+                  <X className="w-5 h-5" />
                 </button>
                 <button
                   type="submit"
                   onClick={handleSubmit}
                   disabled={updateShelf.isPending}
-                  className="px-6 py-2.5 bg-walnut text-white rounded-xl text-sm font-medium hover:bg-darkBrown transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Save Changes"
+                  className="px-4 py-2 bg-white text-darkBrown border border-walnut/20 rounded-xl hover:bg-cream transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
-                  {updateShelf.isPending ? 'Saving...' : 'Save Changes'}
+                  <Save className="w-5 h-5" />
                 </button>
               </div>
             </motion.div>

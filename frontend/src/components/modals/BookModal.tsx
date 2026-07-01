@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, BookOpen, Trash2, AlertTriangle, Calendar, Hash, FileText, Globe, Package, Upload } from 'lucide-react'
+import { X, BookOpen, Trash2, AlertTriangle, Calendar, Hash, FileText, Globe, Package, Upload, Plus, Save } from 'lucide-react'
 import { useCreateBook, useUpdateBook, useDeleteBook } from '../../hooks/useBooks'
 import { useShelves } from '../../hooks/useShelves'
 import type { Book, BookFormat, BookHeight, BookThickness } from '../../types'
@@ -542,21 +542,19 @@ export default function BookModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-6 py-2.5 bg-white border border-walnut/20 rounded-xl text-sm font-medium text-walnut hover:bg-walnut/5 transition-colors"
+                    title="Cancel"
+                    className="px-4 py-2 bg-transparent text-walnut/60 hover:bg-walnut/10 rounded-xl transition-colors"
                   >
-                    Cancel
+                    <X className="w-5 h-5" />
                   </button>
                   <button
                     type="submit"
                     form="book-form"
                     disabled={mode === 'create' ? createBook.isPending : updateBook.isPending}
-                    className="px-6 py-2.5 bg-walnut text-white rounded-xl text-sm font-medium hover:bg-darkBrown transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={mode === 'create' ? 'Add Book' : 'Update Book'}
+                    className="px-4 py-2 bg-white text-darkBrown border border-walnut/20 rounded-xl hover:bg-cream transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >
-                    {mode === 'create' ? (
-                      createBook.isPending ? 'Adding...' : 'Add Book'
-                    ) : (
-                      updateBook.isPending ? 'Updating...' : 'Update Book'
-                    )}
+                    {mode === 'create' ? <Plus className="w-5 h-5" /> : <Save className="w-5 h-5" />}
                   </button>
                 </div>
               </motion.div>

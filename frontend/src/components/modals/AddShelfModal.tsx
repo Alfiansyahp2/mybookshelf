@@ -78,18 +78,19 @@ export default function AddShelfModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-walnut/20 text-walnut rounded-lg hover:bg-walnut/30 transition-colors"
+            title="Cancel"
+            className="px-4 py-2 bg-transparent text-walnut/60 hover:bg-walnut/10 rounded-xl transition-colors"
           >
-            Cancel
+            <X className="w-5 h-5" />
           </button>
 
           <button
             type="submit"
             disabled={createShelf.isPending}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+            title="Add Shelf"
+            className="px-4 py-2 bg-white text-darkBrown border border-walnut/20 rounded-xl hover:bg-cream transition-colors disabled:opacity-50 flex items-center justify-center shadow-sm"
           >
-            <Plus className="w-4 h-4" />
-            Add Shelf
+            <Plus className="w-5 h-5" />
           </button>
         </div>
       </form>

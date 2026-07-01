@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Modal from '../ui/Modal'
 import { useUpdateBook } from '../../hooks/useBooks'
 import type { Book } from '../../types'
-import { Save, Trash2, Edit3 } from 'lucide-react'
+import { Save, Trash2, Edit3, X } from 'lucide-react'
 
 interface EditBookModalProps {
   book: Book | null
@@ -352,14 +352,14 @@ export default function EditBookModal({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-walnut/10">
+          <div className="flex gap-3 p-6 border-t border-walnut/10 bg-cream/30">
             <button
               type="button"
               onClick={handleDelete}
-              className="w-10 h-10 bg-red-500/20 hover:bg-red-500/40 backdrop-blur-sm rounded-lg flex items-center justify-center transition-all duration-200 border border-red-500/30 hover:border-red-500/50 group flex-shrink-0"
+              className="w-10 h-10 bg-transparent text-red-400 hover:bg-red-50 hover:text-red-500 rounded-xl flex items-center justify-center transition-colors"
               title="Delete book"
             >
-              <Trash2 className="w-4 h-4 text-red-400 group-hover:text-red-300" />
+              <Trash2 className="w-5 h-5" />
             </button>
 
             <div className="flex-1"></div>
@@ -367,20 +367,19 @@ export default function EditBookModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center transition-all duration-200 border border-white/20 hover:border-white/40 group"
+              className="px-4 py-2 bg-transparent text-walnut/60 hover:bg-walnut/10 rounded-xl transition-colors"
               title="Cancel"
             >
-              <span className="text-white/80 group-hover:text-white font-medium">Cancel</span>
+              <X className="w-5 h-5" />
             </button>
 
             <button
               type="submit"
               disabled={updateBook.isPending}
-              className="px-6 py-2.5 bg-green-600/90 hover:bg-green-600 backdrop-blur-sm rounded-lg flex items-center justify-center transition-all duration-200 border border-green-500/30 hover:border-green-500/50 disabled:opacity-50 group"
+              className="px-4 py-2 bg-white text-darkBrown border border-walnut/20 rounded-xl hover:bg-cream transition-colors disabled:opacity-50 flex items-center justify-center shadow-sm"
               title="Save changes"
             >
-              <Save className="w-4 h-4 text-white mr-2" />
-              <span className="text-white font-medium">Save</span>
+              <Save className="w-5 h-5" />
             </button>
           </div>
         </div>

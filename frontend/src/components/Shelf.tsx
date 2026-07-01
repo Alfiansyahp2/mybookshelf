@@ -62,9 +62,9 @@ export default function LibraryShelf({
 
   useEffect(() => { saveDecorations(decoStore) }, [decoStore])
 
-  const handleSelectDeco = (kind: DecorationKind) => {
+  const handleSelectDeco = (kind: DecorationKind, customData?: any) => {
     if (!pickerSlot) return
-    setDecoStore(prev => addDecoration(prev, shelf.id, kind, pickerSlot))
+    setDecoStore(prev => addDecoration(prev, shelf.id, kind, pickerSlot, customData))
   }
   const handleRemoveDeco = () => {
     if (!pickerSlot) return
@@ -159,13 +159,13 @@ export default function LibraryShelf({
 
             {/* Left decoration slot */}
             <div
-              style={{ flexShrink:0, display:'flex', alignItems:'flex-end', paddingLeft:4, paddingRight:6, cursor:'pointer', position:'relative', minWidth:8 }}
+              style={{ flexShrink:0, display:'flex', alignItems: leftDeco?.kind === 'plant_hanging' ? 'flex-start' : 'flex-end', height: '100%', paddingLeft:4, paddingRight:6, cursor:'pointer', position:'relative', minWidth:8 }}
               onClick={() => setPickerSlot('left')}
               title="Tambah hiasan kiri"
             >
               {leftDeco
-                ? <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} style={{ paddingBottom:2 }}>
-                    {renderDecoration(leftDeco.kind, leftDeco.id)}
+                ? <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} style={{ paddingBottom: leftDeco.kind === 'plant_hanging' ? 0 : 2 }}>
+                    {renderDecoration(leftDeco, leftDeco.id)}
                   </motion.div>
                 : <div style={{
                     width:22, height:40, border:'1.5px dashed rgba(255,210,100,0.3)', borderRadius:4,
@@ -204,13 +204,13 @@ export default function LibraryShelf({
 
             {/* Right decoration slot */}
             <div
-              style={{ flexShrink:0, display:'flex', alignItems:'flex-end', paddingLeft:6, paddingRight:4, cursor:'pointer', position:'relative', minWidth:8 }}
+              style={{ flexShrink:0, display:'flex', alignItems: rightDeco?.kind === 'plant_hanging' ? 'flex-start' : 'flex-end', height: '100%', paddingLeft:6, paddingRight:4, cursor:'pointer', position:'relative', minWidth:8 }}
               onClick={() => setPickerSlot('right')}
               title="Tambah hiasan kanan"
             >
               {rightDeco
-                ? <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} style={{ paddingBottom:2 }}>
-                    {renderDecoration(rightDeco.kind, rightDeco.id)}
+                ? <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} style={{ paddingBottom: rightDeco.kind === 'plant_hanging' ? 0 : 2 }}>
+                    {renderDecoration(rightDeco, rightDeco.id)}
                   </motion.div>
                 : <div style={{
                     width:22, height:40, border:'1.5px dashed rgba(255,210,100,0.3)', borderRadius:4,
@@ -263,10 +263,10 @@ export default function LibraryShelf({
           <div style={{ width:1, height:14, background:'rgba(255,255,255,0.1)', flexShrink:0 }} />
 
           {/* Action buttons */}
-          <div style={{ display:'flex', alignItems:'center', gap:3, flexShrink:0 }}>
-            <ActionBtn icon={<Plus size={11} />}   label="Tambah" onClick={() => onAddBook?.(shelf.id)}    color="#34d399" />
-            <ActionBtn icon={<Pencil size={11} />} label="Edit"   onClick={() => onEditShelf?.(shelf.id)}  color="#60a5fa" />
-            <ActionBtn icon={<Trash2 size={11} />} label="Hapus"  onClick={() => { if (confirm(`Hapus rak "${shelf.name}"?`)) onDeleteShelf?.(shelf.id) }} color="#f87171" />
+          <div style={{ display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
+            <ActionBtn icon={<Plus size={12} />}   title="Tambah Buku" onClick={() => onAddBook?.(shelf.id)}    color="#ffffff" />
+            <ActionBtn icon={<Pencil size={11} />} title="Edit Rak"    onClick={() => onEditShelf?.(shelf.id)}  color="#60a5fa" />
+            <ActionBtn icon={<Trash2 size={11} />} title="Hapus Rak"   onClick={() => { if (confirm(`Hapus rak "${shelf.name}"?`)) onDeleteShelf?.(shelf.id) }} color="#f87171" />
           </div>
         </div>
       </motion.div>
@@ -274,16 +274,16 @@ export default function LibraryShelf({
   )
 }
 
-function ActionBtn({ icon, label, onClick, color }: { icon: React.ReactNode; label: string; onClick: () => void; color: string }) {
+function ActionBtn({ icon, title, onClick, color }: { icon: React.ReactNode; title: string; onClick: () => void; color: string }) {
   return (
     <button
       onClick={onClick}
-      title={label}
-      style={{ display:'flex', alignItems:'center', gap:3, padding:'3px 8px', borderRadius:5, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.09)', color, cursor:'pointer', transition:'all 0.12s', fontSize:9.5, fontWeight:600, whiteSpace:'nowrap' }}
+      title={title}
+      style={{ display:'flex', alignItems:'center', justifyContent:'center', width:22, height:22, borderRadius:5, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.09)', color, cursor:'pointer', transition:'all 0.12s' }}
       onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
     >
-      {icon} {label}
+      {icon}
     </button>
   )
 }

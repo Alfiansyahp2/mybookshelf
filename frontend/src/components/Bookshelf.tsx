@@ -101,7 +101,7 @@ export default function Bookshelf({
       <motion.div
         animate={{ opacity: (1 - ledOpacity) * 0.7 }}
         transition={{ duration: 0.5 }}
-        style={{ position:'absolute', inset:0, background:'#000', pointerEvents:'none' }}
+        style={{ position:'absolute', inset:0, background:'#000', pointerEvents:'none', zIndex: 1 }}
       />
 
       {/* ── Bookcase unit ──────────────────────── */}
@@ -111,6 +111,7 @@ export default function Bookshelf({
         transition={{ duration:0.45 }}
         style={{
           position:'relative',
+          zIndex: 10,
           filter:'drop-shadow(0 12px 36px rgba(0,0,0,0.32)) drop-shadow(0 2px 6px rgba(0,0,0,0.22))',
         }}
       >

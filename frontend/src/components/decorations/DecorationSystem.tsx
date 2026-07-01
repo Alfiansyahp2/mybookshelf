@@ -26,6 +26,7 @@ export interface ShelfDecoration {
   kind: DecorationKind
   /** 0–100, left-to-right percentage position on shelf */
   slot: 'left' | 'right'
+  customData?: any
 }
 
 export interface DecorationStore {
@@ -48,11 +49,12 @@ export function addDecoration(
   shelfId: string,
   kind: DecorationKind,
   slot: 'left' | 'right',
+  customData?: any
 ): DecorationStore {
   const list = store[shelfId] || []
   // only one per slot
   const filtered = list.filter(d => d.slot !== slot)
-  const next: ShelfDecoration = { id: `${Date.now()}`, kind, slot }
+  const next: ShelfDecoration = { id: `${Date.now()}`, kind, slot, customData }
   return { ...store, [shelfId]: [...filtered, next] }
 }
 
@@ -217,15 +219,21 @@ function VaseRound() {
   )
 }
 
-function FramePhoto() {
+function FramePhoto({ customData }: { customData?: any }) {
   return (
     <div style={{ position: 'relative', width: 52, height: 42, flexShrink: 0 }}>
       <div style={{ width: '100%', height: '100%', border: '4px solid #7a5020', borderRadius: 3, background: 'linear-gradient(135deg,#d4c0a0,#b8a080)', boxShadow: '2px 3px 10px rgba(0,0,0,0.4)', overflow: 'hidden' }}>
-        {/* simple landscape scene */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '38%', background: 'linear-gradient(180deg,#4a7a3a,#2a5020)' }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '65%', background: 'linear-gradient(180deg,#7ab0e0,#b8d8f8)' }} />
-        <div style={{ position: 'absolute', bottom: '32%', left: '40%', width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderBottom: '10px solid #e8e4cc' }} />
-        <div style={{ position: 'absolute', bottom: '30%', left: '15%', width: 12, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.7)' }} />
+        {customData?.imageUrl ? (
+          <img src={customData.imageUrl} alt="frame" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          <>
+            {/* simple landscape scene */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '38%', background: 'linear-gradient(180deg,#4a7a3a,#2a5020)' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '65%', background: 'linear-gradient(180deg,#7ab0e0,#b8d8f8)' }} />
+            <div style={{ position: 'absolute', bottom: '32%', left: '40%', width: 0, height: 0, borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderBottom: '10px solid #e8e4cc' }} />
+            <div style={{ position: 'absolute', bottom: '30%', left: '15%', width: 12, height: 12, borderRadius: '50%', background: 'rgba(255,255,255,0.7)' }} />
+          </>
+        )}
       </div>
       {/* frame stand */}
       <div style={{ position: 'absolute', bottom: -4, left: '55%', width: 3, height: 8, background: '#5a3a10', transform: 'rotate(15deg)', borderRadius: 2 }} />
@@ -339,7 +347,10 @@ function Succulent() {
 
 // ── Master render function ────────────────────────────────
 
-export function renderDecoration(kind: DecorationKind, key?: string) {
+export function renderDecoration(deco: ShelfDecoration | DecorationKind, key?: string) {
+  const kind = typeof deco === 'string' ? deco : deco.kind
+  const customData = typeof deco === 'string' ? undefined : deco.customData
+
   const map: Record<DecorationKind, JSX.Element> = {
     candle:        <Candle key={key} />,
     candle_pair:   <div key={key} style={{ display:'flex', gap:5, alignItems:'flex-end' }}><Candle /><Candle scale={0.8} /></div>,
@@ -348,7 +359,7 @@ export function renderDecoration(kind: DecorationKind, key?: string) {
     succulent:     <Succulent key={key} />,
     vase_tall:     <VaseTall key={key} />,
     vase_round:    <VaseRound key={key} />,
-    frame_photo:   <FramePhoto key={key} />,
+    frame_photo:   <FramePhoto key={key} customData={customData} />,
     bookend_L:     <BookendL key={key} />,
     clock_small:   <ClockSmall key={key} />,
     mug:           <Mug key={key} />,
