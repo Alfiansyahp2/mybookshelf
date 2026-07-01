@@ -488,6 +488,7 @@ export default function BookDetailModal({
                         <motion.div key="tn"
                           initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.16 }}
+                          className="h-full flex flex-col"
                         >
                           <BookNotesSection
                             userNotes={userNotes} tempNotes={tempNotes}

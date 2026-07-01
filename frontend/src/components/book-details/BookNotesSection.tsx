@@ -22,7 +22,7 @@ export default function BookNotesSection({
   onTempNotesChange
 }: BookNotesSectionProps) {
   return (
-    <div className="p-4 bg-white rounded-xl border border-walnut/10 shadow-sm">
+    <div className="flex-1 flex flex-col p-4 bg-white rounded-xl border border-walnut/10 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-darkBrown flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-walnut" />
@@ -56,7 +56,7 @@ export default function BookNotesSection({
       </div>
 
       {!isEditingNotes ? (
-        <div className="p-3 bg-walnut/10 rounded-lg min-h-[80px] max-h-[150px] overflow-y-auto">
+        <div className="flex-1 p-3 bg-walnut/10 rounded-lg overflow-y-auto min-h-0">
           <p className="text-sm text-darkBrown whitespace-pre-wrap">
             {userNotes || 'No notes yet. Add your thoughts about this book...'}
           </p>
@@ -65,7 +65,7 @@ export default function BookNotesSection({
         <textarea
           value={tempNotes}
           onChange={(e) => onTempNotesChange(e.target.value)}
-          className="w-full h-24 p-3 bg-white border border-walnut/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 resize-none"
+          className="flex-1 w-full p-3 bg-white border border-walnut/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 resize-none min-h-0"
           placeholder="Add your thoughts, quotes, or memories..."
         />
       )}

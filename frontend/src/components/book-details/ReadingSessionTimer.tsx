@@ -142,6 +142,7 @@ function SessionCard({ session, index }: { session: ReadingSession; index: numbe
 export default function ReadingSessionTimer({ book, updateProgress }: ReadingSessionTimerProps) {
   const [isReadingSession,    setIsReadingSession]    = useState(false)
   const [sessionDuration,     setSessionDuration]     = useState(0)
+  const [targetMinutes,       setTargetMinutes]       = useState<number | null>(null)
   const [startingPage,        setStartingPage]        = useState(0)
   const [activeSessionId,     setActiveSessionId]     = useState<string | null>(null)
   const [isEndingSession,     setIsEndingSession]     = useState(false)
@@ -228,6 +229,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
       }
       setIsReadingSession(false); setIsEndingSession(false)
       setSessionDuration(0); setActiveSessionId(null); setNotes('')
+      setTargetMinutes(null)
     } catch (err) {
       console.error('Failed to end session:', err)
     }
@@ -280,12 +282,28 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
 
         {/* Timer display */}
         <div className="text-center mb-2">
-          <div
-            className="text-2xl font-mono font-bold tracking-widest"
-            style={{ color: isReadingSession ? '#065f46' : '#2a1a08' }}
-          >
-            {fmt(sessionDuration)}
-          </div>
+          {targetMinutes ? (
+            <div
+              className="text-2xl font-mono font-bold tracking-widest"
+              style={{ color: (targetMinutes * 60 - sessionDuration) > 0 ? (isReadingSession ? '#065f46' : '#2a1a08') : '#dc2626' }}
+            >
+              <span className="text-[10px] mr-1 opacity-60">
+                {(targetMinutes * 60 - sessionDuration) > 0 ? '' : '+'}
+              </span>
+              {fmt(Math.abs(targetMinutes * 60 - sessionDuration))}
+              <span className="text-[10px] ml-1 opacity-60">
+                {(targetMinutes * 60 - sessionDuration) > 0 ? 'sisa' : 'lewat'}
+              </span>
+            </div>
+          ) : (
+            <div
+              className="text-2xl font-mono font-bold tracking-widest"
+              style={{ color: isReadingSession ? '#065f46' : '#2a1a08' }}
+            >
+              {fmt(sessionDuration)}
+            </div>
+          )}
+          
           {isReadingSession && sessionDuration > 60 && (
             <div className="text-xs mt-0.5" style={{ color: '#9c6d3a' }}>
               {readingSpeed} hlm/jam
@@ -295,8 +313,26 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
 
         {/* Start / Stop / Save flow */}
         {!isReadingSession ? (
-          <button
-            onClick={handleStart}
+          <>
+            {/* Target Time Selection */}
+            <div className="flex justify-center gap-1.5 mb-3">
+              {[15, 30, 45, 60].map(min => (
+                <button
+                  key={min}
+                  onClick={() => setTargetMinutes(targetMinutes === min ? null : min)}
+                  className={`px-2 py-1 text-[10px] font-semibold rounded border transition-all ${
+                    targetMinutes === min
+                      ? 'bg-[#8B7355] text-white border-[#8B7355]'
+                      : 'bg-white text-[#8B7355] border-[#8B7355]/30 hover:bg-[#8B7355]/10'
+                  }`}
+                >
+                  {min}m
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={handleStart}
             disabled={startSessionMutation.isPending}
             className="w-full py-2 rounded-lg text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all hover:scale-[1.01] disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg, #16a34a, #15803d)' }}
@@ -304,6 +340,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
             <Play className="w-4 h-4" />
             {startSessionMutation.isPending ? 'Memulai...' : 'Start Session'}
           </button>
+          </>
         ) : !isEndingSession ? (
           <>
             <button
