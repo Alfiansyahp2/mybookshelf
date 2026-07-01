@@ -75,8 +75,10 @@ export default function Library() {
   return (
     <div className="p-3 md:p-5 flex flex-col h-full">
       {/* Filter tabs + Widgets on top of shelf */}
-      <div style={{ position: 'relative', zIndex: 50, display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 0, paddingTop: 4 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', paddingBottom: 10, flex: 1 }}>
+      <div className="relative z-50 flex flex-col-reverse md:flex-row md:items-end gap-2 md:gap-4 mb-0 pt-1 md:pt-4 px-1 md:px-0">
+        
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-2 md:gap-6 overflow-x-auto pb-2 md:pb-10 flex-1 hide-scrollbar">
           {FILTER_TABS.filter(t => t.key === 'all' || counts[t.key as keyof typeof counts] > 0).map(tab => {
             const count = counts[tab.key as keyof typeof counts]
             const active = activeFilter === tab.key
@@ -100,12 +102,14 @@ export default function Library() {
             )
           })}
         </div>
-        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'flex-end', gap: '20px', paddingRight: '24px', position: 'relative', zIndex: 10 }}>
+
+        {/* Widgets */}
+        <div className="flex flex-shrink-0 items-end justify-between md:justify-end gap-3 md:gap-5 pr-0 md:pr-6 relative z-10 w-full md:w-auto scale-90 md:scale-100 origin-bottom-right">
           <FlipCalendar onClick={() => setIsCalendarModalOpen(true)} />
-          <div style={{ paddingBottom: '4px' }}>
+          <div className="hidden sm:block pb-1">
             <BigDigitalClock />
           </div>
-          <div style={{ paddingBottom: '2px' }}>
+          <div className="pb-0.5">
             <LightingControl />
           </div>
         </div>

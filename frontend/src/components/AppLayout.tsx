@@ -394,7 +394,7 @@ export default function AppLayout() {
             animate={{ rotateY: 0, filter: 'brightness(1)' }}
             exit={{ rotateY: 90, filter: 'brightness(0.2)' }}
             transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-            className="w-full h-full absolute inset-0 overflow-auto bg-cream"
+            className="w-full h-full absolute inset-0 overflow-auto bg-cream pb-16 md:pb-0"
             style={{ 
               transformOrigin: '50% 50% 50vw',
               transformStyle: 'preserve-3d',
@@ -440,6 +440,28 @@ export default function AppLayout() {
 
       {/* Global Toast Notifications */}
       <ToastContainer />
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-cream/95 backdrop-blur-md border-t border-walnut/20 z-[60]">
+        <div className="flex items-center justify-around px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          {navItems.map((item) => {
+            const Icon = item.icon
+            const isActive = location.pathname === item.path
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all ${
+                  isActive ? 'text-walnut' : 'text-walnut/50 hover:text-walnut/80'
+                }`}
+              >
+                <Icon className={`w-5 h-5 mb-1 ${isActive ? 'fill-walnut/10' : ''}`} />
+                <span className="text-[10px] font-medium">{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
     </div>
   )
 }

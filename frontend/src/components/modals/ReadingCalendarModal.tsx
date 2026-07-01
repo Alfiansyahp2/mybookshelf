@@ -130,8 +130,8 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
           className="relative flex flex-col bg-[#faf9f6] text-[#2a1a08] font-sans w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl overflow-hidden border border-[#8B7355]/30 z-10"
         >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#8B7355]/20 bg-[#fdfbf7]">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b border-[#8B7355]/20 bg-[#fdfbf7] gap-3 md:gap-0">
+            <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-4">
               <button 
                 onClick={onClose}
                 className="p-2 hover:bg-[#8B7355]/10 rounded-full transition-colors text-[#8B7355]"
@@ -146,10 +146,10 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
               </h1>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center justify-between md:justify-end gap-2 md:gap-6 w-full md:w-auto">
               <button 
                 onClick={handleToday}
-                className="px-4 py-2 border border-[#8B7355]/30 rounded-lg hover:bg-[#8B7355]/10 transition-colors text-sm font-semibold text-[#8B7355]"
+                className="px-3 md:px-4 py-1.5 md:py-2 border border-[#8B7355]/30 rounded-lg hover:bg-[#8B7355]/10 transition-colors text-xs md:text-sm font-semibold text-[#8B7355]"
               >
                 Today
               </button>
@@ -161,7 +161,7 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
                 <button onClick={handleNextMonth} className="p-1 hover:bg-[#8B7355]/10 rounded-full text-[#8B7355]">
                   <ChevronRight size={20} />
                 </button>
-                <h2 className="text-[22px] text-[#2a1a08] w-48 font-serif font-bold">
+                <h2 className="text-lg md:text-[22px] text-[#2a1a08] w-40 md:w-48 font-serif font-bold text-right md:text-left">
                   {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
                 </h2>
               </div>

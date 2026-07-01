@@ -181,7 +181,7 @@ export default function LibraryShelf({
             </div>
 
             {/* Books */}
-            <div style={{ flex:1, display:'flex', alignItems:'flex-end', gap:1, overflow:'visible', perspective:'500px', perspectiveOrigin:'50% 100%' }}>
+            <div className="hide-scrollbar" style={{ flex:1, display:'flex', alignItems:'flex-end', gap:1, overflowX:'auto', overflowY:'visible', perspective:'500px', perspectiveOrigin:'50% 100%', paddingBottom: 2 }}>
               {books.map(book => {
                 if (book.status === 'borrowed') {
                   return (

@@ -120,17 +120,18 @@ export default function BookDetailModal({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.22 }}
-                className="flex relative"
+                className="flex flex-col md:flex-row relative"
                 style={{
                   boxShadow: '0 48px 96px rgba(0,0,0,0.7), 0 12px 32px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(139, 115, 85, 0.2)',
                   borderRadius: '3px 6px 6px 3px',
                   minHeight: '580px',
                   maxHeight: '88vh',
                   background: '#fdfbf7', // Hardcover inner background
+                  overflowY: 'auto'
                 }}
               >
                 {/* Book Spine / Center Fold Shadow */}
-                <div className="absolute top-0 bottom-0 left-[42%] -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-30" />
+                <div className="hidden md:block absolute top-0 bottom-0 left-[42%] -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-30" />
 
                 {/* ══════════════════════════════════════════════
                     LEFT PAGE  — swings in from the spine
@@ -143,18 +144,13 @@ export default function BookDetailModal({
                   animate={{ rotateY: 0,  opacity: 1 }}
                   exit={{    rotateY: 90, opacity: 0 }}
                   transition={{ type: 'spring', damping: 28, stiffness: 130, delay: 0.06 }}
+                  className="w-full md:w-[42%] flex-shrink-0 relative overflow-hidden flex flex-col"
                   style={{
                     transformOrigin: 'right center',
-                    width: '42%',
-                    flexShrink: 0,
                     background: PAPER_BG,
                     backgroundImage: PAPER_LINES,
-                    /* right edge shadow simulates page curl into binding */
                     boxShadow: 'inset -18px 0 28px rgba(0,0,0,0.18)',
                     borderRadius: '3px 0 0 3px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
                   }}
                 >
                   {/* ── colour accent strip at top (book colour) ── */}
@@ -379,18 +375,14 @@ export default function BookDetailModal({
                   initial={{ rotateY: -90, opacity: 0 }}
                   animate={{ rotateY: 0,   opacity: 1 }}
                   exit={{    rotateY: -90, opacity: 0 }}
-                  transition={{ type: 'spring', damping: 28, stiffness: 130, delay: 0.14 }}
+                  transition={{ type: 'spring', damping: 28, stiffness: 130, delay: 0.12 }}
+                  className="w-full md:flex-1 relative flex flex-col min-h-[500px] overflow-hidden"
                   style={{
                     transformOrigin: 'left center',
-                    flex: 1,
-                    background: '#faf3e6',
+                    background: PAPER_BG,
                     backgroundImage: PAPER_LINES,
-                    /* left edge shadow — deeper near binding */
                     boxShadow: 'inset 18px 0 28px rgba(0,0,0,0.13)',
                     borderRadius: '0 6px 6px 0',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
                   }}
                 >
                   {/* top accent strip */}
