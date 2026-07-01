@@ -4,6 +4,7 @@
  * Types, storage helpers, and CSS-drawn decoration components
  * for placing ornamental items on bookshelves.
  */
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 // ── Types ─────────────────────────────────────────────────
@@ -17,6 +18,7 @@ export type DecorationKind =
   | 'frame_photo'
   | 'bookend_L'
   | 'clock_small'
+  | 'clock_digital'
   | 'mug'
   | 'lantern'
   | 'succulent'
@@ -79,6 +81,7 @@ export const DECORATION_CATALOGUE: { kind: DecorationKind; label: string; emoji:
   { kind: 'frame_photo',   label: 'Bingkai Foto',    emoji: '🖼️',  desc: 'Bingkai foto kenangan' },
   { kind: 'bookend_L',     label: 'Bookend',         emoji: '📐',  desc: 'Penopang buku berbentuk L' },
   { kind: 'clock_small',   label: 'Jam Meja',        emoji: '🕰️',  desc: 'Jam meja klasik kecil' },
+  { kind: 'clock_digital', label: 'Jam Digital',     emoji: '📟',  desc: 'Jam elektronik digital kotak' },
   { kind: 'mug',           label: 'Mug Kopi',        emoji: '☕',  desc: 'Mug kopi hangat' },
   { kind: 'lantern',       label: 'Lentera',         emoji: '🏮',  desc: 'Lentera hangat vintage' },
 ]
@@ -253,9 +256,15 @@ function BookendL({ flip = false }: { flip?: boolean }) {
 }
 
 function ClockSmall() {
-  const now = new Date()
-  const hDeg = (now.getHours() % 12) * 30 + now.getMinutes() * 0.5
-  const mDeg = now.getMinutes() * 6
+  const [time, setTime] = useState(new Date())
+  
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const hDeg = (time.getHours() % 12) * 30 + time.getMinutes() * 0.5
+  const mDeg = time.getMinutes() * 6
   return (
     <div style={{ position: 'relative', width: 38, height: 52, flexShrink: 0 }}>
       {/* base */}
@@ -273,6 +282,32 @@ function ClockSmall() {
         {/* center dot */}
         <div style={{ position: 'absolute', top: '50%', left: '50%', width: 4, height: 4, borderRadius: '50%', background: '#8a4020', transform: 'translate(-50%,-50%)' }} />
       </div>
+    </div>
+  )
+}
+
+function ClockDigital() {
+  const [time, setTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const hh = time.getHours().toString().padStart(2, '0')
+  const mm = time.getMinutes().toString().padStart(2, '0')
+  const ss = time.getSeconds() % 2 === 0 ? ':' : ' '
+
+  return (
+    <div style={{ position: 'relative', width: 44, height: 26, flexShrink: 0 }}>
+      <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', height: '100%', background: '#2a2a2a', borderRadius: 4, border: '2px solid #1a1a1a', boxShadow: '2px 3px 6px rgba(0,0,0,0.4)' }} />
+      <div style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3, background: '#0a0a0a', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 0 4px rgba(0,0,0,0.8)' }}>
+        <span style={{ fontFamily: 'monospace', color: '#ff3b30', fontSize: 12, fontWeight: 'bold', textShadow: '0 0 4px rgba(255,59,48,0.7)', letterSpacing: 0 }}>
+          {hh}{ss}{mm}
+        </span>
+      </div>
+      <div style={{ position: 'absolute', top: -2, left: 8, width: 8, height: 2, background: '#444', borderRadius: '2px 2px 0 0' }} />
+      <div style={{ position: 'absolute', top: -2, right: 8, width: 8, height: 2, background: '#444', borderRadius: '2px 2px 0 0' }} />
     </div>
   )
 }
@@ -362,6 +397,7 @@ export function renderDecoration(deco: ShelfDecoration | DecorationKind, key?: s
     frame_photo:   <FramePhoto key={key} customData={customData} />,
     bookend_L:     <BookendL key={key} />,
     clock_small:   <ClockSmall key={key} />,
+    clock_digital: <ClockDigital key={key} />,
     mug:           <Mug key={key} />,
     lantern:       <Lantern key={key} />,
   }

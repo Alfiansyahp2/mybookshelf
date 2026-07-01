@@ -6,6 +6,8 @@ import type { Book } from '../types'
 import Bookshelf from '../components/Bookshelf'
 import AddBookModal from '../components/AddBookModal'
 import LightingControl from '../components/LightingControl'
+import BigDigitalClock from '../components/ui/BigDigitalClock'
+import FlipCalendar from '../components/ui/FlipCalendar'
 
 const FILTER_TABS = [
   { key: 'all',      label: 'Semua' },
@@ -69,10 +71,10 @@ export default function Library() {
   }
 
   return (
-    <div className="p-3 md:p-5 space-y-4">
-      {/* Filter tabs + Lighting control */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingTop: 4 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', paddingBottom: 4, flex: 1 }}>
+    <div className="p-3 md:p-5 flex flex-col h-full">
+      {/* Filter tabs + Widgets on top of shelf */}
+      <div style={{ position: 'relative', zIndex: 50, display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 0, paddingTop: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, overflowX: 'auto', paddingBottom: 10, flex: 1 }}>
           {FILTER_TABS.filter(t => t.key === 'all' || counts[t.key as keyof typeof counts] > 0).map(tab => {
             const count = counts[tab.key as keyof typeof counts]
             const active = activeFilter === tab.key
@@ -96,22 +98,29 @@ export default function Library() {
             )
           })}
         </div>
-        {/* Lighting control button */}
-        <div style={{ flexShrink: 0 }}>
-          <LightingControl />
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'flex-end', gap: '20px', paddingRight: '24px', position: 'relative', zIndex: 10 }}>
+          <FlipCalendar />
+          <div style={{ paddingBottom: '4px' }}>
+            <BigDigitalClock />
+          </div>
+          <div style={{ paddingBottom: '2px' }}>
+            <LightingControl />
+          </div>
         </div>
       </div>
 
       {/* Bookshelf */}
-      <Bookshelf
-        books={books}
-        shelves={shelves}
-        onAddBook={handleAddBook}
-        filterStatus={activeFilter === 'all' ? undefined : activeFilter}
-        selectedBookId={selectedBookId}
-        isDrawerOpen={isBookDetailOpen}
-        onBookClick={handleBookClick}
-      />
+      <div style={{ flex: 1, marginTop: '-2px' }}>
+        <Bookshelf
+          books={books}
+          shelves={shelves}
+          onAddBook={handleAddBook}
+          filterStatus={activeFilter === 'all' ? undefined : activeFilter}
+          selectedBookId={selectedBookId}
+          isDrawerOpen={isBookDetailOpen}
+          onBookClick={handleBookClick}
+        />
+      </div>
 
       {/* Empty state */}
       {books.length === 0 && (

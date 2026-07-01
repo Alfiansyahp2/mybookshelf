@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate, useOutlet } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -33,6 +33,7 @@ const navItems = [
 export default function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const currentOutlet = useOutlet()
   const { selectedBookId, isBookDetailOpen, closeBookDetail } = useBookstore()
   const logout = useLogout()
   const deleteBook = useDeleteBook()
@@ -385,8 +386,24 @@ export default function AppLayout() {
       </header>
 
       {/* Page Content */}
-      <main className="flex-1 overflow-auto">
-        <Outlet />
+      <main className="flex-1 relative overflow-hidden bg-black" style={{ perspective: '1200px' }}>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={location.pathname}
+            initial={{ rotateY: -90, filter: 'brightness(0.2)' }}
+            animate={{ rotateY: 0, filter: 'brightness(1)' }}
+            exit={{ rotateY: 90, filter: 'brightness(0.2)' }}
+            transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+            className="w-full h-full absolute inset-0 overflow-auto bg-cream"
+            style={{ 
+              transformOrigin: '50% 50% 50vw',
+              transformStyle: 'preserve-3d',
+              backfaceVisibility: 'hidden'
+            }}
+          >
+            {currentOutlet}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Book Detail Modal */}
