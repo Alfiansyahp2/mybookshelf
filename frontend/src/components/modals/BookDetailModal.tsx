@@ -120,14 +120,17 @@ export default function BookDetailModal({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.22 }}
-                className="flex"
+                className="flex relative"
                 style={{
-                  boxShadow: '0 48px 96px rgba(0,0,0,0.7), 0 12px 32px rgba(0,0,0,0.4)',
+                  boxShadow: '0 48px 96px rgba(0,0,0,0.7), 0 12px 32px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(139, 115, 85, 0.2)',
                   borderRadius: '3px 6px 6px 3px',
                   minHeight: '580px',
                   maxHeight: '88vh',
+                  background: '#fdfbf7', // Hardcover inner background
                 }}
               >
+                {/* Book Spine / Center Fold Shadow */}
+                <div className="absolute top-0 bottom-0 left-[42%] -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-30" />
 
                 {/* ══════════════════════════════════════════════
                     LEFT PAGE  — swings in from the spine
@@ -365,32 +368,6 @@ export default function BookDetailModal({
                     <span className="text-xs italic" style={{ color: `${c1}70`, fontFamily: 'Georgia, serif' }}>i</span>
                   </div>
                 </motion.div>
-
-                {/* ══════════════════════════════════════════════
-                    BINDING / SPINE
-                    ══════════════════════════════════════════════ */}
-                <div
-                  className="flex-shrink-0 relative z-10"
-                  style={{
-                    width: 28,
-                    background: `linear-gradient(to right,
-                      ${c2}ee 0%,
-                      rgba(0,0,0,0.70) 30%,
-                      rgba(0,0,0,0.60) 50%,
-                      ${c2}ee 100%)`,
-                    boxShadow:
-                      'inset 6px 0 10px rgba(0,0,0,0.5),' +
-                      'inset -6px 0 10px rgba(0,0,0,0.5)',
-                  }}
-                >
-                  {/* Stitching marks */}
-                  {[15, 27, 39, 51, 63, 75, 87].map(p => (
-                    <div key={p}
-                      className="absolute left-1/2 -translate-x-1/2 rounded-full"
-                      style={{ top: `${p}%`, width: 16, height: 2, background: 'rgba(255,255,255,0.12)' }}
-                    />
-                  ))}
-                </div>
 
                 {/* ══════════════════════════════════════════════
                     RIGHT PAGE — swings in from the spine

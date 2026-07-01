@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export default function FlipCalendar() {
+export default function FlipCalendar({ onClick }: { onClick?: () => void }) {
   const [date, setDate] = useState(new Date())
 
   useEffect(() => {
@@ -23,7 +23,11 @@ export default function FlipCalendar() {
   const monthStr = date.toLocaleString('default', { month: 'short' }).toUpperCase()
 
   return (
-    <div className="relative flex flex-col items-center justify-end w-32 h-16 ml-2" style={{ transform: 'scale(0.85)', transformOrigin: 'bottom' }}>
+    <div 
+      onClick={onClick}
+      className={`relative flex flex-col items-center justify-end w-32 h-16 ml-2 ${onClick ? 'cursor-pointer hover:scale-90 transition-transform' : ''}`} 
+      style={{ transform: onClick ? 'scale(0.85)' : 'scale(0.85)', transformOrigin: 'bottom' }}
+    >
       {/* Base */}
       <div className="absolute bottom-0 w-full h-3 bg-[#2a1a10] rounded-sm shadow-md" style={{ boxShadow: '0 4px 6px -1px rgba(0,0,0,0.3)' }} />
       

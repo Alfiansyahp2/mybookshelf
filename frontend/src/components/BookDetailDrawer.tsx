@@ -201,18 +201,29 @@ export default function BookDetailDrawer() {
               stiffness: 100,
               rotateY: { type: "spring", damping: 15, stiffness: 100 }
             }}
-            className="fixed top-0 right-0 h-full w-full md:w-[800px] bg-cream z-50 shadow-2xl overflow-hidden flex"
+            className="fixed top-0 right-0 h-full w-full md:w-[800px] bg-[#fdfbf7] z-50 shadow-2xl overflow-hidden flex relative"
             style={{
-              perspective: "2000px"
+              perspective: "2000px",
+              boxShadow: 'inset 0 0 0 1px rgba(139, 115, 85, 0.2)'
             }}
           >
+            {/* Book Spine / Center Fold Shadow */}
+            <div className="absolute top-0 bottom-0 left-1/2 -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-30" />
+
             {/* Left Page - Book Cover & Info */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="w-1/2 bg-white border-r border-walnut/10 flex flex-col overflow-y-auto"
+              className="w-1/2 bg-gradient-to-br from-[#fdfbf7] to-[#f4f1ea] border-r border-walnut/20 flex flex-col overflow-y-auto relative"
+              style={{ boxShadow: 'inset -20px 0 30px -20px rgba(0,0,0,0.15)' }}
             >
+              {/* Subtle page texture */}
+              <div className="absolute inset-0 opacity-30 pointer-events-none z-0" style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(139, 115, 85, 0.05) 24px, rgba(139, 115, 85, 0.05) 25px)'
+              }} />
+              
+              <div className="relative z-10">
               {/* Book Cover */}
               <div className="p-8 bg-gradient-to-br from-cream to-beige flex-shrink-0">
                 <motion.div
@@ -364,6 +375,7 @@ export default function BookDetailDrawer() {
                   )}
                 </div>
               </div>
+              </div>
             </motion.div>
 
             {/* Right Page - Reading Progress & Sessions */}
@@ -371,9 +383,15 @@ export default function BookDetailDrawer() {
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="w-1/2 flex flex-col overflow-y-auto bg-cream"
+              className="w-1/2 flex flex-col overflow-y-auto bg-gradient-to-bl from-[#fdfbf7] to-[#f4f1ea] relative"
+              style={{ boxShadow: 'inset 20px 0 30px -20px rgba(0,0,0,0.15)' }}
             >
-              <div className="p-8 h-full flex flex-col">
+              {/* Subtle page texture */}
+              <div className="absolute inset-0 opacity-30 pointer-events-none z-0" style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(139, 115, 85, 0.05) 24px, rgba(139, 115, 85, 0.05) 25px)'
+              }} />
+              
+              <div className="p-8 h-full flex flex-col relative z-10">
                 {/* Currently Reading Section */}
                 {isReading && (
                   <motion.div

@@ -5,6 +5,7 @@ import { useBookstore } from '../store/useBookstore'
 import type { Book } from '../types'
 import Bookshelf from '../components/Bookshelf'
 import AddBookModal from '../components/AddBookModal'
+import ReadingCalendarModal from '../components/modals/ReadingCalendarModal'
 import LightingControl from '../components/LightingControl'
 import BigDigitalClock from '../components/ui/BigDigitalClock'
 import FlipCalendar from '../components/ui/FlipCalendar'
@@ -22,6 +23,7 @@ export default function Library() {
 
   const [activeFilter, setActiveFilter]     = useState<string>('all')
   const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false)
+  const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false)
   const [selectedShelfId, setSelectedShelfId]   = useState<string | undefined>()
   const [selectedShelfName, setSelectedShelfName] = useState<string | undefined>()
 
@@ -99,7 +101,7 @@ export default function Library() {
           })}
         </div>
         <div style={{ flexShrink: 0, display: 'flex', alignItems: 'flex-end', gap: '20px', paddingRight: '24px', position: 'relative', zIndex: 10 }}>
-          <FlipCalendar />
+          <FlipCalendar onClick={() => setIsCalendarModalOpen(true)} />
           <div style={{ paddingBottom: '4px' }}>
             <BigDigitalClock />
           </div>
@@ -142,6 +144,12 @@ export default function Library() {
         onClose={() => setIsAddBookModalOpen(false)}
         shelfId={selectedShelfId}
         shelfName={selectedShelfName}
+      />
+      
+      <ReadingCalendarModal
+        isOpen={isCalendarModalOpen}
+        onClose={() => setIsCalendarModalOpen(false)}
+        books={books}
       />
     </div>
   )
