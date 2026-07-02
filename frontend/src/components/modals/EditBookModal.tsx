@@ -21,6 +21,10 @@ const colorPalettes = [
   { name: 'Ocean Blue', colors: ['#1A5F7A', '#2E86AB', '#4793AF'] },
   { name: 'Sunset Orange', colors: ['#D4621A', '#E67E22', '#F39C12'] },
   { name: 'Emerald Green', colors: ['#27AE60', '#2ECC71', '#58D68D'] },
+  { name: 'Pure White', colors: ['#F5F5F5', '#E0E0E0', '#CCCCCC'] },
+  { name: 'Midnight Black', colors: ['#2A2A2A', '#1A1A1A', '#0D0D0D'] },
+  { name: 'Vibrant Yellow', colors: ['#F4D03F', '#F1C40F', '#D4AC0D'] },
+  { name: 'Soft Pink', colors: ['#FADBD8', '#F5B7B1', '#F1948A'] },
   { name: 'Custom', colors: ['#8B7355', '#6B5344', '#5C4532'] }
 ]
 
@@ -51,7 +55,12 @@ export default function EditBookModal({
     purchaseDate: new Date().toISOString().split('T')[0],
     purchasePrice: '',
     purchaseCurrency: 'IDR',
-    isGift: false,
+    acquisitionType: 'purchased' as 'purchased' | 'gift' | 'borrowed',
+    giftFrom: '',
+    borrowedFrom: '',
+    borrowedBy: '',
+    borrowedDate: new Date().toISOString().split('T')[0],
+    dueDate: '',
   })
 
   // Reset form when book changes
@@ -76,7 +85,12 @@ export default function EditBookModal({
         purchaseDate: book.purchaseDate?.split('T')[0] || new Date().toISOString().split('T')[0],
         purchasePrice: book.purchasePrice?.toString() || '',
         purchaseCurrency: book.purchaseCurrency || 'IDR',
-        isGift: book.isGift || false,
+        acquisitionType: book.personalNotes?.startsWith('Borrowed from: ') ? 'borrowed' : (book.isGift ? 'gift' : 'purchased'),
+        giftFrom: book.personalNotes?.startsWith('Gift from: ') ? book.personalNotes.replace('Gift from: ', '') : '',
+        borrowedFrom: book.personalNotes?.startsWith('Borrowed from: ') ? book.personalNotes.replace('Borrowed from: ', '') : '',
+        borrowedBy: book.borrowedBy || '',
+        borrowedDate: book.borrowedDate?.split('T')[0] || new Date().toISOString().split('T')[0],
+        dueDate: book.dueDate?.split('T')[0] || '',
       })
     }
   }, [book])
@@ -97,9 +111,14 @@ export default function EditBookModal({
           pages: formData.pages ? parseInt(formData.pages) : undefined,
           spineColors: [formData.color1, formData.color2, formData.color3],
           purchaseDate: formData.purchaseDate,
-          purchasePrice: formData.isGift ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
+          purchasePrice: formData.acquisitionType !== 'purchased' ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
           purchaseCurrency: formData.purchaseCurrency,
-          isGift: formData.isGift,
+          isGift: formData.acquisitionType === 'gift',
+          status: formData.status,
+          personalNotes: formData.acquisitionType === 'gift' && formData.giftFrom ? `Gift from: ${formData.giftFrom}` : (formData.acquisitionType === 'borrowed' && formData.borrowedFrom ? `Borrowed from: ${formData.borrowedFrom}` : ''),
+          borrowedBy: formData.status === 'borrowed' ? formData.borrowedBy : '',
+          borrowedDate: formData.status === 'borrowed' ? formData.borrowedDate : '',
+          dueDate: formData.status === 'borrowed' && formData.dueDate ? formData.dueDate : '',
         }
       },
       {
@@ -422,10 +441,31 @@ export default function EditBookModal({
                 <option value="reading">Reading</option>
                 <option value="finished">Finished</option>
                 <option value="wishlist">Wishlist</option>
-                <option value="borrowed">Borrowed</option>
+                <option value="borrowed">Dipinjam (Lent Out)</option>
               </select>
             </div>
           </div>
+
+          {/* Lending Info */}
+          {formData.status === 'borrowed' && (
+            <div className="pt-4 border-t border-walnut/10 space-y-4">
+              <h3 className="text-sm font-semibold text-darkBrown uppercase tracking-wider">Lending Info</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-darkBrown mb-1">Dipinjam Oleh</label>
+                  <input type="text" value={formData.borrowedBy} onChange={(e) => setFormData({ ...formData, borrowedBy: e.target.value })} className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" placeholder="Nama peminjam" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-darkBrown mb-1">Tanggal Dipinjam</label>
+                  <input type="date" value={formData.borrowedDate} onChange={(e) => setFormData({ ...formData, borrowedDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-darkBrown mb-1">Tenggat Waktu</label>
+                  <input type="date" value={formData.dueDate} onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Color Palette Picker */}
           <div className="pt-2">
@@ -468,20 +508,20 @@ export default function EditBookModal({
 
           {/* Purchase Info */}
           <div className="pt-4 border-t border-walnut/10 space-y-4">
-            <h3 className="text-sm font-semibold text-darkBrown uppercase tracking-wider">Purchase Info</h3>
-            
-            <div className="flex gap-4">
-              <button type="button" onClick={() => setFormData({ ...formData, isGift: false })} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${!formData.isGift ? 'bg-walnut text-white shadow' : 'bg-white text-walnut/70 border border-walnut/20'}`}>Purchased</button>
-              <button type="button" onClick={() => setFormData({ ...formData, isGift: true })} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${formData.isGift ? 'bg-walnut text-white shadow' : 'bg-white text-walnut/70 border border-walnut/20'}`}>Gift</button>
-            </div>
+                <label className="block text-sm font-medium text-darkBrown mb-1">Acquisition Type</label>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setFormData({ ...formData, acquisitionType: 'purchased' })} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${formData.acquisitionType === 'purchased' ? 'bg-walnut text-white shadow' : 'bg-white text-walnut/70 border border-walnut/20'}`}>Purchased</button>
+                  <button type="button" onClick={() => setFormData({ ...formData, acquisitionType: 'gift' })} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${formData.acquisitionType === 'gift' ? 'bg-walnut text-white shadow' : 'bg-white text-walnut/70 border border-walnut/20'}`}>Gift</button>
+                  <button type="button" onClick={() => setFormData({ ...formData, acquisitionType: 'borrowed' })} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${formData.acquisitionType === 'borrowed' ? 'bg-walnut text-white shadow' : 'bg-white text-walnut/70 border border-walnut/20'}`}>Minjam</button>
+                </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-darkBrown mb-1">{formData.isGift ? 'Received Date' : 'Purchase Date'}</label>
+                <label className="block text-sm font-medium text-darkBrown mb-1">{formData.acquisitionType === 'gift' ? 'Received Date' : formData.acquisitionType === 'borrowed' ? 'Borrowed Date' : 'Purchase Date'}</label>
                 <input type="date" value={formData.purchaseDate} onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" />
               </div>
-
-              {!formData.isGift && (
+              {/* Price - Only show if purchased */}
+              {formData.acquisitionType === 'purchased' && (
                 <div>
                   <label className="block text-sm font-medium text-darkBrown mb-1">Purchase Price</label>
                   <div className="flex relative">
@@ -497,6 +537,22 @@ export default function EditBookModal({
                 </div>
               )}
             </div>
+
+            {/* Gift From */}
+            {formData.acquisitionType === 'gift' && (
+              <div>
+                <label className="block text-sm font-medium text-darkBrown mb-1">Gift From</label>
+                <input type="text" value={formData.giftFrom} onChange={(e) => setFormData({ ...formData, giftFrom: e.target.value })} className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" placeholder="Name of the person" />
+              </div>
+            )}
+
+            {/* Borrowed From */}
+            {formData.acquisitionType === 'borrowed' && (
+              <div>
+                <label className="block text-sm font-medium text-darkBrown mb-1">Pinjam Dari</label>
+                <input type="text" value={formData.borrowedFrom} onChange={(e) => setFormData({ ...formData, borrowedFrom: e.target.value })} className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" placeholder="Nama teman atau perpustakaan" />
+              </div>
+            )}
           </div>
 
           {/* Actions */}

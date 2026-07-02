@@ -57,7 +57,21 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
+    <div 
+      className="p-4 md:p-8 flex flex-col h-full min-h-screen relative"
+      style={{
+        background: 'linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)',
+      }}
+    >
+      {/* Plaster / linen wall texture */}
+      <div style={{
+        position:'absolute', inset:0, pointerEvents:'none', opacity:0.18,
+        backgroundImage:`
+          repeating-linear-gradient(0deg,  transparent, transparent 5px, rgba(0,0,0,0.02) 5px, rgba(0,0,0,0.02) 6px),
+          repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 9px)
+        `,
+      }} />
+      <div className="max-w-7xl mx-auto w-full relative z-10">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
@@ -280,6 +294,7 @@ export default function Wishlist() {
           </div>
         </motion.div>
       )}
+      </div>
     </div>
   )
 }

@@ -216,10 +216,10 @@ export const booksApi = {
     if (updates.currentPage !== undefined) apiData.current_page = updates.currentPage;
     if (updates.personalNotes !== undefined) apiData.personal_notes = updates.personalNotes;
     if (updates.personalRating !== undefined) apiData.personal_rating = updates.personalRating;
-    if (updates.borrowedBy) apiData.borrowed_by = updates.borrowedBy;
-    if (updates.borrowedDate) apiData.borrowed_date = updates.borrowedDate;
-    if (updates.dueDate) apiData.due_date = updates.dueDate;
-    if (updates.shelfId) apiData.shelf_id = updates.shelfId;
+    if (updates.borrowedBy !== undefined) apiData.borrowed_by = updates.borrowedBy || null;
+    if (updates.borrowedDate !== undefined) apiData.borrowed_date = updates.borrowedDate || null;
+    if (updates.dueDate !== undefined) apiData.due_date = updates.dueDate || null;
+    if (updates.shelfId !== undefined) apiData.shelf_id = updates.shelfId;
     if (updates.readDates) apiData.read_dates = updates.readDates;
     // Purchase information
     if (updates.purchaseDate !== undefined) apiData.purchase_date = updates.purchaseDate || null;

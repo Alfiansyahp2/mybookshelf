@@ -232,8 +232,8 @@ export default function LibraryShelf({
               {books.map(book => {
                 if (book.status === 'borrowed') {
                   return (
-                    <div key={book.id} style={{ width:22, height:BOOK_AREA_H*0.82, flexShrink:0, background:'repeating-linear-gradient(45deg,rgba(255,255,255,0.04),rgba(255,255,255,0.04) 3px,transparent 3px,transparent 7px)', border:'1px dashed rgba(255,255,255,0.15)', borderRadius:2, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      <span style={{ fontSize:11, opacity:0.4 }}>📤</span>
+                    <div key={book.id} onClick={() => onBookClick(book)} className="cursor-pointer hover:border-white/40 transition-colors" style={{ width:22, height:BOOK_AREA_H*0.82, flexShrink:0, background:'repeating-linear-gradient(45deg,rgba(255,255,255,0.04),rgba(255,255,255,0.04) 3px,transparent 3px,transparent 7px)', border:'1px dashed rgba(255,255,255,0.15)', borderRadius:2, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <span style={{ fontSize:11, opacity:0.4 }} title={`Dipinjam oleh ${book.borrowedBy || 'seseorang'}`}>📤</span>
                     </div>
                   )
                 }

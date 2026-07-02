@@ -31,8 +31,9 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
     purchaseDate: new Date().toISOString().split('T')[0],
     purchasePrice: '',
     purchaseCurrency: 'IDR',
-    isGift: false,
-    giftFrom: ''
+    acquisitionType: 'purchased' as 'purchased' | 'gift' | 'borrowed',
+    giftFrom: '',
+    borrowedFrom: ''
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -61,10 +62,10 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
       thickness: formData.thickness as any,
       spineColors: [formData.color1, formData.color2, formData.color3] as [string, string, string],
       purchaseDate: formData.purchaseDate,
-      purchasePrice: formData.isGift ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
+      purchasePrice: formData.acquisitionType !== 'purchased' ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
       purchaseCurrency: formData.purchaseCurrency,
-      isGift: formData.isGift,
-      personalNotes: formData.isGift && formData.giftFrom ? `Gift from: ${formData.giftFrom}` : '',
+      isGift: formData.acquisitionType === 'gift',
+      personalNotes: formData.acquisitionType === 'gift' && formData.giftFrom ? `Gift from: ${formData.giftFrom}` : (formData.acquisitionType === 'borrowed' && formData.borrowedFrom ? `Borrowed from: ${formData.borrowedFrom}` : ''),
     }
 
     createBook.mutate(bookData)
@@ -429,14 +430,14 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Purchase/Gift Toggle */}
-                      <div>
+                      <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-walnut mb-1.5">Acquisition Type</label>
                         <div className="flex gap-2">
                           <button
                             type="button"
-                            onClick={() => setFormData({ ...formData, isGift: false })}
+                            onClick={() => setFormData({ ...formData, acquisitionType: 'purchased' })}
                             className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                              !formData.isGift
+                              formData.acquisitionType === 'purchased'
                                 ? 'bg-walnut text-white shadow'
                                 : 'bg-white text-walnut/70 hover:bg-walnut/10 border border-walnut/20'
                             }`}
@@ -445,14 +446,25 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                           </button>
                           <button
                             type="button"
-                            onClick={() => setFormData({ ...formData, isGift: true })}
+                            onClick={() => setFormData({ ...formData, acquisitionType: 'gift' })}
                             className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                              formData.isGift
+                              formData.acquisitionType === 'gift'
                                 ? 'bg-walnut text-white shadow'
                                 : 'bg-white text-walnut/70 hover:bg-walnut/10 border border-walnut/20'
                             }`}
                           >
                             Gift
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, acquisitionType: 'borrowed' })}
+                            className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                              formData.acquisitionType === 'borrowed'
+                                ? 'bg-walnut text-white shadow'
+                                : 'bg-white text-walnut/70 hover:bg-walnut/10 border border-walnut/20'
+                            }`}
+                          >
+                            Minjam
                           </button>
                         </div>
                       </div>
@@ -461,7 +473,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                       <div>
                         <label className="block text-sm font-medium text-walnut mb-1.5">
                           <Calendar className="w-4 h-4 inline mr-1" />
-                          {formData.isGift ? 'Received Date' : 'Purchase Date'}
+                          {formData.acquisitionType === 'gift' ? 'Received Date' : formData.acquisitionType === 'borrowed' ? 'Borrowed Date' : 'Purchase Date'}
                         </label>
                         <input
                           type="date"
@@ -471,8 +483,8 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                         />
                       </div>
 
-                      {/* Price - Only show if not gift */}
-                      {!formData.isGift && (
+                      {/* Price - Only show if purchased */}
+                      {formData.acquisitionType === 'purchased' && (
                         <div>
                           <label className="block text-sm font-medium text-walnut mb-1.5">
                             💰 Purchase Price
@@ -503,7 +515,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                       )}
 
                       {/* Gift From */}
-                      {formData.isGift && (
+                      {formData.acquisitionType === 'gift' && (
                         <div>
                           <label className="block text-sm font-medium text-walnut mb-1.5">🎁 Gift From</label>
                           <input
@@ -511,7 +523,21 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                             value={formData.giftFrom}
                             onChange={(e) => setFormData({ ...formData, giftFrom: e.target.value })}
                             className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
-                            placeholder="Person's name"
+                            placeholder="Name of the person"
+                          />
+                        </div>
+                      )}
+
+                      {/* Borrowed From */}
+                      {formData.acquisitionType === 'borrowed' && (
+                        <div>
+                          <label className="block text-sm font-medium text-walnut mb-1.5">👤 Pinjam Dari</label>
+                          <input
+                            type="text"
+                            value={formData.borrowedFrom}
+                            onChange={(e) => setFormData({ ...formData, borrowedFrom: e.target.value })}
+                            className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                            placeholder="Nama teman atau perpustakaan"
                           />
                         </div>
                       )}
@@ -580,5 +606,9 @@ const colorPalettes = [
   { name: 'Ocean Blue', colors: ['#1A5F7A', '#2E86AB', '#4793AF'] },
   { name: 'Sunset Orange', colors: ['#D4621A', '#E67E22', '#F39C12'] },
   { name: 'Emerald Green', colors: ['#27AE60', '#2ECC71', '#58D68D'] },
+  { name: 'Pure White', colors: ['#F5F5F5', '#E0E0E0', '#CCCCCC'] },
+  { name: 'Midnight Black', colors: ['#2A2A2A', '#1A1A1A', '#0D0D0D'] },
+  { name: 'Vibrant Yellow', colors: ['#F4D03F', '#F1C40F', '#D4AC0D'] },
+  { name: 'Soft Pink', colors: ['#FADBD8', '#F5B7B1', '#F1948A'] },
   { name: 'Custom', colors: ['#8B7355', '#6B5344', '#5C4532'] }
 ]

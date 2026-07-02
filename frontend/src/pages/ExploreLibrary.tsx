@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Shelf from '../components/Shelf'
-import { useBookstore } from '../store/useBookstore'
+import { useBooks } from '../hooks/useBooks'
 import { useShelves } from '../hooks/useShelves'
 import { useState, useEffect } from 'react'
 import type { Book } from '../types'
 
 export default function ExploreLibrary() {
-  const { books } = useBookstore()
+  const { data: booksResponse } = useBooks()
+  const books = booksResponse?.data?.data || []
   const { data: shelves = [], isLoading } = useShelves()
   const [currentShelf, setCurrentShelf] = useState(0)
 
@@ -127,7 +128,7 @@ export default function ExploreLibrary() {
 
           <button
             onClick={goToNextShelf}
-            disabled={currentShelf === mockShelves.length - 1}
+            disabled={currentShelf === shelves.length - 1}
             className="px-4 py-2 bg-white border border-walnut/20 rounded-xl flex items-center gap-2 hover:bg-walnut/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Next Shelf
@@ -154,7 +155,7 @@ export default function ExploreLibrary() {
       <KeyboardNavigation
         onNext={goToNextShelf}
         onPrev={goToPrevShelf}
-        canNext={currentShelf < mockShelves.length - 1}
+        canNext={currentShelf < shelves.length - 1}
         canPrev={currentShelf > 0}
       />
     </div>
