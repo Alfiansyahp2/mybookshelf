@@ -1,11 +1,18 @@
 import { motion } from 'framer-motion'
 import LibraryShelf from './Shelf'
+import { useState, useEffect } from 'react'
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from '@dnd-kit/sortable'
+import { SortableShelf } from './SortableShelf'
 import { useLighting, TEMP_COLORS } from '../hooks/useLighting'
 import type { Book, Shelf as ShelfType } from '../types'
 
 interface BookshelfProps {
   books: Book[]
   shelves: ShelfType[]
+  isEditMode?: boolean
+  onSaveLayout?: (layoutData: { id: string; order: number; span: number }[]) => void
   onAddBook?: (shelfId: string, shelfName?: string) => void
   onEditShelf?: (shelfId: string) => void
   onDeleteShelf?: (shelfId: string) => void
@@ -29,7 +36,7 @@ const FRAME = {
 }
 
 export default function Bookshelf({
-  books, shelves, onAddBook, filterStatus,
+  books, shelves, isEditMode = false, onSaveLayout, onAddBook, filterStatus,
   selectedBookId, isDrawerOpen = false, onBookClick,
 }: BookshelfProps) {
 
@@ -65,6 +72,58 @@ export default function Bookshelf({
   const ledOpacity = lightOn ? brightness / 100 : 0
 
   const grainPcts = [8, 18, 30, 44, 58, 72, 84, 93]
+
+  // --- Layout Edit State ---
+  const [localShelves, setLocalShelves] = useState<ShelfType[]>([])
+
+  useEffect(() => {
+    if (!isEditMode) {
+      setLocalShelves(shelves)
+    }
+  }, [isEditMode, shelves])
+
+  useEffect(() => {
+    if (!isEditMode && onSaveLayout && localShelves !== shelves) {
+      // It was saved via Library.tsx, but Library.tsx needs the layout data.
+      // Wait, Library.tsx doesn't have the data, it triggers onSaveLayout!
+      // I should call onSaveLayout from a useEffect when isEditMode turns false?
+      // No, Library.tsx triggers it. We should pass the local state UP.
+      // Since Library.tsx calls updateLayout, it's better if Library.tsx holds the state, OR Bookshelf manages the save button itself.
+      // Actually, if we use useEffect:
+    }
+  }, [isEditMode])
+
+  // Fix: pass data up to Library via a ref or just call onSaveLayout here when isEditMode goes false
+  const [prevEditMode, setPrevEditMode] = useState(isEditMode)
+  useEffect(() => {
+    if (prevEditMode && !isEditMode) {
+      // Just turned off
+      onSaveLayout?.(localShelves.map((s, i) => ({ id: s.id, order: i, span: s.span || 12 })))
+    }
+    setPrevEditMode(isEditMode)
+  }, [isEditMode, prevEditMode, localShelves, onSaveLayout])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      setLocalShelves((items) => {
+        const oldIndex = items.findIndex((s) => s.id === active.id)
+        const newIndex = items.findIndex((s) => s.id === over.id)
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
+
+  const handleResize = (id: string, span: number) => {
+    setLocalShelves((items) => items.map(s => s.id === id ? { ...s, span } : s))
+  }
+
+  const shelvesToRender = isEditMode ? localShelves : visibleShelves
 
   return (
     /* ── Room / wall background ─────────────────── */
@@ -132,22 +191,28 @@ export default function Bookshelf({
         </div>
 
         {/* ── Shelves ──────────────────────────── */}
-        <div style={{ overflow:'visible', position:'relative' }}>
-          {visibleShelves.map((shelf, idx) => (
-            <LibraryShelf
-              key={shelf.id}
-              shelf={shelf}
-              books={booksDistribution.get(shelf.id) || []}
-              onBookClick={handleBookClick}
-              onAddBook={handleAddBook}
-              onEditShelf={handleEditShelf}
-              onDeleteShelf={handleDeleteShelf}
-              isDrawerOpen={isDrawerOpen}
-              selectedBookId={selectedBookId}
-              shelfIndex={idx}
-            />
-          ))}
-        </div>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 0, padding: 0, position: 'relative' }}>
+            <SortableContext items={shelvesToRender.map(s => s.id)} strategy={rectSortingStrategy}>
+              {shelvesToRender.map((shelf, idx) => (
+                <SortableShelf
+                  key={shelf.id}
+                  shelf={shelf}
+                  books={booksDistribution.get(shelf.id) || []}
+                  isEditMode={isEditMode}
+                  onResize={handleResize}
+                  onBookClick={handleBookClick}
+                  onAddBook={handleAddBook}
+                  onEditShelf={handleEditShelf}
+                  onDeleteShelf={handleDeleteShelf}
+                  isDrawerOpen={isDrawerOpen}
+                  selectedBookId={selectedBookId}
+                  shelfIndex={idx}
+                />
+              ))}
+            </SortableContext>
+          </div>
+        </DndContext>
 
         {/* ── Base plinth ──────────────────────── */}
         <div style={{

@@ -42,6 +42,10 @@ export const shelvesApi = {
     return apiClient.patch(`/v1/shelves/${id}`, updates);
   },
 
+  async updateLayout(shelves: { id: string; order: number; span: number }[]): Promise<any> {
+    return apiClient.put(`/v1/shelves/layout`, { shelves });
+  },
+
   async deleteShelf(id: string): Promise<any> {
     return apiClient.delete(`/v1/shelves/${id}`);
   },
@@ -90,6 +94,22 @@ export function useUpdateShelf() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['shelves'] });
       queryClient.invalidateQueries({ queryKey: ['shelves', variables.id] });
+    },
+  });
+}
+
+/**
+ * Hook to update shelf layout in batch
+ */
+export function useUpdateShelfLayout() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (shelves: { id: string; order: number; span: number }[]) =>
+      shelvesApi.updateLayout(shelves).then((res) => res.data),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shelves'] });
     },
   });
 }

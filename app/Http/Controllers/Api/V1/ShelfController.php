@@ -121,4 +121,30 @@ class ShelfController extends Controller
 
         return response()->success($occupancy, 'Occupancy retrieved successfully');
     }
+    /**
+     * Batch update shelf layout (span and order).
+     */
+    public function updateLayout(Request $request)
+    {
+        $data = $request->validate([
+            'shelves' => 'required|array',
+            'shelves.*.id' => 'required|uuid',
+            'shelves.*.order' => 'required|integer',
+            'shelves.*.span' => 'required|integer|min:2|max:12',
+        ]);
+
+        $userId = $request->user()->id;
+
+        // Perform batch update
+        foreach ($data['shelves'] as $shelfData) {
+            Shelf::where('id', $shelfData['id'])
+                ->where('user_id', $userId)
+                ->update([
+                    'order' => $shelfData['order'],
+                    'span' => $shelfData['span']
+                ]);
+        }
+
+        return response()->success(null, 'Layout updated successfully');
+    }
 }

@@ -5,6 +5,8 @@ import { useBookstore } from '../store/useBookstore'
 import type { Book } from '../types'
 import Bookshelf from '../components/Bookshelf'
 import AddBookModal from '../components/AddBookModal'
+import { LayoutGrid, Save, X } from 'lucide-react'
+import { useUpdateShelfLayout } from '../hooks/useShelves'
 import ReadingCalendarModal from '../components/modals/ReadingCalendarModal'
 import LightingControl from '../components/LightingControl'
 import BigDigitalClock from '../components/ui/BigDigitalClock'
@@ -20,8 +22,10 @@ const FILTER_TABS = [
 
 export default function Library() {
   const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
+  const { mutate: updateLayout } = useUpdateShelfLayout()
 
-  const [activeFilter, setActiveFilter]     = useState<string>('all')
+  const [activeFilter, setActiveFilter] = useState<string>('all')
+  const [isEditMode, setIsEditMode] = useState(false)
   const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false)
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false)
   const [selectedShelfId, setSelectedShelfId]   = useState<string | undefined>()
@@ -105,6 +109,25 @@ export default function Library() {
 
         {/* Widgets */}
         <div className="flex flex-shrink-0 items-end justify-between md:justify-end gap-3 md:gap-5 pr-0 md:pr-6 relative z-10 w-full md:w-auto scale-90 md:scale-100 origin-bottom-right">
+          <div className="pb-1 flex gap-2">
+            {isEditMode ? (
+              <button
+                onClick={() => setIsEditMode(false)}
+                className="h-10 px-4 rounded-xl bg-green-600/90 text-white backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-green-500 shadow-sm transition-all"
+              >
+                <Save size={18} />
+                <span className="text-sm font-medium">Selesai</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsEditMode(true)}
+                className="w-10 h-10 rounded-xl bg-white/50 backdrop-blur-sm border border-walnut/10 flex items-center justify-center text-walnut transition-all hover:bg-white hover:shadow-sm"
+                title="Edit Layout"
+              >
+                <LayoutGrid size={20} />
+              </button>
+            )}
+          </div>
           <FlipCalendar onClick={() => setIsCalendarModalOpen(true)} />
           <div className="hidden sm:block pb-1">
             <BigDigitalClock />
@@ -116,15 +139,19 @@ export default function Library() {
       </div>
 
       {/* Bookshelf */}
-      <div style={{ flex: 1, marginTop: '-2px' }}>
+      <div style={{ flex: 1, marginTop: '-2px', opacity: isEditMode ? 0.95 : 1 }}>
         <Bookshelf
           books={books}
           shelves={shelves}
-          onAddBook={handleAddBook}
+          isEditMode={isEditMode}
+          onSaveLayout={(layoutData) => {
+            updateLayout(layoutData)
+          }}
+          onAddBook={isEditMode ? undefined : handleAddBook}
           filterStatus={activeFilter === 'all' ? undefined : activeFilter}
           selectedBookId={selectedBookId}
           isDrawerOpen={isBookDetailOpen}
-          onBookClick={handleBookClick}
+          onBookClick={isEditMode ? undefined : handleBookClick}
         />
       </div>
 

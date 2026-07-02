@@ -23,6 +23,7 @@ class Shelf extends Model
         'name',
         'capacity',
         'order',
+        'span',
     ];
 
     protected $casts = [

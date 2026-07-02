@@ -68,6 +68,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     });
 
     // Shelves - Full CRUD with occupancy
+    Route::put('shelves/layout', [ShelfController::class, 'updateLayout']);
     Route::apiResource('shelves', ShelfController::class);
     Route::get('shelves/{shelf}/occupancy', [ShelfController::class, 'occupancy']);
 
