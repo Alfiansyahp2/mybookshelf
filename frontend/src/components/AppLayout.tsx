@@ -21,7 +21,6 @@ import { useLogout } from '../hooks/useAuth'
 import { useBook, useDeleteBook } from '../hooks/useBooks'
 import { useDeleteShelf, useShelves } from '../hooks/useShelves'
 import NotificationCenter from './NotificationCenter'
-import ToastContainer from './ui/ToastContainer'
 import { useAchievementTracker } from '../hooks/useAchievementTracker'
 
 const navItems = [
@@ -437,9 +436,6 @@ export default function AppLayout() {
           onShelfAdded={handleAddShelf}
         />
       )}
-
-      {/* Global Toast Notifications */}
-      <ToastContainer />
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-cream/95 backdrop-blur-md border-t border-walnut/20 z-[60]">

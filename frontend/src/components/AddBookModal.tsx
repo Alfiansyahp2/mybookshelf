@@ -17,7 +17,8 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
     title: '',
     author: '',
     isbn: '',
-    genre: '',
+    genres: [] as string[],
+    language: 'Indonesian',
     publisher: '',
     publishYear: new Date().getFullYear(),
     pages: 0,
@@ -29,6 +30,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
     color3: '#5C4532',
     purchaseDate: new Date().toISOString().split('T')[0],
     purchasePrice: '',
+    purchaseCurrency: 'IDR',
     isGift: false,
     giftFrom: ''
   })
@@ -47,11 +49,22 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
       author: formData.author,
       shelfId: shelfId,
       status: 'unread' as const,
-      totalPages: formData.pages,
+      pages: formData.pages,
       currentPage: 0,
       isbn: formData.isbn,
-      publishedYear: formData.publishYear,
-      notes: `${formData.publisher ? `Publisher: ${formData.publisher}` : ''}\n${formData.isGift ? `Gift from: ${formData.giftFrom}` : `Purchased for: $${formData.purchasePrice}`}`,
+      genre: formData.genres.join(', '),
+      language: formData.language,
+      publisher: formData.publisher,
+      publishYear: formData.publishYear,
+      format: formData.format as any,
+      height: formData.height as any,
+      thickness: formData.thickness as any,
+      spineColors: [formData.color1, formData.color2, formData.color3] as [string, string, string],
+      purchaseDate: formData.purchaseDate,
+      purchasePrice: formData.isGift ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
+      purchaseCurrency: formData.purchaseCurrency,
+      isGift: formData.isGift,
+      personalNotes: formData.isGift && formData.giftFrom ? `Gift from: ${formData.giftFrom}` : '',
     }
 
     createBook.mutate(bookData)
@@ -62,7 +75,8 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
       title: '',
       author: '',
       isbn: '',
-      genre: '',
+      genres: [],
+      language: 'Indonesian',
       publisher: '',
       publishYear: new Date().getFullYear(),
       pages: 0,
@@ -74,6 +88,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
       color3: '#5C4532',
       purchaseDate: new Date().toISOString().split('T')[0],
       purchasePrice: '',
+      purchaseCurrency: 'IDR',
       isGift: false,
       giftFrom: ''
     })
@@ -180,19 +195,50 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                       </div>
 
                       {/* Genre */}
-                      <div>
+                      <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-walnut mb-1.5">
                           <Globe className="w-4 h-4 inline mr-1" />
-                          Genre *
+                          Genres *
                         </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.genre}
-                          onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
-                          placeholder="e.g., Fiction, Science"
-                        />
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap gap-2">
+                            {['Fiction', 'Non-Fiction', 'Fantasy', 'Sci-Fi', 'Romance', 'Thriller', 'Mystery', 'Biography', 'History', 'Self-Help', 'Business', 'Science'].map(g => (
+                              <button
+                                key={g}
+                                type="button"
+                                onClick={() => {
+                                  if (formData.genres.includes(g)) {
+                                    setFormData({ ...formData, genres: formData.genres.filter(x => x !== g) })
+                                  } else {
+                                    setFormData({ ...formData, genres: [...formData.genres, g] })
+                                  }
+                                }}
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                  formData.genres.includes(g) ? 'bg-walnut text-white' : 'bg-walnut/10 text-walnut/80 hover:bg-walnut/20'
+                                }`}
+                              >
+                                {g}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="Or type a custom genre and press Enter"
+                              className="flex-1 px-4 py-2 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const val = e.currentTarget.value.trim();
+                                  if (val && !formData.genres.includes(val)) {
+                                    setFormData({ ...formData, genres: [...formData.genres, val] });
+                                  }
+                                  e.currentTarget.value = '';
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       {/* Publisher */}
@@ -207,6 +253,30 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                           className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
                           placeholder="Publisher name"
                         />
+                      </div>
+
+                      {/* Language */}
+                      <div>
+                        <label className="block text-sm font-medium text-walnut mb-1.5">
+                          Language
+                        </label>
+                        <select
+                          value={formData.language}
+                          onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                          className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        >
+                          <option value="Indonesian">Indonesian</option>
+                          <option value="English">English</option>
+                          <option value="Japanese">Japanese</option>
+                          <option value="Korean">Korean</option>
+                          <option value="Chinese">Chinese</option>
+                          <option value="Arabic">Arabic</option>
+                          <option value="Spanish">Spanish</option>
+                          <option value="French">French</option>
+                          <option value="German">German</option>
+                          <option value="Dutch">Dutch</option>
+                          <option value="Other">Other</option>
+                        </select>
                       </div>
 
                       {/* Publish Year */}
@@ -407,16 +477,26 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                           <label className="block text-sm font-medium text-walnut mb-1.5">
                             💰 Purchase Price
                           </label>
-                          <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/60 text-sm">$</span>
+                          <div className="flex relative">
+                            <select
+                              value={formData.purchaseCurrency}
+                              onChange={(e) => setFormData({ ...formData, purchaseCurrency: e.target.value })}
+                              className="absolute left-1 top-1.5 bottom-1.5 bg-transparent border-r border-walnut/20 text-walnut/80 text-sm focus:outline-none px-2 rounded-l-lg z-10"
+                            >
+                              <option value="IDR">Rp</option>
+                              <option value="USD">$</option>
+                              <option value="EUR">€</option>
+                              <option value="GBP">£</option>
+                              <option value="JPY">¥</option>
+                            </select>
                             <input
                               type="number"
-                              step="0.01"
+                              step={formData.purchaseCurrency === 'IDR' || formData.purchaseCurrency === 'JPY' ? '1' : '0.01'}
                               min="0"
                               value={formData.purchasePrice}
                               onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value })}
-                              className="w-full pl-8 pr-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
-                              placeholder="0.00"
+                              className="w-full pl-16 pr-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                              placeholder="0"
                             />
                           </div>
                         </div>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, Mail, Lock, Eye, EyeOff, User, ChevronRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useLogin, useRegister, useAuthUser } from '../hooks/useAuth'
+import { useNotifications } from '../hooks/useNotifications'
 import { authApi } from '../lib/api/auth'
 
 // Debug: expose authApi to window for testing
@@ -18,6 +19,7 @@ export default function Login() {
   const login = useLogin()
   const register = useRegister()
   const { data: user } = useAuthUser()
+  const addNotification = useNotifications(state => state.addNotification)
 
   // Debug: make authApi available in browser console
   useEffect(() => {
@@ -88,7 +90,11 @@ export default function Login() {
 
         // Show more detailed error message
         const errorMessage = error.response?.data?.message || error.message || 'Unknown error'
-        alert(`${isLogin ? 'Login' : 'Registration'} failed: ${errorMessage}`)
+        addNotification({
+          title: `${isLogin ? 'Login' : 'Registration'} failed`,
+          message: errorMessage,
+          type: 'warning'
+        })
       }
     })
   }

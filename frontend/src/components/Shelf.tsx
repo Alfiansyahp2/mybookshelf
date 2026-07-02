@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Pencil, Trash2, Sparkles } from 'lucide-react'
 import RealisticBook from './Book'
 import DecorationPicker from './decorations/DecorationPicker'
@@ -50,6 +50,7 @@ export default function LibraryShelf({
   /* ── Decoration state ─────────────────────────── */
   const [decoStore, setDecoStore] = useState(() => loadDecorations())
   const [pickerSlot, setPickerSlot] = useState<'left' | 'right' | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   /* ── Lighting state ──────────────────────────── */
   const { on: lightOn, brightness, colorTemp } = useLighting()
@@ -90,6 +91,52 @@ export default function LibraryShelf({
         onSelect={handleSelectDeco}
         onRemove={handleRemoveDeco}
       />
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {isDeleting && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+              className="absolute inset-0"
+              style={{ background: 'rgba(10,5,0,0.6)', backdropFilter: 'blur(4px)' }}
+              onClick={() => setIsDeleting(false)}
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: -10 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative rounded-2xl shadow-2xl p-6 max-w-sm w-full"
+              style={{ background: '#fef9ec', border: '1px solid #fcd34d66' }}
+            >
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#2a1a08' }}>Hapus Rak?</h3>
+              <p className="text-sm mb-6" style={{ color: '#6b4c2a' }}>
+                Apakah Anda yakin ingin menghapus rak <strong>"{shelf.name}"</strong>? Buku-buku di dalamnya tidak akan terhapus, namun akan kehilangan posisi raknya.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setIsDeleting(false)}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold transition-colors hover:bg-black/5"
+                  style={{ color: '#6b4c2a' }}
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={() => {
+                    setIsDeleting(false);
+                    onDeleteShelf?.(shelf.id);
+                  }}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-transform hover:scale-105 active:scale-95 shadow-md shadow-red-500/20"
+                  style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}
+                >
+                  Hapus
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -266,7 +313,7 @@ export default function LibraryShelf({
           <div style={{ display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
             <ActionBtn icon={<Plus size={12} />}   title="Tambah Buku" onClick={() => onAddBook?.(shelf.id)}    color="#ffffff" />
             <ActionBtn icon={<Pencil size={11} />} title="Edit Rak"    onClick={() => onEditShelf?.(shelf.id)}  color="#60a5fa" />
-            <ActionBtn icon={<Trash2 size={11} />} title="Hapus Rak"   onClick={() => { if (confirm(`Hapus rak "${shelf.name}"?`)) onDeleteShelf?.(shelf.id) }} color="#f87171" />
+            <ActionBtn icon={<Trash2 size={11} />} title="Hapus Rak"   onClick={() => setIsDeleting(true)} color="#f87171" />
           </div>
         </div>
       </motion.div>

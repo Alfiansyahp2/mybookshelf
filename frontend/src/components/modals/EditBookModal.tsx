@@ -11,6 +11,19 @@ interface EditBookModalProps {
   onDelete?: (bookId: string) => void
 }
 
+const colorPalettes = [
+  { name: 'Classic Brown', colors: ['#8B7355', '#6B5344', '#5C4532'] },
+  { name: 'Navy Blue', colors: ['#1E3A5F', '#2A4A7F', '#3D5A8F'] },
+  { name: 'Forest Green', colors: ['#2D5A3D', '#3A7B4F', '#4A8B5F'] },
+  { name: 'Burgundy Red', colors: ['#7A1C1C', '#9B2C2C', '#BF3E3E'] },
+  { name: 'Royal Purple', colors: ['#4A2374', '#6B3491', '#8B45AB'] },
+  { name: 'Charcoal Gray', colors: ['#2C3E50', '#34495E', '#4A5A6A'] },
+  { name: 'Ocean Blue', colors: ['#1A5F7A', '#2E86AB', '#4793AF'] },
+  { name: 'Sunset Orange', colors: ['#D4621A', '#E67E22', '#F39C12'] },
+  { name: 'Emerald Green', colors: ['#27AE60', '#2ECC71', '#58D68D'] },
+  { name: 'Custom', colors: ['#8B7355', '#6B5344', '#5C4532'] }
+]
+
 export default function EditBookModal({
   book,
   isOpen,
@@ -23,8 +36,8 @@ export default function EditBookModal({
     title: '',
     author: '',
     isbn: '',
-    genre: '',
-    language: '',
+    genres: [] as string[],
+    language: 'Indonesian',
     publisher: '',
     publishYear: '',
     pages: '',
@@ -32,6 +45,13 @@ export default function EditBookModal({
     height: 'medium' as Book['height'],
     thickness: 'regular' as Book['thickness'],
     status: 'unread' as Book['status'],
+    color1: '#8B7355',
+    color2: '#6B5344',
+    color3: '#5C4532',
+    purchaseDate: new Date().toISOString().split('T')[0],
+    purchasePrice: '',
+    purchaseCurrency: 'IDR',
+    isGift: false,
   })
 
   // Reset form when book changes
@@ -41,8 +61,8 @@ export default function EditBookModal({
         title: book.title || '',
         author: book.author || '',
         isbn: book.isbn || '',
-        genre: book.genre || '',
-        language: book.language || '',
+        genres: book.genre ? book.genre.split(',').map(s => s.trim()).filter(Boolean) : [],
+        language: book.language || 'Indonesian',
         publisher: book.publisher || '',
         publishYear: book.publishYear?.toString() || '',
         pages: book.pages?.toString() || '',
@@ -50,6 +70,13 @@ export default function EditBookModal({
         height: book.height || 'medium',
         thickness: book.thickness || 'regular',
         status: book.status || 'unread',
+        color1: book.spineColors?.[0] || '#8B7355',
+        color2: book.spineColors?.[1] || '#6B5344',
+        color3: book.spineColors?.[2] || '#5C4532',
+        purchaseDate: book.purchaseDate?.split('T')[0] || new Date().toISOString().split('T')[0],
+        purchasePrice: book.purchasePrice?.toString() || '',
+        purchaseCurrency: book.purchaseCurrency || 'IDR',
+        isGift: book.isGift || false,
       })
     }
   }, [book])
@@ -65,8 +92,14 @@ export default function EditBookModal({
         id: book.id,
         updates: {
           ...formData,
+          genre: formData.genres.join(', '),
           publishYear: formData.publishYear ? parseInt(formData.publishYear) : undefined,
           pages: formData.pages ? parseInt(formData.pages) : undefined,
+          spineColors: [formData.color1, formData.color2, formData.color3],
+          purchaseDate: formData.purchaseDate,
+          purchasePrice: formData.isGift ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
+          purchaseCurrency: formData.purchaseCurrency,
+          isGift: formData.isGift,
         }
       },
       {
@@ -85,9 +118,9 @@ export default function EditBookModal({
   }
 
   // Safe colors
-  const spineColor0 = book.spineColors?.[0] || '#8B7355'
-  const spineColor1 = book.spineColors?.[1] || '#6B5344'
-  const spineColor2 = book.spineColors?.[2] || '#5C4532'
+  const spineColor0 = formData.color1
+  const spineColor1 = formData.color2
+  const spineColor2 = formData.color3
 
   return (
     <Modal
@@ -210,23 +243,56 @@ export default function EditBookModal({
                 placeholder="978-0-123456-78-9"
               />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-darkBrown mb-1">
-                Genre
-              </label>
-              <input
-                type="text"
-                value={formData.genre}
-                onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
-                placeholder="Fiction, Non-fiction, etc."
-              />
+          {/* Genres */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-darkBrown mb-1">
+              Genres
+            </label>
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-2">
+                {['Fiction', 'Non-Fiction', 'Fantasy', 'Sci-Fi', 'Romance', 'Thriller', 'Mystery', 'Biography', 'History', 'Self-Help', 'Business', 'Science'].map(g => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => {
+                      if (formData.genres.includes(g)) {
+                        setFormData({ ...formData, genres: formData.genres.filter(x => x !== g) })
+                      } else {
+                        setFormData({ ...formData, genres: [...formData.genres, g] })
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      formData.genres.includes(g) ? 'bg-walnut text-white' : 'bg-walnut/10 text-walnut/80 hover:bg-walnut/20'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Or type a custom genre and press Enter"
+                  className="flex-1 px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const val = e.currentTarget.value.trim();
+                      if (val && !formData.genres.includes(val)) {
+                        setFormData({ ...formData, genres: [...formData.genres, val] });
+                      }
+                      e.currentTarget.value = '';
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
 
           {/* Publisher & Language */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-1">
                 Publisher
@@ -243,13 +309,23 @@ export default function EditBookModal({
               <label className="block text-sm font-medium text-darkBrown mb-1">
                 Language
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.language}
                 onChange={(e) => setFormData({ ...formData, language: e.target.value })}
                 className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
-                placeholder="English"
-              />
+              >
+                <option value="Indonesian">Indonesian</option>
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Dutch">Dutch</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
 
@@ -348,6 +424,78 @@ export default function EditBookModal({
                 <option value="wishlist">Wishlist</option>
                 <option value="borrowed">Borrowed</option>
               </select>
+            </div>
+          </div>
+
+          {/* Color Palette Picker */}
+          <div className="pt-2">
+            <label className="block text-sm font-medium text-darkBrown mb-2">Spine Color Palette</label>
+            <div className="space-y-3">
+              {/* Predefined Palettes */}
+              <div className="flex flex-wrap gap-2">
+                {colorPalettes.map((palette) => (
+                  <button
+                    key={palette.name}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, color1: palette.colors[0], color2: palette.colors[1], color3: palette.colors[2] })}
+                    className={`px-3 py-2 rounded-lg border-2 transition-all ${
+                      formData.color1 === palette.colors[0] && formData.color2 === palette.colors[1] && formData.color3 === palette.colors[2]
+                        ? 'border-walnut bg-walnut/10 shadow-md'
+                        : 'border-walnut/20 hover:border-walnut/40 bg-white'
+                    }`}
+                    title={palette.name}
+                  >
+                    <div className="flex gap-1">
+                      {palette.colors.map((color, i) => (
+                        <div key={i} className="w-4 h-4 rounded-full border border-black/10" style={{ backgroundColor: color }} />
+                      ))}
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Custom Color Preview */}
+              <div className="flex items-center gap-3 p-3 bg-white/50 rounded-xl border border-walnut/20">
+                <span className="text-sm text-walnut/60">Current:</span>
+                <div className="flex gap-2">
+                  <input type="color" value={formData.color1} onChange={(e) => setFormData({ ...formData, color1: e.target.value })} className="w-8 h-8 rounded border-none cursor-pointer p-0 bg-transparent" />
+                  <input type="color" value={formData.color2} onChange={(e) => setFormData({ ...formData, color2: e.target.value })} className="w-8 h-8 rounded border-none cursor-pointer p-0 bg-transparent" />
+                  <input type="color" value={formData.color3} onChange={(e) => setFormData({ ...formData, color3: e.target.value })} className="w-8 h-8 rounded border-none cursor-pointer p-0 bg-transparent" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Purchase Info */}
+          <div className="pt-4 border-t border-walnut/10 space-y-4">
+            <h3 className="text-sm font-semibold text-darkBrown uppercase tracking-wider">Purchase Info</h3>
+            
+            <div className="flex gap-4">
+              <button type="button" onClick={() => setFormData({ ...formData, isGift: false })} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${!formData.isGift ? 'bg-walnut text-white shadow' : 'bg-white text-walnut/70 border border-walnut/20'}`}>Purchased</button>
+              <button type="button" onClick={() => setFormData({ ...formData, isGift: true })} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-all ${formData.isGift ? 'bg-walnut text-white shadow' : 'bg-white text-walnut/70 border border-walnut/20'}`}>Gift</button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-darkBrown mb-1">{formData.isGift ? 'Received Date' : 'Purchase Date'}</label>
+                <input type="date" value={formData.purchaseDate} onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })} className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" />
+              </div>
+
+              {!formData.isGift && (
+                <div>
+                  <label className="block text-sm font-medium text-darkBrown mb-1">Purchase Price</label>
+                  <div className="flex relative">
+                    <select value={formData.purchaseCurrency} onChange={(e) => setFormData({ ...formData, purchaseCurrency: e.target.value })} className="absolute left-1 top-1 bottom-1 bg-transparent border-r border-walnut/20 text-walnut/80 text-sm focus:outline-none px-2 rounded-l-lg z-10">
+                      <option value="IDR">Rp</option>
+                      <option value="USD">$</option>
+                      <option value="EUR">€</option>
+                      <option value="GBP">£</option>
+                      <option value="JPY">¥</option>
+                    </select>
+                    <input type="number" step={formData.purchaseCurrency === 'IDR' || formData.purchaseCurrency === 'JPY' ? '1' : '0.01'} min="0" value={formData.purchasePrice} onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value })} className="w-full pl-16 pr-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50" placeholder="0" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

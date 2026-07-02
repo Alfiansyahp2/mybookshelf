@@ -3,6 +3,7 @@ import { ReactQueryProvider } from './lib/ReactQueryProvider'
 import AppLayout from './components/AppLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import CatchAll from './components/CatchAll'
+import ToastContainer from './components/ui/ToastContainer'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Library from './pages/Library'
@@ -44,6 +45,7 @@ function App() {
           {/* Catch-all route for unmatched paths */}
           <Route path="*" element={<CatchAll />} />
         </Routes>
+        <ToastContainer />
       </BrowserRouter>
     </ReactQueryProvider>
   )

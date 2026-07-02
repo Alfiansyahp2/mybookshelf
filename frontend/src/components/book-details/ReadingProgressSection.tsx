@@ -1,12 +1,13 @@
-import { BookOpen, Clock } from 'lucide-react'
+import { BookOpen, Clock, Plus } from 'lucide-react'
 import type { Book } from '../../types'
 
 interface ReadingProgressSectionProps {
   book: Book
   onProgressChange: (currentPage: number) => void
+  onAddReadDate?: (date: string) => void
 }
 
-export default function ReadingProgressSection({ book, onProgressChange }: ReadingProgressSectionProps) {
+export default function ReadingProgressSection({ book, onProgressChange, onAddReadDate }: ReadingProgressSectionProps) {
   const progress = book.pages && book.pages > 0
     ? Math.round(((book.currentPage || 0) / book.pages) * 100)
     : 0
@@ -57,11 +58,48 @@ export default function ReadingProgressSection({ book, onProgressChange }: Readi
       </div>
 
       {book.startedDate && (
-        <div className="flex items-center gap-2 p-2 bg-walnut/10 rounded-lg text-xs">
+        <div className="flex items-center gap-2 p-2 bg-walnut/10 rounded-lg text-xs mb-3">
           <Clock className="w-4 h-4 text-walnut" />
           <span className="text-walnut/70">
             Reading since {new Date(book.startedDate).toLocaleDateString()}
           </span>
+        </div>
+      )}
+
+      {book.status === 'finished' && (
+        <div className="mt-4 pt-4 border-t border-walnut/10">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-semibold text-darkBrown flex items-center gap-2 text-sm">
+              <Clock className="w-4 h-4 text-walnut" />
+              Reading History
+            </h4>
+            <div className="relative">
+              <input 
+                type="date" 
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                onChange={(e) => {
+                  if (e.target.value && onAddReadDate) {
+                    onAddReadDate(e.target.value);
+                    e.target.value = '';
+                  }
+                }}
+              />
+              <button className="text-xs px-2 py-1 bg-walnut/10 hover:bg-walnut/20 text-darkBrown font-medium rounded transition-colors flex items-center gap-1 pointer-events-none">
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+          
+          {book.readDates && book.readDates.length > 0 && (
+            <ul className="space-y-2">
+              {book.readDates.map((date, idx) => (
+                <li key={idx} className="flex items-center gap-2 text-xs text-walnut/80 bg-walnut/5 p-2 rounded border border-walnut/10">
+                  <span className="w-1.5 h-1.5 rounded-full bg-walnut/40" />
+                  {new Date(date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </div>

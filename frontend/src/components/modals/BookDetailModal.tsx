@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import {
   useUpdateProgress, useToggleFavorite, useUpdateNotes,
-  useUpdateRating, useStartReading, useFinishReading
+  useUpdateRating, useStartReading, useFinishReading, useUpdateBook
 } from '../../hooks/useBooks'
 import type { Book } from '../../types'
 import ReadingProgressSection from '../book-details/ReadingProgressSection'
@@ -44,12 +44,15 @@ export default function BookDetailModal({
   const updateRating   = useUpdateRating()
   const startReading   = useStartReading()
   const finishReading  = useFinishReading()
+  const updateBook     = useUpdateBook()
 
   const [userRating,     setUserRating]     = useState(0)
   const [userNotes,      setUserNotes]      = useState('')
   const [isEditingNotes, setIsEditingNotes] = useState(false)
   const [tempNotes,      setTempNotes]      = useState('')
   const [activeTab,      setActiveTab]      = useState<RightTab>('progress')
+  const [showMarkAsReadDatePicker, setShowMarkAsReadDatePicker] = useState(false)
+  const [markAsReadDate, setMarkAsReadDate] = useState(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
     if (book) {
@@ -87,6 +90,41 @@ export default function BookDetailModal({
   const handleNotes    = () => { updateNotes.mutate({ id: book.id, notes: tempNotes }); setUserNotes(tempNotes); setIsEditingNotes(false) }
   const handleStart    = () => { if (book.status === 'unread')   startReading.mutate(book.id) }
   const handleFinish   = () => { if (book.status === 'reading') finishReading.mutate(book.id) }
+  
+  const handleAddReadDate = (date: string) => {
+    const dates = book.readDates ? [...book.readDates] : []
+    if (!dates.includes(date)) {
+      dates.push(date)
+      dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+      updateBook.mutate({ 
+        id: book.id, 
+        updates: { 
+          readDates: dates,
+          progress: 100,
+          status: 'finished',
+          finishedDate: new Date(date).toISOString()
+        } 
+      })
+    }
+  }
+
+  const handleMarkAsReadNow = () => {
+    const dates = book.readDates ? [...book.readDates] : [];
+    if (!dates.includes(markAsReadDate)) {
+      dates.push(markAsReadDate);
+      dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    }
+    updateBook.mutate({
+      id: book.id,
+      updates: {
+        status: 'finished',
+        progress: 100,
+        finishedDate: new Date(markAsReadDate).toISOString(),
+        readDates: dates
+      }
+    });
+    setShowMarkAsReadDatePicker(false);
+  }
 
   return (
     <AnimatePresence>
@@ -338,13 +376,24 @@ export default function BookDetailModal({
                         </button>
 
                         {book.status === 'unread' && (
-                          <button onClick={handleStart} disabled={startReading.isPending}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                            style={{ background: `linear-gradient(135deg, ${c0}, ${c2})`, color: 'white' }}
-                          >
-                            <Play className="w-3.5 h-3.5" />
-                            Mulai Baca
-                          </button>
+                          <div className="flex-1 flex gap-1.5">
+                            <button onClick={handleStart} disabled={startReading.isPending}
+                              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                              style={{ background: `linear-gradient(135deg, ${c0}, ${c2})`, color: 'white' }}
+                              title="Mulai Membaca"
+                            >
+                              <Play className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">Mulai</span>
+                            </button>
+                            <button onClick={() => { setActiveTab('progress'); setShowMarkAsReadDatePicker(true); }} disabled={updateBook.isPending}
+                              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 border border-transparent"
+                              style={{ background: `${c0}15`, color: '#6b4c2a' }}
+                              title="Tandai Sudah Dibaca"
+                            >
+                              <Check className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">Selesai</span>
+                            </button>
+                          </div>
                         )}
                         {book.status === 'reading' && (
                           <button onClick={handleFinish} disabled={finishReading.isPending}
@@ -353,6 +402,15 @@ export default function BookDetailModal({
                           >
                             <Check className="w-3.5 h-3.5" />
                             Selesai
+                          </button>
+                        )}
+                        {book.status === 'finished' && (
+                          <button onClick={() => updateBook.mutate({ id: book.id, updates: { status: 'reading', currentPage: 0 } })} disabled={updateBook.isPending}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                            style={{ background: `linear-gradient(135deg, ${c0}, ${c2})`, color: 'white' }}
+                          >
+                            <Play className="w-3.5 h-3.5" />
+                            Baca Ulang
                           </button>
                         )}
                       </div>
@@ -446,21 +504,55 @@ export default function BookDetailModal({
                           exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.16 }}
                           className="space-y-4"
                         >
-                          {book.status === 'reading' ? (
-                            <ReadingProgressSection book={book} onProgressChange={handleProgress} />
+                          {book.status === 'reading' || book.status === 'finished' ? (
+                            <ReadingProgressSection book={book} onProgressChange={handleProgress} onAddReadDate={handleAddReadDate} />
                           ) : (
                             <div className="flex flex-col items-center justify-center py-14 text-center">
                               <BookOpen className="w-12 h-12 mb-3" style={{ color: `${c1}40` }} />
                               <p className="text-sm" style={{ color: '#9c6d3a' }}>
                                 {book.status === 'finished' ? 'Buku ini sudah selesai dibaca 🎉' : 'Mulai membaca untuk melihat progress'}
                               </p>
-                              {book.status === 'unread' && (
-                                <button onClick={handleStart} disabled={startReading.isPending}
-                                  className="mt-5 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
-                                  style={{ background: `linear-gradient(135deg, ${c0}, ${c2})` }}
-                                >
-                                  Mulai Membaca
-                                </button>
+                              {book.status === 'unread' && !showMarkAsReadDatePicker && (
+                                <div className="flex gap-3 mt-5">
+                                  <button onClick={handleStart} disabled={startReading.isPending}
+                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
+                                    style={{ background: `linear-gradient(135deg, ${c0}, ${c2})` }}
+                                  >
+                                    Mulai Membaca
+                                  </button>
+                                  <button onClick={() => setShowMarkAsReadDatePicker(true)}
+                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105 border-2"
+                                    style={{ color: c0, borderColor: c0, background: 'transparent' }}
+                                  >
+                                    Sudah Baca
+                                  </button>
+                                </div>
+                              )}
+                              {book.status === 'unread' && showMarkAsReadDatePicker && (
+                                <div className="flex flex-col items-center gap-3 mt-5 p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.6)', border: `1px solid ${c0}30` }}>
+                                  <label className="text-sm font-medium" style={{ color: '#2a1a08' }}>Pilih Tanggal Selesai Dibaca:</label>
+                                  <input 
+                                    type="date" 
+                                    value={markAsReadDate}
+                                    onChange={(e) => setMarkAsReadDate(e.target.value)}
+                                    className="w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2"
+                                    style={{ borderColor: `${c0}40`, color: '#2a1a08' }}
+                                  />
+                                  <div className="flex gap-2 w-full mt-1">
+                                    <button onClick={handleMarkAsReadNow} disabled={updateBook.isPending}
+                                      className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
+                                      style={{ background: `linear-gradient(135deg, ${c0}, ${c2})` }}
+                                    >
+                                      Simpan
+                                    </button>
+                                    <button onClick={() => setShowMarkAsReadDatePicker(false)}
+                                      className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:scale-105 border border-transparent"
+                                      style={{ color: c0, background: `${c0}15` }}
+                                    >
+                                      Batal
+                                    </button>
+                                  </div>
+                                </div>
                               )}
                             </div>
                           )}
@@ -519,33 +611,48 @@ export default function BookDetailModal({
                             </div>
                           ))}
 
-                          {(book.purchaseDate || book.purchasePrice || book.purchaseLocation) && (
+                          {(book.purchaseDate || (book.purchasePrice !== undefined && book.purchasePrice !== null) || book.purchaseLocation || book.isGift) && (
                             <div className="mt-3">
                               <p className="text-[10px] uppercase tracking-widest px-1 mb-2" style={{ color: '#9c6d3a' }}>Informasi Pembelian</p>
                               <div className="p-3 rounded-xl space-y-2"
                                 style={{ background: '#fef9ec', border: '1px solid #fcd34d66' }}
                               >
                                 {book.purchaseDate && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <ShoppingBag className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#d97706' }} />
-                                    <span style={{ color: '#9c6d3a' }}>Tanggal:</span>
+                                  <div className="flex justify-between items-center text-sm pb-1.5">
+                                    <div className="flex items-center gap-2">
+                                      <ShoppingBag className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#d97706' }} />
+                                      <span style={{ color: '#9c6d3a' }}>Tanggal</span>
+                                    </div>
                                     <span className="font-medium" style={{ color: '#2a1a08' }}>
                                       {new Date(book.purchaseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                                     </span>
                                   </div>
                                 )}
                                 {book.purchaseLocation && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#d97706' }} />
-                                    <span style={{ color: '#9c6d3a' }}>Tempat:</span>
-                                    <span className="font-medium" style={{ color: '#2a1a08' }}>{book.purchaseLocation}</span>
+                                  <div className="flex justify-between items-center text-sm pb-1.5">
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#d97706' }} />
+                                      <span style={{ color: '#9c6d3a' }}>Tempat</span>
+                                    </div>
+                                    <span className="font-medium text-right max-w-[60%] truncate" style={{ color: '#2a1a08' }}>
+                                      {book.purchaseLocation}
+                                    </span>
                                   </div>
                                 )}
-                                {book.purchasePrice && (
+                                {book.isGift ? (
                                   <div className="flex justify-between items-center pt-1.5 border-t" style={{ borderColor: '#fcd34d66' }}>
-                                    <span className="text-xs" style={{ color: '#9c6d3a' }}>Harga</span>
-                                    <span className="font-bold" style={{ color: '#2a1a08' }}>Rp {book.purchasePrice.toLocaleString('id-ID')}</span>
+                                    <span className="text-xs" style={{ color: '#9c6d3a' }}>Status</span>
+                                    <span className="font-bold px-2 py-0.5 rounded-full bg-[#fcd34d66]" style={{ color: '#d97706', fontSize: '10px' }}>🎁 Hadiah / Gift</span>
                                   </div>
+                                ) : (
+                                  (book.purchasePrice !== undefined && book.purchasePrice !== null) && (
+                                    <div className="flex justify-between items-center pt-1.5 border-t" style={{ borderColor: '#fcd34d66' }}>
+                                      <span className="text-xs" style={{ color: '#9c6d3a' }}>Harga</span>
+                                      <span className="font-bold" style={{ color: '#2a1a08' }}>
+                                        {new Intl.NumberFormat('en-US', { style: 'currency', currency: book.purchaseCurrency || 'IDR', minimumFractionDigits: 0 }).format(book.purchasePrice)}
+                                      </span>
+                                    </div>
+                                  )
                                 )}
                               </div>
                             </div>

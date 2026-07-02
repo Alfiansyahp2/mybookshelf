@@ -16,6 +16,8 @@ class ShelfController extends Controller
         // SECURITY: Only show shelves belonging to authenticated user
         $shelves = Shelf::with(['room', 'books'])
             ->where('user_id', $request->user()->id)
+            ->orderBy('order')
+            ->latest()
             ->get();
         return response()->success($shelves, 'Shelves retrieved successfully');
     }
@@ -29,11 +31,21 @@ class ShelfController extends Controller
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'order' => 'nullable|integer|min:0',
-            'room_id' => 'required|exists:rooms,id',
+            'room_id' => 'nullable|exists:rooms,id',
         ]);
 
         // SECURITY: Set user_id to authenticated user
-        $data['user_id'] = $request->user()->id;
+        $user = $request->user();
+        $data['user_id'] = $user->id;
+
+        if (empty($data['room_id'])) {
+            $room = \App\Models\Room::firstOrCreate(
+                ['user_id' => $user->id],
+                ['name' => 'Main Room', 'theme' => 'classic']
+            );
+            $data['room_id'] = $room->id;
+        }
+
         $shelf = Shelf::create($data);
 
         return response()->success($shelf->load(['room', 'books']), 'Shelf created successfully', 201);

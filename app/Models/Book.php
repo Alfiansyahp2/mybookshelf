@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 class Book extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUuids;
 
     protected $primaryKey = 'id';
     protected $keyType = 'string';
@@ -61,7 +63,10 @@ class Book extends Model
         'personal_rating',
         'purchase_date',
         'purchase_price',
+        'purchase_currency',
+        'is_gift',
         'purchase_location',
+        'read_dates',
         'date_added',
         'last_modified',
     ];
@@ -74,6 +79,7 @@ class Book extends Model
         'pages' => 'integer',
         'position' => 'integer',
         'favorite' => 'boolean',
+        'is_gift' => 'boolean',
         'current_page' => 'integer',
         'progress' => 'decimal:2',
         'started_date' => 'datetime',
@@ -85,6 +91,7 @@ class Book extends Model
         'personal_rating' => 'decimal:1',
         'purchase_date' => 'datetime',
         'purchase_price' => 'decimal:2',
+        'read_dates' => 'array',
         'date_added' => 'datetime',
         'last_modified' => 'datetime',
     ];

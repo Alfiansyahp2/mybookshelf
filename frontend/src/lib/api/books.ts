@@ -53,7 +53,7 @@ interface RawBook {
 }
 
 // Transform raw API book to frontend Book type
-function transformBook(raw: RawBook): Book {
+export function transformBook(raw: RawBook): Book {
   return {
     id: raw.id,
     title: raw.title,
@@ -77,6 +77,7 @@ function transformBook(raw: RawBook): Book {
     startedDate: raw.started_date || undefined,
     finishedDate: raw.finished_date || undefined,
     estimatedStartDate: raw.estimated_start_date || undefined,
+    readDates: raw.read_dates || [],
     borrowedBy: raw.borrowed_by || undefined,
     borrowedDate: raw.borrowed_date || undefined,
     dueDate: raw.due_date || undefined,
@@ -85,6 +86,8 @@ function transformBook(raw: RawBook): Book {
     personalRating: raw.personal_rating || undefined,
     purchaseDate: raw.purchase_date || undefined,
     purchasePrice: raw.purchase_price ? parseFloat(raw.purchase_price) : undefined,
+    purchaseCurrency: raw.purchase_currency || undefined,
+    isGift: raw.is_gift || false,
     purchaseLocation: raw.purchase_location || undefined,
     shelfId: raw.shelf_id,
     position: raw.position,
@@ -159,6 +162,7 @@ export const booksApi = {
       shelf_id: bookData.shelfId,
       isbn: bookData.isbn,
       genre: bookData.genre,
+      language: bookData.language,
       publisher: bookData.publisher,
       publish_year: bookData.publishYear,
       pages: bookData.pages,
@@ -175,6 +179,8 @@ export const booksApi = {
       // Purchase information
       purchase_date: bookData.purchaseDate || null,
       purchase_price: bookData.purchasePrice ?? null,
+      purchase_currency: bookData.purchaseCurrency || 'IDR',
+      is_gift: bookData.isGift || false,
       purchase_location: bookData.purchaseLocation || null,
       // Personal info
       personal_notes: bookData.personalNotes || null,
@@ -198,6 +204,7 @@ export const booksApi = {
     if (updates.author) apiData.author = updates.author;
     if (updates.isbn) apiData.isbn = updates.isbn;
     if (updates.genre) apiData.genre = updates.genre;
+    if (updates.language) apiData.language = updates.language;
     if (updates.publisher !== undefined) apiData.publisher = updates.publisher;
     if (updates.publishYear) apiData.publish_year = updates.publishYear;
     if (updates.pages) apiData.pages = updates.pages;
@@ -213,9 +220,12 @@ export const booksApi = {
     if (updates.borrowedDate) apiData.borrowed_date = updates.borrowedDate;
     if (updates.dueDate) apiData.due_date = updates.dueDate;
     if (updates.shelfId) apiData.shelf_id = updates.shelfId;
+    if (updates.readDates) apiData.read_dates = updates.readDates;
     // Purchase information
     if (updates.purchaseDate !== undefined) apiData.purchase_date = updates.purchaseDate || null;
     if (updates.purchasePrice !== undefined) apiData.purchase_price = updates.purchasePrice ?? null;
+    if (updates.purchaseCurrency !== undefined) apiData.purchase_currency = updates.purchaseCurrency;
+    if (updates.isGift !== undefined) apiData.is_gift = updates.isGift;
     if (updates.purchaseLocation !== undefined) apiData.purchase_location = updates.purchaseLocation || null;
     // Spine colors
     if (updates.spineColors) {

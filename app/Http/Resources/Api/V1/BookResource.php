@@ -46,6 +46,7 @@ class BookResource extends JsonResource
             'started_date' => $this->started_date?->toIso8601String(),
             'finished_date' => $this->finished_date?->toIso8601String(),
             'estimated_start_date' => $this->estimated_start_date?->toIso8601String(),
+            'read_dates' => $this->read_dates,
 
             // Borrowing info
             'borrowed_by' => $this->borrowed_by,
@@ -60,6 +61,8 @@ class BookResource extends JsonResource
             // Purchase info
             'purchase_date' => $this->purchase_date?->toIso8601String(),
             'purchase_price' => $this->purchase_price ? (float) $this->purchase_price : null,
+            'purchase_currency' => $this->purchase_currency,
+            'is_gift' => $this->is_gift,
             'purchase_location' => $this->purchase_location,
 
             // Shelf placement

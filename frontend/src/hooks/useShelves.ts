@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../lib/apiClient';
+import { transformBook } from '../lib/api/books';
 import type { Shelf } from '../types';
 
 interface PaginatedResponse<T> {
@@ -20,7 +21,13 @@ export const shelvesApi = {
     const response = await apiClient.get('/v1/shelves');
     console.log('Shelves API response:', response);
     // Laravel API returns {success: true, message: "...", data: [...]}
-    return response.data?.data || response.data || [];
+    const shelves = response.data?.data || response.data || [];
+    
+    // Transform nested books in each shelf
+    return shelves.map((shelf: any) => ({
+      ...shelf,
+      books: shelf.books ? shelf.books.map((book: any) => transformBook(book)) : []
+    }));
   },
 
   async getShelf(id: string): Promise<any> {

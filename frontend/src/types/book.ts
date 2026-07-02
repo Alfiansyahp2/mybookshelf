@@ -33,6 +33,7 @@ export interface Book {
   startedDate?: string
   finishedDate?: string
   estimatedStartDate?: string
+  readDates?: string[]
 
   // Borrowing
   borrowedBy?: string
@@ -47,6 +48,8 @@ export interface Book {
   // Purchase info
   purchaseDate?: string
   purchasePrice?: number
+  purchaseCurrency?: string
+  isGift?: boolean
   purchaseLocation?: string
 
   // Location on shelf

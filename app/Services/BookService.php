@@ -164,6 +164,7 @@ class BookService
         $book->update([
             'status' => 'finished',
             'finished_date' => now(),
+            'current_page' => $book->pages,
             'progress' => 100.0,
             'last_modified' => now(),
         ]);

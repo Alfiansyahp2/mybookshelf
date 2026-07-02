@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Modal from '../ui/Modal'
 import { useCreateShelf } from '../../hooks/useShelves'
+import { useNotifications } from '../../hooks/useNotifications'
 import type { Shelf } from '../../types'
 import { Plus, X } from 'lucide-react'
 
@@ -16,6 +17,7 @@ export default function AddShelfModal({
   onShelfAdded
 }: AddShelfModalProps) {
   const createShelf = useCreateShelf()
+  const { addNotification } = useNotifications()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -34,6 +36,14 @@ export default function AddShelfModal({
         // Reset form
         setFormData({ name: '', capacity: 10 })
       },
+      onError: (error: any) => {
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to create shelf'
+        addNotification({
+          title: 'Error',
+          message: errorMessage,
+          type: 'warning'
+        })
+      }
     })
   }
 
