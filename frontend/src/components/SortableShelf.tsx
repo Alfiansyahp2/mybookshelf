@@ -38,13 +38,12 @@ export function SortableShelf({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 50 : 1,
-    opacity: isDragging ? 0.8 : 1,
+    ...(isDragging ? { zIndex: 50, opacity: 0.8 } : {}),
     gridColumn: `span ${span}`,
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="relative group">
+    <div ref={setNodeRef} style={style} className={`relative group ${isDragging ? '' : 'z-10 hover:z-40'}`}>
       {isEditMode && (
         <div className="absolute inset-0 z-20 border-2 border-dashed border-[#0078d4]/50 rounded-[14px] pointer-events-none transition-all group-hover:border-[#0078d4]" />
       )}

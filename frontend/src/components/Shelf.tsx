@@ -5,10 +5,10 @@ import RealisticBook from './Book'
 import DecorationPicker from './decorations/DecorationPicker'
 import {
   renderDecoration,
-  loadDecorations, saveDecorations,
   addDecoration, removeDecoration,
   type DecorationKind, type ShelfDecoration,
 } from './decorations/DecorationSystem'
+import { useUpdateShelf } from '../hooks/useShelves'
 import { useLighting, TEMP_COLORS } from '../hooks/useLighting'
 import type { Shelf, Book as BookType } from '../types'
 
@@ -47,29 +47,28 @@ export default function LibraryShelf({
   shelf, books, onBookClick, onAddBook, onEditShelf, onDeleteShelf,
   isDrawerOpen, selectedBookId, shelfIndex = 0,
 }: ShelfProps) {
-  /* ── Decoration state ─────────────────────────── */
-  const [decoStore, setDecoStore] = useState(() => loadDecorations())
   const [pickerSlot, setPickerSlot] = useState<'left' | 'right' | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const updateShelf = useUpdateShelf()
 
   /* ── Lighting state ──────────────────────────── */
   const { on: lightOn, brightness, colorTemp } = useLighting()
   const ct = TEMP_COLORS[colorTemp]
   const ledOpacity = lightOn ? brightness / 100 : 0
 
-  const myDecos: ShelfDecoration[] = decoStore[shelf.id] || []
+  const myDecos: ShelfDecoration[] = shelf.decorations || []
   const leftDeco  = myDecos.find(d => d.slot === 'left')
   const rightDeco = myDecos.find(d => d.slot === 'right')
 
-  useEffect(() => { saveDecorations(decoStore) }, [decoStore])
-
   const handleSelectDeco = (kind: DecorationKind, customData?: any) => {
     if (!pickerSlot) return
-    setDecoStore(prev => addDecoration(prev, shelf.id, kind, pickerSlot, customData))
+    const newDecos = addDecoration(myDecos, kind, pickerSlot, customData)
+    updateShelf.mutate({ id: shelf.id, updates: { decorations: newDecos } })
   }
   const handleRemoveDeco = () => {
     if (!pickerSlot) return
-    setDecoStore(prev => removeDecoration(prev, shelf.id, pickerSlot))
+    const newDecos = removeDecoration(myDecos, pickerSlot)
+    updateShelf.mutate({ id: shelf.id, updates: { decorations: newDecos } })
   }
 
   /* ── Capacity ──────────────────────────────────── */
@@ -201,7 +200,7 @@ export default function LibraryShelf({
           {/* ── Content row: left deco + books + right deco ── */}
           <div style={{
             position:'absolute', left:20, right:20, top:0, bottom:BOARD_H,
-            zIndex:5, display:'flex', alignItems:'flex-end', overflow:'visible',
+            zIndex:15, display:'flex', alignItems:'flex-end', overflow:'visible',
           }}>
 
             {/* Left decoration slot */}
@@ -228,7 +227,7 @@ export default function LibraryShelf({
             </div>
 
             {/* Books */}
-            <div className="hide-scrollbar" style={{ flex:1, display:'flex', alignItems:'flex-end', gap:1, overflowX:'auto', overflowY:'visible', perspective:'500px', perspectiveOrigin:'50% 100%', paddingBottom: 2 }}>
+            <div className="hide-scrollbar" style={{ flex:1, display:'flex', alignItems:'flex-end', gap:1, overflowX:'visible', overflowY:'visible', perspective:'500px', perspectiveOrigin:'50% 100%', paddingBottom: 2 }}>
               {books.map(book => {
                 if (book.status === 'borrowed') {
                   return (

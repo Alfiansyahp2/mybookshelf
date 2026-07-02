@@ -8,6 +8,7 @@ export interface Shelf {
   order: number
   span: number
   roomId?: string
+  decorations?: any[]
 }
 
 export interface Room {

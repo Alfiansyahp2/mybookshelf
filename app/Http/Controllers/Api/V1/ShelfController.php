@@ -76,6 +76,7 @@ class ShelfController extends Controller
             'capacity' => 'sometimes|integer|min:1',
             'order' => 'sometimes|integer|min:0',
             'room_id' => 'sometimes|exists:rooms,id',
+            'decorations' => 'sometimes|array|nullable',
         ]);
 
         $shelf->update($data);

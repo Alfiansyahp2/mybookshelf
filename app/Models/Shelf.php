@@ -24,11 +24,14 @@ class Shelf extends Model
         'capacity',
         'order',
         'span',
+        'decorations',
     ];
 
     protected $casts = [
         'capacity' => 'integer',
         'order' => 'integer',
+        'span' => 'integer',
+        'decorations' => 'array',
     ];
 
     public function room(): BelongsTo

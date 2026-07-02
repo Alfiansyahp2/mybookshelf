@@ -22,6 +22,8 @@ export type DecorationKind =
   | 'mug'
   | 'lantern'
   | 'succulent'
+  | 'cat_sleep'
+  | 'cat_sit'
 
 export interface ShelfDecoration {
   id: string
@@ -31,42 +33,22 @@ export interface ShelfDecoration {
   customData?: any
 }
 
-export interface DecorationStore {
-  [shelfId: string]: ShelfDecoration[]
-}
-
-const STORAGE_KEY = 'mybookshelf_decorations'
-
-export function loadDecorations(): DecorationStore {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') }
-  catch { return {} }
-}
-
-export function saveDecorations(store: DecorationStore) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store))
-}
-
 export function addDecoration(
-  store: DecorationStore,
-  shelfId: string,
+  list: ShelfDecoration[],
   kind: DecorationKind,
   slot: 'left' | 'right',
   customData?: any
-): DecorationStore {
-  const list = store[shelfId] || []
-  // only one per slot
+): ShelfDecoration[] {
   const filtered = list.filter(d => d.slot !== slot)
   const next: ShelfDecoration = { id: `${Date.now()}`, kind, slot, customData }
-  return { ...store, [shelfId]: [...filtered, next] }
+  return [...filtered, next]
 }
 
 export function removeDecoration(
-  store: DecorationStore,
-  shelfId: string,
+  list: ShelfDecoration[],
   slot: 'left' | 'right',
-): DecorationStore {
-  const list = (store[shelfId] || []).filter(d => d.slot !== slot)
-  return { ...store, [shelfId]: list }
+): ShelfDecoration[] {
+  return list.filter(d => d.slot !== slot)
 }
 
 // ── Decoration catalogue (label + emoji) ─────────────────
@@ -78,12 +60,14 @@ export const DECORATION_CATALOGUE: { kind: DecorationKind; label: string; emoji:
   { kind: 'succulent',     label: 'Sukulen',         emoji: '🌵',  desc: 'Kaktus mini lucu' },
   { kind: 'vase_tall',     label: 'Vas Tinggi',      emoji: '🏺',  desc: 'Vas elegan dengan bunga kering' },
   { kind: 'vase_round',    label: 'Vas Bulat',       emoji: '⚱️',  desc: 'Vas keramik bulat' },
-  { kind: 'frame_photo',   label: 'Bingkai Foto',    emoji: '🖼️',  desc: 'Bingkai foto kenangan' },
-  { kind: 'bookend_L',     label: 'Bookend',         emoji: '📐',  desc: 'Penopang buku berbentuk L' },
-  { kind: 'clock_small',   label: 'Jam Meja',        emoji: '🕰️',  desc: 'Jam meja klasik kecil' },
-  { kind: 'clock_digital', label: 'Jam Digital',     emoji: '📟',  desc: 'Jam elektronik digital kotak' },
-  { kind: 'mug',           label: 'Mug Kopi',        emoji: '☕',  desc: 'Mug kopi hangat' },
-  { kind: 'lantern',       label: 'Lentera',         emoji: '🏮',  desc: 'Lentera hangat vintage' },
+  { kind: 'frame_photo',   label: 'Bingkai Foto',    emoji: '🖼️',  desc: 'Foto kenangan kecil' },
+  { kind: 'bookend_L',     label: 'Penyangga L',     emoji: '📐',  desc: 'Penyangga buku kayu' },
+  { kind: 'clock_small',   label: 'Jam Meja',        emoji: '⏱️',  desc: 'Jam meja klasik' },
+  { kind: 'clock_digital', label: 'Jam Digital',     emoji: '📟',  desc: 'Jam retro menyala' },
+  { kind: 'mug',           label: 'Cangkir Kopi',    emoji: '☕',  desc: 'Kopi hangat mengepul' },
+  { kind: 'lantern',       label: 'Lentera',         emoji: '🏮',  desc: 'Lentera kertas kecil' },
+  { kind: 'cat_sleep',     label: 'Kucing Tidur',    emoji: '🐈',  desc: 'Kucing pixel tidur pulas' },
+  { kind: 'cat_sit',       label: 'Kucing Duduk',    emoji: '🐱',  desc: 'Kucing pixel duduk santai' },
 ]
 
 // ── Individual CSS decoration renderers ──────────────────
@@ -380,6 +364,49 @@ function Succulent() {
   )
 }
 
+function CatSleep() {
+  return (
+    <div style={{ position: 'relative', width: 60, height: 45, flexShrink: 0 }}>
+      <motion.img 
+        src="/assets/decorations/cat_sleep.png" 
+        alt="Sleeping Cat"
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        animate={{ scaleY: [1, 1.05, 1], scaleX: [1, 0.98, 1] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      />
+      {/* Zzz floating animation */}
+      <motion.div
+        style={{ position: 'absolute', top: -10, right: 0, fontSize: 10, color: '#fca5a5', fontWeight: 'bold' }}
+        animate={{ opacity: [0, 1, 0], y: [0, -15], x: [0, 5, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeOut", delay: 1 }}
+      >
+        Z
+      </motion.div>
+      <motion.div
+        style={{ position: 'absolute', top: -20, right: -5, fontSize: 14, color: '#f87171', fontWeight: 'bold' }}
+        animate={{ opacity: [0, 1, 0], y: [0, -20], x: [0, 8, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeOut", delay: 2.5 }}
+      >
+        Z
+      </motion.div>
+    </div>
+  )
+}
+
+function CatSit() {
+  return (
+    <div style={{ position: 'relative', width: 45, height: 60, flexShrink: 0 }}>
+      <motion.img 
+        src="/assets/decorations/cat_sit.png" 
+        alt="Sitting Cat"
+        style={{ width: '100%', height: '100%', objectFit: 'contain', transformOrigin: 'bottom center' }}
+        animate={{ rotate: [-2, 2, -2], scaleY: [1, 0.98, 1] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </div>
+  )
+}
+
 // ── Master render function ────────────────────────────────
 
 export function renderDecoration(deco: ShelfDecoration | DecorationKind, key?: string) {
@@ -400,6 +427,8 @@ export function renderDecoration(deco: ShelfDecoration | DecorationKind, key?: s
     clock_digital: <ClockDigital key={key} />,
     mug:           <Mug key={key} />,
     lantern:       <Lantern key={key} />,
+    cat_sleep:     <CatSleep key={key} />,
+    cat_sit:       <CatSit key={key} />,
   }
   return map[kind] ?? null
 }

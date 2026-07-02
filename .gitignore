@@ -309,4 +309,7 @@ package-lock.json
 # frontend/package-lock.json
 # composer.lock
 
+# Temporary Python Scripts
+*.py
+
 # End of .gitignore
