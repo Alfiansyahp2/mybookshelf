@@ -510,7 +510,7 @@ export default function BookDetailModal({
                             <div className="flex flex-col items-center justify-center py-14 text-center">
                               <BookOpen className="w-12 h-12 mb-3" style={{ color: `${c1}40` }} />
                               <p className="text-sm" style={{ color: '#9c6d3a' }}>
-                                {book.status === 'finished' ? 'Buku ini sudah selesai dibaca 🎉' : 'Mulai membaca untuk melihat progress'}
+                                Mulai membaca untuk melihat progress
                               </p>
                               {book.status === 'unread' && !showMarkAsReadDatePicker && (
                                 <div className="flex gap-3 mt-5">

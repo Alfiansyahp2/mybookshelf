@@ -32,7 +32,7 @@ class BookController extends Controller
 
         // SECURITY: Pass authenticated user ID to filter their books only
         $userId = $request->user()->id;
-        $books = $this->bookService->getAllBooks($filters, true, $userId);
+        $books = $this->bookService->getAllBooks($filters, false, $userId);
 
         return response()->success($books, 'Books retrieved successfully');
     }

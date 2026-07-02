@@ -2,19 +2,20 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Shelf from '../components/Shelf'
 import { useBookstore } from '../store/useBookstore'
-import { mockShelves } from '../utils/mockData'
+import { useShelves } from '../hooks/useShelves'
 import { useState, useEffect } from 'react'
 import type { Book } from '../types'
 
 export default function ExploreLibrary() {
   const { books } = useBookstore()
+  const { data: shelves = [], isLoading } = useShelves()
   const [currentShelf, setCurrentShelf] = useState(0)
 
   // Distribute books across shelves
   const distributeBooksAcrossShelves = (): Map<string, Book[]> => {
     const distribution = new Map<string, Book[]>()
 
-    mockShelves.forEach((shelf) => {
+    shelves.forEach((shelf) => {
       distribution.set(shelf.id, [])
     })
 
@@ -43,7 +44,7 @@ export default function ExploreLibrary() {
   }
 
   const goToNextShelf = () => {
-    if (currentShelf < mockShelves.length - 1) {
+    if (currentShelf < shelves.length - 1) {
       setCurrentShelf(currentShelf + 1)
     }
   }
@@ -54,8 +55,16 @@ export default function ExploreLibrary() {
     }
   }
 
-  const currentShelfData = mockShelves[currentShelf]
+  const currentShelfData = shelves[currentShelf]
   const currentBooks = booksDistribution.get(currentShelfData?.id) || []
+
+  if (isLoading) {
+    return <div className="p-8">Memuat rak...</div>
+  }
+
+  if (shelves.length === 0) {
+    return <div className="p-8 text-center text-walnut/60">Tidak ada rak. Silakan tambahkan rak di perpustakaan.</div>
+  }
 
   return (
     <div className="p-8">
@@ -72,10 +81,10 @@ export default function ExploreLibrary() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-serif text-darkBrown mb-1">Main Library Room</h2>
-            <p className="text-walnut/70">{mockShelves.length} Shelves · {books.length} Books</p>
+            <p className="text-walnut/70">{shelves.length} Shelves · {books.length} Books</p>
           </div>
           <div className="flex gap-2">
-            {mockShelves.map((_, index) => (
+            {shelves.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentShelf(index)}
