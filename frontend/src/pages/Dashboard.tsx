@@ -159,6 +159,9 @@ export default function Dashboard() {
       .sort((a: any, b: any) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime())
       .slice(0, 5)
 
+    const authorCounts: Record<string, number> = {}
+    books.forEach((b: any) => { if (b.author) authorCounts[b.author] = (authorCounts[b.author] || 0) + 1 })
+
     return {
       total: books.length, reading: reading.length, finished: finished.length,
       unread: unread.length, wishlist: wishlist.length, borrowed: borrowed.length,
@@ -166,8 +169,11 @@ export default function Dashboard() {
       avgRating: Math.round(avgRating * 10) / 10,
       currentlyReading, recentBooks,
       genreChart: Object.entries(genreCounts)
-        .map(([name, count]) => ({ name: name.length > 10 ? name.slice(0, 10) + '…' : name, count }))
-        .sort((a, b) => b.count - a.count).slice(0, 6),
+        .map(([name, count]) => ({ name: name.length > 15 ? name.slice(0, 15) + '…' : name, count }))
+        .sort((a, b) => b.count - a.count),
+      authorChart: Object.entries(authorCounts)
+        .map(([name, count]) => ({ name: name.length > 15 ? name.slice(0, 15) + '…' : name, count }))
+        .sort((a, b) => b.count - a.count),
       statusPie: Object.entries(STATUS_CFG)
         .map(([k, v]) => ({ name: v.label, value: byStatus(k).length, color: v.color }))
         .filter(d => d.value > 0),
@@ -358,7 +364,7 @@ export default function Dashboard() {
       </div>
 
       {/* ─── Charts row ───────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20, marginBottom: 20 }}>
 
         {/* Status donut */}
         <motion.div {...fadeUp(0.5)}>
@@ -398,15 +404,43 @@ export default function Dashboard() {
               {stats.genreChart.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data genre</div>
               ) : (
-                <ResponsiveContainer width="100%" height={150}>
-                  <BarChart data={stats.genreChart} barSize={18}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} />
-                    <YAxis hide />
-                    <Tooltip content={<ChartTooltip />} />
-                    <Bar dataKey="count" name="Buku" fill={BRAND.walnut} radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div style={{ overflowY: 'auto', maxHeight: 150, paddingRight: 4 }} className="hide-scrollbar">
+                  <ResponsiveContainer width="100%" height={Math.max(150, stats.genreChart.length * 28)}>
+                    <BarChart data={stats.genreChart} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
+                      <XAxis type="number" hide />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
+                      <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
+                      <Bar dataKey="count" name="Buku" fill={BRAND.walnut} radius={[0, 4, 4, 0]} barSize={14} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Author bar chart */}
+        <motion.div {...fadeUp(0.58)}>
+          <Card>
+            <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
+              <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Penulis Terbanyak</h3>
+            </div>
+            <div style={{ padding: '12px 16px 12px' }}>
+              {stats.authorChart.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data penulis</div>
+              ) : (
+                <div style={{ overflowY: 'auto', maxHeight: 150, paddingRight: 4 }} className="hide-scrollbar">
+                  <ResponsiveContainer width="100%" height={Math.max(150, stats.authorChart.length * 28)}>
+                    <BarChart data={stats.authorChart} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
+                      <XAxis type="number" hide />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
+                      <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
+                      <Bar dataKey="count" name="Buku" fill={'#8b5cf6'} radius={[0, 4, 4, 0]} barSize={14} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               )}
             </div>
           </Card>

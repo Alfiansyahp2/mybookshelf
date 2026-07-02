@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import type { ReactNode } from 'react'
 
@@ -28,7 +29,7 @@ export default function Modal({
     xl: 'max-w-4xl'
   }
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -78,4 +79,6 @@ export default function Modal({
       )}
     </AnimatePresence>
   )
+
+  return createPortal(modalContent, document.body)
 }

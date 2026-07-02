@@ -126,25 +126,12 @@ export default function Bookshelf({
   const shelvesToRender = isEditMode ? localShelves : visibleShelves
 
   return (
-    /* ── Room / wall background ─────────────────── */
     <div style={{
       position:'relative',
       borderRadius:14,
       overflow:'hidden',
-      /* Warm parchment wall — like a reading room */
-      background:'linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)',
       padding:'0 0 14px',
-      boxShadow:'inset 0 0 50px rgba(0,0,0,0.08), 0 6px 28px rgba(0,0,0,0.18)',
     }}>
-
-      {/* Plaster / linen wall texture */}
-      <div style={{
-        position:'absolute', inset:0, pointerEvents:'none', opacity:0.18,
-        backgroundImage:`
-          repeating-linear-gradient(0deg,  transparent, transparent 5px, rgba(0,0,0,0.02) 5px, rgba(0,0,0,0.02) 6px),
-          repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 9px)
-        `,
-      }} />
 
       {/* Warm ceiling ambient glow */}
       <motion.div

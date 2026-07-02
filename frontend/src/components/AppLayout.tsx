@@ -10,7 +10,8 @@ import {
   Bell,
   Layers,
   LogOut,
-  Award
+  Award,
+  LayoutDashboard
 } from 'lucide-react'
 import BookDetailModal from './modals/BookDetailModal'
 import EditBookModal from './modals/EditBookModal'
@@ -158,9 +159,19 @@ export default function AppLayout() {
           <div className="flex items-center gap-4 md:gap-8">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 md:gap-3">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-walnut rounded-lg flex items-center justify-center">
-                <BookOpen className="w-4 h-4 md:w-6 md:h-6 text-white" />
-              </div>
+              <motion.div 
+                className="w-8 h-8 md:w-10 md:h-10 bg-walnut rounded-lg flex items-center justify-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                >
+                  <BookOpen className="w-4 h-4 md:w-6 md:h-6 text-white" />
+                </motion.div>
+              </motion.div>
               <h1 className="text-base md:text-xl font-serif font-semibold text-darkBrown hidden sm:block">
                 MyBookshelf
               </h1>
@@ -235,34 +246,35 @@ export default function AppLayout() {
               </motion.button>
 
               {/* Notification Center */}
-              <div className="hidden sm:block mt-1.5">
-                <NotificationCenter />
-              </div>
+              <motion.div 
+                className="hidden sm:block mt-1.5"
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                >
+                  <NotificationCenter />
+                </motion.div>
+              </motion.div>
 
               {/* User Profile Dropdown */}
               <div className="relative" ref={profileRef}>
                 <motion.button
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                   className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-walnut to-darkBrown rounded-xl flex items-center justify-center text-white font-semibold text-xs md:text-sm relative shadow-lg"
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.95 }}
                   animate={{
-                    rotate: isProfileDropdownOpen ? 360 : 0,
                     scale: isProfileDropdownOpen ? 1.1 : 1
                   }}
-                  transition={{
-                    duration: 0.4,
-                    ease: [0.34, 1.56, 0.64, 1]
-                  }}
+                  transition={{ duration: 0.2 }}
                 >
                   <motion.div
-                    animate={{
-                      rotate: isProfileDropdownOpen ? -360 : 0
-                    }}
-                    transition={{
-                      duration: 0.4,
-                      ease: [0.34, 1.56, 0.64, 1]
-                    }}
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
                   >
                     U
                   </motion.div>

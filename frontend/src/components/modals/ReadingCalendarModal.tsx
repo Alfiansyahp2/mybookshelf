@@ -17,10 +17,6 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedBook, setSelectedBook] = useState<{ book: Book, rect: DOMRect } | null>(null)
 
-  const finishedBooks = useMemo(() => {
-    return books.filter(b => b.status === 'finished' && b.finishedDate)
-  }, [books])
-
   const { daysInMonth, startDayOfWeek, previousMonthDays } = useMemo(() => {
     const year = currentDate.getFullYear()
     const month = currentDate.getMonth()
@@ -84,16 +80,25 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
     setSelectedBook(null)
   }
 
-  // Get books for a specific date
+  // Get books for a specific date (both finished and read dates)
   const getBooksForDate = (date: Date) => {
-    return finishedBooks.filter(book => {
-      if (!book.finishedDate) return false
-      const finishDate = new Date(book.finishedDate)
-      return (
-        finishDate.getDate() === date.getDate() &&
-        finishDate.getMonth() === date.getMonth() &&
-        finishDate.getFullYear() === date.getFullYear()
-      )
+    const localDateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+    return books.filter(book => {
+      let isMatch = false
+      
+      if (book.finishedDate) {
+        const finishDateStr = book.finishedDate.split('T')[0]
+        if (finishDateStr === localDateStr) isMatch = true
+      }
+      
+      if (book.readDates && Array.isArray(book.readDates)) {
+        if (book.readDates.some(rd => rd.split('T')[0] === localDateStr)) {
+          isMatch = true
+        }
+      }
+      
+      return isMatch
     })
   }
 
