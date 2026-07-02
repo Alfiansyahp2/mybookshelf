@@ -246,19 +246,9 @@ export default function AppLayout() {
               </motion.button>
 
               {/* Notification Center */}
-              <motion.div 
-                className="hidden sm:block mt-1.5"
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-              >
-                <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                >
-                  <NotificationCenter />
-                </motion.div>
-              </motion.div>
+              <div className="hidden sm:block mt-1.5">
+                <NotificationCenter />
+              </div>
 
               {/* User Profile Dropdown */}
               <div className="relative" ref={profileRef}>

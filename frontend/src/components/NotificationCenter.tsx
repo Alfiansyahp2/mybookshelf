@@ -53,18 +53,26 @@ export default function NotificationCenter() {
   return (
     <div className="relative" ref={menuRef}>
       {/* Bell Button */}
-      <button
+      <motion.button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-full transition-colors hover:bg-walnut/10 text-darkBrown focus:outline-none"
         title="Notifikasi"
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.9 }}
+        transition={{ duration: 0.2 }}
       >
-        <Bell size={20} className={unreadCount > 0 ? 'fill-current opacity-20' : ''} />
-        {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-cream">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
-      </button>
+        <motion.div
+          whileHover={{ rotate: 360 }}
+          transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+        >
+          <Bell size={20} className={unreadCount > 0 ? 'fill-current opacity-20' : ''} />
+          {unreadCount > 0 && (
+            <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-cream">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </motion.div>
+      </motion.button>
 
       {/* Dropdown Menu */}
       <AnimatePresence>

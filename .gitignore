@@ -312,4 +312,11 @@ package-lock.json
 # Temporary Python Scripts
 *.py
 
+# Generated AI Documentation & Test Files
+*SUMMARY.md
+*GUIDE.md
+*FIX.md
+gamma_*.html
+test-*.html
+
 # End of .gitignore
