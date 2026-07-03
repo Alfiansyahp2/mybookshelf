@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Upload, BookOpen, Calendar, Hash, FileText, Globe, Package } from 'lucide-react'
 import { useState } from 'react'
 import { useCreateBook } from '../hooks/useBooks'
+import { BOOK_GENRES } from '../constants/genres'
 
 interface AddBookModalProps {
   isOpen: boolean
@@ -201,28 +202,34 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                           <Globe className="w-4 h-4 inline mr-1" />
                           Genres *
                         </label>
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap gap-2">
-                            {['Fiction', 'Non-Fiction', 'Fantasy', 'Sci-Fi', 'Romance', 'Thriller', 'Mystery', 'Biography', 'History', 'Self-Help', 'Business', 'Science'].map(g => (
-                              <button
-                                key={g}
-                                type="button"
-                                onClick={() => {
-                                  if (formData.genres.includes(g)) {
-                                    setFormData({ ...formData, genres: formData.genres.filter(x => x !== g) })
-                                  } else {
-                                    setFormData({ ...formData, genres: [...formData.genres, g] })
-                                  }
-                                }}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                  formData.genres.includes(g) ? 'bg-walnut text-white' : 'bg-walnut/10 text-walnut/80 hover:bg-walnut/20'
-                                }`}
-                              >
-                                {g}
-                              </button>
-                            ))}
-                          </div>
-                          <div className="flex gap-2">
+                        <div className="space-y-4">
+                          {BOOK_GENRES.map((group) => (
+                            <div key={group.category}>
+                              <h4 className="text-xs font-bold text-walnut/60 mb-2 uppercase tracking-wider">{group.category}</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {group.genres.map(g => (
+                                  <button
+                                    key={g}
+                                    type="button"
+                                    onClick={() => {
+                                      if (formData.genres.includes(g)) {
+                                        setFormData({ ...formData, genres: formData.genres.filter(x => x !== g) })
+                                      } else {
+                                        setFormData({ ...formData, genres: [...formData.genres, g] })
+                                      }
+                                    }}
+                                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                      formData.genres.includes(g) ? 'bg-walnut text-white' : 'bg-walnut/10 text-walnut/80 hover:bg-walnut/20'
+                                    }`}
+                                  >
+                                    {g}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                          
+                          <div className="flex gap-2 pt-2 border-t border-walnut/10">
                             <input
                               type="text"
                               placeholder="Or type a custom genre and press Enter"
