@@ -62,6 +62,44 @@ class ReadingSessionController extends Controller
     }
 
     /**
+     * Pause the active reading session.
+     */
+    public function pause(Request $request, $id)
+    {
+        $session = ReadingSession::where('user_id', $request->user()->id)
+            ->findOrFail($id);
+
+        if ($session->end_time) {
+            return response()->error('Cannot pause an already ended session', 400);
+        }
+
+        $data = $request->validate([
+            'is_paused' => 'required|boolean'
+        ]);
+
+        if ($data['is_paused']) {
+            if (!$session->is_paused) {
+                // We are pausing
+                $session->is_paused = true;
+                $session->last_paused_at = now();
+            }
+        } else {
+            if ($session->is_paused) {
+                // We are resuming
+                $session->is_paused = false;
+                if ($session->last_paused_at) {
+                    $pausedDuration = \Carbon\Carbon::parse($session->last_paused_at)->diffInSeconds(now());
+                    $session->paused_seconds += $pausedDuration;
+                }
+            }
+        }
+        
+        $session->save();
+
+        return response()->success($session->load('book'), 'Reading session pause status updated');
+    }
+
+    /**
      * Update the specified reading session (typically to end it).
      */
     public function update(Request $request, $id)
@@ -76,10 +114,19 @@ class ReadingSessionController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Calculate duration using actual end_time from request
-        $startTime = \Carbon\Carbon::parse($session->start_time);
         $endTime = \Carbon\Carbon::parse($data['end_time']);
-        $duration = (int) $startTime->diffInSeconds($endTime);
+
+        // Calculate any unrecorded paused time if it was paused when ending
+        if ($session->is_paused && $session->last_paused_at) {
+            $pausedDuration = \Carbon\Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
+            $session->paused_seconds += $pausedDuration;
+            $session->is_paused = false;
+        }
+
+        // Calculate duration using actual end_time from request minus total paused_seconds
+        $startTime = \Carbon\Carbon::parse($session->start_time);
+        
+        $duration = max(0, (int) $startTime->diffInSeconds($endTime) - $session->paused_seconds);
 
         $session->update([
             'end_time' => $data['end_time'],

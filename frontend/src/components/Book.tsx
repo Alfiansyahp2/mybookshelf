@@ -42,8 +42,7 @@ export default function RealisticBook({ book, onClick, isDrawerOpen, bookAreaHei
 
   const ratio   = HEIGHT_RATIO[book.height]  ?? 0.86
   const bookH   = Math.round(bookAreaHeight * ratio)
-  const bookW   = THICKNESS_PX[book.thickness] ?? 26
-  const isThin  = bookW < 22
+  const bookW   = THICKNESS_PX[book.thickness] ?? 28
   const sCfg    = STATUS_CFG[book.status] ?? STATUS_CFG['unread']
 
   useEffect(() => {
@@ -123,34 +122,32 @@ export default function RealisticBook({ book, onClick, isDrawerOpen, bookAreaHei
           <div style={{ position:'absolute', top:1, right:0, bottom:1, width:2,
             background:'linear-gradient(to left,#e8dcc8,#d4c5a9)', opacity:0.65 }} />
 
-          {/* Title — only if wide enough */}
-          {!isThin && (
-            <div style={{
-              position:'absolute', inset:0,
-              display:'flex', alignItems:'center', justifyContent:'center',
-              padding:'14px 3px',
+          {/* Title */}
+          <div style={{
+            position:'absolute', inset:0,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            padding:'14px 2px',
+          }}>
+            <span style={{
+              writingMode:'vertical-rl',
+              textOrientation:'mixed',
+              transform:'rotate(180deg)',
+              color:'rgba(255,255,255,0.92)',
+              fontSize: bookW <= 22 ? 7.5 : bookW >= 38 ? 9 : 8.5,
+              fontFamily:"'Georgia', 'Times New Roman', serif",
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+              textShadow:'0 1px 3px rgba(0,0,0,0.85)',
+              maxHeight: bookH - 36,
+              overflow:'hidden',
+              display:'-webkit-box',
+              WebkitLineClamp: bookW <= 22 ? 1 : 2,
+              WebkitBoxOrient:'vertical',
+              lineHeight:1.15,
             }}>
-              <span style={{
-                writingMode:'vertical-rl',
-                textOrientation:'mixed',
-                transform:'rotate(180deg)',
-                color:'rgba(255,255,255,0.88)',
-                fontSize: bookW >= 34 ? 9 : 7.5,
-                fontFamily:"'Georgia', 'Times New Roman', serif",
-                fontWeight: 600,
-                letterSpacing: '0.4px',
-                textShadow:'0 1px 4px rgba(0,0,0,0.75)',
-                maxHeight: bookH - 36,
-                overflow:'hidden',
-                display:'-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient:'vertical',
-                lineHeight:1.25,
-              }}>
-                {book.title}
-              </span>
-            </div>
-          )}
+              {book.title}
+            </span>
+          </div>
 
           {/* Reading ribbon */}
           {book.status === 'reading' && (

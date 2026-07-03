@@ -42,6 +42,7 @@ Route::prefix('v1/auth')->group(function () {
 Route::middleware('auth:sanctum')->prefix('v1/books')->group(function () {
     // Reading session management
     Route::post('{book}/reading-sessions/start', [BookController::class, 'startReadingSession']);
+    Route::patch('{book}/reading-sessions/{session}/pause', [BookController::class, 'pauseReadingSession']);
     Route::put('{book}/reading-sessions/{session}/end', [BookController::class, 'endReadingSession']);
     Route::get('{book}/reading-sessions', [BookController::class, 'getBookReadingSessions']);
     Route::post('{book}/read-again', [BookController::class, 'readAgain']);

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Play, Pause, Clock, BookOpen, Check, X, ChevronDown, ChevronUp, Calendar, FileText, TrendingUp, BarChart2, Activity } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Book } from '../../types'
-import { useStartReadingSession, useEndReadingSession, useBookReadingSessions } from '../../hooks/useReadingSessions'
+import { useStartReadingSession, useEndReadingSession, useBookReadingSessions, usePauseReadingSession } from '../../hooks/useReadingSessions'
 import type { ReadingSession } from '../../lib/api/readingSessions'
 
 interface ReadingSessionTimerProps {
@@ -154,6 +154,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
 
   const startSessionMutation = useStartReadingSession()
   const endSessionMutation   = useEndReadingSession()
+  const pauseSessionMutation = usePauseReadingSession()
   const { data: sessionData } = useBookReadingSessions(book.id)
 
   const sessions         = sessionData?.sessions ?? []
@@ -170,7 +171,13 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
         setActiveSessionId(active.id)
         setStartingPage(active.start_page)
         setEndPage(book.currentPage || active.start_page)
-        const durationSeconds = Math.max(0, Math.floor((Date.now() - new Date(active.start_time).getTime()) / 1000))
+        
+        let durationSeconds = 0;
+        if (active.is_paused && active.last_paused_at) {
+          durationSeconds = Math.max(0, Math.floor((new Date(active.last_paused_at).getTime() - new Date(active.start_time).getTime()) / 1000)) - (active.paused_seconds || 0);
+        } else {
+          durationSeconds = Math.max(0, Math.floor((Date.now() - new Date(active.start_time).getTime()) / 1000)) - (active.paused_seconds || 0);
+        }
         setSessionDuration(durationSeconds)
       }
       setHasInitializedSession(true)
@@ -180,11 +187,12 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
   // Live timer
   useEffect(() => {
     let interval: number
-    if (isReadingSession && !isEndingSession) {
+    const isPaused = activeSession?.is_paused || false;
+    if (isReadingSession && !isEndingSession && !isPaused) {
       interval = setInterval(() => setSessionDuration(prev => prev + 1), 1000)
     }
     return () => clearInterval(interval)
-  }, [isReadingSession, isEndingSession])
+  }, [isReadingSession, isEndingSession, activeSession?.is_paused])
 
   // Format HH:MM:SS
   const fmt = (secs: number) => {
@@ -251,6 +259,11 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
           <h3 className="text-sm font-semibold flex items-center gap-2" style={{ color: '#2a1a08' }}>
             <Clock className="w-4 h-4" style={{ color: '#8B7355' }} />
             Reading Session
+            {activeSession?.is_paused && (
+              <span className="ml-1 text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider" style={{ background: '#fef3c7', color: '#92400e' }}>
+                Dijeda
+              </span>
+            )}
           </h3>
 
           <div className="flex items-center gap-2">
@@ -343,14 +356,32 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
           </>
         ) : !isEndingSession ? (
           <>
-            <button
-              onClick={handleStop}
-              className="w-full py-2 rounded-lg text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
-              style={{ background: 'linear-gradient(135deg, #dc2626, #b91c1c)' }}
-            >
-              <Pause className="w-4 h-4" />
-              Stop Session
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  if (activeSessionId) {
+                    pauseSessionMutation.mutate({ bookId: book.id, sessionId: activeSessionId, isPaused: !activeSession?.is_paused });
+                  }
+                }}
+                disabled={pauseSessionMutation.isPending}
+                className="flex-1 py-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.01] disabled:opacity-50"
+                style={{ 
+                  background: activeSession?.is_paused ? 'linear-gradient(135deg, #16a34a, #15803d)' : 'linear-gradient(135deg, #f59e0b, #d97706)', 
+                  color: 'white' 
+                }}
+              >
+                {activeSession?.is_paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                {activeSession?.is_paused ? 'Lanjutkan' : 'Jeda'}
+              </button>
+              <button
+                onClick={handleStop}
+                className="flex-1 py-2 rounded-lg text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
+                style={{ background: 'linear-gradient(135deg, #dc2626, #b91c1c)' }}
+              >
+                <Check className="w-4 h-4" />
+                Selesai
+              </button>
+            </div>
             <div className="mt-2 text-center text-[10px]" style={{ color: '#9c6d3a' }}>
               Dari hal. {startingPage} · {pagesRead} halaman dibaca
             </div>

@@ -333,14 +333,14 @@ class BookService
     /**
      * Create timeline event
      */
-    protected function createTimelineEvent(Book $book, $type, $description)
+    public function createTimelineEvent(Book $book, $type, $description)
     {
         return TimelineEvent::create([
             'id' => Str::uuid()->toString(),
             'book_id' => $book->id,
             'type' => $type,
             'date' => now(),
-            'description' => $description,
+            'description' => is_array($description) ? json_encode($description) : $description,
             'metadata' => [
                 'page' => $book->current_page,
                 'progress' => $book->progress,

@@ -55,6 +55,30 @@ export function useEndReadingSession() {
 }
 
 /**
+ * Hook to pause or resume a reading session
+ */
+export function usePauseReadingSession() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ bookId, sessionId, isPaused }: { bookId: string; sessionId: string; isPaused: boolean }) =>
+      readingSessionsApi.pauseSession(bookId, sessionId, isPaused),
+
+    onSuccess: (data, variables) => {
+      console.log('Reading session pause toggled successfully:', data);
+
+      // Invalidate and refetch reading sessions queries
+      queryClient.invalidateQueries({ queryKey: ['reading-sessions', variables.bookId] });
+    },
+
+    onError: (error: any) => {
+      console.error('Failed to toggle pause for reading session:', error);
+      console.error('Error response:', error.response?.data);
+    },
+  });
+}
+
+/**
  * Hook to get reading sessions for a book
  */
 export function useBookReadingSessions(bookId: string) {

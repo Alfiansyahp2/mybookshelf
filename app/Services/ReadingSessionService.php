@@ -26,13 +26,49 @@ class ReadingSessionService
     }
 
     /**
+     * Pause or resume the active reading session.
+     */
+    public function togglePause(ReadingSession $session, bool $isPaused): ReadingSession
+    {
+        if ($session->end_time) {
+            throw new \InvalidArgumentException('Cannot pause an already ended session');
+        }
+
+        if ($isPaused) {
+            if (!$session->is_paused) {
+                $session->is_paused = true;
+                $session->last_paused_at = now();
+            }
+        } else {
+            if ($session->is_paused) {
+                $session->is_paused = false;
+                if ($session->last_paused_at) {
+                    $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds(now());
+                    $session->paused_seconds += $pausedDuration;
+                }
+            }
+        }
+
+        $session->save();
+        return $session->fresh();
+    }
+
+    /**
      * End a reading session with page data.
      */
     public function endSession(ReadingSession $session, int $endPage, ?string $notes = null): ReadingSession
     {
         $endTime = now();
+
+        // Calculate any unrecorded paused time if it was paused when ending
+        if ($session->is_paused && $session->last_paused_at) {
+            $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
+            $session->paused_seconds += $pausedDuration;
+            $session->is_paused = false;
+        }
+
         $startTime = Carbon::parse($session->start_time);
-        $duration = (int) $startTime->diffInSeconds($endTime);
+        $duration = max(0, (int) $startTime->diffInSeconds($endTime) - $session->paused_seconds);
 
         // Validate that end page is not less than start page
         if ($endPage < $session->start_page) {

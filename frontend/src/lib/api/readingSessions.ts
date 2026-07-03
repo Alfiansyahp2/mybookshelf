@@ -9,6 +9,9 @@ export interface ReadingSession {
   start_page: number;
   end_page: number | null;
   duration: number | null;
+  is_paused: boolean;
+  paused_seconds: number;
+  last_paused_at: string | null;
   mood: 'great' | 'good' | 'okay' | 'difficult' | null;
   location: string | null;
   notes: string | null;
@@ -67,6 +70,20 @@ export const readingSessionsApi = {
 
     const response = await apiClient.put(`/v1/books/${bookId}/reading-sessions/${sessionId}/end`, data);
     console.log('Reading session ended:', response);
+
+    return response.data || response;
+  },
+
+  /**
+   * Pause or resume a reading session
+   */
+  async pauseSession(bookId: string, sessionId: string, isPaused: boolean): Promise<ReadingSession> {
+    console.log('Toggling pause for reading session:', sessionId, { is_paused: isPaused });
+
+    const response = await apiClient.patch(`/v1/books/${bookId}/reading-sessions/${sessionId}/pause`, {
+      is_paused: isPaused
+    });
+    console.log('Reading session pause toggled:', response);
 
     return response.data || response;
   },

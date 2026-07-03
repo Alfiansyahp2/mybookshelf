@@ -362,6 +362,29 @@ class BookController extends Controller
     }
 
     /**
+     * Pause or resume the active reading session.
+     */
+    public function pauseReadingSession(Request $request, $id, $sessionId)
+    {
+        $book = $this->bookService->getBook($id, $request->user()->id);
+
+        $session = ReadingSession::where('user_id', $request->user()->id)
+            ->where('book_id', $book->id)
+            ->findOrFail($sessionId);
+
+        $data = $request->validate([
+            'is_paused' => 'required|boolean'
+        ]);
+
+        $updatedSession = $this->readingSessionService->togglePause(
+            $session,
+            $data['is_paused']
+        );
+
+        return response()->success($updatedSession->load('book'), 'Reading session pause status updated');
+    }
+
+    /**
      * End a reading session.
      */
     public function endReadingSession(Request $request, $id, $sessionId)
@@ -373,15 +396,9 @@ class BookController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $session = $this->readingSessionService->getActiveSession($book, $request->user()->id);
-
-        if (!$session) {
-            return response()->error('No active reading session found', null, Response::HTTP_NOT_FOUND);
-        }
-
-        if ($session->id !== $sessionId) {
-            return response()->error('Session ID mismatch', null, Response::HTTP_BAD_REQUEST);
-        }
+        $session = ReadingSession::where('user_id', $request->user()->id)
+            ->where('book_id', $book->id)
+            ->findOrFail($sessionId);
 
         $updatedSession = $this->readingSessionService->endSession(
             $session,
