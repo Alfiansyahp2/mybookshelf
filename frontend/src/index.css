@@ -36,3 +36,29 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Custom Scrollbar for horizontal/vertical lists */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(74, 59, 47, 0.1); /* darkBrown with opacity */
+  border-radius: 10px;
+  margin: 0 4px; /* small margin to not touch the edges */
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-walnut);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-dark-brown);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-walnut) transparent;
+}

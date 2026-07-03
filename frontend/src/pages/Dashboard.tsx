@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useBooks } from '../hooks/useBooks'
 import { useShelves } from '../hooks/useShelves'
+import { BOOK_GENRES } from '../constants/genres'
 import {
   BookOpen, Library, Star, Bookmark, Users,
   TrendingUp, Target, Clock, Heart, Award,
@@ -120,6 +121,7 @@ export default function Dashboard() {
   const { data: booksResponse, isLoading } = useBooks()
   const { data: shelves = [] } = useShelves()
   const books = useMemo(() => booksResponse?.data?.data || [], [booksResponse])
+  const [genreFilter, setGenreFilter] = useState<string>('Semua')
 
   /* ── compute stats ─────────────────────────── */
   const stats = useMemo(() => {
@@ -131,18 +133,53 @@ export default function Dashboard() {
     const borrowed = byStatus('borrowed')
     const favs     = books.filter((b: any) => b.isFavorite || b.favorite)
 
-    const totalPages = books.reduce((s: number, b: any) => s + (b.pages || b.totalPages || 0), 0)
-    const pagesRead  = finished.reduce((s: number, b: any) => s + (b.pages || b.totalPages || 0), 0)
-                     + reading.reduce((s: number, b: any) => s + (b.currentPage || 0), 0)
-
     const now = new Date()
+
+    const booksReadThisYear = books.filter((b: any) => {
+      let isThisYear = false
+      if (b.finishedDate) isThisYear = new Date(b.finishedDate).getFullYear() === now.getFullYear()
+      if (!isThisYear && b.startedDate) isThisYear = new Date(b.startedDate).getFullYear() === now.getFullYear()
+      if (!isThisYear && b.readDates && Array.isArray(b.readDates)) {
+        isThisYear = b.readDates.some((d: string) => new Date(d).getFullYear() === now.getFullYear())
+      }
+      // Include books that are actively being read and don't have explicit dates but were updated this year
+      if (!isThisYear && b.status === 'reading') {
+         isThisYear = new Date(b.lastModified || b.dateAdded).getFullYear() === now.getFullYear()
+      }
+      return isThisYear
+    })
+
+    const totalPages = booksReadThisYear.reduce((s: number, b: any) => s + (b.pages || b.totalPages || 0), 0)
+    const pagesRead = booksReadThisYear.reduce((s: number, b: any) => {
+      if (b.status === 'finished') return s + (b.pages || b.totalPages || 0)
+      return s + (b.currentPage || 0)
+    }, 0)
+
     const addedThisMonth = books.filter((b: any) => {
       const d = new Date(b.dateAdded)
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
     }).length
 
+    const finishedThisYear = finished.filter((b: any) => {
+      let isThisYear = false
+      if (b.finishedDate) {
+        isThisYear = new Date(b.finishedDate).getFullYear() === now.getFullYear()
+      }
+      if (!isThisYear && b.readDates && Array.isArray(b.readDates)) {
+        isThisYear = b.readDates.some((d: string) => new Date(d).getFullYear() === now.getFullYear())
+      }
+      return isThisYear
+    }).length
+
     const genreCounts: Record<string, number> = {}
-    books.forEach((b: any) => { if (b.genre) genreCounts[b.genre] = (genreCounts[b.genre] || 0) + 1 })
+    books.forEach((b: any) => {
+      if (b.genre) {
+        const genres = b.genre.split(',').map((g: string) => g.trim()).filter(Boolean)
+        genres.forEach((g: string) => {
+          genreCounts[g] = (genreCounts[g] || 0) + 1
+        })
+      }
+    })
     const topGenre = Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '—'
 
     const rated = books.filter((b: any) => b.personalRating > 0)
@@ -167,9 +204,10 @@ export default function Dashboard() {
       unread: unread.length, wishlist: wishlist.length, borrowed: borrowed.length,
       favorites: favs.length, totalPages, pagesRead, addedThisMonth, topGenre,
       avgRating: Math.round(avgRating * 10) / 10,
+      finishedThisYear, currentYear: now.getFullYear(),
       currentlyReading, recentBooks,
       genreChart: Object.entries(genreCounts)
-        .map(([name, count]) => ({ name: name.length > 15 ? name.slice(0, 15) + '…' : name, count }))
+        .map(([name, count]) => ({ name, count }))
         .sort((a, b) => b.count - a.count),
       authorChart: Object.entries(authorCounts)
         .map(([name, count]) => ({ name: name.length > 15 ? name.slice(0, 15) + '…' : name, count }))
@@ -180,6 +218,20 @@ export default function Dashboard() {
       bookColors: books.slice(0, 12).map((b: any) => b.spineColors?.[0] || '#8B7355'),
     }
   }, [books])
+
+  const displayedGenres = useMemo(() => {
+    let filtered = stats.genreChart;
+    if (genreFilter !== 'Semua') {
+      const category = BOOK_GENRES.find(c => c.category === genreFilter);
+      if (category) {
+        filtered = filtered.filter(g => category.genres.includes(g.name));
+      }
+    }
+    return filtered.map(g => ({
+      ...g,
+      displayName: g.name.length > 15 ? g.name.slice(0, 15) + '…' : g.name
+    }));
+  }, [stats.genreChart, genreFilter]);
 
   if (isLoading) return (
     <div className="flex items-center justify-center py-24">
@@ -193,7 +245,7 @@ export default function Dashboard() {
   )
 
   const readPct = stats.totalPages > 0 ? Math.round((stats.pagesRead / stats.totalPages) * 100) : 0
-  const goalPct = Math.min((stats.finished / 12) * 100, 100)
+  const goalPct = Math.min((stats.finishedThisYear / 12) * 100, 100)
 
   return (
     <div style={{ padding: '20px 20px 40px', maxWidth: 1200, margin: '0 auto' }}>
@@ -221,7 +273,7 @@ export default function Dashboard() {
         {[
           { icon: Library,   label: 'Total Buku',     val: stats.total,     sub: `+${stats.addedThisMonth} bulan ini`, color: '#6366f1', bg: '#eef2ff' },
           { icon: BookOpen,  label: 'Sedang Dibaca',  val: stats.reading,   sub: 'aktif dibaca',                       color: '#10b981', bg: '#d1fae5' },
-          { icon: Bookmark,  label: 'Selesai',        val: stats.finished,  sub: 'buku tuntas',                        color: '#8b5cf6', bg: '#ede9fe' },
+          { icon: Bookmark,  label: 'Selesai Dibaca', val: stats.finished,  sub: `${stats.finishedThisYear} tahun ini`, color: '#8b5cf6', bg: '#ede9fe' },
           { icon: Heart,     label: 'Favorit',        val: stats.favorites, sub: 'buku favorit',                       color: '#ec4899', bg: '#fce7f3' },
           { icon: Users,     label: 'Dipinjam',       val: stats.borrowed,  sub: 'belum kembali',                      color: '#f59e0b', bg: '#fef3c7' },
           { icon: BookMarked,label: 'Belum Dibaca',   val: stats.unread,    sub: 'menunggu',                           color: '#64748b', bg: '#f1f5f9' },
@@ -307,9 +359,9 @@ export default function Dashboard() {
               <div style={{ padding: '16px 18px', background: `linear-gradient(135deg,${BRAND.darkBrown} 0%,#6b4528 100%)`, borderRadius: '16px 16px 0 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                   <h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'rgba(255,210,140,0.9)', fontFamily: "'Georgia',serif", display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <Target size={14} /> Target Bacaan
+                    <Target size={14} /> Target {stats.currentYear}
                   </h3>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: 'white' }}>{stats.finished} / 12</span>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: 'white' }}>{stats.finishedThisYear} / 12</span>
                 </div>
                 <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.15)', overflow: 'hidden' }}>
                   <motion.div
@@ -319,7 +371,7 @@ export default function Dashboard() {
                   />
                 </div>
                 <p style={{ margin: '8px 0 0', fontSize: 11, color: 'rgba(255,210,140,0.55)' }}>
-                  {goalPct >= 100 ? '🎉 Target tercapai!' : `${12 - stats.finished} buku lagi untuk target tahun ini`}
+                  {goalPct >= 100 ? '🎉 Target tercapai!' : `${12 - stats.finishedThisYear} buku lagi untuk target tahun ini`}
                 </p>
               </div>
 
@@ -398,18 +450,48 @@ export default function Dashboard() {
         <motion.div {...fadeUp(0.55)}>
           <Card>
             <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Genre Terbanyak</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Genre Terbanyak</h3>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+                <button
+                  onClick={() => setGenreFilter('Semua')}
+                  style={{
+                    padding: '4px 8px', fontSize: 10, fontWeight: 600, borderRadius: 6, border: 'none', cursor: 'pointer',
+                    background: genreFilter === 'Semua' ? BRAND.walnut : 'rgba(139,99,56,0.1)',
+                    color: genreFilter === 'Semua' ? 'white' : BRAND.walnut,
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  Semua
+                </button>
+                {BOOK_GENRES.map(g => (
+                  <button
+                    key={g.category}
+                    onClick={() => setGenreFilter(g.category)}
+                    style={{
+                      padding: '4px 8px', fontSize: 10, fontWeight: 600, borderRadius: 6, border: 'none', cursor: 'pointer',
+                      background: genreFilter === g.category ? BRAND.walnut : 'rgba(139,99,56,0.1)',
+                      color: genreFilter === g.category ? 'white' : BRAND.walnut,
+                      transition: 'all 0.2s'
+                    }}
+                    title={g.category}
+                  >
+                    {g.category.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
             </div>
             <div style={{ padding: '12px 16px 12px' }}>
-              {stats.genreChart.length === 0 ? (
+              {displayedGenres.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data genre</div>
               ) : (
                 <div style={{ overflowY: 'auto', maxHeight: 150, paddingRight: 4 }} className="hide-scrollbar">
-                  <ResponsiveContainer width="100%" height={Math.max(150, stats.genreChart.length * 28)}>
-                    <BarChart data={stats.genreChart} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
+                  <ResponsiveContainer width="100%" height={Math.max(150, displayedGenres.length * 28)}>
+                    <BarChart data={displayedGenres} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
                       <XAxis type="number" hide />
-                      <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
+                      <YAxis type="category" dataKey="displayName" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
                       <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
                       <Bar dataKey="count" name="Buku" fill={BRAND.walnut} radius={[0, 4, 4, 0]} barSize={14} />
                     </BarChart>

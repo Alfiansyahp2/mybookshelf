@@ -182,6 +182,9 @@ export const booksApi = {
       purchase_currency: bookData.purchaseCurrency || 'IDR',
       is_gift: bookData.isGift || false,
       purchase_location: bookData.purchaseLocation || null,
+      // Reading info
+      started_date: bookData.startedDate || null,
+      finished_date: bookData.finishedDate || null,
       // Personal info
       personal_notes: bookData.personalNotes || null,
     };
@@ -221,6 +224,8 @@ export const booksApi = {
     if (updates.dueDate !== undefined) apiData.due_date = updates.dueDate || null;
     if (updates.shelfId !== undefined) apiData.shelf_id = updates.shelfId;
     if (updates.readDates) apiData.read_dates = updates.readDates;
+    if (updates.startedDate !== undefined) apiData.started_date = updates.startedDate || null;
+    if (updates.finishedDate !== undefined) apiData.finished_date = updates.finishedDate || null;
     // Purchase information
     if (updates.purchaseDate !== undefined) apiData.purchase_date = updates.purchaseDate || null;
     if (updates.purchasePrice !== undefined) apiData.purchase_price = updates.purchasePrice ?? null;
