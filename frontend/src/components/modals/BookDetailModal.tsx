@@ -89,7 +89,27 @@ export default function BookDetailModal({
   const handleProgress = (p: number) => updateProgress.mutate({ id: book.id, currentPage: p })
   const handleNotes    = () => { updateNotes.mutate({ id: book.id, notes: tempNotes }); setUserNotes(tempNotes); setIsEditingNotes(false) }
   const handleStart    = () => { if (book.status === 'unread')   startReading.mutate(book.id) }
-  const handleFinish   = () => { if (book.status === 'reading') finishReading.mutate(book.id) }
+  const handleFinish   = () => {
+    if (book.status === 'reading') {
+      const today = new Date().toISOString().split('T')[0]
+      const dates = book.readDates ? [...book.readDates] : []
+      if (!dates.includes(today)) {
+        dates.push(today)
+        dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+      }
+      finishReading.mutate(book.id, {
+        onSuccess: () => {
+          updateBook.mutate({
+            id: book.id,
+            updates: {
+              readDates: dates,
+              finishedDate: new Date().toISOString(),
+            }
+          })
+        }
+      })
+    }
+  }
   
   const handleAddReadDate = (date: string) => {
     const dates = book.readDates ? [...book.readDates] : []
@@ -275,19 +295,51 @@ export default function BookDetailModal({
                         )}
 
                         {/* Status badge */}
-                        <div
-                          className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold mt-0.5"
-                          style={{
-                            background: cfg.bg,
-                            color: cfg.color,
-                            border: `1px solid ${cfg.border}`,
-                          }}
-                        >
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${book.status === 'reading' ? 'animate-pulse' : ''}`}
-                            style={{ background: cfg.dot }}
-                          />
-                          {cfg.label}
+                        <div className="flex flex-wrap gap-1.5 mt-0.5">
+                          <div
+                            className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                            style={{
+                              background: cfg.bg,
+                              color: cfg.color,
+                              border: `1px solid ${cfg.border}`,
+                            }}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${book.status === 'reading' ? 'animate-pulse' : ''}`}
+                              style={{ background: cfg.dot }}
+                            />
+                            {cfg.label}
+                          </div>
+
+                          {/* Gift badge */}
+                          {book.isGift && (
+                            <div
+                              className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                              style={{ background: '#fce7f3', color: '#9d174d', border: '1px solid #fbcfe8' }}
+                            >
+                              🎁 Hadiah
+                            </div>
+                          )}
+
+                          {/* Purchased badge */}
+                          {!book.isGift && book.purchaseDate && (
+                            <div
+                              className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                              style={{ background: '#d1fae5', color: '#065f46', border: '1px solid #6ee7b7' }}
+                            >
+                              🛒 Dibeli
+                            </div>
+                          )}
+
+                          {/* Borrowed from someone badge */}
+                          {book.borrowedBy && (
+                            <div
+                              className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold"
+                              style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d' }}
+                            >
+                              📚 Pinjaman
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -320,28 +372,32 @@ export default function BookDetailModal({
                         ))}
                       </div>
 
-                      {/* Reading progress bar (only if reading) */}
-                      {book.status === 'reading' && (
-                        <div>
-                          <div className="flex justify-between text-xs mb-1" style={{ color: '#9c6d3a' }}>
-                            <span>Progress</span>
-                            <span className="font-bold" style={{ color: '#2a1a08' }}>{progress}%</span>
+                      {/* Reading progress bar (for reading and finished) */}
+                      {(book.status === 'reading' || book.status === 'finished') && (() => {
+                        const displayProgress = book.status === 'finished' ? 100 : progress;
+                        const displayPage = book.status === 'finished' ? (book.pages || 0) : (book.currentPage || 0);
+                        return (
+                          <div>
+                            <div className="flex justify-between text-xs mb-1" style={{ color: '#9c6d3a' }}>
+                              <span>Progress</span>
+                              <span className="font-bold" style={{ color: '#2a1a08' }}>{displayProgress}%</span>
+                            </div>
+                            <div className="h-2 rounded-full overflow-hidden" style={{ background: `${c0}30` }}>
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${displayProgress}%` }}
+                                transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
+                                className="h-full rounded-full"
+                                style={{ background: book.status === 'finished' ? `linear-gradient(90deg, #10b981, #059669)` : `linear-gradient(90deg, ${c0}, ${c2})` }}
+                              />
+                            </div>
+                            <div className="flex justify-between text-[10px] mt-0.5" style={{ color: '#9c6d3a' }}>
+                              <span>Hal. {displayPage}</span>
+                              <span>dari {book.pages || '?'}</span>
+                            </div>
                           </div>
-                          <div className="h-2 rounded-full overflow-hidden" style={{ background: `${c0}30` }}>
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${progress}%` }}
-                              transition={{ duration: 0.9, delay: 0.4, ease: 'easeOut' }}
-                              className="h-full rounded-full"
-                              style={{ background: `linear-gradient(90deg, ${c0}, ${c2})` }}
-                            />
-                          </div>
-                          <div className="flex justify-between text-[10px] mt-0.5" style={{ color: '#9c6d3a' }}>
-                            <span>Hal. {book.currentPage || 0}</span>
-                            <span>dari {book.pages || '?'}</span>
-                          </div>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {/* Star rating */}
                       <div>

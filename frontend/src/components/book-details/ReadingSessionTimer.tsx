@@ -230,7 +230,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
       if (activeSessionId) {
         await endSessionMutation.mutateAsync({
           bookId: book.id, sessionId: activeSessionId,
-          data: { end_page: endPage, notes: notes || `Durasi: ${fmt(sessionDuration)}` }
+          data: { end_time: new Date().toISOString(), end_page: endPage, notes: notes || `Durasi: ${fmt(sessionDuration)}` }
         })
       } else if (endPage > startingPage) {
         updateProgress.mutate({ id: book.id, currentPage: endPage })

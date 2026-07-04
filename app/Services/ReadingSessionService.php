@@ -43,8 +43,8 @@ class ReadingSessionService
             if ($session->is_paused) {
                 $session->is_paused = false;
                 if ($session->last_paused_at) {
-                    $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds(now());
-                    $session->paused_seconds += $pausedDuration;
+                    $pausedDuration = (int) Carbon::parse($session->last_paused_at)->diffInSeconds(now());
+                    $session->paused_seconds = (int) $session->paused_seconds + $pausedDuration;
                 }
             }
         }
@@ -62,8 +62,8 @@ class ReadingSessionService
 
         // Calculate any unrecorded paused time if it was paused when ending
         if ($session->is_paused && $session->last_paused_at) {
-            $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
-            $session->paused_seconds += $pausedDuration;
+            $pausedDuration = (int) Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
+            $session->paused_seconds = (int) $session->paused_seconds + $pausedDuration;
             $session->is_paused = false;
         }
 

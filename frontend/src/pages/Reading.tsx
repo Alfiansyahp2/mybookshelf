@@ -26,9 +26,11 @@ export default function Reading() {
 
   const allBooks = allBooksResponse?.data?.data || []
   const readingBooks = allBooks.filter((book: Book) => book.status === 'reading')
+  const unreadBooks = allBooks.filter((book: Book) => book.status === 'unread')
 
   // Calculate reading statistics
   const totalReadingBooks = readingBooks.length
+  const totalUnreadBooks = unreadBooks.length
   const totalPagesRead = readingBooks.reduce((sum: number, book: Book) => sum + (book.currentPage || 0), 0)
   const totalPages = readingBooks.reduce((sum: number, book: Book) => sum + (book.pages || 0), 0)
   const averageProgress = totalReadingBooks > 0
@@ -407,7 +409,7 @@ export default function Reading() {
         </motion.div>
       )}
 
-      {/* Reading Bookshelf - Only show if there are reading books */}
+      {/* Reading Bookshelf */}
       {totalReadingBooks > 0 && (
         <Bookshelf
           books={allBooks}
@@ -418,6 +420,58 @@ export default function Reading() {
           isDrawerOpen={isBookDetailOpen}
           onBookClick={handleBookClick}
         />
+      )}
+
+      {/* Unread Books Section */}
+      {totalUnreadBooks > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mb-8"
+        >
+          <h2 className="text-xl font-serif font-semibold text-darkBrown mb-2 flex items-center gap-2">
+            <Bookmark className="w-5 h-5 text-walnut/50" />
+            Belum Dibaca
+            <span className="ml-auto text-sm font-normal bg-walnut/10 text-walnut px-3 py-0.5 rounded-full">
+              {totalUnreadBooks} buku
+            </span>
+          </h2>
+          <p className="text-sm text-walnut/50 mb-5">Buku yang menunggu untuk dibaca</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {unreadBooks.map((book: Book, index: number) => (
+              <motion.div
+                key={book.id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => handleBookClick(book)}
+                className="flex items-center gap-3 p-3 rounded-xl border border-walnut/10 hover:border-walnut/30 hover:shadow-sm transition-all cursor-pointer bg-cream/40 hover:bg-cream/80"
+              >
+                {/* Mini book cover */}
+                <div
+                  className="flex-shrink-0 w-10 h-14 rounded-sm shadow-md flex items-center justify-center"
+                  style={{ background: `linear-gradient(150deg, ${book.spineColors[0]}, ${book.spineColors[2]})` }}
+                >
+                  <div
+                    className="absolute w-1 self-stretch rounded-l-sm opacity-60"
+                    style={{ background: book.spineColors[2] }}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-darkBrown truncate">{book.title}</p>
+                  <p className="text-xs text-walnut/60 truncate">{book.author}</p>
+                  {book.pages && (
+                    <p className="text-[10px] text-walnut/40 mt-0.5">{book.pages} halaman</p>
+                  )}
+                </div>
+                <div className="flex-shrink-0">
+                  <div className="w-2 h-2 rounded-full bg-gray-300" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       )}
 
       {/* Action Buttons */}
@@ -438,8 +492,8 @@ export default function Reading() {
         </motion.div>
       )}
 
-      {/* Empty State */}
-      {totalReadingBooks === 0 && (
+      {/* Empty State - only if truly nothing to show */}
+      {totalReadingBooks === 0 && totalUnreadBooks === 0 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -449,10 +503,10 @@ export default function Reading() {
             <BookOpen className="w-10 h-10 text-walnut/30" />
           </div>
           <h3 className="text-xl font-serif text-darkBrown mb-2">
-            No books currently being read
+            Belum ada buku
           </h3>
           <p className="text-walnut/70 mb-6">
-            Start a new reading journey from your library
+            Mulai perjalanan membaca dari perpustakaan kamu
           </p>
           <div className="flex justify-center">
             <button
