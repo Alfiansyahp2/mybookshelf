@@ -8,6 +8,7 @@ use App\Services\ReadingSessionService;
 use App\Models\ReadingSession;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -155,8 +156,8 @@ class BookController extends Controller
         // Delete old cover if exists
         if ($book->cover_image) {
             $oldPath = str_replace('/storage/', 'public/', $book->cover_image);
-            if (\Storage::exists($oldPath)) {
-                \Storage::delete($oldPath);
+            if (Storage::exists($oldPath)) {
+                Storage::delete($oldPath);
             }
         }
 
