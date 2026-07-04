@@ -62,6 +62,44 @@ class StatisticsController extends Controller
             ->map(fn ($group) => $group->count())
             ->sortKeysDesc();
 
+        // Daily reading activity (for Github-style heatmap)
+        // Get all reading sessions for the last 365 days
+        $lastYear = now()->subDays(365);
+        
+        $allSessions = ReadingSession::where('user_id', $user->id)
+            ->whereNotNull('end_time')
+            ->where('start_time', '>=', $lastYear)
+            ->get();
+            
+        $sessionsByDate = $allSessions->groupBy(function ($session) {
+            return \Carbon\Carbon::parse($session->start_time)->format('Y-m-d');
+        });
+        
+        $booksFinishedLastYear = Book::where('user_id', $user->id)
+            ->whereNotNull('finished_date')
+            ->where('finished_date', '>=', $lastYear)
+            ->get();
+            
+        $finishedByDate = $booksFinishedLastYear->groupBy(function ($book) {
+            return \Carbon\Carbon::parse($book->finished_date)->format('Y-m-d');
+        });
+        
+        $allDates = collect(array_keys($sessionsByDate->toArray()))
+            ->merge(array_keys($finishedByDate->toArray()))
+            ->unique();
+            
+        $dailyActivity = $allDates->map(function ($date) use ($sessionsByDate, $finishedByDate) {
+            $sessions = $sessionsByDate->get($date, collect());
+            $finished = $finishedByDate->get($date, collect());
+            
+            return [
+                'date' => $date,
+                'duration' => $sessions->sum('duration'),
+                'pages' => $sessions->sum('end_page') - $sessions->sum('start_page'),
+                'books_finished' => $finished->count()
+            ];
+        });
+
         $statistics = [
             'overview' => [
                 'total_books' => $totalBooks,
@@ -80,6 +118,7 @@ class StatisticsController extends Controller
             'format_distribution' => $formatDistribution,
             'monthly_reading' => $monthlyReading,
             'yearly_reading' => $yearlyReading,
+            'daily_activity' => $dailyActivity->values(),
             'purchases' => [
                 'total_spent' => $totalSpent ? (float) number_format($totalSpent, 2) : 0,
                 'average_price' => $totalBooks > 0 ? (float) number_format($totalSpent / $totalBooks, 2) : 0,
