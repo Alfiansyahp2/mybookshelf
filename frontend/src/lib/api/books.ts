@@ -284,6 +284,18 @@ export const booksApi = {
   },
 
   /**
+   * Upload cover image for a book
+   */
+  async uploadCover(id: string, file: File): Promise<{ cover_image: string }> {
+    const formData = new FormData();
+    formData.append('cover', file);
+    const response = await apiClient.post(`/v1/books/${id}/cover`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data?.data || response.data;
+  },
+
+  /**
    * Update reading progress
    */
   async updateProgress(id: string, currentPage: number): Promise<ApiResponse<Book>> {

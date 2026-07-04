@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Modal from '../ui/Modal'
-import { useUpdateBook } from '../../hooks/useBooks'
+import { useUpdateBook, useUploadCover } from '../../hooks/useBooks'
 import type { Book } from '../../types'
-import { Save, Trash2, Edit3, X } from 'lucide-react'
+import { Save, Trash2, Edit3, Camera, Upload, X } from 'lucide-react'
 import { BOOK_GENRES } from '../../constants/genres'
 
 interface EditBookModalProps {
@@ -36,6 +36,10 @@ export default function EditBookModal({
   onDelete
 }: EditBookModalProps) {
   const updateBook = useUpdateBook()
+  const uploadCover = useUploadCover()
+  const coverInputRef = useRef<HTMLInputElement>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -62,11 +66,13 @@ export default function EditBookModal({
     borrowedBy: '',
     borrowedDate: new Date().toISOString().split('T')[0],
     dueDate: '',
+    purchaseLocation: '',
   })
 
   // Reset form when book changes
   useEffect(() => {
     if (book) {
+      setCoverPreview(book.coverImage || null)
       setFormData({
         title: book.title || '',
         author: book.author || '',
@@ -92,12 +98,31 @@ export default function EditBookModal({
         borrowedBy: book.borrowedBy || '',
         borrowedDate: book.borrowedDate?.split('T')[0] || new Date().toISOString().split('T')[0],
         dueDate: book.dueDate?.split('T')[0] || '',
+        purchaseLocation: book.purchaseLocation || '',
       })
     }
   }, [book])
 
   // Early return if no book
   if (!book) return null
+
+  const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    // Show local preview immediately
+    const reader = new FileReader()
+    reader.onload = (ev) => setCoverPreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+    // Upload to server
+    setIsUploading(true)
+    uploadCover.mutate({ id: book.id, file }, {
+      onSuccess: (data) => {
+        setCoverPreview(data.cover_image)
+        setIsUploading(false)
+      },
+      onError: () => setIsUploading(false),
+    })
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -114,6 +139,7 @@ export default function EditBookModal({
           purchaseDate: formData.purchaseDate,
           purchasePrice: formData.acquisitionType !== 'purchased' ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
           purchaseCurrency: formData.purchaseCurrency,
+          purchaseLocation: formData.acquisitionType === 'purchased' ? formData.purchaseLocation : undefined,
           isGift: formData.acquisitionType === 'gift',
           status: formData.status,
           personalNotes: formData.acquisitionType === 'gift' && formData.giftFrom ? `Gift from: ${formData.giftFrom}` : (formData.acquisitionType === 'borrowed' && formData.borrowedFrom ? `Borrowed from: ${formData.borrowedFrom}` : ''),
@@ -150,51 +176,93 @@ export default function EditBookModal({
       size="xl"
     >
       <form onSubmit={handleSubmit} className="flex gap-6">
-        {/* Left Side - Book Cover Preview */}
+        {/* Left Side - Book Cover */}
         <div className="w-1/3 flex-shrink-0">
-          {/* 3D Book Cover Preview */}
+          {/* Cover Image with Upload Overlay */}
           <div
-            className="w-full aspect-[3/4] rounded-xl shadow-2xl relative overflow-hidden"
+            className="w-full aspect-[3/4] rounded-xl shadow-2xl relative overflow-hidden group cursor-pointer"
             style={{
-              background: `linear-gradient(135deg, ${spineColor0} 0%, ${spineColor1} 50%, ${spineColor2} 100%)`
+              background: coverPreview
+                ? undefined
+                : `linear-gradient(135deg, ${spineColor0} 0%, ${spineColor1} 50%, ${spineColor2} 100%)`
             }}
+            onClick={() => coverInputRef.current?.click()}
           >
-            <div className="h-full p-6 flex flex-col justify-between">
-              <div>
-                <h3 className="text-white font-serif font-bold text-xl mb-2 leading-tight" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
-                  {formData.title || 'Book Title'}
-                </h3>
-                <p className="text-white/90 text-base" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>
-                  {formData.author || 'Author Name'}
-                </p>
-              </div>
-
-              {formData.genre && (
-                <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                  <span className="text-white text-sm font-medium" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>
-                    {formData.genre}
-                  </span>
-                </div>
-              )}
-
-              {/* Shine Effect */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 55%, transparent 60%)'
-                }}
+            {/* Actual cover image */}
+            {coverPreview && (
+              <img
+                src={coverPreview}
+                alt="Book cover"
+                className="absolute inset-0 w-full h-full object-cover"
               />
+            )}
+
+            {/* Fallback text when no cover */}
+            {!coverPreview && (
+              <div className="h-full p-6 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-white font-serif font-bold text-xl mb-2 leading-tight" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+                    {formData.title || 'Book Title'}
+                  </h3>
+                  <p className="text-white/90 text-base" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>
+                    {formData.author || 'Author Name'}
+                  </p>
+                </div>
+                {/* Shine Effect */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 55%, transparent 60%)' }}
+                />
+                {/* Spine Effect */}
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-12 rounded-l-xl"
+                  style={{ background: `linear-gradient(to right, ${spineColor2} 0%, ${spineColor1} 50%, ${spineColor0} 100%)`, boxShadow: 'inset -2px 0 5px rgba(0,0,0,0.2)' }}
+                />
+              </div>
+            )}
+
+            {/* Upload overlay on hover */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center text-white">
+                {isUploading ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="text-xs font-medium">Mengupload...</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <Camera className="w-8 h-8" />
+                    <span className="text-xs font-medium">{coverPreview ? 'Ganti Cover' : 'Upload Cover'}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Spine Effect */}
-            <div
-              className="absolute left-0 top-0 bottom-0 w-12 rounded-l-xl"
-              style={{
-                background: `linear-gradient(to right, ${spineColor2} 0%, ${spineColor1} 50%, ${spineColor0} 100%)`,
-                boxShadow: 'inset -2px 0 5px rgba(0,0,0,0.2)'
-              }}
-            />
+            {/* Remove cover button */}
+            {coverPreview && !isUploading && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setCoverPreview(null) }}
+                className="absolute top-2 right-2 w-6 h-6 bg-red-500/80 hover:bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
+
+          {/* Hidden file input */}
+          <input
+            ref={coverInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            className="hidden"
+            onChange={handleCoverSelect}
+          />
+
+          {/* Upload hint */}
+          <p className="text-center text-xs text-walnut/40 mt-2">
+            Klik cover untuk {coverPreview ? 'mengganti' : 'upload'} foto
+          </p>
 
           {/* Book Stats Preview */}
           <div className="mt-4 space-y-3">
@@ -544,6 +612,20 @@ export default function EditBookModal({
                 </div>
               )}
             </div>
+
+            {/* Purchase Location - Only show if purchased */}
+            {formData.acquisitionType === 'purchased' && (
+              <div>
+                <label className="block text-sm font-medium text-darkBrown mb-1">Tempat Pembelian</label>
+                <input
+                  type="text"
+                  value={formData.purchaseLocation}
+                  onChange={(e) => setFormData({ ...formData, purchaseLocation: e.target.value })}
+                  className="w-full px-3 py-2 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                  placeholder="Contoh: Gramedia, Tokopedia, Periplus..."
+                />
+              </div>
+            )}
 
             {/* Gift From */}
             {formData.acquisitionType === 'gift' && (

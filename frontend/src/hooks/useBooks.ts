@@ -113,6 +113,23 @@ export function useFinishReading() {
 }
 
 /**
+ * Hook to upload a book cover image
+ */
+export function useUploadCover() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) =>
+      booksApi.uploadCover(id, file),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['books'] });
+      queryClient.invalidateQueries({ queryKey: ['books', variables.id] });
+    },
+  });
+}
+
+/**
  * Hook to update reading progress
  */
 export function useUpdateProgress() {

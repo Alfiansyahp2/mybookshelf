@@ -232,14 +232,24 @@ export default function BookDetailModal({
                             boxShadow: '4px 6px 16px rgba(0,0,0,0.45)',
                           }}
                         >
-                          <div className="absolute inset-0 opacity-10"
-                            style={{ background: 'repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(0,0,0,0.2) 4px)' }}
-                          />
-                          <p className="text-white text-center font-bold leading-tight relative z-10"
-                            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)', fontSize: 8 }}
-                          >
-                            {book.title}
-                          </p>
+                          {book.coverImage ? (
+                            <img
+                              src={book.coverImage}
+                              alt={book.title}
+                              className="absolute inset-0 w-full h-full object-cover rounded-r-sm"
+                            />
+                          ) : (
+                            <>
+                              <div className="absolute inset-0 opacity-10"
+                                style={{ background: 'repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(0,0,0,0.2) 4px)' }}
+                              />
+                              <p className="text-white text-center font-bold leading-tight relative z-10"
+                                style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)', fontSize: 8 }}
+                              >
+                                {book.title}
+                              </p>
+                            </>
+                          )}
                         </div>
                         {/* spine left edge */}
                         <div

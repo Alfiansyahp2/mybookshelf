@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::patch('notes', [BookController::class, 'updateNotes']);
         Route::patch('rating', [BookController::class, 'updateRating']);
         Route::patch('shelf', [BookController::class, 'moveToShelf']);
+        Route::post('cover', [BookController::class, 'uploadCover']);
         Route::get('timeline', [TimelineController::class, 'bookTimeline']);
     });
 

@@ -91,8 +91,9 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
       purchaseDate: new Date().toISOString().split('T')[0],
       purchasePrice: '',
       purchaseCurrency: 'IDR',
-      isGift: false,
-      giftFrom: ''
+      acquisitionType: 'purchased' as 'purchased' | 'gift' | 'borrowed',
+      giftFrom: '',
+      borrowedFrom: ''
     })
   }
 

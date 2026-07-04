@@ -142,6 +142,40 @@ class BookController extends Controller
     }
 
     /**
+     * Upload or replace book cover image.
+     */
+    public function uploadCover(Request $request, $id)
+    {
+        $book = $this->bookService->getBook($id, $request->user()->id);
+
+        $request->validate([
+            'cover' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120', // max 5MB
+        ]);
+
+        // Delete old cover if exists
+        if ($book->cover_image) {
+            $oldPath = str_replace('/storage/', 'public/', $book->cover_image);
+            if (\Storage::exists($oldPath)) {
+                \Storage::delete($oldPath);
+            }
+        }
+
+        // Store new cover in book-covers folder
+        $file = $request->file('cover');
+        $filename = 'book_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('public/book-covers', $filename);
+
+        // Build public URL
+        $url = '/storage/book-covers/' . $filename;
+
+        // Update book record
+        $book->cover_image = $url;
+        $book->save();
+
+        return response()->success(['cover_image' => $url], 'Cover uploaded successfully');
+    }
+
+    /**
      * Remove the specified book (soft delete).
      */
     public function destroy($id)
