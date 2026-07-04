@@ -19,7 +19,7 @@ import EditShelfModal from './modals/EditShelfModal'
 import AddShelfModal from './modals/AddShelfModal'
 import { useBookstore } from '../store/useBookstore'
 import { useLogout } from '../hooks/useAuth'
-import { useBook, useDeleteBook } from '../hooks/useBooks'
+import { useBook, useDeleteBook, useBooks } from '../hooks/useBooks'
 import { useDeleteShelf, useShelves } from '../hooks/useShelves'
 import NotificationCenter from './NotificationCenter'
 import { useAchievementTracker } from '../hooks/useAchievementTracker'
@@ -59,6 +59,12 @@ export default function AppLayout() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
 
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
   // Handlers
   const handleEditBook = () => {
     setIsEditBookModalOpen(true)
@@ -91,7 +97,26 @@ export default function AppLayout() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [lastScrollY])
 
-  // Close dropdown when clicking outside
+  // Search results (only query when >= 2 chars)
+  const { data: searchResults } = useBooks(
+    searchQuery.trim().length >= 2 ? { search: searchQuery.trim() } : undefined
+  )
+  const searchBooks = searchQuery.trim().length >= 2
+    ? (searchResults?.data?.data || []).slice(0, 6)
+    : []
+
+  // Close search dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setIsSearchFocused(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -218,14 +243,106 @@ export default function AppLayout() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-2 md:gap-4">
-              {/* Search - Hide on small screens */}
-              <div className="hidden sm:block relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut/50" />
+              {/* Search - Live with dropdown */}
+              <div className="hidden sm:block relative" ref={searchRef}>
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut/50 pointer-events-none z-10" />
                 <input
+                  ref={searchInputRef}
                   type="text"
-                  placeholder="Search..."
-                  className="w-48 md:w-64 pl-10 pr-4 py-2 md:py-2.5 bg-white border border-walnut/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  placeholder="Cari buku, penulis..."
+                  className="w-48 md:w-64 pl-10 pr-7 py-2 md:py-2.5 bg-white border border-walnut/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 transition-all"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => { setSearchQuery(''); searchInputRef.current?.focus() }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-walnut/40 hover:text-walnut/70 transition-colors leading-none"
+                  >✕</button>
+                )}
+
+                <AnimatePresence>
+                  {isSearchFocused && searchQuery.trim().length >= 2 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full mt-2 left-0 w-80 bg-white rounded-2xl shadow-2xl border border-walnut/10 overflow-hidden z-50"
+                    >
+                      {searchBooks.length === 0 ? (
+                        <div className="p-5 text-center text-sm text-walnut/50">
+                          <Search className="w-6 h-6 mx-auto mb-2 opacity-30" />
+                          Tidak ada hasil untuk <strong>"{searchQuery}"</strong>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="px-3 py-2 border-b border-walnut/8">
+                            <span className="text-[10px] font-semibold uppercase tracking-widest text-walnut/40">
+                              {searchBooks.length} hasil ditemukan
+                            </span>
+                          </div>
+                          <div className="max-h-72 overflow-y-auto">
+                            {searchBooks.map((book: any) => {
+                              const SC: Record<string, { bg: string; color: string; label: string }> = {
+                                reading:  { bg: '#d1fae5', color: '#065f46', label: 'Dibaca' },
+                                finished: { bg: '#dbeafe', color: '#1e40af', label: 'Selesai' },
+                                unread:   { bg: '#f3f4f6', color: '#374151', label: 'Belum' },
+                                wishlist: { bg: '#f3e8ff', color: '#6b21a8', label: 'Wishlist' },
+                                borrowed: { bg: '#fef3c7', color: '#92400e', label: 'Pinjam' },
+                              }
+                              const sc = SC[book.status] || SC['unread']
+                              const c0 = book.spineColors?.[0] || '#8B7355'
+                              const c2 = book.spineColors?.[2] || '#5C4532'
+                              return (
+                                <button
+                                  key={book.id}
+                                  onClick={() => {
+                                    setIsSearchFocused(false)
+                                    setSearchQuery('')
+                                    navigate('/library')
+                                    setTimeout(() => {
+                                      const store = useBookstore.getState()
+                                      store.setSelectedBookId(book.id)
+                                      store.toggleBookDetail(book.id)
+                                    }, 200)
+                                  }}
+                                  className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-walnut/5 transition-colors text-left border-b border-walnut/5 last:border-0"
+                                >
+                                  <div
+                                    className="flex-shrink-0 w-8 h-11 rounded-sm shadow-sm"
+                                    style={{ background: `linear-gradient(150deg, ${c0}, ${c2})` }}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-darkBrown truncate leading-tight">{book.title}</p>
+                                    <p className="text-xs text-walnut/60 italic truncate">{book.author}</p>
+                                    {book.genre && <p className="text-[10px] text-walnut/40 truncate mt-0.5">{book.genre}</p>}
+                                  </div>
+                                  <span className="flex-shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: sc.bg, color: sc.color }}>
+                                    {sc.label}
+                                  </span>
+                                </button>
+                              )
+                            })}
+                          </div>
+                          <div className="border-t border-walnut/8 p-2">
+                            <button
+                              onClick={() => {
+                                navigate(`/library?search=${encodeURIComponent(searchQuery)}`)
+                                setIsSearchFocused(false)
+                                setSearchQuery('')
+                              }}
+                              className="w-full text-center text-xs text-walnut/60 hover:text-walnut py-1 transition-colors"
+                            >
+                              Lihat semua hasil di Library →
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Add Bookshelf Button - Icon Only */}
