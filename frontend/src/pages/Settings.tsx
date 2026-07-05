@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useAuthUser, useUpdateProfile, useUpdatePassword } from '../hooks/useAuth'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   User,
   Bell,
@@ -18,10 +20,19 @@ import {
   Clock,
   Award,
   GitBranch,
-  TrendingUp
+  TrendingUp,
+  Save,
+  Key
 } from 'lucide-react'
 
 export default function Settings() {
+  const { data: authData } = useAuthUser()
+  const authUser = authData?.user
+  
+  const updateProfile = useUpdateProfile()
+  const updatePassword = useUpdatePassword()
+  const queryClient = useQueryClient()
+
   const [settings, setSettings] = useState({
     theme: 'light',
     notifications: true,
@@ -37,11 +48,52 @@ export default function Settings() {
     memberSince: '2024'
   })
 
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: '',
+    password: '',
+    password_confirmation: ''
+  })
+
+  useEffect(() => {
+    if (authUser) {
+      setUser({
+        name: authUser.name,
+        email: authUser.email,
+        avatar: authUser.name.charAt(0).toUpperCase(),
+        memberSince: authUser.created_at ? new Date(authUser.created_at).getFullYear().toString() : '2024'
+      })
+    }
+  }, [authUser])
+
   const [activeSection, setActiveSection] = useState('account')
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     console.log('Logging out...')
-    // TODO: Implement logout logic
+    // Use clear/logout logic from auth if needed, but since AppLayout has it, we can just clear local storage
+    localStorage.removeItem('user')
+    queryClient.clear()
+    window.location.href = '/login'
+  }
+
+  const handleProfileSubmit = () => {
+    updateProfile.mutate({ name: user.name, email: user.email }, {
+      onSuccess: () => alert('Profile updated successfully!'),
+      onError: () => alert('Failed to update profile.')
+    })
+  }
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    updatePassword.mutate(passwordForm, {
+      onSuccess: () => {
+        alert('Password updated successfully!')
+        setPasswordForm({ current_password: '', password: '', password_confirmation: '' })
+      },
+      onError: (err: any) => {
+        alert('Failed to update password. Check your current password.')
+        console.error(err)
+      }
+    })
   }
 
   const handleExportData = () => {
@@ -288,7 +340,68 @@ export default function Settings() {
                       <p className="text-xs text-walnut/50">First letter of your name</p>
                     </div>
                   </div>
+                  <div className="pt-2 flex justify-end">
+                    <button 
+                      onClick={handleProfileSubmit}
+                      disabled={updateProfile.isPending}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-walnut text-white rounded-xl hover:bg-darkBrown transition-colors font-medium disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" />
+                      {updateProfile.isPending ? 'Saving...' : 'Save Profile'}
+                    </button>
+                  </div>
                 </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mt-4">
+                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
+                  <Key className="w-5 h-5" />
+                  Change Password
+                </h2>
+                <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-walnut mb-2">Current Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={passwordForm.current_password}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-walnut mb-2">New Password</label>
+                    <input
+                      type="password"
+                      required
+                      minLength={8}
+                      value={passwordForm.password}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })}
+                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-walnut mb-2">Confirm New Password</label>
+                    <input
+                      type="password"
+                      required
+                      minLength={8}
+                      value={passwordForm.password_confirmation}
+                      onChange={(e) => setPasswordForm({ ...passwordForm, password_confirmation: e.target.value })}
+                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                    />
+                  </div>
+                  <div className="pt-2 flex justify-end">
+                    <button 
+                      type="submit"
+                      disabled={updatePassword.isPending}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-darkBrown text-white rounded-xl hover:bg-[#2a1a10] transition-colors font-medium disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" />
+                      {updatePassword.isPending ? 'Updating...' : 'Update Password'}
+                    </button>
+                  </div>
+                </form>
               </div>
             </motion.div>
           )}

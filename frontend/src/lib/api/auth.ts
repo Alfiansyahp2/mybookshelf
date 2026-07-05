@@ -90,18 +90,11 @@ export const authApi = {
   },
 
   /**
-   * Get current user info
+   * Get current authenticated user
    */
   async me(): Promise<{ user: User }> {
-    console.log('authApi.me called');
     const response = await apiClient.get('/v1/auth/me');
-    console.log('authApi.me response:', response);
-
-    // response is: { success: true, data: { user: {...} } }
-    const userData = response.data || response;
-    console.log('authApi.me returning:', userData);
-
-    return userData;
+    return response.data?.data || response.data || response;
   },
 
   /**
@@ -110,4 +103,19 @@ export const authApi = {
   async logout(): Promise<void> {
     await apiClient.post('/v1/auth/logout');
   },
+
+  /**
+   * Update user profile
+   */
+  async updateProfile(data: { name: string; email: string }): Promise<AuthResponse> {
+    const response = await apiClient.put('/v1/user/profile', data);
+    return response.data?.data || response.data || response;
+  },
+
+  /**
+   * Update password
+   */
+  async updatePassword(data: { current_password: string; password: string; password_confirmation: string }): Promise<void> {
+    await apiClient.put('/v1/user/password', data);
+  }
 };

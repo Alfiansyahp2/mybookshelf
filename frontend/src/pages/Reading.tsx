@@ -37,7 +37,7 @@ export default function Reading() {
     ? Math.round(readingBooks.reduce((sum: number, book: Book) => sum + (book.progress || 0), 0) / totalReadingBooks)
     : 0
   // Calculate yearly statistics
-  const getBookYears = (b: any) => {
+  const getBookYears = (b: any): number[] => {
     const years = new Set<number>()
     if (b.finishedDate) years.add(new Date(b.finishedDate).getFullYear())
     if (b.startedDate) years.add(new Date(b.startedDate).getFullYear())
@@ -50,7 +50,8 @@ export default function Reading() {
     return Array.from(years)
   }
 
-  const activeYears = Array.from(new Set(allBooks.flatMap(getBookYears))).sort((a, b) => b - a)
+  const activeYears = Array.from(new Set(allBooks.flatMap(getBookYears))) as number[]
+  activeYears.sort((a, b) => b - a)
 
   const yearlyStats = activeYears.map(year => {
     const booksThisYear = allBooks.filter((b: Book) => getBookYears(b).includes(year))
@@ -119,21 +120,6 @@ export default function Reading() {
 
   const handleMouseLeave = () => {
     stopScrolling()
-  }
-
-  const getReadingTime = (bookId: string) => {
-    // Calculate reading time from startedDate if available
-    const book = readingBooks.find(b => b.id === bookId)
-    if (!book || !book.startedDate) return null
-
-    const startDate = new Date(book.startedDate)
-    const now = new Date()
-    const diffMs = now.getTime() - startDate.getTime()
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
-
-    return { days: diffDays, hours: diffHours, minutes: diffMinutes }
   }
 
   const handleBookClick = (book: any) => {
@@ -244,13 +230,13 @@ export default function Reading() {
       {/* Selected Year Books */}
       {selectedYear && (
         <div className="mb-12">
-          <Bookshelf 
+          <Bookshelf
             books={allBooks
               .filter((b: Book) => getBookYears(b).includes(selectedYear))
               .map((b: Book) => ({ ...b, shelfId: 'year-shelf' }))
-            } 
-            shelves={[{ id: 'year-shelf', name: `Buku yang Dibaca Tahun ${selectedYear}`, order: 0, span: 12 }]} 
-            onBookClick={handleBookClick} 
+            }
+            shelves={[{ id: 'year-shelf', name: `Buku yang Dibaca Tahun ${selectedYear}`, order: 0, span: 12, capacity: 100 }]}
+            onBookClick={handleBookClick}
           />
         </div>
       )}
@@ -340,8 +326,8 @@ export default function Reading() {
               ...unreadBooks.map((b: Book) => ({ ...b, shelfId: 'unread-shelf' }))
             ]}
             shelves={[
-              ...(totalReadingBooks > 0 ? [{ id: 'reading-shelf', name: 'Sedang Dibaca', order: 0, span: 12 }] : []),
-              ...(totalUnreadBooks > 0 ? [{ id: 'unread-shelf', name: 'Belum Dibaca', order: 1, span: 12 }] : [])
+              ...(totalReadingBooks > 0 ? [{ id: 'reading-shelf', name: 'Sedang Dibaca', order: 0, span: 12, capacity: 100 }] : []),
+              ...(totalUnreadBooks > 0 ? [{ id: 'unread-shelf', name: 'Belum Dibaca', order: 1, span: 12, capacity: 100 }] : [])
             ]}
             onAddBook={handleAddBook}
             selectedBookId={selectedBookId}

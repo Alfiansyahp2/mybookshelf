@@ -38,6 +38,12 @@ Route::prefix('v1/auth')->group(function () {
     Route::get('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 });
 
+// User settings routes
+Route::middleware('auth:sanctum')->prefix('v1/user')->group(function () {
+    Route::put('/profile', [AuthController::class, 'updateProfile']);
+    Route::put('/password', [AuthController::class, 'updatePassword']);
+});
+
 // Reading session routes
 Route::middleware('auth:sanctum')->prefix('v1/books')->group(function () {
     // Reading session management

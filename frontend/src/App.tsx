@@ -15,6 +15,7 @@ import Statistics from './pages/Statistics'
 import Collections from './pages/Collections'
 import Achievements from './pages/Achievements'
 import Notes from './pages/Notes'
+import Settings from './pages/Settings'
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="collections" element={<Collections />} />
             <Route path="achievements" element={<Achievements />} />
             <Route path="notes" element={<Notes />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* Catch-all route for unmatched paths */}

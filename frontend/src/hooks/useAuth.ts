@@ -84,3 +84,29 @@ export function useLogout() {
     },
   });
 }
+
+/**
+ * Hook to update user profile
+ */
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { name: string; email: string }) => authApi.updateProfile(data),
+    
+    onSuccess: (data) => {
+      localStorage.setItem('user', JSON.stringify(data.user));
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+    },
+  });
+}
+
+/**
+ * Hook to update password
+ */
+export function useUpdatePassword() {
+  return useMutation({
+    mutationFn: (data: { current_password: string; password: string; password_confirmation: string }) => 
+      authApi.updatePassword(data),
+  });
+}
