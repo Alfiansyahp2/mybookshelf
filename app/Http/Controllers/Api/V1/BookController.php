@@ -155,23 +155,23 @@ class BookController extends Controller
 
         // Delete old cover if exists
         if ($book->cover_image) {
-            $oldPath = str_replace('/storage/', 'public/', $book->cover_image);
-            if (Storage::exists($oldPath)) {
-                Storage::delete($oldPath);
+            // Extract filename from the URL, which might be a full URL now
+            $filename = basename(parse_url($book->cover_image, PHP_URL_PATH));
+            if ($filename && $filename !== 'book-covers') {
+                $oldPath = 'public/book-covers/' . $filename;
+                if (Storage::exists($oldPath)) {
+                    Storage::delete($oldPath);
+                }
             }
         }
 
         // Store new cover in book-covers folder
         $file = $request->file('cover');
-        $filename = 'book_' . $id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('public/book-covers', $filename);
+        $filename = 'book_' . $book->id . '_' . time() . '.' . $request->file('cover')->getClientOriginalExtension();
+        $request->file('cover')->storeAs('public/book-covers', $filename);
 
-        // Build public URL
-        $url = '/storage/book-covers/' . $filename;
-
-        // Update book record
-        $book->cover_image = $url;
-        $book->save();
+        $url = asset('storage/book-covers/' . $filename);
+        $book->update(['cover_image' => $url]);
 
         return response()->success(['cover_image' => $url], 'Cover uploaded successfully');
     }

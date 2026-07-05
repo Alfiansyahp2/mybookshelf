@@ -109,10 +109,21 @@ export default function EditBookModal({
   const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    
+    // Validate size before upload (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file terlalu besar! Maksimal 5MB.');
+      return;
+    }
+
+    // Save previous preview to revert if failed
+    const previousPreview = coverPreview;
+
     // Show local preview immediately
     const reader = new FileReader()
     reader.onload = (ev) => setCoverPreview(ev.target?.result as string)
     reader.readAsDataURL(file)
+
     // Upload to server
     setIsUploading(true)
     uploadCover.mutate({ id: book.id, file }, {
@@ -120,7 +131,12 @@ export default function EditBookModal({
         setCoverPreview(data.cover_image)
         setIsUploading(false)
       },
-      onError: () => setIsUploading(false),
+      onError: (err: any) => {
+        console.error('Upload error:', err);
+        alert('Gagal mengupload cover. Pastikan format file benar (jpg/png) dan tidak lebih dari 5MB.');
+        setCoverPreview(previousPreview); // revert
+        setIsUploading(false)
+      },
     })
   }
 

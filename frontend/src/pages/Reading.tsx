@@ -331,147 +331,24 @@ export default function Reading() {
         </div>
       )}
 
-      {/* Reading Books Grid */}
-      {totalReadingBooks > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mb-8"
-        >
-          <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-            <Bookmark className="w-5 h-5" />
-            Active Reading Sessions
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {readingBooks.map((book: Book, index: number) => {
-              const readingTime = getReadingTime(book.id)
-              return (
-                <motion.div
-                  key={book.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-gradient-to-br from-cream to-beige rounded-xl p-4 border border-walnut/10 hover:shadow-md transition-shadow"
-                >
-                  {/* Book Cover Preview */}
-                  <div className="w-full h-32 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
-                    style={{
-                      background: `linear-gradient(135deg, ${book.spineColors[0]} 0%, ${book.spineColors[2]} 100%)`
-                    }}
-                  >
-                    <div className="text-white text-center p-2 z-10">
-                      <div className="text-sm font-semibold">{book.title}</div>
-                      <div className="text-xs opacity-90">{book.author}</div>
-                    </div>
-                  </div>
-
-                  {/* Progress Info */}
-                  <h3 className="font-semibold text-darkBrown mb-2 truncate">{book.title}</h3>
-                  <p className="text-sm text-walnut/70 mb-3">{book.author}</p>
-
-                  {/* Progress Bar */}
-                  <div className="mb-3">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-walnut/60">Progress</span>
-                      <span className="font-medium text-darkBrown">{book.progress || 0}%</span>
-                    </div>
-                    <div className="h-2 bg-walnut/20 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${book.progress || 0}%`,
-                          background: `linear-gradient(90deg, ${book.spineColors[0]}, ${book.spineColors[2]})`
-                        }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-xs mt-1 text-walnut/60">
-                      <span>Page {book.currentPage || 0}</span>
-                      <span>of {book.pages}</span>
-                    </div>
-                  </div>
-
-                  {/* Reading Time */}
-                  {readingTime && (
-                    <div className="bg-white/50 rounded-lg p-2 text-xs">
-                      <div className="flex items-center gap-2 text-walnut/70">
-                        <Clock className="w-3 h-3" />
-                        <span>
-                          {readingTime.days}d {readingTime.hours}h {readingTime.minutes}m
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              )
-            })}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Reading Bookshelf */}
-      {totalReadingBooks > 0 && (
-        <Bookshelf
-          books={allBooks}
-          shelves={shelves}
-          onAddBook={handleAddBook}
-          filterStatus="reading"
-          selectedBookId={selectedBookId}
-          isDrawerOpen={isBookDetailOpen}
-          onBookClick={handleBookClick}
-        />
-      )}
-
-      {/* Unread Books Section */}
-      {totalUnreadBooks > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mb-8"
-        >
-          <h2 className="text-xl font-serif font-semibold text-darkBrown mb-2 flex items-center gap-2">
-            <Bookmark className="w-5 h-5 text-walnut/50" />
-            Belum Dibaca
-            <span className="ml-auto text-sm font-normal bg-walnut/10 text-walnut px-3 py-0.5 rounded-full">
-              {totalUnreadBooks} buku
-            </span>
-          </h2>
-          <p className="text-sm text-walnut/50 mb-5">Buku yang menunggu untuk dibaca</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {unreadBooks.map((book: Book, index: number) => (
-              <motion.div
-                key={book.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => handleBookClick(book)}
-                className="flex items-center gap-3 p-3 rounded-xl border border-walnut/10 hover:border-walnut/30 hover:shadow-sm transition-all cursor-pointer bg-cream/40 hover:bg-cream/80"
-              >
-                {/* Mini book cover */}
-                <div
-                  className="flex-shrink-0 w-10 h-14 rounded-sm shadow-md flex items-center justify-center"
-                  style={{ background: `linear-gradient(150deg, ${book.spineColors[0]}, ${book.spineColors[2]})` }}
-                >
-                  <div
-                    className="absolute w-1 self-stretch rounded-l-sm opacity-60"
-                    style={{ background: book.spineColors[2] }}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-darkBrown truncate">{book.title}</p>
-                  <p className="text-xs text-walnut/60 truncate">{book.author}</p>
-                  {book.pages && (
-                    <p className="text-[10px] text-walnut/40 mt-0.5">{book.pages} halaman</p>
-                  )}
-                </div>
-                <div className="flex-shrink-0">
-                  <div className="w-2 h-2 rounded-full bg-gray-300" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+      {/* Unified Reading & Unread Bookshelf */}
+      {(totalReadingBooks > 0 || totalUnreadBooks > 0) && (
+        <div className="mb-12">
+          <Bookshelf
+            books={[
+              ...readingBooks.map((b: Book) => ({ ...b, shelfId: 'reading-shelf' })),
+              ...unreadBooks.map((b: Book) => ({ ...b, shelfId: 'unread-shelf' }))
+            ]}
+            shelves={[
+              ...(totalReadingBooks > 0 ? [{ id: 'reading-shelf', name: 'Sedang Dibaca', order: 0, span: 12 }] : []),
+              ...(totalUnreadBooks > 0 ? [{ id: 'unread-shelf', name: 'Belum Dibaca', order: 1, span: 12 }] : [])
+            ]}
+            onAddBook={handleAddBook}
+            selectedBookId={selectedBookId}
+            isDrawerOpen={isBookDetailOpen}
+            onBookClick={handleBookClick}
+          />
+        </div>
       )}
 
       {/* Action Buttons */}
