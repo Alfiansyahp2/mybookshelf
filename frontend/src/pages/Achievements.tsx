@@ -72,6 +72,7 @@ export default function Achievements() {
       else if (ach.title.includes('Bintang') || ach.title.includes('Sempurna')) progress = stats.fiveStar;
       else if (ach.title.includes('Favorit') || ach.title.includes('Setia')) progress = stats.favs;
       else if (ach.title.includes('Wishlist') || ach.title.includes('Pemimpi')) progress = stats.wishlist;
+      else if (ach.title.includes('Kritikus')) progress = stats.rated;
       else if (ach.category === 'books') progress = stats.total;
       
       const isUnlocked = ach.user_progress?.unlocked || false;

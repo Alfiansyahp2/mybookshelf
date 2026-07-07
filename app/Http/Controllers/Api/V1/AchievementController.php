@@ -22,6 +22,12 @@ class AchievementController extends Controller
         // Transform to include user progress
         $achievementsWithProgress = $achievements->map(function ($achievement) use ($user) {
             $userAchievement = $achievement->users->first();
+            
+            $unlockedDate = $userAchievement?->pivot->unlocked_date;
+            $unlockedDateStr = null;
+            if ($unlockedDate) {
+                $unlockedDateStr = is_string($unlockedDate) ? $unlockedDate : $unlockedDate->toIso8601String();
+            }
 
             return [
                 'id' => $achievement->id,
@@ -32,9 +38,9 @@ class AchievementController extends Controller
                 'category' => $achievement->category,
                 'rarity' => $achievement->rarity,
                 'user_progress' => [
-                    'current' => $userAchievement?->pivot->current ?? 0,
+                    'current' => (int) ($userAchievement?->pivot->current ?? 0),
                     'unlocked' => (bool) ($userAchievement?->pivot->unlocked ?? false),
-                    'unlocked_date' => $userAchievement?->pivot->unlocked_date?->toIso8601String(),
+                    'unlocked_date' => $unlockedDateStr,
                 ],
             ];
         });
@@ -55,6 +61,12 @@ class AchievementController extends Controller
 
         $userAchievement = $achievement->users->first();
 
+        $unlockedDate = $userAchievement?->pivot->unlocked_date;
+        $unlockedDateStr = null;
+        if ($unlockedDate) {
+            $unlockedDateStr = is_string($unlockedDate) ? $unlockedDate : $unlockedDate->toIso8601String();
+        }
+
         $achievementData = [
             'id' => $achievement->id,
             'title' => $achievement->title,
@@ -64,9 +76,9 @@ class AchievementController extends Controller
             'category' => $achievement->category,
             'rarity' => $achievement->rarity,
             'user_progress' => [
-                'current' => $userAchievement?->pivot->current ?? 0,
+                'current' => (int) ($userAchievement?->pivot->current ?? 0),
                 'unlocked' => (bool) ($userAchievement?->pivot->unlocked ?? false),
-                'unlocked_date' => $userAchievement?->pivot->unlocked_date?->toIso8601String(),
+                'unlocked_date' => $unlockedDateStr,
             ],
         ];
 

@@ -121,6 +121,33 @@ class AchievementSeeder extends Seeder
                 'requirement' => 5,
                 'category' => 'special',
                 'rarity' => 'common',
+            ],
+            [
+                'id' => 'cfa4b1a4-9226-44ea-8422-5a46ae9dddfb',
+                'title' => 'Super Marathon',
+                'description' => 'Membaca lebih dari 10.000 halaman! Kamu luar biasa!',
+                'icon' => 'Shield',
+                'requirement' => 10000,
+                'category' => 'reading',
+                'rarity' => 'legendary',
+            ],
+            [
+                'id' => 'dfa4b1a4-9226-44ea-8422-5a46ae9eeefb',
+                'title' => 'Desainer Rak',
+                'description' => 'Membuat 5 rak berbeda untuk koleksimu.',
+                'icon' => 'Layers',
+                'requirement' => 5,
+                'category' => 'collections',
+                'rarity' => 'legendary',
+            ],
+            [
+                'id' => 'efa4b1a4-9226-44ea-8422-5a46ae9ffffb',
+                'title' => 'Kritikus Buku',
+                'description' => 'Memberikan rating pada 10 buku yang berbeda.',
+                'icon' => 'Star',
+                'requirement' => 10,
+                'category' => 'special',
+                'rarity' => 'epic',
             ]
         ];
 
