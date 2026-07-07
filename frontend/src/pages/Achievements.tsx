@@ -1,24 +1,12 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useBooks } from '../hooks/useBooks'
 import { useShelves } from '../hooks/useShelves'
-import { useAchievementStore } from '../hooks/useAchievementTracker'
+import { useAchievements, useUnlockAchievement } from '../hooks/useAchievements'
 import {
   Trophy, BookOpen, Star, Crown, Heart, Sparkles, Layers,
-  Bookmark, CheckCircle, Flame, Shield, Map
+  Bookmark, CheckCircle, Flame, Shield, Map, Icon
 } from 'lucide-react'
-
-interface Achievement {
-  id: string
-  title: string
-  description: string
-  icon: any
-  category: 'milestone' | 'collection' | 'special'
-  target: number
-  progress: number
-  unlocked: boolean
-  color: string
-}
 
 const BRAND = {
   cream:     '#F8F5F0',
@@ -28,14 +16,28 @@ const BRAND = {
   beige:     '#E8E0D5',
 }
 
+const iconMap: Record<string, any> = {
+  BookOpen, CheckCircle, Trophy, Flame, Shield, Bookmark, Crown, Layers, Map, Star, Heart, Sparkles
+}
+
+const colorMap: Record<string, string> = {
+  common: '#3b82f6', // blue
+  rare: '#10b981', // green
+  epic: '#8b5cf6', // purple
+  legendary: '#f59e0b', // gold
+}
+
 export default function Achievements() {
-  const { data: booksResponse, isLoading } = useBooks()
+  const { data: booksResponse } = useBooks()
   const { data: shelves = [] } = useShelves()
-  const { unlockedIds } = useAchievementStore()
+  
+  // API Fetch
+  const { data: apiAchievements = [], isLoading } = useAchievements()
+  const unlockMutation = useUnlockAchievement()
 
   const books = booksResponse?.data?.data || []
 
-  // Compute stats
+  // Compute stats for progress
   const stats = useMemo(() => {
     const finished = books.filter(b => b.status === 'finished')
     const wishlist = books.filter(b => b.status === 'wishlist')
@@ -58,81 +60,44 @@ export default function Achievements() {
     }
   }, [books, shelves])
 
-  // Define achievements matching useAchievementTracker
-  const achievementsList: Achievement[] = useMemo(() => [
-    {
-      id: 'first-book', title: 'Langkah Pertama',
-      description: 'Menambahkan buku pertama ke perpustakaan.',
-      icon: BookOpen, category: 'milestone', target: 1, progress: stats.total,
-      unlocked: unlockedIds.includes('first-book'), color: '#3b82f6'
-    },
-    {
-      id: 'kutu-buku-1', title: 'Kutu Buku Pemula',
-      description: 'Menyelesaikan 5 buku.',
-      icon: CheckCircle, category: 'milestone', target: 5, progress: stats.finished,
-      unlocked: unlockedIds.includes('kutu-buku-1'), color: '#10b981'
-    },
-    {
-      id: 'kutu-buku-2', title: 'Kutu Buku Pro',
-      description: 'Menyelesaikan 20 buku.',
-      icon: Trophy, category: 'milestone', target: 20, progress: stats.finished,
-      unlocked: unlockedIds.includes('kutu-buku-2'), color: '#8b5cf6'
-    },
-    {
-      id: 'marathon', title: 'Marathon Membaca',
-      description: 'Membaca lebih dari 1.000 halaman.',
-      icon: Flame, category: 'milestone', target: 1000, progress: stats.pages,
-      unlocked: unlockedIds.includes('marathon'), color: '#ef4444'
-    },
-    {
-      id: 'marathon-ultra', title: 'Ultra Marathon',
-      description: 'Membaca lebih dari 5.000 halaman!',
-      icon: Shield, category: 'milestone', target: 5000, progress: stats.pages,
-      unlocked: unlockedIds.includes('marathon-ultra'), color: '#dc2626'
-    },
-    {
-      id: 'kolektor', title: 'Kolektor',
-      description: 'Perpustakaanmu memiliki 20 buku.',
-      icon: Bookmark, category: 'collection', target: 20, progress: stats.total,
-      unlocked: unlockedIds.includes('kolektor'), color: '#f59e0b'
-    },
-    {
-      id: 'kolektor-master', title: 'Master Kolektor',
-      description: 'Luar biasa, kamu memiliki 50 buku!',
-      icon: Crown, category: 'collection', target: 50, progress: stats.total,
-      unlocked: unlockedIds.includes('kolektor-master'), color: '#d97706'
-    },
-    {
-      id: 'arsitek-rak', title: 'Arsitek Rak',
-      description: 'Membuat 3 rak berbeda untuk koleksimu.',
-      icon: Layers, category: 'collection', target: 3, progress: stats.shelves,
-      unlocked: unlockedIds.includes('arsitek-rak'), color: '#6366f1'
-    },
-    {
-      id: 'ahli-genre', title: 'Eksplorator Genre',
-      description: 'Membaca buku dari 3 genre berbeda.',
-      icon: Map, category: 'special', target: 3, progress: stats.genres,
-      unlocked: unlockedIds.includes('ahli-genre'), color: '#ec4899'
-    },
-    {
-      id: 'kurator', title: 'Kurator Sempurna',
-      description: 'Memberikan rating bintang 5 pada sebuah buku.',
-      icon: Star, category: 'special', target: 1, progress: stats.fiveStar,
-      unlocked: unlockedIds.includes('kurator'), color: '#eab308'
-    },
-    {
-      id: 'penggemar', title: 'Penggemar Setia',
-      description: 'Menandai 5 buku sebagai favorit.',
-      icon: Heart, category: 'special', target: 5, progress: stats.favs,
-      unlocked: unlockedIds.includes('penggemar'), color: '#f43f5e'
-    },
-    {
-      id: 'pemimpi', title: 'Sang Pemimpi',
-      description: 'Menambahkan 5 buku ke Wishlist.',
-      icon: Sparkles, category: 'special', target: 5, progress: stats.wishlist,
-      unlocked: unlockedIds.includes('pemimpi'), color: '#8b5cf6'
-    }
-  ], [stats, unlockedIds])
+  // Combine API data with computed progress and UI mapping
+  const achievementsList = useMemo(() => {
+    return apiAchievements.map(ach => {
+      let progress = 0;
+      if (ach.category === 'reading' && ach.title.includes('Marathon')) progress = stats.pages;
+      else if (ach.category === 'reading') progress = stats.finished;
+      else if (ach.category === 'collections' && ach.title.includes('Rak')) progress = stats.shelves;
+      else if (ach.category === 'collections') progress = stats.total;
+      else if (ach.title.includes('Genre')) progress = stats.genres;
+      else if (ach.title.includes('Bintang') || ach.title.includes('Sempurna')) progress = stats.fiveStar;
+      else if (ach.title.includes('Favorit') || ach.title.includes('Setia')) progress = stats.favs;
+      else if (ach.title.includes('Wishlist') || ach.title.includes('Pemimpi')) progress = stats.wishlist;
+      else if (ach.category === 'books') progress = stats.total;
+      
+      const isUnlocked = ach.user_progress?.unlocked || false;
+
+      return {
+        id: ach.id,
+        title: ach.title,
+        description: ach.description,
+        icon: iconMap[ach.icon] || Trophy,
+        category: ach.category === 'special' ? 'special' : ach.category === 'collections' ? 'collection' : 'milestone',
+        target: ach.requirement,
+        progress,
+        unlocked: isUnlocked,
+        color: colorMap[ach.rarity] || colorMap.common
+      }
+    })
+  }, [apiAchievements, stats])
+
+  // Optional: Auto-unlock achievements if progress >= target
+  useEffect(() => {
+    achievementsList.forEach(ach => {
+      if (!ach.unlocked && ach.progress >= ach.target) {
+        unlockMutation.mutate(ach.id);
+      }
+    })
+  }, [achievementsList])
 
   if (isLoading) {
     return (
