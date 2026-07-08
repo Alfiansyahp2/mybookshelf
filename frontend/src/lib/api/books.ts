@@ -289,10 +289,30 @@ export const booksApi = {
   async uploadCover(id: string, file: File): Promise<{ cover_image: string }> {
     const formData = new FormData();
     formData.append('cover', file);
-    const response = await apiClient.post(`/v1/books/${id}/cover`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    
+    // Get CSRF token
+    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+    const csrfToken = match ? decodeURIComponent(match[1]) : '';
+    
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+    
+    const response = await fetch(`${API_BASE_URL}/v1/books/${id}/cover`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Accept': 'application/json',
+        'X-XSRF-TOKEN': csrfToken
+      },
+      credentials: 'include'
     });
-    return response.data?.data || response.data;
+    
+    if (!response.ok) {
+       const errorData = await response.json().catch(() => ({}));
+       throw new Error(errorData.message || `Upload failed with status ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.data || data;
   },
 
   /**

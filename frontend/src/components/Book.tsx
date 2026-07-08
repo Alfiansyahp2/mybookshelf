@@ -219,12 +219,18 @@ export default function RealisticBook({ book, onClick, isDrawerOpen, bookAreaHei
                 {/* Mini cover */}
                 <div style={{ display:'flex', gap:8, alignItems:'flex-start', marginBottom:8 }}>
                   <div style={{ position:'relative', width:24, height:36, flexShrink:0 }}>
-                    <div style={{ position:'absolute', inset:0, borderRadius:'0 2px 2px 0',
-                      background:`linear-gradient(150deg,${c0},${c1} 50%,${c2})`,
-                      boxShadow:'2px 2px 5px rgba(0,0,0,0.35)' }} />
-                    <div style={{ position:'absolute', left:0, top:0, bottom:0, width:4,
-                      background:`linear-gradient(to right,${c2},${c1})`,
-                      borderRadius:'1px 0 0 1px' }} />
+                    {book.coverImage ? (
+                      <img src={book.coverImage} alt={book.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '0 2px 2px 0', boxShadow: '2px 2px 5px rgba(0,0,0,0.35)' }} />
+                    ) : (
+                      <>
+                        <div style={{ position:'absolute', inset:0, borderRadius:'0 2px 2px 0',
+                          background:`linear-gradient(150deg,${c0},${c1} 50%,${c2})`,
+                          boxShadow:'2px 2px 5px rgba(0,0,0,0.35)' }} />
+                        <div style={{ position:'absolute', left:0, top:0, bottom:0, width:4,
+                          background:`linear-gradient(to right,${c2},${c1})`,
+                          borderRadius:'1px 0 0 1px' }} />
+                      </>
+                    )}
                   </div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <p style={{ color:'#1c0f05', fontSize:11, fontWeight:700,

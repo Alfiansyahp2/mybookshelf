@@ -149,6 +149,12 @@ class BookController extends Controller
     {
         $book = $this->bookService->getBook($id, $request->user()->id);
 
+        \Illuminate\Support\Facades\Log::info('uploadCover request received', [
+            'has_file' => $request->hasFile('cover'),
+            'file_name' => $request->hasFile('cover') ? $request->file('cover')->getClientOriginalName() : null,
+            'all_data' => $request->all()
+        ]);
+
         $request->validate([
             'cover' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120', // max 5MB
         ]);
@@ -167,10 +173,10 @@ class BookController extends Controller
 
         // Store new cover in book-covers folder
         $file = $request->file('cover');
-        $filename = 'book_' . $book->id . '_' . time() . '.' . $request->file('cover')->getClientOriginalExtension();
-        $request->file('cover')->storeAs('public/book-covers', $filename);
+        $filename = 'book_' . $book->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $file->storeAs('book-covers', $filename, 'public');
 
-        $url = asset('storage/book-covers/' . $filename);
+        $url = request()->getSchemeAndHttpHost() . '/storage/book-covers/' . $filename;
         $book->update(['cover_image' => $url]);
 
         return response()->success(['cover_image' => $url], 'Cover uploaded successfully');

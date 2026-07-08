@@ -133,7 +133,8 @@ export default function EditBookModal({
       },
       onError: (err: any) => {
         console.error('Upload error:', err);
-        alert('Gagal mengupload cover. Pastikan format file benar (jpg/png) dan tidak lebih dari 5MB.');
+        const backendMsg = err.response?.data?.message || err.message || '';
+        alert(`Gagal mengupload cover. Pesan dari server: ${backendMsg}`);
         setCoverPreview(previousPreview); // revert
         setIsUploading(false)
       },
