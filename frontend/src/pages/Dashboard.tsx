@@ -11,6 +11,7 @@ import {
   TrendingUp, Target, Clock, Heart, Award,
   ChevronRight, BookMarked, Layers
 } from 'lucide-react'
+import DashboardAccountingSection from '../components/accounting/DashboardAccountingSection'
 import ReadingCalendarModal from '../components/modals/ReadingCalendarModal'
 import {
   PieChart, Pie, Cell,
@@ -916,6 +917,11 @@ export default function Dashboard() {
           </Link>
         </motion.div>
       )}
+
+      {/* ─── Accounting Section ─────────────────────────── */}
+      <motion.div {...fadeUp(0.7)}>
+        <DashboardAccountingSection />
+      </motion.div>
 
       <ReadingCalendarModal
         isOpen={isCalendarModalOpen}

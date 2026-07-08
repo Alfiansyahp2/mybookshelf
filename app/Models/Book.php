@@ -138,6 +138,69 @@ class Book extends Model
     }
 
     /**
+     * Get all expenses associated with the book.
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class)->where('status', 'completed');
+    }
+
+    /**
+     * Get the total purchase cost including all related expenses.
+     */
+    public function getTotalInvestment(): float
+    {
+        // Base purchase price
+        $total = $this->purchase_price ?: 0;
+
+        // Add all related expenses (shipping, maintenance, etc.)
+        foreach ($this->expenses as $expense) {
+            $total += $expense->amount_base_currency;
+        }
+
+        return $total;
+    }
+
+    /**
+     * Get the total additional expenses (excluding the original purchase).
+     */
+    public function getAdditionalExpenses(): float
+    {
+        return $this->expenses->sum('amount_base_currency');
+    }
+
+    /**
+     * Get formatted total investment.
+     */
+    public function getFormattedTotalInvestment(): string
+    {
+        return 'Rp ' . number_format($this->getTotalInvestment(), 2, ',', '.');
+    }
+
+    /**
+     * Check if the book has any additional expenses beyond purchase.
+     */
+    public function hasAdditionalExpenses(): bool
+    {
+        return $this->expenses->count() > 0;
+    }
+
+    /**
+     * Get the cost breakdown of the book.
+     */
+    public function getCostBreakdown(): array
+    {
+        return [
+            'purchase_price' => $this->purchase_price ?: 0,
+            'purchase_currency' => $this->purchase_currency ?: 'IDR',
+            'purchase_date' => $this->purchase_date,
+            'additional_expenses' => $this->getAdditionalExpenses(),
+            'total_investment' => $this->getTotalInvestment(),
+            'expense_count' => $this->expenses->count(),
+        ];
+    }
+
+    /**
      * Scope a query to only include favorite books.
      */
     public function scopeFavorite($query)

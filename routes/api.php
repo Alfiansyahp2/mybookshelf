@@ -78,6 +78,8 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::patch('shelf', [BookController::class, 'moveToShelf']);
         Route::post('cover', [BookController::class, 'uploadCover']);
         Route::get('timeline', [TimelineController::class, 'bookTimeline']);
+        Route::get('expenses', [BookController::class, 'getExpenses']);
+        Route::get('cost-breakdown', [BookController::class, 'getCostBreakdown']);
     });
 
     // Shelves - Full CRUD with occupancy

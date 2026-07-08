@@ -479,4 +479,58 @@ class BookController extends Controller
 
         return response()->success($updatedBook, 'Book restarted successfully');
     }
+
+    /**
+     * Get expenses for a specific book.
+     */
+    public function getExpenses(Request $request, $id)
+    {
+        try {
+            $book = $this->bookService->getBook($id, $request->user()->id);
+
+            $expenses = $book->expenses()->with(['category'])->get();
+
+            return response()->success($expenses, 'Book expenses retrieved successfully');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->error('Book not found', 404);
+        } catch (\Exception $e) {
+            return response()->error($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get cost breakdown for a specific book.
+     */
+    public function getCostBreakdown(Request $request, $id)
+    {
+        try {
+            $book = $this->bookService->getBook($id, $request->user()->id);
+
+            $breakdown = [
+                'book_id' => $book->id,
+                'title' => $book->title,
+                'author' => $book->author,
+                'purchase_price' => $book->purchase_price,
+                'purchase_currency' => $book->purchase_currency,
+                'purchase_date' => $book->purchase_date,
+                'is_gift' => $book->is_gift,
+                'purchase_location' => $book->purchase_location,
+                'additional_expenses' => $book->getAdditionalExpenses(),
+                'total_investment' => $book->getTotalInvestment(),
+                'expense_count' => $book->expenses->count(),
+                'expenses' => $book->expenses()->with(['category'])->get(),
+                'formatted' => [
+                    'purchase_price' => $book->purchase_price ? 'Rp ' . number_format($book->purchase_price, 2, ',', '.') : 'Not set',
+                    'additional_expenses' => 'Rp ' . number_format($book->getAdditionalExpenses(), 2, ',', '.'),
+                    'total_investment' => $book->getFormattedTotalInvestment(),
+                ],
+            ];
+
+            return response()->success($breakdown, 'Book cost breakdown retrieved successfully');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->error('Book not found', 404);
+        } catch (\Exception $e) {
+            return response()->error($e->getMessage(), 500);
+        }
+    }
 }

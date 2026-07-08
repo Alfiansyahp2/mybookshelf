@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Book;
 use App\Models\ReadingSession;
+use App\Models\Expense;
+use App\Models\Budget;
 use Illuminate\Http\Request;
 
 class StatisticsController extends Controller
@@ -122,6 +124,15 @@ class StatisticsController extends Controller
             'purchases' => [
                 'total_spent' => $totalSpent ? (float) number_format($totalSpent, 2) : 0,
                 'average_price' => $totalBooks > 0 ? (float) number_format($totalSpent / $totalBooks, 2) : 0,
+                'accounting' => [
+                    'total_expenses' => Expense::where('user_id', $user->id)->count(),
+                    'total_invested' => Expense::where('user_id', $user->id)->sum('amount_base_currency'),
+                    'active_budgets' => Budget::where('user_id', $user->id)->where('is_active', true)->count(),
+                    'this_month_expenses' => Expense::where('user_id', $user->id)
+                        ->whereMonth('expense_date', now()->month)
+                        ->whereYear('expense_date', now()->year)
+                        ->sum('amount_base_currency') ?: 0,
+                ],
             ],
             'generated_at' => now()->toIso8601String(),
         ];

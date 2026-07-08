@@ -88,7 +88,7 @@ class BookService
      */
     public function getBook($id, $userId = null)
     {
-        $query = Book::with(['shelf', 'shelf.room', 'collections', 'readingSessions', 'timelineEvents']);
+        $query = Book::with(['shelf', 'shelf.room', 'collections', 'readingSessions', 'timelineEvents', 'expenses.category']);
 
         // SECURITY: Filter by user_id if provided
         if ($userId) {

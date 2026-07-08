@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -36,7 +37,9 @@ return new class extends Migration
             $table->boolean('is_recurring')->default(false);
             $table->string('recurring_period', 20)->nullable(); // daily, weekly, monthly, yearly
             $table->uuid('parent_expense_id')->nullable(); // For recurring expense series
-            $table->foreign('parent_expense_id')->references('id')->on('expenses')->nullOnDelete();
+
+            // Foreign key constraints will be added separately
+            $table->index('parent_expense_id');
 
             // Location & vendor
             $table->string('vendor', 255)->nullable();
@@ -72,6 +75,11 @@ return new class extends Migration
             $table->index('is_recurring');
             $table->index(['user_id', 'expense_date']);
         });
+
+        // Add self-referential foreign key for parent_expense_id
+        // This needs to be done separately for PostgreSQL compatibility
+        DB::statement('ALTER TABLE expenses ADD CONSTRAINT expenses_parent_expense_id_foreign
+                       FOREIGN KEY (parent_expense_id) REFERENCES expenses(id) ON DELETE SET NULL');
     }
 
     /**

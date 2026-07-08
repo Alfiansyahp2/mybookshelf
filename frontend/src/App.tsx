@@ -15,6 +15,7 @@ import Statistics from './pages/Statistics'
 import Collections from './pages/Collections'
 import Achievements from './pages/Achievements'
 import Notes from './pages/Notes'
+import Accounting from './pages/Accounting'
 import Settings from './pages/Settings'
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
             <Route path="collections" element={<Collections />} />
             <Route path="achievements" element={<Achievements />} />
             <Route path="notes" element={<Notes />} />
+            <Route path="accounting" element={<Accounting />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 
