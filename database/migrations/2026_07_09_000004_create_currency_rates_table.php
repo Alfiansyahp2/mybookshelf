@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('from_currency', 3);
             $table->string('to_currency', 3)->default('IDR');
-            $table->decimal('rate', 10, 6);
+            $table->decimal('rate', 12, 6);
             $table->timestamp('effective_date');
             $table->timestamp('expires_at')->nullable();
             $table->boolean('is_active')->default(true);
