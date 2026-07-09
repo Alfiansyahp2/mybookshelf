@@ -107,6 +107,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
     // Accounting System - Complete expense tracking and budgeting
     Route::prefix('accounting')->group(function () {
+        // Expenses - Custom routes
+        Route::get('expenses/by-category', [ExpenseController::class, 'getByCategory']);
+        Route::get('expenses/total', [ExpenseController::class, 'getTotalExpenses']);
+
         // Expenses - Full CRUD with advanced operations
         Route::apiResource('expenses', ExpenseController::class);
         Route::prefix('expenses/{expense}')->group(function () {
@@ -117,13 +121,13 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
             Route::post('mark-paid', [ExpenseController::class, 'markAsPaid']);
             Route::post('send-reminder', [ExpenseController::class, 'sendReminder']);
         });
-        Route::get('expenses/by-category', [ExpenseController::class, 'getByCategory']);
-        Route::get('expenses/total', [ExpenseController::class, 'getTotalExpenses']);
+
+        // Expense Categories - Custom routes
+        Route::get('categories/default', [ExpenseCategoryController::class, 'getDefaultCategories']);
+        Route::post('categories/initialize-defaults', [ExpenseCategoryController::class, 'initializeDefaults']);
 
         // Expense Categories - Full CRUD with defaults
         Route::apiResource('categories', ExpenseCategoryController::class);
-        Route::get('categories/default', [ExpenseCategoryController::class, 'getDefaultCategories']);
-        Route::post('categories/initialize-defaults', [ExpenseCategoryController::class, 'initializeDefaults']);
         Route::get('categories/{category}/statistics', [ExpenseCategoryController::class, 'getStatistics']);
 
         Route::get('budgets/summary', [BudgetController::class, 'getSummary']);

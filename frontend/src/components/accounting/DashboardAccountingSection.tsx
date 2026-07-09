@@ -20,8 +20,8 @@ export default function DashboardAccountingSection() {
     );
   }
 
-  const summary = overview?.summary;
-  const budget = budgetSummary;
+  const summary = overview?.data?.summary;
+  const budget = budgetSummary?.data || budgetSummary; // In case budgetSummary is wrapped or not
 
   return (
     <div className="bg-cream border border-beige rounded-lg shadow-sm">

@@ -36,10 +36,10 @@ export default function AccountingDashboard({
     );
   }
 
-  const summary = overview?.summary;
-  const budgetData = overview?.budget;
-  const categoriesData = overview?.expenses_by_category || [];
-  const recentExpenses = overview?.recent_expenses || [];
+  const summary = overview?.data?.summary;
+  const budgetData = overview?.data?.budget;
+  const categoriesData = overview?.data?.expenses_by_category || [];
+  const recentExpenses = overview?.data?.recent_expenses || [];
 
   return (
     <div className="space-y-6">
