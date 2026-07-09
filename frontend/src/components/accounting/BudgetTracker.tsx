@@ -48,10 +48,10 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-          <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-4 bg-beige rounded w-1/4"></div>
+          <div className="h-32 bg-beige rounded"></div>
         </div>
       </div>
     );
@@ -61,11 +61,11 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Budget</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-walnut/80">Total Budget</p>
+              <p className="text-2xl font-bold font-serif text-darkBrown">
                 Rp {(summary?.total_budget || 0).toLocaleString()}
               </p>
             </div>
@@ -73,11 +73,11 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-walnut/80">Total Spent</p>
+              <p className="text-2xl font-bold font-serif text-darkBrown">
                 Rp {(summary?.total_spent || 0).toLocaleString()}
               </p>
             </div>
@@ -85,11 +85,11 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Remaining</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-walnut/80">Remaining</p>
+              <p className="text-2xl font-bold font-serif text-darkBrown">
                 Rp {(summary?.total_remaining || 0).toLocaleString()}
               </p>
             </div>
@@ -97,11 +97,11 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Usage</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-walnut/80">Usage</p>
+              <p className="text-2xl font-bold font-serif text-darkBrown">
                 {summary?.overall_usage_percentage?.toFixed(1) || 0}%
               </p>
             </div>
@@ -117,9 +117,9 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
       </div>
 
       {/* Budget List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+      <div className="bg-cream border border-beige rounded-lg shadow-sm">
         <div className="p-6 border-b dark:border-gray-700 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg font-semibold text-darkBrown">
             Active Budgets
           </h3>
           <button
@@ -135,7 +135,7 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
           {budgets.length === 0 ? (
             <div className="text-center py-12">
               <Wallet className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400 mb-4">No budgets set up yet</p>
+              <p className="text-walnut/80 mb-4">No budgets set up yet</p>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="text-blue-600 hover:text-blue-700 font-medium"
@@ -161,8 +161,8 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
 
       {/* Alerts Summary */}
       {(summary?.exceeded_count || 0) > 0 || (summary?.warning_count || 0) > 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Budget Alerts</h4>
+        <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
+          <h4 className="text-lg font-semibold text-darkBrown mb-4">Budget Alerts</h4>
           <div className="space-y-3">
             {(summary?.exceeded_count || 0) > 0 && (
               <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
@@ -214,7 +214,7 @@ function BudgetCard({ budget, onViewDetails, onEdit, onDelete }: BudgetCardProps
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+      className="border border-beige bg-white/40 rounded-lg p-4 hover:shadow-md transition-shadow"
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
@@ -223,8 +223,8 @@ function BudgetCard({ budget, onViewDetails, onEdit, onDelete }: BudgetCardProps
               <StatusIcon className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white">{budget.name}</h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{budget.period}</p>
+              <h4 className="font-semibold text-darkBrown">{budget.name}</h4>
+              <p className="text-sm text-walnut/80 capitalize">{budget.period}</p>
             </div>
           </div>
           {budget.category && (
@@ -264,12 +264,12 @@ function BudgetCard({ budget, onViewDetails, onEdit, onDelete }: BudgetCardProps
         <div className="flex justify-between text-sm mb-1">
           <span className="text-gray-600 dark:text-gray-300">Progress</span>
           <span className={`font-medium ${
-            (progress?.usage_percentage || 0) > 80 ? 'text-red-600' : 'text-gray-900 dark:text-white'
+            (progress?.usage_percentage || 0) > 80 ? 'text-red-600' : 'text-darkBrown'
           }`}>
             {progress?.usage_percentage?.toFixed(1)}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-beige rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all ${
               (progress?.usage_percentage || 0) > 80 ? 'bg-red-500' :
@@ -283,19 +283,19 @@ function BudgetCard({ budget, onViewDetails, onEdit, onDelete }: BudgetCardProps
       {/* Amount Details */}
       <div className="grid grid-cols-3 gap-4 text-sm">
         <div>
-          <p className="text-gray-500 dark:text-gray-400">Budget</p>
-          <p className="font-medium text-gray-900 dark:text-white">
+          <p className="text-walnut/80">Budget</p>
+          <p className="font-medium text-darkBrown">
             Rp {progress?.budget_amount?.toLocaleString() || 0}
           </p>
         </div>
         <div>
-          <p className="text-gray-500 dark:text-gray-400">Spent</p>
-          <p className="font-medium text-gray-900 dark:text-white">
+          <p className="text-walnut/80">Spent</p>
+          <p className="font-medium text-darkBrown">
             Rp {progress?.total_spent?.toLocaleString() || 0}
           </p>
         </div>
         <div>
-          <p className="text-gray-500 dark:text-gray-400">Remaining</p>
+          <p className="text-walnut/80">Remaining</p>
           <p className={`font-medium ${
             (progress?.remaining_amount || 0) < 0 ? 'text-red-600' : 'text-green-600'
           }`}>

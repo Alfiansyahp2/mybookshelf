@@ -68,11 +68,11 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+    <div className="bg-cream border border-beige rounded-lg shadow-sm">
       {/* Header */}
       <div className="p-6 border-b dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Expenses</h3>
+          <h3 className="text-lg font-semibold text-darkBrown">Expenses</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -104,7 +104,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Category Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Category
               </label>
               <select
@@ -123,7 +123,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Status
               </label>
               <select
@@ -140,7 +140,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
 
             {/* Date Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 From Date
               </label>
               <input
@@ -152,7 +152,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 To Date
               </label>
               <input
@@ -177,8 +177,8 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
         ) : expenses.length === 0 ? (
           <div className="p-12 text-center">
             <Receipt className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-500 dark:text-gray-400">No expenses found</p>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+            <p className="text-walnut/80">No expenses found</p>
+            <p className="text-sm text-walnut/60 mt-2">
               {searchTerm || filters.category_id ? 'Try adjusting your filters' : 'Add your first expense to get started'}
             </p>
           </div>
@@ -238,7 +238,7 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete, onMarkAsPaid }: Expens
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+      className="p-4 hover:bg-white/40 transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-start justify-between">
@@ -246,7 +246,7 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete, onMarkAsPaid }: Expens
           <div className="flex items-center gap-3 mb-2">
             <span className="text-lg">{expense.category?.icon || '💰'}</span>
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white">{expense.title}</h4>
+              <h4 className="font-semibold text-darkBrown">{expense.title}</h4>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`text-xs px-2 py-0.5 rounded ${getStatusColor(expense.status)}`}>
                   {expense.status}
@@ -263,26 +263,26 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete, onMarkAsPaid }: Expens
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
             <div>
-              <p className="text-gray-500 dark:text-gray-400">Amount</p>
-              <p className="font-semibold text-gray-900 dark:text-white">
+              <p className="text-walnut/80">Amount</p>
+              <p className="font-semibold text-darkBrown">
                 {expense.currency} {expense.amount.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-gray-500 dark:text-gray-400">Category</p>
-              <p className="text-gray-900 dark:text-white">
+              <p className="text-walnut/80">Category</p>
+              <p className="text-darkBrown">
                 {expense.category?.name || 'Uncategorized'}
               </p>
             </div>
             <div>
-              <p className="text-gray-500 dark:text-gray-400">Date</p>
-              <p className="text-gray-900 dark:text-white">
+              <p className="text-walnut/80">Date</p>
+              <p className="text-darkBrown">
                 {new Date(expense.expense_date).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <p className="text-gray-500 dark:text-gray-400">Payment</p>
-              <p className="text-gray-900 dark:text-white capitalize">
+              <p className="text-walnut/80">Payment</p>
+              <p className="text-darkBrown capitalize">
                 {expense.payment_method.replace('_', ' ')}
               </p>
             </div>

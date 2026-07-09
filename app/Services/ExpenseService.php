@@ -441,15 +441,25 @@ class ExpenseService
     /**
      * Get total expenses for a user in a period.
      */
-    public function getTotalExpenses(string $userId, ?string $startDate = null, ?string $endDate = null): float
+    public function getTotalExpenses(?string $userId, ?string $startDate = null, ?string $endDate = null): float
     {
-        $query = Expense::forUser($userId)->completed();
-
-        if ($startDate && $endDate) {
-            $query->inPeriod($startDate, $endDate);
+        // Handle empty or invalid user ID
+        if (empty($userId)) {
+            return 0;
         }
 
-        return (float) $query->sum('amount_base_currency');
+        try {
+            $query = Expense::forUser($userId)->completed();
+
+            if ($startDate && $endDate) {
+                $query->inPeriod($startDate, $endDate);
+            }
+
+            return (float) $query->sum('amount_base_currency');
+        } catch (\Exception $e) {
+            // Return 0 on any database errors
+            return 0;
+        }
     }
 
     /**

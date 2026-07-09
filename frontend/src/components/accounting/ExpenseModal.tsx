@@ -166,7 +166,7 @@ export default function ExpenseModal({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          className="bg-cream rounded-lg shadow-xl border border-beige max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
@@ -178,7 +178,7 @@ export default function ExpenseModal({
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   {mode === 'create' ? 'Add New Expense' : 'Edit Expense'}
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-walnut/80">
                   {mode === 'create' ? 'Track your book-related expenses' : 'Update expense details'}
                 </p>
               </div>
@@ -195,7 +195,7 @@ export default function ExpenseModal({
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Title *
               </label>
               <input
@@ -211,7 +211,7 @@ export default function ExpenseModal({
             {/* Amount & Currency */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Amount *
                 </label>
                 <div className="relative">
@@ -230,7 +230,7 @@ export default function ExpenseModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Currency
                 </label>
                 <select
@@ -251,7 +251,7 @@ export default function ExpenseModal({
             {/* Category & Payment Method */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Category
                 </label>
                 <select
@@ -269,7 +269,7 @@ export default function ExpenseModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Payment Method
                 </label>
                 <select
@@ -289,7 +289,7 @@ export default function ExpenseModal({
             {/* Book & Date */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Related Book (Optional)
                 </label>
                 <select
@@ -307,7 +307,7 @@ export default function ExpenseModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Expense Date *
                 </label>
                 <input
@@ -322,7 +322,7 @@ export default function ExpenseModal({
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Description
               </label>
               <textarea
@@ -337,7 +337,7 @@ export default function ExpenseModal({
             {/* Vendor & Location */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Vendor
                 </label>
                 <input
@@ -350,7 +350,7 @@ export default function ExpenseModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Location
                 </label>
                 <input
@@ -374,7 +374,7 @@ export default function ExpenseModal({
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                 />
                 <div className="flex-1">
-                  <label htmlFor="is_recurring" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <label htmlFor="is_recurring" className="flex items-center gap-2 text-sm font-medium text-darkBrown cursor-pointer">
                     <Repeat className="w-4 h-4" />
                     Recurring Expense
                   </label>
@@ -402,7 +402,7 @@ export default function ExpenseModal({
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                 />
                 <div className="flex-1">
-                  <label htmlFor="has_reminder" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <label htmlFor="has_reminder" className="flex items-center gap-2 text-sm font-medium text-darkBrown cursor-pointer">
                     <Bell className="w-4 h-4" />
                     Payment Reminder
                   </label>
@@ -420,7 +420,7 @@ export default function ExpenseModal({
 
             {/* Receipt Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Receipt/Proof of Purchase
               </label>
               <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">

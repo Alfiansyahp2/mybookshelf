@@ -22,6 +22,8 @@ return new class extends Migration
             return; // No users, skip sample data
         }
 
+        // Use the first user's ID for sample data
+        // This ensures data is accessible when testing
         $firstUserId = $users->first()->id;
 
         // Sample expenses

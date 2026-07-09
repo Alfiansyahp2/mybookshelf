@@ -72,8 +72,8 @@ class BudgetService
             'remaining_amount' => $budget->formatted_remaining,
             'usage_percentage' => round($usagePercentage, 2),
             'status' => $status,
-            'is_exceeded' => $budget->is_exceeded(),
-            'is_at_threshold' => $budget->is_at_alert_threshold(),
+            'is_exceeded' => $budget->isExceeded(),
+            'is_at_threshold' => $budget->isAtAlertThreshold(),
             'alert_threshold' => $budget->alert_threshold,
             'period' => $budget->period,
             'start_date' => $budget->start_date->format('Y-m-d'),
@@ -373,37 +373,64 @@ class BudgetService
     /**
      * Get budget summary for dashboard.
      */
-    public function getBudgetSummary(string $userId): array
+    public function getBudgetSummary(?string $userId): array
     {
-        $activeBudgets = Budget::forUser($userId)
-                              ->active()
-                              ->current()
-                              ->get();
-
-        $totalBudget = $activeBudgets->sum('amount_base_currency');
-        $totalSpent = 0;
-        $exceededCount = 0;
-        $warningCount = 0;
-
-        foreach ($activeBudgets as $budget) {
-            $totalSpent += $budget->total_spent;
-
-            if ($budget->is_exceeded()) {
-                $exceededCount++;
-            } elseif ($budget->is_at_alert_threshold()) {
-                $warningCount++;
-            }
+        // Handle empty or invalid user ID
+        if (empty($userId)) {
+            return $this->getEmptyBudgetSummary();
         }
 
+        try {
+            $activeBudgets = Budget::forUser($userId)
+                                  ->active()
+                                  ->current()
+                                  ->get();
+
+            $totalBudget = $activeBudgets->sum('amount_base_currency');
+            $totalSpent = 0;
+            $exceededCount = 0;
+            $warningCount = 0;
+
+            foreach ($activeBudgets as $budget) {
+                $totalSpent += $budget->total_spent;
+
+                if ($budget->isExceeded()) {
+                    $exceededCount++;
+                } elseif ($budget->isAtAlertThreshold()) {
+                    $warningCount++;
+                }
+            }
+
+            return [
+                'total_budget' => $totalBudget,
+                'total_spent' => $totalSpent,
+                'total_remaining' => max(0, $totalBudget - $totalSpent),
+                'overall_usage_percentage' => $totalBudget > 0 ? ($totalSpent / $totalBudget) * 100 : 0,
+                'active_budgets_count' => $activeBudgets->count(),
+                'exceeded_count' => $exceededCount,
+                'warning_count' => $warningCount,
+                'healthy_count' => $activeBudgets->count() - $exceededCount - $warningCount,
+            ];
+        } catch (\Exception $e) {
+            // Return empty summary on any database errors
+            return $this->getEmptyBudgetSummary();
+        }
+    }
+
+    /**
+     * Get empty budget summary when user is not authenticated or no data exists.
+     */
+    protected function getEmptyBudgetSummary(): array
+    {
         return [
-            'total_budget' => $totalBudget,
-            'total_spent' => $totalSpent,
-            'total_remaining' => max(0, $totalBudget - $totalSpent),
-            'overall_usage_percentage' => $totalBudget > 0 ? ($totalSpent / $totalBudget) * 100 : 0,
-            'active_budgets_count' => $activeBudgets->count(),
-            'exceeded_count' => $exceededCount,
-            'warning_count' => $warningCount,
-            'healthy_count' => $activeBudgets->count() - $exceededCount - $warningCount,
+            'total_budget' => 0,
+            'total_spent' => 0,
+            'total_remaining' => 0,
+            'overall_usage_percentage' => 0,
+            'active_budgets_count' => 0,
+            'exceeded_count' => 0,
+            'warning_count' => 0,
+            'healthy_count' => 0,
         ];
     }
 

@@ -42,21 +42,21 @@ export default function Accounting() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Accounting</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold font-serif text-darkBrown">Accounting</h1>
+          <p className="text-walnut/80 mt-1">
             Track your book-related expenses and budgets
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+            className="p-2 text-walnut hover:bg-beige rounded-lg rounded-lg"
           >
             <Filter className="w-5 h-5" />
           </button>
           <button
             onClick={() => setShowExpenseModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown shadow-sm transition"
           >
             <Plus className="w-4 h-4" />
             Add Expense
@@ -69,14 +69,14 @@ export default function Accounting() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+          className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg"
         >
-          <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
           <div className="flex-1">
-            <p className="font-medium text-red-900 dark:text-red-100">
+            <p className="font-medium text-red-900">
               {budgetSummary.exceeded_count} Budget Alert{budgetSummary.exceeded_count > 1 ? 's' : ''}
             </p>
-            <p className="text-sm text-red-700 dark:text-red-300">
+            <p className="text-sm text-red-700">
               You have exceeded your budget limits this month
             </p>
           </div>
@@ -85,41 +85,41 @@ export default function Accounting() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <DollarSign className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="p-3 bg-gold/20 rounded-lg">
+              <DollarSign className="w-6 h-6 text-gold" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Expenses</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-walnut/80">Total Expenses</p>
+              <p className="text-2xl font-bold text-darkBrown">
                 {overview?.summary?.formatted_total || 'Rp 0'}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Wallet className="w-6 h-6 text-green-600 dark:text-green-400" />
+            <div className="p-3 bg-walnut/20 rounded-lg">
+              <Wallet className="w-6 h-6 text-walnut" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Budget</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-walnut/80">Budget</p>
+              <p className="text-2xl font-bold text-darkBrown">
                 {budgetSummary?.active_budgets_count || 0} Active
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            <div className="p-3 bg-darkBrown/10 rounded-lg">
+              <TrendingUp className="w-6 h-6 text-darkBrown" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">vs Last Month</p>
+              <p className="text-sm text-walnut/80">vs Last Month</p>
               <p className={`text-2xl font-bold ${
                 (overview?.summary?.month_over_month_change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
               }`}>
@@ -130,14 +130,14 @@ export default function Accounting() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-              <Calendar className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            <div className="p-3 bg-gold/30 rounded-lg">
+              <Calendar className="w-6 h-6 text-gold" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Pending</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-walnut/80">Pending</p>
+              <p className="text-2xl font-bold text-darkBrown">
                 {overview?.summary?.pending_expenses || 0}
               </p>
             </div>
@@ -146,8 +146,8 @@ export default function Accounting() {
       </div>
 
       {/* Tabs */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div className="border-b dark:border-gray-700">
+      <div className="bg-cream border border-beige rounded-lg shadow-sm overflow-hidden">
+        <div className="border-b border-beige bg-white/50">
           <nav className="flex space-x-8 px-6" aria-label="Tabs">
             {tabs.map((tab) => (
               <button
@@ -155,8 +155,8 @@ export default function Accounting() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                    ? 'border-gold text-darkBrown'
+                    : 'border-transparent text-walnut/80 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />

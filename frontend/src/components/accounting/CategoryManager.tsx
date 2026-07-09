@@ -98,7 +98,7 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+          className="bg-cream border border-beige rounded-lg shadow-sm-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
@@ -107,10 +107,10 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
                 <FolderOpen className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-semibold text-darkBrown">
                   Expense Categories
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-walnut/80">
                   Manage your expense categories and budgets
                 </p>
               </div>
@@ -143,7 +143,7 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
             ) : categories.length === 0 ? (
               <div className="text-center py-12">
                 <FolderOpen className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No categories yet</p>
+                <p className="text-walnut/80 mb-4">No categories yet</p>
                 <button
                   onClick={openCreateModal}
                   className="text-purple-600 hover:text-purple-700 font-medium"
@@ -209,9 +209,9 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
             {category.icon || '📁'}
           </div>
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white">{category.name}</h4>
+            <h4 className="font-semibold text-darkBrown">{category.name}</h4>
             {category.is_default && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">Default</span>
+              <span className="text-xs text-walnut/80">Default</span>
             )}
           </div>
         </div>
@@ -243,8 +243,8 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
 
       {category.monthly_budget && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500 dark:text-gray-400">Monthly Budget</span>
-          <span className="font-semibold text-gray-900 dark:text-white">
+          <span className="text-walnut/80">Monthly Budget</span>
+          <span className="font-semibold text-darkBrown">
             Rp {category.monthly_budget.toLocaleString()}
           </span>
         </div>
@@ -253,8 +253,8 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
       {category.total_expenses !== undefined && (
         <div className="mt-3 pt-3 border-t dark:border-gray-600">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-gray-500 dark:text-gray-400">Total Spent</span>
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <span className="text-walnut/80">Total Spent</span>
+            <span className="font-semibold text-darkBrown">
               Rp {category.total_expenses.toLocaleString()}
             </span>
           </div>
@@ -315,17 +315,17 @@ function CategoryFormModal({
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full"
+          className="bg-cream border border-beige rounded-lg shadow-sm-xl max-w-md w-full"
         >
           <div className="p-6 border-b dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-lg font-semibold text-darkBrown">
               {isEditing ? 'Edit Category' : 'New Category'}
             </h3>
           </div>
 
           <form onSubmit={onSubmit} className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Name *
               </label>
               <input
@@ -339,7 +339,7 @@ function CategoryFormModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Description
               </label>
               <textarea
@@ -353,7 +353,7 @@ function CategoryFormModal({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Icon
                 </label>
                 <select
@@ -370,7 +370,7 @@ function CategoryFormModal({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-darkBrown mb-2">
                   Color
                 </label>
                 <div className="flex items-center gap-2">
@@ -396,7 +396,7 @@ function CategoryFormModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-darkBrown mb-2">
                 Monthly Budget
               </label>
               <div className="relative">
