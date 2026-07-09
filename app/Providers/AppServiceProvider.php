@@ -20,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \App\Models\Book::observe(\App\Observers\BookObserver::class);
+
         // Register API response macros
         Response::macro('success', function ($data = null, $message = 'Success', $statusCode = 200) {
             return response()->json([
