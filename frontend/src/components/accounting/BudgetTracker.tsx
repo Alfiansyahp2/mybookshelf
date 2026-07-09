@@ -160,35 +160,48 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
       </div>
 
       {/* Alerts Summary */}
-      {(summary?.exceeded_count || 0) > 0 || (summary?.warning_count || 0) > 0 ? (
+      {summary?.data?.exceeded_count > 0 || summary?.data?.warning_count > 0 ? (
         <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <h4 className="text-lg font-semibold text-darkBrown mb-4">Budget Alerts</h4>
           <div className="space-y-3">
-            {(summary?.exceeded_count || 0) > 0 && (
-              <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            {summary?.data?.exceeded_count > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800/30"
+              >
+                <div className="p-2 bg-red-100 dark:bg-red-800/50 rounded-full shrink-0">
+                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                </div>
                 <div>
                   <p className="font-medium text-red-900 dark:text-red-100">
-                    {summary.exceeded_count} Budget{summary.exceeded_count > 1 ? 's' : ''} Exceeded
+                    {summary.data.exceeded_count} Budget{summary.data.exceeded_count > 1 ? 's' : ''} Exceeded
                   </p>
                   <p className="text-sm text-red-700 dark:text-red-300">
                     You've spent more than your allocated budget
                   </p>
                 </div>
-              </div>
+              </motion.div>
             )}
-            {(summary?.warning_count || 0) > 0 && (
-              <div className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+
+            {summary?.data?.warning_count > 0 && (
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800/30"
+              >
+                <div className="p-2 bg-yellow-100 dark:bg-yellow-800/50 rounded-full shrink-0">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+                </div>
                 <div>
                   <p className="font-medium text-yellow-900 dark:text-yellow-100">
-                    {summary.warning_count} Budget{summary.warning_count > 1 ? 's' : ''} at Warning Level
+                    {summary.data.warning_count} Budget{summary.data.warning_count > 1 ? 's' : ''} at Warning Level
                   </p>
                   <p className="text-sm text-yellow-700 dark:text-yellow-300">
                     You've used 80% or more of your budget
                   </p>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>

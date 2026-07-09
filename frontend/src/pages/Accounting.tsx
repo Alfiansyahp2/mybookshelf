@@ -65,7 +65,7 @@ export default function Accounting() {
       </div>
 
       {/* Alert for Budget Exceeded */}
-      {budgetSummary && budgetSummary.exceeded_count > 0 && (
+      {budgetSummary?.data && budgetSummary.data.exceeded_count > 0 && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,7 +74,7 @@ export default function Accounting() {
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
           <div className="flex-1">
             <p className="font-medium text-red-900">
-              {budgetSummary.exceeded_count} Budget Alert{budgetSummary.exceeded_count > 1 ? 's' : ''}
+              {budgetSummary.data.exceeded_count} Budget Alert{budgetSummary.data.exceeded_count > 1 ? 's' : ''}
             </p>
             <p className="text-sm text-red-700">
               You have exceeded your budget limits this month
@@ -93,7 +93,7 @@ export default function Accounting() {
             <div>
               <p className="text-sm text-walnut/80">Total Expenses</p>
               <p className="text-2xl font-bold text-darkBrown">
-                {overview?.summary?.formatted_total || 'Rp 0'}
+                {overview?.data?.summary?.formatted_total || 'Rp 0'}
               </p>
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function Accounting() {
             <div>
               <p className="text-sm text-walnut/80">Budget</p>
               <p className="text-2xl font-bold text-darkBrown">
-                {budgetSummary?.active_budgets_count || 0} Active
+                {budgetSummary?.data?.active_budgets_count || 0} Active
               </p>
             </div>
           </div>
@@ -121,10 +121,10 @@ export default function Accounting() {
             <div>
               <p className="text-sm text-walnut/80">vs Last Month</p>
               <p className={`text-2xl font-bold ${
-                (overview?.summary?.month_over_month_change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                (overview?.data?.summary?.month_over_month_change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
               }`}>
-                {(overview?.summary?.month_over_month_change || 0) >= 0 ? '+' : ''}
-                {overview?.summary?.month_over_month_change?.toFixed(1)}%
+                {(overview?.data?.summary?.month_over_month_change || 0) >= 0 ? '+' : ''}
+                {overview?.data?.summary?.month_over_month_change?.toFixed(1)}%
               </p>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function Accounting() {
             <div>
               <p className="text-sm text-walnut/80">Pending</p>
               <p className="text-2xl font-bold text-darkBrown">
-                {overview?.summary?.pending_expenses || 0}
+                {overview?.data?.summary?.pending_expenses || 0}
               </p>
             </div>
           </div>
