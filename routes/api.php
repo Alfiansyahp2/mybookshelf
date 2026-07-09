@@ -126,6 +126,10 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::post('categories/initialize-defaults', [ExpenseCategoryController::class, 'initializeDefaults']);
         Route::get('categories/{category}/statistics', [ExpenseCategoryController::class, 'getStatistics']);
 
+        Route::get('budgets/summary', [BudgetController::class, 'getSummary']);
+        Route::get('budgets/check-alerts', [BudgetController::class, 'checkAlerts']);
+        Route::get('budgets/top-spending-categories', [BudgetController::class, 'getTopSpendingCategories']);
+
         // Budgets - Full CRUD with progress tracking
         Route::apiResource('budgets', BudgetController::class);
         Route::prefix('budgets/{budget}')->group(function () {
@@ -134,9 +138,6 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
             Route::post('reset-period', [BudgetController::class, 'resetPeriod']);
             Route::get('performance-trends', [BudgetController::class, 'getPerformanceTrends']);
         });
-        Route::get('budgets/summary', [BudgetController::class, 'getSummary']);
-        Route::get('budgets/check-alerts', [BudgetController::class, 'checkAlerts']);
-        Route::get('budgets/top-spending-categories', [BudgetController::class, 'getTopSpendingCategories']);
 
         // Currency Management - Rates and conversion
         Route::prefix('currency')->group(function () {
