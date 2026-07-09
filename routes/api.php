@@ -82,6 +82,9 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::get('cost-breakdown', [BookController::class, 'getCostBreakdown']);
     });
 
+    // Books purchase history
+    Route::get('books/purchase-history', [BookController::class, 'getPurchaseHistory']);
+
     // Shelves - Full CRUD with occupancy
     Route::put('shelves/layout', [ShelfController::class, 'updateLayout']);
     Route::apiResource('shelves', ShelfController::class);

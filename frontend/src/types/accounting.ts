@@ -271,7 +271,7 @@ export interface YearToDateSummary {
 // Enums
 export type PaymentMethod = 'cash' | 'transfer' | 'e-wallet' | 'credit_card';
 export type RecurringPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly';
-export type BudgetPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly';
+export type BudgetPeriod = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'all';
 export type ExpenseStatus = 'pending' | 'completed' | 'cancelled';
 export type TimelineEventType =
   | 'expense_created'

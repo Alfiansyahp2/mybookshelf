@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { DollarSign, TrendingUp, Calendar, PieChart, BarChart3, Wallet, AlertCircle, Plus } from 'lucide-react';
 import { useAccountingOverview } from '../../hooks/accounting/useAccountingReports';
 import type { ExpenseByCategory } from '../../types/accounting';
-import MonthlyExpensesChart from './MonthlyExpensesChart';
+import PurchaseHistoryChart from './MonthlyExpensesChart';
 
 interface AccountingDashboardProps {
   period?: 'today' | 'week' | 'month' | 'year' | 'all';
@@ -178,13 +178,13 @@ export default function AccountingDashboard({
         </motion.div>
       ) : null}
 
-      {/* Monthly Expenses Trend Chart */}
+      {/* Monthly Purchase History Chart */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <MonthlyExpensesChart months={12} />
+        <PurchaseHistoryChart months={12} />
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

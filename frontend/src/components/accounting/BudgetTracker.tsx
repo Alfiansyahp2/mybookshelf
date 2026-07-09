@@ -145,7 +145,7 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
             </div>
           ) : (
             <div className="space-y-4">
-              {budgets.map((budget) => (
+              {budgets.map((budget: Budget) => (
                 <BudgetCard
                   key={budget.id}
                   budget={budget}
