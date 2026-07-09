@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { DollarSign, TrendingUp, Calendar, PieChart, BarChart3, Wallet, AlertCircle, Plus } from 'lucide-react';
 import { useAccountingOverview } from '../../hooks/accounting/useAccountingReports';
-import { useTotalExpenses } from '../../hooks/accounting/useExpenses';
-import type { AccountingOverview, ExpenseByCategory } from '../../types/accounting';
+import type { ExpenseByCategory } from '../../types/accounting';
+import MonthlyExpensesChart from './MonthlyExpensesChart';
 
 interface AccountingDashboardProps {
   period?: 'today' | 'week' | 'month' | 'year' | 'all';
@@ -17,7 +16,6 @@ export default function AccountingDashboard({
   onCreateBudget,
 }: AccountingDashboardProps) {
   const { data: overview, isLoading } = useAccountingOverview({ period });
-  const { data: totalExpenses } = useTotalExpenses();
 
   if (isLoading) {
     return (
@@ -180,6 +178,15 @@ export default function AccountingDashboard({
         </motion.div>
       ) : null}
 
+      {/* Monthly Expenses Trend Chart */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <MonthlyExpensesChart months={12} />
+      </motion.div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Expenses by Category */}
         <motion.div
@@ -200,7 +207,7 @@ export default function AccountingDashboard({
               </p>
             ) : (
               <div className="space-y-4">
-                {categoriesData.map((category, index) => (
+                {categoriesData.map((category: ExpenseByCategory, index: number) => (
                   <CategoryBar key={index} category={category} index={index} allCategories={categoriesData} />
                 ))}
               </div>
@@ -227,7 +234,7 @@ export default function AccountingDashboard({
               </p>
             ) : (
               <div className="space-y-3">
-                {recentExpenses.slice(0, 5).map((expense) => (
+                {recentExpenses.slice(0, 5).map((expense: any) => (
                   <div
                     key={expense.id}
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
@@ -333,7 +340,7 @@ function CategoryBar({ category, index, allCategories }: CategoryBarProps) {
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
-          <span className="text-lg">{category.category_icon || '📊'}</span>
+          <span className="text-lg">📊</span>
           <span className="font-medium text-darkBrown">{category.category_name}</span>
         </div>
         <div className="text-right">

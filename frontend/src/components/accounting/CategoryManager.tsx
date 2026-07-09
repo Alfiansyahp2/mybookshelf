@@ -17,7 +17,7 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ExpenseCategory | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
     description: '',
     color: '#3B82F6',
@@ -153,7 +153,7 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categories.map((category) => (
+                {categories.map((category: ExpenseCategory) => (
                   <CategoryCard
                     key={category.id}
                     category={category}
@@ -275,11 +275,19 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
 }
 
 // Category Form Modal Component
+interface CategoryFormData {
+  name: string;
+  description: string;
+  color: string;
+  icon: string;
+  monthly_budget: number;
+}
+
 interface CategoryFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: CategoryFormData;
+  setFormData: (data: CategoryFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   isEditing: boolean;
 }
