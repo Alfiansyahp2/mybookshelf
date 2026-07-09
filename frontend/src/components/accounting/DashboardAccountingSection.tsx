@@ -11,10 +11,10 @@ export default function DashboardAccountingSection() {
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-          <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-4 bg-beige animate-pulse rounded w-1/3"></div>
+          <div className="h-32 bg-beige animate-pulse rounded"></div>
         </div>
       </div>
     );
@@ -24,18 +24,18 @@ export default function DashboardAccountingSection() {
   const budget = budgetSummary;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <div className="bg-cream border border-beige rounded-lg shadow-sm">
       {/* Header */}
-      <div className="p-6 border-b dark:border-gray-700 flex items-center justify-between">
+      <div className="p-6 border-b border-beige flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Accounting Overview</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <h3 className="text-lg font-semibold font-serif text-darkBrown">Accounting Overview</h3>
+          <p className="text-sm text-walnut/80 mt-1">
             Track your book-related expenses
           </p>
         </div>
         <button
           onClick={() => navigate('/accounting')}
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+          className="flex items-center gap-2 text-gold hover:text-darkBrown font-medium"
         >
           View All
           <ChevronRight className="w-4 h-4" />
@@ -51,8 +51,8 @@ export default function DashboardAccountingSection() {
                 <DollarSign className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">Total Expenses</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                <p className="text-xs text-gold font-medium">Total Expenses</p>
+                <p className="text-lg font-bold font-serif text-darkBrown">
                   {summary?.formatted_total || 'Rp 0'}
                 </p>
               </div>
@@ -65,8 +65,8 @@ export default function DashboardAccountingSection() {
                 <Wallet className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-xs text-green-600 dark:text-green-400 font-medium">Budget Status</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">
+                <p className="text-xs text-walnut font-medium">Budget Status</p>
+                <p className="text-lg font-bold font-serif text-darkBrown">
                   {budget?.healthy_count || 0}/{budget?.active_budgets_count || 0}
                 </p>
               </div>
@@ -79,14 +79,14 @@ export default function DashboardAccountingSection() {
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+            className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg"
           >
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
             <div className="flex-1">
-              <p className="font-medium text-red-900 dark:text-red-100 text-sm">
+              <p className="font-medium text-red-900 text-sm">
                 {budget.exceeded_count} Budget Alert{budget.exceeded_count > 1 ? 's' : ''}
               </p>
-              <p className="text-xs text-red-700 dark:text-red-300">
+              <p className="text-xs text-red-700">
                 Budget exceeded this month
               </p>
             </div>
@@ -105,7 +105,7 @@ export default function DashboardAccountingSection() {
                 {summary.month_over_month_change?.toFixed(1)}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="w-full bg-beige animate-pulse rounded-full h-2">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: '100%' }}
