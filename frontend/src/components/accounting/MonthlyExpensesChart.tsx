@@ -41,15 +41,15 @@ const CustomTooltip = ({ active, payload }: any) => {
 
   const data = payload[0].payload;
   return (
-    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-beige dark:border-gray-700">
-      <p className="font-medium text-darkBrown dark:text-gray-100">{data.month_name}</p>
-      <p className="text-sm text-walnut dark:text-gray-300 mt-1">
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-beige dark:border-gray-700">
+      <p className="font-semibold text-darkBrown dark:text-gray-100 mb-2 leading-relaxed">{data.month_name}</p>
+      <p className="text-sm text-walnut dark:text-gray-300 mb-1 leading-relaxed">
         Total: {data.formatted_amount}
       </p>
-      <p className="text-xs text-walnut/70 dark:text-gray-400">
+      <p className="text-xs text-walnut/70 dark:text-gray-400 mb-1 leading-relaxed">
         {data.book_count} books purchased
       </p>
-      <p className="text-xs text-walnut/70 dark:text-gray-400">
+      <p className="text-xs text-walnut/70 dark:text-gray-400 leading-relaxed">
         Avg: {formatCurrency(data.average_price)}
       </p>
     </div>
@@ -110,13 +110,13 @@ export default function PurchaseHistoryChart({ months = 12 }: PurchaseHistoryCha
   if (error) {
     return (
       <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-darkBrown flex items-center gap-2 mb-4">
+        <h3 className="text-xl font-semibold text-darkBrown flex items-center gap-2 mb-4 leading-relaxed">
           <BookOpen className="w-5 h-5" />
           Purchase History
         </h3>
-        <div className="text-center text-walnut/80 py-8">
-          <p className="text-red-600 mb-2">Error loading purchase history</p>
-          <p className="text-sm text-walnut/60">Please try refreshing the page</p>
+        <div className="text-center text-walnut/80 py-12 leading-relaxed">
+          <p className="text-red-600 mb-2 leading-relaxed">Error loading purchase history</p>
+          <p className="text-sm text-walnut/70 leading-relaxed">Please try refreshing the page</p>
         </div>
       </div>
     );
@@ -125,11 +125,11 @@ export default function PurchaseHistoryChart({ months = 12 }: PurchaseHistoryCha
   if (!chartData.length) {
     return (
       <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-darkBrown flex items-center gap-2 mb-4">
+        <h3 className="text-xl font-semibold text-darkBrown flex items-center gap-2 mb-4 leading-relaxed">
           <BookOpen className="w-5 h-5" />
           Purchase History
         </h3>
-        <p className="text-center text-walnut/80 py-8">
+        <p className="text-center text-walnut/80 py-12 leading-relaxed">
           No purchase data available for the selected period
         </p>
       </div>
@@ -140,21 +140,21 @@ export default function PurchaseHistoryChart({ months = 12 }: PurchaseHistoryCha
     <div className="bg-cream border border-beige rounded-lg shadow-sm">
       <div className="p-6 border-b border-beige">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-darkBrown flex items-center gap-2">
+          <h3 className="text-xl font-semibold text-darkBrown flex items-center gap-2 leading-relaxed">
             <BookOpen className="w-5 h-5" />
             Book Purchase History
           </h3>
           {statistics && (
             <div className="flex items-center gap-4 text-sm">
               <div className="text-right">
-                <p className="text-walnut/80">Avg Monthly</p>
-                <p className="font-semibold text-darkBrown">{formatCurrency(statistics.avg)}</p>
+                <p className="text-walnut/80 leading-relaxed">Avg Monthly</p>
+                <p className="font-semibold text-darkBrown leading-relaxed">{formatCurrency(statistics.avg)}</p>
               </div>
               <div className={`text-right ${
                 statistics.trend >= 0 ? 'text-red-600' : 'text-green-600'
               }`}>
-                <p className="text-xs text-walnut/80">3-Month Trend</p>
-                <p className="font-semibold">
+                <p className="text-xs text-walnut/80 leading-relaxed">3-Month Trend</p>
+                <p className="font-semibold leading-relaxed">
                   {statistics.trend >= 0 ? '+' : ''}{statistics.trend.toFixed(1)}%
                 </p>
               </div>
@@ -208,22 +208,22 @@ export default function PurchaseHistoryChart({ months = 12 }: PurchaseHistoryCha
 
         {/* Summary Statistics */}
         {statistics && (
-          <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t border-beige">
+          <div className="grid grid-cols-4 gap-4 mt-5 pt-5 border-t border-beige">
             <div className="text-center">
-              <p className="text-xs text-walnut/80">Highest</p>
-              <p className="font-semibold text-darkBrown">{formatCurrency(statistics.max)}</p>
+              <p className="text-xs text-walnut/80 leading-relaxed mb-1">Highest</p>
+              <p className="font-semibold text-darkBrown leading-relaxed">{formatCurrency(statistics.max)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-walnut/80">Lowest</p>
-              <p className="font-semibold text-darkBrown">{formatCurrency(statistics.min)}</p>
+              <p className="text-xs text-walnut/80 leading-relaxed mb-1">Lowest</p>
+              <p className="font-semibold text-darkBrown leading-relaxed">{formatCurrency(statistics.min)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-walnut/80">Average</p>
-              <p className="font-semibold text-darkBrown">{formatCurrency(statistics.avg)}</p>
+              <p className="text-xs text-walnut/80 leading-relaxed mb-1">Average</p>
+              <p className="font-semibold text-darkBrown leading-relaxed">{formatCurrency(statistics.avg)}</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-walnut/80">Total Books</p>
-              <p className="font-semibold text-darkBrown">{statistics.totalBooks}</p>
+              <p className="text-xs text-walnut/80 leading-relaxed mb-1">Total Books</p>
+              <p className="font-semibold text-darkBrown leading-relaxed">{statistics.totalBooks}</p>
             </div>
           </div>
         )}

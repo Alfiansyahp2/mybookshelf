@@ -7,13 +7,11 @@ import {
   AlertCircle,
   Plus,
   Filter,
-  Download,
   Calendar,
   PieChart,
   BarChart3
 } from 'lucide-react';
 import { useAccountingOverview } from '../hooks/accounting/useAccountingReports';
-import { useExpenses } from '../hooks/accounting/useExpenses';
 import { useBudgetSummary } from '../hooks/accounting/useBudgets';
 import AccountingDashboard from '../components/accounting/AccountingDashboard';
 import ExpenseList from '../components/accounting/ExpenseList';
@@ -26,9 +24,8 @@ export default function Accounting() {
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  const { data: overview, isLoading: overviewLoading } = useAccountingOverview({ period: 'month' });
+  const { data: overview } = useAccountingOverview({ period: 'month' });
   const { data: budgetSummary } = useBudgetSummary();
-  const { data: expenses } = useExpenses({ per_page: 10 });
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: PieChart },
@@ -38,19 +35,21 @@ export default function Accounting() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div style={{ padding: '20px 20px 40px', maxWidth: 1200, margin: '0 auto' }}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 28 }}>
         <div>
-          <h1 className="text-3xl font-bold font-serif text-darkBrown">Accounting</h1>
-          <p className="text-walnut/80 mt-1">
-            Track your book-related expenses and budgets
+          <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7A5C42', opacity: 0.6, margin: '0 0 4px' }}>
+            Keuangan & Pengeluaran
           </p>
+          <h1 style={{ fontSize: 28, fontFamily: "'Georgia',serif", fontWeight: 700, color: '#4A3B2F', margin: 0, lineHeight: 1.2 }}>
+            Accounting
+          </h1>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="p-2 text-walnut hover:bg-beige rounded-lg rounded-lg"
+            className="p-2 text-walnut hover:bg-beige rounded-lg"
           >
             <Filter className="w-5 h-5" />
           </button>
@@ -64,90 +63,9 @@ export default function Accounting() {
         </div>
       </div>
 
-      {/* Alert for Budget Exceeded */}
-      {budgetSummary?.data && budgetSummary.data.exceeded_count > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg"
-        >
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="font-medium text-red-900">
-              {budgetSummary.data.exceeded_count} Budget Alert{budgetSummary.data.exceeded_count > 1 ? 's' : ''}
-            </p>
-            <p className="text-sm text-red-700">
-              You have exceeded your budget limits this month
-            </p>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-gold/20 rounded-lg">
-              <DollarSign className="w-6 h-6 text-gold" />
-            </div>
-            <div>
-              <p className="text-sm text-walnut/80">Total Expenses</p>
-              <p className="text-2xl font-bold text-darkBrown">
-                {overview?.data?.summary?.formatted_total || 'Rp 0'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-walnut/20 rounded-lg">
-              <Wallet className="w-6 h-6 text-walnut" />
-            </div>
-            <div>
-              <p className="text-sm text-walnut/80">Budget</p>
-              <p className="text-2xl font-bold text-darkBrown">
-                {budgetSummary?.data?.active_budgets_count || 0} Active
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-darkBrown/10 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-darkBrown" />
-            </div>
-            <div>
-              <p className="text-sm text-walnut/80">vs Last Month</p>
-              <p className={`text-2xl font-bold ${
-                (overview?.data?.summary?.month_over_month_change || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {(overview?.data?.summary?.month_over_month_change || 0) >= 0 ? '+' : ''}
-                {overview?.data?.summary?.month_over_month_change?.toFixed(1)}%
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-cream border border-beige p-6 rounded-lg shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-gold/30 rounded-lg">
-              <Calendar className="w-6 h-6 text-gold" />
-            </div>
-            <div>
-              <p className="text-sm text-walnut/80">Pending</p>
-              <p className="text-2xl font-bold text-darkBrown">
-                {overview?.data?.summary?.pending_expenses || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Tabs */}
-      <div className="bg-cream border border-beige rounded-lg shadow-sm overflow-hidden">
-        <div className="border-b border-beige bg-white/50">
+      <div style={{ background: 'white', borderRadius: 16, border: '1px solid rgba(139,99,56,0.1)', boxShadow: '0 2px 12px -4px rgba(122,92,66,0.06)', overflow: 'hidden', marginTop: 32 }}>
+        <div style={{ borderBottom: '1px solid rgba(139,99,56,0.1)', background: '#F8F5F0' }}>
           <nav className="flex space-x-8 px-6" aria-label="Tabs">
             {tabs.map((tab) => (
               <button
@@ -170,7 +88,12 @@ export default function Accounting() {
           {activeTab === 'overview' && <AccountingDashboard />}
           {activeTab === 'expenses' && <ExpenseList />}
           {activeTab === 'budgets' && <BudgetTracker />}
-          {activeTab === 'categories' && <CategoryManager />}
+          {activeTab === 'categories' && (
+            <CategoryManager
+              isOpen={activeTab === 'categories'}
+              onClose={() => setActiveTab('overview')}
+            />
+          )}
         </div>
       </div>
 
@@ -178,10 +101,6 @@ export default function Accounting() {
       {showExpenseModal && (
         <ExpenseModal
           onClose={() => setShowExpenseModal(false)}
-          onSuccess={() => {
-            setShowExpenseModal(false);
-            // Invalidate queries to refresh data
-          }}
         />
       )}
     </div>
