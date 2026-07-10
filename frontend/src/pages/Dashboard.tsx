@@ -505,6 +505,7 @@ export default function Dashboard() {
       favorites: favs.length, totalPages, pagesRead, addedThisMonth, topGenre,
       avgRating: Math.round(avgRating * 10) / 10,
       finishedThisYear, currentYear: now.getFullYear(),
+      target: 12, // Annual reading target
       currentlyReading, recentBooks, recentlyFinished,
       genreChart: Object.entries(genreCounts)
         .map(([name, count]) => ({ name, count }))
@@ -674,7 +675,7 @@ export default function Dashboard() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
           <motion.div {...fadeUp(0.5)} style={{ height: '100%' }}>
-            <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Card style={{ height: 280, display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
                 <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Distribusi Status</h3>
               </div>
@@ -701,7 +702,7 @@ export default function Dashboard() {
           </motion.div>
 
           <motion.div {...fadeUp(0.55)} style={{ height: '100%' }}>
-            <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Card style={{ height: 280, display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Genre Terbanyak</h3>
@@ -735,12 +736,13 @@ export default function Dashboard() {
                   ))}
                 </div>
               </div>
-              <div style={{ padding: '12px 16px 12px' }}>
+              <div style={{ padding: '12px 16px 12px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                 {displayedGenres.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data genre</div>
                 ) : (
-                  <div style={{ overflowY: 'auto', maxHeight: 150, paddingRight: 4 }} className="hide-scrollbar">
-                    <ResponsiveContainer width="100%" height={Math.max(150, displayedGenres.length * 28)}>
+                  <div style={{ overflowY: 'auto', flex: 1, paddingRight: 4, display: 'flex', flexDirection: 'column' }} className="hide-scrollbar">
+                    <div style={{ minHeight: Math.max(150, displayedGenres.length * 28), flex: 1 }}>
+                      <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={displayedGenres} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
                         <XAxis type="number" hide />
@@ -750,6 +752,7 @@ export default function Dashboard() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
+                </div>
                 )}
               </div>
             </Card>
@@ -810,20 +813,19 @@ export default function Dashboard() {
           </motion.div>
 
           <motion.div {...fadeUp(0.58)}>
-            <Card>
+            <Card style={{ height: 280, display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Penulis Terbanyak</h3>
                 </div>
-                {/* Spacer to match the height of Genre Terbanyak filter buttons */}
-                <div style={{ height: 26, marginBottom: 4 }} />
               </div>
-              <div style={{ padding: '12px 16px 12px' }}>
+              <div style={{ padding: '12px 16px 12px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                 {stats.authorChart.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data penulis</div>
                 ) : (
-                  <div style={{ overflowY: 'auto', height: 150, paddingRight: 4 }} className="hide-scrollbar">
-                    <ResponsiveContainer width="100%" height={Math.max(150, stats.authorChart.length * 28)}>
+                  <div style={{ overflowY: 'auto', flex: 1, paddingRight: 4, display: 'flex', flexDirection: 'column' }} className="hide-scrollbar">
+                    <div style={{ minHeight: Math.max(150, stats.authorChart.length * 28), flex: 1 }}>
+                      <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={stats.authorChart} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
                         <XAxis type="number" hide />
@@ -833,6 +835,7 @@ export default function Dashboard() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
+                </div>
                 )}
               </div>
             </Card>
