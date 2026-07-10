@@ -24,9 +24,23 @@ interface PurchaseHistoryResponse {
 }
 
 export function usePurchaseHistory(months: number = 12) {
-  return useQuery({
+  return useQuery<PurchaseHistoryResponse>({
     queryKey: ['purchase-history', months],
-    queryFn: () => apiClient.get<PurchaseHistoryResponse>('/v1/books/purchase-history', { months }),
+    queryFn: async () => {
+      const response = await apiClient.get('/v1/books/purchase-history', { months });
+
+      // Validate response structure
+      if (!response || typeof response !== 'object') {
+        throw new Error('Invalid response structure');
+      }
+
+      // Validate data is array
+      if (!response.data || !Array.isArray(response.data)) {
+        throw new Error('Invalid data format in response');
+      }
+
+      return response as PurchaseHistoryResponse;
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

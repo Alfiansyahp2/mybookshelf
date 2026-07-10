@@ -62,6 +62,9 @@ Route::middleware('auth:sanctum')->prefix('v1/books')->group(function () {
 // API routes (protected - require authentication)
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
 
+    // Books purchase history (must be before apiResource to avoid route conflict)
+    Route::get('books/purchase-history', [BookController::class, 'getPurchaseHistory']);
+
     // Books - Core CRUD with sub-resources
     Route::apiResource('books', BookController::class);
 
@@ -81,9 +84,6 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::get('expenses', [BookController::class, 'getExpenses']);
         Route::get('cost-breakdown', [BookController::class, 'getCostBreakdown']);
     });
-
-    // Books purchase history
-    Route::get('books/purchase-history', [BookController::class, 'getPurchaseHistory']);
 
     // Shelves - Full CRUD with occupancy
     Route::put('shelves/layout', [ShelfController::class, 'updateLayout']);

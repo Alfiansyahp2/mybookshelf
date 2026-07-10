@@ -543,55 +543,59 @@ class BookController extends Controller
             $months = $request->query('months', 12);
             $userId = $request->user()->id;
 
-            // Get books with purchase data for the authenticated user
+            // Get books with purchase data, ordered by date
             $books = \App\Models\Book::where('user_id', $userId)
                 ->whereNotNull('purchase_date')
                 ->whereNotNull('purchase_price')
-                ->where('purchase_date', '>=', now()->subMonths($months)->startOfMonth())
-                ->orderBy('purchase_date')
+                ->orderBy('purchase_date', 'desc')
                 ->get(['id', 'purchase_date', 'purchase_price', 'purchase_currency', 'title']);
+
+            if ($books->isEmpty()) {
+                return response()->success([], 'No purchase data available');
+            }
 
             // Group by month
             $purchaseHistory = [];
-            $currentDate = now()->copy()->subMonths($months - 1)->startOfMonth();
+            $indonesianMonths = [
+                'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret',
+                'April' => 'April', 'May' => 'Mei', 'June' => 'Juni',
+                'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September',
+                'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'
+            ];
 
-            // Initialize all months with zero values
-            for ($i = 0; $i < $months; $i++) {
-                $monthKey = $currentDate->format('Y-m');
-                $monthName = $currentDate->format('F Y');
-                $purchaseHistory[$monthKey] = [
-                    'month' => $monthKey,
-                    'month_name' => $monthName,
-                    'total_amount' => 0,
-                    'formatted_amount' => 'Rp 0',
-                    'book_count' => 0,
-                    'average_price' => 0,
-                    'books' => []
-                ];
-                $currentDate->addMonth();
-            }
-
-            // Fill in actual data
             foreach ($books as $book) {
                 $monthKey = \Carbon\Carbon::parse($book->purchase_date)->format('Y-m');
-                if (isset($purchaseHistory[$monthKey])) {
-                    $purchaseHistory[$monthKey]['book_count']++;
-                    $purchaseHistory[$monthKey]['books'][] = [
-                        'id' => $book->id,
-                        'title' => $book->title,
-                        'purchase_price' => $book->purchase_price,
-                        'purchase_currency' => $book->purchase_currency,
-                        'purchase_date' => $book->purchase_date,
+                $englishMonthName = \Carbon\Carbon::parse($book->purchase_date)->format('F Y');
+                $monthName = strtr($englishMonthName, $indonesianMonths);
+
+                if (!isset($purchaseHistory[$monthKey])) {
+                    $purchaseHistory[$monthKey] = [
+                        'month' => $monthKey,
+                        'month_name' => $monthName,
+                        'total_amount' => 0,
+                        'formatted_amount' => 'Rp 0',
+                        'book_count' => 0,
+                        'average_price' => 0,
+                        'books' => []
                     ];
-
-                    // Convert to IDR if needed (assuming 1 USD = 15000 IDR for now)
-                    $amountInIdr = $book->purchase_price;
-                    if ($book->purchase_currency === 'USD') {
-                        $amountInIdr = $book->purchase_price * 15000;
-                    }
-
-                    $purchaseHistory[$monthKey]['total_amount'] += $amountInIdr;
                 }
+
+                $purchaseHistory[$monthKey]['book_count']++;
+                $purchaseHistory[$monthKey]['books'][] = [
+                    'id' => $book->id,
+                    'title' => $book->title,
+                    'purchase_price' => $book->purchase_price,
+                    'purchase_currency' => $book->purchase_currency,
+                    'purchase_date' => $book->purchase_date,
+                ];
+
+                // Convert to IDR if needed (assuming 1 USD = 15000 IDR for now)
+                $amountInIdr = $book->purchase_price;
+                if ($book->purchase_currency === 'USD') {
+                    $amountInIdr = $book->purchase_price * 15000;
+                }
+
+                $purchaseHistory[$monthKey]['total_amount'] += $amountInIdr;
             }
 
             // Calculate averages and format amounts
@@ -602,8 +606,11 @@ class BookController extends Controller
                 }
             }
 
-            // Convert to indexed array and sort by month
-            $result = array_values($purchaseHistory);
+            // Sort by month (oldest first for proper line chart display)
+            ksort($purchaseHistory); // Sort keys in ascending order (chronological)
+
+            // Limit to requested months (most recent ones)
+            $result = array_slice(array_values($purchaseHistory), -$months, $months);
 
             return response()->success($result, 'Purchase history retrieved successfully');
         } catch (\Exception $e) {

@@ -18,7 +18,7 @@ interface PurchaseData {
   formatted_amount: string;
   book_count: number;
   average_price: number;
-  shortMonth: string;
+  shortMonth?: string;
 }
 
 interface PurchaseHistoryChartProps {
@@ -57,13 +57,15 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 export default function PurchaseHistoryChart({ months = 12 }: PurchaseHistoryChartProps) {
-  const { data: purchaseHistory, isLoading } = usePurchaseHistory(months);
+  const { data: purchaseHistory, isLoading, error } = usePurchaseHistory(months);
 
   // Transform data for chart and calculate statistics
   const chartData = useMemo(() => {
-    if (!purchaseHistory?.data) return [];
+    if (!purchaseHistory?.data || !Array.isArray(purchaseHistory.data)) {
+      return [];
+    }
 
-    const data = purchaseHistory.data.map((item: PurchaseData) => ({
+    const data = purchaseHistory.data.map((item: any) => ({
       ...item,
       // Use short month name for x-axis
       shortMonth: new Date(item.month + '-01').toLocaleDateString('id-ID', { month: 'short' }),
@@ -100,6 +102,21 @@ export default function PurchaseHistoryChart({ months = 12 }: PurchaseHistoryCha
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-beige rounded w-1/3"></div>
           <div className="h-64 bg-beige rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-darkBrown flex items-center gap-2 mb-4">
+          <BookOpen className="w-5 h-5" />
+          Purchase History
+        </h3>
+        <div className="text-center text-walnut/80 py-8">
+          <p className="text-red-600 mb-2">Error loading purchase history</p>
+          <p className="text-sm text-walnut/60">Please try refreshing the page</p>
         </div>
       </div>
     );
