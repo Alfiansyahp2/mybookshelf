@@ -1,9 +1,23 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, Search, Calendar, DollarSign, Receipt, Edit, Trash2, Eye } from 'lucide-react';
-import { useExpenses, useDeleteExpense, useMarkAsPaid } from '../../hooks/accounting/useExpenses';
+import { Filter, Search, Receipt, Edit, Trash2 } from 'lucide-react';
+import { useExpenses, useDeleteExpense } from '../../hooks/accounting/useExpenses';
 import { useExpenseCategories } from '../../hooks/accounting/useExpenseCategories';
-import type { Expense, ExpenseFilters, PaymentMethod, ExpenseStatus } from '../../types/accounting';
+import type { Expense, ExpenseFilters, ExpenseStatus } from '../../types/accounting';
+
+// Helper functions - defined outside components to be reused
+const getStatusColor = (status: ExpenseStatus) => {
+  switch (status) {
+    case 'completed':
+      return 'bg-green-100 text-green-700';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-700';
+    case 'cancelled':
+      return 'bg-red-100 text-red-700';
+    default:
+      return 'bg-gray-100 text-gray-700';
+  }
+};
 
 interface ExpenseListProps {
   userId?: string;
@@ -22,10 +36,9 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
 
   const { data: expensesData, isLoading } = useExpenses(filters);
   const deleteExpense = useDeleteExpense();
-  const markAsPaid = useMarkAsPaid();
   const { data: categories = [] } = useExpenseCategories();
 
-  const expenses = expensesData?.data || [];
+  const expenses = Array.isArray(expensesData?.data) ? expensesData.data : [];
 
   const handleFilterChange = (key: keyof ExpenseFilters, value: any) => {
     setFilters({ ...filters, [key]: value });
@@ -39,32 +52,6 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
         console.error('Error deleting expense:', error);
       }
     }
-  };
-
-  const handleMarkAsPaid = async (expenseId: string) => {
-    try {
-      await markAsPaid.mutateAsync(expenseId);
-    } catch (error) {
-      console.error('Error marking expense as paid:', error);
-    }
-  };
-
-  const getStatusColor = (status: ExpenseStatus) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-700';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'cancelled':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  const getPaymentMethodIcon = (method: PaymentMethod) => {
-    // Simplified - you could use actual icons
-    return '💳';
   };
 
   return (
@@ -113,7 +100,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 <option value="">All Categories</option>
-                {categories.map((category) => (
+                {categories.map((category: any) => (
                   <option key={category.id} value={category.id}>
                     {category.icon} {category.name}
                   </option>
@@ -183,14 +170,13 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
             </p>
           </div>
         ) : (
-          expenses.map((expense) => (
+          expenses.map((expense: Expense) => (
             <ExpenseRow
               key={expense.id}
               expense={expense}
               onClick={() => onExpenseClick?.(expense)}
               onEdit={() => onEditExpense?.(expense)}
               onDelete={() => handleDelete(expense.id)}
-              onMarkAsPaid={() => handleMarkAsPaid(expense.id)}
             />
           ))
         )}
@@ -230,10 +216,9 @@ interface ExpenseRowProps {
   onClick: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onMarkAsPaid: () => void;
 }
 
-function ExpenseRow({ expense, onClick, onEdit, onDelete, onMarkAsPaid }: ExpenseRowProps) {
+function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

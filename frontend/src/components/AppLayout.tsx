@@ -11,7 +11,8 @@ import {
   Layers,
   LogOut,
   Award,
-  LayoutDashboard
+  LayoutDashboard,
+  DollarSign
 } from 'lucide-react'
 import BookDetailModal from './modals/BookDetailModal'
 import EditBookModal from './modals/EditBookModal'
@@ -28,6 +29,7 @@ const navItems = [
   { path: '/library', icon: Library, label: 'My Library' },
   { path: '/reading', icon: BookOpen, label: 'Reading' },
   { path: '/wishlist', icon: ShoppingCart, label: 'Wishlist' },
+  { path: '/accounting', icon: DollarSign, label: 'Accounting' },
 ]
 
 export default function AppLayout() {
