@@ -600,9 +600,10 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, marginBottom: 20 }}>
 
         {/* LEFT — Currently reading + unread */}
-        <motion.div {...fadeUp(0.35)}>
-          <Card style={{ height: '100%' }}>
-            <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid rgba(139,99,56,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <motion.div {...fadeUp(0.35)}>
+            <Card style={{ maxHeight: 400, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid rgba(139,99,56,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <h2 style={{ margin: 0, fontSize: 15, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <BookOpen size={16} color={BRAND.walnut} /> Sedang & Belum Dibaca
               </h2>
@@ -611,7 +612,7 @@ export default function Dashboard() {
               </Link>
             </div>
 
-            <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', flex: 1 }}>
               {stats.currentlyReading.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '24px 0', color: 'rgba(122,92,66,0.45)' }}>
                   <BookOpen size={32} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.4 }} />
@@ -667,10 +668,97 @@ export default function Dashboard() {
           </Card>
         </motion.div>
 
-        {/* RIGHT — Goals + Reading stats */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <motion.div {...fadeUp(0.4)}>
+          <DashboardAccountingSection />
+        </motion.div>
 
-          {/* Reading Goal */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+          <motion.div {...fadeUp(0.5)} style={{ height: '100%' }}>
+            <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
+                <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Distribusi Status</h3>
+              </div>
+              <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
+                <ResponsiveContainer width={140} height={140}>
+                  <PieChart>
+                    <Pie data={stats.statusPie} cx="50%" cy="50%" innerRadius={38} outerRadius={62} dataKey="value" paddingAngle={2}>
+                      {stats.statusPie.map((e, i) => <Cell key={i} fill={e.color} />)}
+                    </Pie>
+                    <Tooltip content={<ChartTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 6 }}>
+                  {stats.statusPie.map(d => (
+                    <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: d.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: 11, color: BRAND.walnut, flex: 1 }}>{d.name}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: BRAND.darkBrown }}>{d.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          <motion.div {...fadeUp(0.55)} style={{ height: '100%' }}>
+            <Card style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Genre Terbanyak</h3>
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+                  <button
+                    onClick={() => setGenreFilter('Semua')}
+                    style={{
+                      padding: '4px 8px', fontSize: 10, fontWeight: 600, borderRadius: 6, border: 'none', cursor: 'pointer',
+                      background: genreFilter === 'Semua' ? BRAND.walnut : 'rgba(139,99,56,0.1)',
+                      color: genreFilter === 'Semua' ? 'white' : BRAND.walnut,
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    Semua
+                  </button>
+                  {BOOK_GENRES.map(g => (
+                    <button
+                      key={g.category}
+                      onClick={() => setGenreFilter(g.category)}
+                      style={{
+                        padding: '4px 8px', fontSize: 10, fontWeight: 600, borderRadius: 6, border: 'none', cursor: 'pointer',
+                        background: genreFilter === g.category ? BRAND.walnut : 'rgba(139,99,56,0.1)',
+                        color: genreFilter === g.category ? 'white' : BRAND.walnut,
+                        transition: 'all 0.2s'
+                      }}
+                      title={g.category}
+                    >
+                      {g.category.split(' ')[0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ padding: '12px 16px 12px' }}>
+                {displayedGenres.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data genre</div>
+                ) : (
+                  <div style={{ overflowY: 'auto', maxHeight: 150, paddingRight: 4 }} className="hide-scrollbar">
+                    <ResponsiveContainer width="100%" height={Math.max(150, displayedGenres.length * 28)}>
+                      <BarChart data={displayedGenres} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
+                        <XAxis type="number" hide />
+                        <YAxis type="category" dataKey="displayName" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
+                        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
+                        <Bar dataKey="count" name="Buku" fill={BRAND.walnut} radius={[0, 4, 4, 0]} barSize={14} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minHeight: 0 }}>
+
           <motion.div {...fadeUp(0.4)}>
             <Card>
               <div style={{ padding: '16px 18px', background: `linear-gradient(135deg,${BRAND.darkBrown} 0%,#6b4528 100%)`, borderRadius: '16px 16px 0 0' }}>
@@ -678,37 +766,28 @@ export default function Dashboard() {
                   <h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'rgba(255,210,140,0.9)', fontFamily: "'Georgia',serif", display: 'flex', alignItems: 'center', gap: 6 }}>
                     <Target size={14} /> Target {stats.currentYear}
                   </h3>
-                  <span style={{ fontSize: 18, fontWeight: 800, color: 'white' }}>{stats.finishedThisYear} / 12</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,251,245,0.7)' }}>{goalPct}% Tercapai</span>
                 </div>
-                <div style={{ height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.15)', overflow: 'hidden' }}>
+                <div style={{ background: 'rgba(0,0,0,0.2)', height: 6, borderRadius: 3, overflow: 'hidden' }}>
                   <motion.div
                     initial={{ width: 0 }} animate={{ width: `${goalPct}%` }}
-                    transition={{ duration: 1.2, delay: 0.6, ease: 'easeOut' }}
-                    style={{ height: '100%', borderRadius: 3, background: goalPct >= 100 ? '#10b981' : 'rgba(255,210,140,0.85)' }}
+                    transition={{ duration: 1, delay: 0.8, ease: 'easeOut' }}
+                    style={{ height: '100%', background: '#ffbd59', borderRadius: 3, boxShadow: '0 0 10px rgba(212,165,116,0.5)' }}
                   />
                 </div>
-                <p style={{ margin: '8px 0 0', fontSize: 11, color: 'rgba(255,210,140,0.55)' }}>
-                  {goalPct >= 100 ? '🎉 Target tercapai!' : `${12 - stats.finishedThisYear} buku lagi untuk target tahun ini`}
-                </p>
               </div>
-
-              {/* Page stats */}
-              <div style={{ padding: '14px 18px', display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-                {[
-                  { label: 'Halaman Dibaca', val: stats.pagesRead.toLocaleString() },
-                  { label: 'Total Halaman', val: stats.totalPages.toLocaleString() },
-                  { label: '% Terbaca', val: `${readPct}%` },
-                ].map(s => (
-                  <div key={s.label} style={{ textAlign: 'center', flex: 1 }}>
-                    <div style={{ fontSize: 16, fontWeight: 800, color: BRAND.darkBrown }}>{s.val}</div>
-                    <div style={{ fontSize: 9, color: BRAND.walnut, opacity: 0.55, marginTop: 1 }}>{s.label}</div>
-                  </div>
-                ))}
+              <div style={{ padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(139,99,56,0.03)' }}>
+                <div>
+                  <span style={{ fontSize: 24, fontWeight: 800, color: BRAND.darkBrown, lineHeight: 1 }}>{stats.finishedThisYear}</span>
+                  <span style={{ fontSize: 11, color: BRAND.walnut, marginLeft: 6, fontWeight: 600 }}>/ {stats.target} buku</span>
+                </div>
+                <div style={{ fontSize: 10, color: BRAND.walnut, opacity: 0.7, textAlign: 'right', lineHeight: 1.3 }}>
+                  Sisa {Math.max(0, stats.target - stats.finishedThisYear)} buku
+                </div>
               </div>
             </Card>
           </motion.div>
 
-          {/* Quick stats */}
           <motion.div {...fadeUp(0.45)}>
             <Card style={{ padding: '16px 18px' }}>
               <h3 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 700, color: BRAND.darkBrown, fontFamily: "'Georgia',serif", display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -729,121 +808,36 @@ export default function Dashboard() {
               </div>
             </Card>
           </motion.div>
-        </div>
-      </div>
 
-      {/* ─── Charts row ───────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20, marginBottom: 20 }}>
-
-        {/* Status donut */}
-        <motion.div {...fadeUp(0.5)}>
-          <Card>
-            <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Distribusi Status</h3>
-            </div>
-            <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', gap: 20 }}>
-              <ResponsiveContainer width={140} height={140}>
-                <PieChart>
-                  <Pie data={stats.statusPie} cx="50%" cy="50%" innerRadius={38} outerRadius={62} dataKey="value" paddingAngle={2}>
-                    {stats.statusPie.map((e, i) => <Cell key={i} fill={e.color} />)}
-                  </Pie>
-                  <Tooltip content={<ChartTooltip />} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {stats.statusPie.map(d => (
-                  <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: d.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 11, color: BRAND.walnut, flex: 1 }}>{d.name}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: BRAND.darkBrown }}>{d.value}</span>
+          <motion.div {...fadeUp(0.58)}>
+            <Card>
+              <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                  <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Penulis Terbanyak</h3>
+                </div>
+                {/* Spacer to match the height of Genre Terbanyak filter buttons */}
+                <div style={{ height: 26, marginBottom: 4 }} />
+              </div>
+              <div style={{ padding: '12px 16px 12px' }}>
+                {stats.authorChart.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data penulis</div>
+                ) : (
+                  <div style={{ overflowY: 'auto', height: 150, paddingRight: 4 }} className="hide-scrollbar">
+                    <ResponsiveContainer width="100%" height={Math.max(150, stats.authorChart.length * 28)}>
+                      <BarChart data={stats.authorChart} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
+                        <XAxis type="number" hide />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
+                        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
+                        <Bar dataKey="count" name="Buku" fill={'#8b5cf6'} radius={[0, 4, 4, 0]} barSize={14} />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
-                ))}
+                )}
               </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Genre bar chart */}
-        <motion.div {...fadeUp(0.55)}>
-          <Card>
-            <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Genre Terbanyak</h3>
-              </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
-                <button
-                  onClick={() => setGenreFilter('Semua')}
-                  style={{
-                    padding: '4px 8px', fontSize: 10, fontWeight: 600, borderRadius: 6, border: 'none', cursor: 'pointer',
-                    background: genreFilter === 'Semua' ? BRAND.walnut : 'rgba(139,99,56,0.1)',
-                    color: genreFilter === 'Semua' ? 'white' : BRAND.walnut,
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  Semua
-                </button>
-                {BOOK_GENRES.map(g => (
-                  <button
-                    key={g.category}
-                    onClick={() => setGenreFilter(g.category)}
-                    style={{
-                      padding: '4px 8px', fontSize: 10, fontWeight: 600, borderRadius: 6, border: 'none', cursor: 'pointer',
-                      background: genreFilter === g.category ? BRAND.walnut : 'rgba(139,99,56,0.1)',
-                      color: genreFilter === g.category ? 'white' : BRAND.walnut,
-                      transition: 'all 0.2s'
-                    }}
-                    title={g.category}
-                  >
-                    {g.category.split(' ')[0]}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div style={{ padding: '12px 16px 12px' }}>
-              {displayedGenres.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data genre</div>
-              ) : (
-                <div style={{ overflowY: 'auto', maxHeight: 150, paddingRight: 4 }} className="hide-scrollbar">
-                  <ResponsiveContainer width="100%" height={Math.max(150, displayedGenres.length * 28)}>
-                    <BarChart data={displayedGenres} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
-                      <XAxis type="number" hide />
-                      <YAxis type="category" dataKey="displayName" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
-                      <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
-                      <Bar dataKey="count" name="Buku" fill={BRAND.walnut} radius={[0, 4, 4, 0]} barSize={14} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Author bar chart */}
-        <motion.div {...fadeUp(0.58)}>
-          <Card>
-            <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Penulis Terbanyak</h3>
-            </div>
-            <div style={{ padding: '12px 16px 12px' }}>
-              {stats.authorChart.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data penulis</div>
-              ) : (
-                <div style={{ overflowY: 'auto', maxHeight: 150, paddingRight: 4 }} className="hide-scrollbar">
-                  <ResponsiveContainer width="100%" height={Math.max(150, stats.authorChart.length * 28)}>
-                    <BarChart data={stats.authorChart} layout="vertical" margin={{ left: 10, right: 20, top: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,99,56,0.08)" horizontal={false} />
-                      <XAxis type="number" hide />
-                      <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
-                      <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
-                      <Bar dataKey="count" name="Buku" fill={'#8b5cf6'} radius={[0, 4, 4, 0]} barSize={14} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
-            </div>
-          </Card>
-        </motion.div>
+            </Card>
+          </motion.div>
+        </div>
       </div>
 
       {/* ─── Reading progress area chart + recent books ─ */}
@@ -918,11 +912,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* ─── Accounting Section ─────────────────────────── */}
-      <motion.div {...fadeUp(0.7)}>
-        <DashboardAccountingSection />
-      </motion.div>
-
+      {/* Reading Calendar Modal */}
       <ReadingCalendarModal
         isOpen={isCalendarModalOpen}
         onClose={() => setIsCalendarModalOpen(false)}
