@@ -26,6 +26,12 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'search' => 'nullable|string|max:50',
+            'status' => 'nullable|string',
+            'favorite' => 'nullable|boolean',
+        ]);
+
         $filters = [
             'status' => $request->query('status'),
             'favorite' => $request->query('favorite'),
@@ -173,7 +179,9 @@ class BookController extends Controller
 
         // Store new cover in book-covers folder
         $file = $request->file('cover');
-        $filename = 'book_' . $book->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        // SECURITY: Use extension() which guesses based on MIME type rather than getClientOriginalExtension()
+        $extension = $file->extension() ?: 'jpg';
+        $filename = 'book_' . $book->id . '_' . time() . '.' . $extension;
         $file->storeAs('book-covers', $filename, 'public');
 
         $url = request()->getSchemeAndHttpHost() . '/storage/book-covers/' . $filename;
