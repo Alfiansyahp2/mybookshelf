@@ -44,7 +44,10 @@ interface RawBook {
   personal_rating: number | null;
   purchase_date: string | null;
   purchase_price: string | null;
+  purchase_currency: string | null;
+  is_gift: boolean;
   purchase_location: string | null;
+  read_dates: any[] | null;
   date_added: string;
   last_modified: string;
   deleted_at: string | null;

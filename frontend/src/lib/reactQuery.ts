@@ -21,4 +21,4 @@ export const queryClient = new QueryClient({
 });
 
 // Export hooks for easier usage
-export const { useQuery, useMutation, useQueryClient } = queryClient;
+export { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
