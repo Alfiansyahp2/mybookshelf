@@ -12,7 +12,9 @@ import {
   LogOut,
   Award,
   LayoutDashboard,
-  DollarSign
+  DollarSign,
+  Menu,
+  X
 } from 'lucide-react'
 import BookDetailModal from './modals/BookDetailModal'
 import EditBookModal from './modals/EditBookModal'
@@ -41,7 +43,7 @@ export default function AppLayout() {
   const deleteBook = useDeleteBook()
   const deleteShelf = useDeleteShelf()
   const { data: authData } = useAuthUser()
-  const authUser = authData?.user || authData?.data
+  const authUser = authData?.user || (authData as any)?.data
   const avatarLetter = authUser?.name ? authUser.name.charAt(0).toUpperCase() : 'U'
 
   // Get shelves data for edit functionality
@@ -62,7 +64,9 @@ export default function AppLayout() {
   const [lastScrollY, setLastScrollY] = useState(0)
   const [isAddShelfModalOpen, setIsAddShelfModalOpen] = useState(false)
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const profileRef = useRef<HTMLDivElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
@@ -126,6 +130,9 @@ export default function AppLayout() {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
         setIsProfileDropdownOpen(false)
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false)
       }
     }
 
@@ -469,42 +476,6 @@ export default function AppLayout() {
               </div>
             </div>
           </div>
-
-          {/* Mobile Navigation - Show only on small screens */}
-          <nav className="flex md:hidden items-center justify-between mt-3 pt-3 border-t border-walnut/10 overflow-x-auto">
-            {navItems.slice(0, 6).map((item) => {
-              const Icon = item.icon
-              const isActive = location.pathname === item.path
-
-              return (
-                <motion.div
-                  key={item.path}
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Link
-                    to={item.path}
-                    className={`
-                      min-w-[60px] flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-200
-                      ${isActive
-                        ? 'bg-walnut/10 text-walnut'
-                        : 'text-walnut/60 hover:bg-walnut/5 hover:text-walnut'
-                      }
-                    `}
-                  >
-                    <motion.div
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </motion.div>
-                    <span className="text-[10px] font-medium">{item.label.split(' ')[0]}</span>
-                  </Link>
-                </motion.div>
-              )
-            })}
-          </nav>
         </div>
       </header>
 
@@ -561,27 +532,52 @@ export default function AppLayout() {
         />
       )}
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-cream/95 backdrop-blur-md border-t border-walnut/20 z-[60]">
-        <div className="flex items-center justify-around px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const isActive = location.pathname === item.path
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all ${
-                  isActive ? 'text-walnut' : 'text-walnut/50 hover:text-walnut/80'
-                }`}
-              >
-                <Icon className={`w-5 h-5 mb-1 ${isActive ? 'fill-walnut/10' : ''}`} />
-                <span className="text-[10px] font-medium">{item.label}</span>
-              </Link>
-            )
-          })}
-        </div>
-      </nav>
+      {/* Mobile Floating Action Button (FAB) Nav */}
+      <div className="md:hidden fixed bottom-6 right-6 z-[60]" ref={mobileMenuRef}>
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="absolute bottom-16 right-0 mb-4 bg-cream/95 backdrop-blur-md rounded-2xl shadow-2xl border border-walnut/20 p-2 flex flex-col gap-2 min-w-[160px]"
+            >
+              {navItems.map((item) => {
+                const Icon = item.icon
+                const isActive = location.pathname === item.path
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      isActive ? 'bg-walnut/10 text-walnut font-bold' : 'text-walnut/70 hover:bg-walnut/5 hover:text-walnut font-medium'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 ${isActive ? 'fill-walnut/10' : ''}`} />
+                    <span className="text-sm">{item.label}</span>
+                  </Link>
+                )
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="w-14 h-14 bg-walnut text-white rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-darkBrown transition-colors"
+        >
+          <motion.div
+            animate={{ rotate: isMobileMenuOpen ? 90 : 0 }}
+            transition={{ type: 'spring', damping: 20 }}
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </motion.div>
+        </motion.button>
+      </div>
     </div>
   )
 }
