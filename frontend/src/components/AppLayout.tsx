@@ -19,7 +19,7 @@ import EditBookModal from './modals/EditBookModal'
 import EditShelfModal from './modals/EditShelfModal'
 import AddShelfModal from './modals/AddShelfModal'
 import { useBookstore } from '../store/useBookstore'
-import { useLogout } from '../hooks/useAuth'
+import { useLogout, useAuthUser } from '../hooks/useAuth'
 import { useBook, useDeleteBook, useBooks } from '../hooks/useBooks'
 import { useDeleteShelf, useShelves } from '../hooks/useShelves'
 import NotificationCenter from './NotificationCenter'
@@ -40,6 +40,9 @@ export default function AppLayout() {
   const logout = useLogout()
   const deleteBook = useDeleteBook()
   const deleteShelf = useDeleteShelf()
+  const { data: authData } = useAuthUser()
+  const authUser = authData?.user || authData?.data
+  const avatarLetter = authUser?.name ? authUser.name.charAt(0).toUpperCase() : 'U'
 
   // Get shelves data for edit functionality
   const { data: shelves } = useShelves()
@@ -385,7 +388,7 @@ export default function AppLayout() {
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
                   >
-                    U
+                    {avatarLetter}
                   </motion.div>
                 </motion.button>
 
