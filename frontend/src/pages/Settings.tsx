@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+
 import { useAuthUser } from '../hooks/useAuth'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   User,
-  Bell,
-  Palette,
   Database,
-  Shield,
   Info,
-  Mail,
   Settings as SettingsIcon,
   LogOut
 } from 'lucide-react'
@@ -22,7 +18,7 @@ import AboutSettings from '../components/settings/AboutSettings'
 
 export default function Settings() {
   const { data: authData } = useAuthUser()
-  const authUser = authData?.user || authData?.data
+  const authUser = authData?.user || (authData as any)?.data?.user
   
   const queryClient = useQueryClient()
 

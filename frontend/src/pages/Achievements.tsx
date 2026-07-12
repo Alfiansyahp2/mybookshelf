@@ -39,13 +39,13 @@ export default function Achievements() {
 
   // Compute stats for progress
   const stats = useMemo(() => {
-    const finished = books.filter(b => b.status === 'finished')
-    const wishlist = books.filter(b => b.status === 'wishlist')
-    const favs = books.filter(b => b.favorite || b.isFavorite)
-    const rated = books.filter(b => b.personalRating > 0)
-    const fiveStar = books.filter(b => b.personalRating === 5)
-    const pages = finished.reduce((sum, b) => sum + (b.pages || b.totalPages || 0), 0)
-    const genres = new Set(books.filter(b => b.genre).map(b => b.genre))
+    const finished = books.filter((b: any) => b.status === 'finished')
+    const wishlist = books.filter((b: any) => b.status === 'wishlist')
+    const favs = books.filter((b: any) => b.favorite || b.isFavorite)
+    const rated = books.filter((b: any) => b.personalRating > 0)
+    const fiveStar = books.filter((b: any) => b.personalRating === 5)
+    const pages = finished.reduce((sum: number, b: any) => sum + (b.pages || b.totalPages || 0), 0)
+    const genres = new Set(books.filter((b: any) => b.genre).map((b: any) => b.genre))
 
     return {
       total: books.length,

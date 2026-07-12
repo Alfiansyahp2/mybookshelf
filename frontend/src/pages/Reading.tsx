@@ -11,7 +11,6 @@ import {
   TrendingUp,
   Clock,
   Target,
-  Bookmark,
   Plus
 } from 'lucide-react'
 
@@ -20,9 +19,8 @@ export default function Reading() {
   const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
   const [selectedYear, setSelectedYear] = useState<number | null>(null)
 
-  // Fetch all books and shelves from API
+  // Fetch all books from API
   const { data: allBooksResponse, isLoading } = useBooks({})
-  const { data: shelves = [], isLoading: shelvesLoading } = useShelves()
 
   const allBooks = allBooksResponse?.data?.data || []
   const readingBooks = allBooks.filter((book: Book) => book.status === 'reading')
@@ -133,7 +131,7 @@ export default function Reading() {
   }
 
   // Loading state
-  if (isLoading || shelvesLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-walnut">Loading reading progress...</div>

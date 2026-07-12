@@ -5,7 +5,7 @@ import { useAuthUser, useUpdateProfile, useUpdatePassword } from '../../hooks/us
 
 export default function AccountSettings() {
   const { data: authData } = useAuthUser();
-  const authUser = authData?.user || authData?.data;
+  const authUser = authData?.user || (authData as any)?.data?.user;
   
   const updateProfile = useUpdateProfile();
   const updatePassword = useUpdatePassword();

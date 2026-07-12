@@ -6,7 +6,7 @@ export interface Shelf {
   name: string
   capacity: number
   order: number
-  span: number
+  span?: number
   roomId?: string
   decorations?: any[]
 }

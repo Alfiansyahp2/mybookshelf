@@ -286,11 +286,11 @@ export default function BookDetailDrawer() {
                   </div>
                   <div>
                     <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">Year</div>
-                    <div className="font-medium text-darkBrown">{selectedBook.publishedYear}</div>
+                    <div className="font-medium text-darkBrown">{selectedBook.publishYear}</div>
                   </div>
                   <div>
                     <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">Pages</div>
-                    <div className="font-medium text-darkBrown">{selectedBook.totalPages || selectedBook.pages || 'N/A'}</div>
+                    <div className="font-medium text-darkBrown">{selectedBook.pages || selectedBook.pages || 'N/A'}</div>
                   </div>
                   <div className="col-span-2">
                     <div className="text-walnut/60 text-xs uppercase tracking-wide mb-1">ISBN</div>
@@ -473,25 +473,25 @@ export default function BookDetailDrawer() {
                     <div className="bg-white rounded-2xl p-6 mb-6 border border-walnut/10 shadow-sm">
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-sm font-medium text-darkBrown">Reading Progress</span>
-                        <span className="text-sm font-bold text-walnut">{Math.round((selectedBook.currentPage || 0) / (selectedBook.totalPages || selectedBook.pages || 1) * 100)}%</span>
+                        <span className="text-sm font-bold text-walnut">{Math.round((selectedBook.currentPage || 0) / (selectedBook.pages || selectedBook.pages || 1) * 100)}%</span>
                       </div>
 
                       <div className="h-3 bg-walnut/20 rounded-full overflow-hidden mb-3">
                         <motion.div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
-                            width: `${Math.round((selectedBook.currentPage || 0) / (selectedBook.totalPages || selectedBook.pages || 1) * 100)}%`,
+                            width: `${Math.round((selectedBook.currentPage || 0) / (selectedBook.pages || selectedBook.pages || 1) * 100)}%`,
                             background: `linear-gradient(90deg, ${selectedBook.spineColors?.[0] || '#8B7355'}, ${selectedBook.spineColors?.[2] || '#5C4532'})`
                           }}
                           initial={{ width: 0 }}
-                          animate={{ width: `${Math.round((selectedBook.currentPage || 0) / (selectedBook.totalPages || selectedBook.pages || 1) * 100)}%` }}
+                          animate={{ width: `${Math.round((selectedBook.currentPage || 0) / (selectedBook.pages || selectedBook.pages || 1) * 100)}%` }}
                           transition={{ duration: 0.5 }}
                         />
                       </div>
 
                       <div className="flex items-center justify-between text-xs text-walnut/60">
                         <span>Page {selectedBook.currentPage || 0}</span>
-                        <span>of {selectedBook.totalPages || selectedBook.pages || 'N/A'}</span>
+                        <span>of {selectedBook.pages || selectedBook.pages || 'N/A'}</span>
                       </div>
 
                       {/* Progress Slider */}
@@ -500,7 +500,7 @@ export default function BookDetailDrawer() {
                         <input
                           type="range"
                           min="0"
-                          max={selectedBook.totalPages || selectedBook.pages || 0}
+                          max={selectedBook.pages || selectedBook.pages || 0}
                           value={selectedBook.currentPage || 0}
                           onChange={(e) => handleUpdateProgress(parseInt(e.target.value))}
                           disabled={updateProgress.isPending}
@@ -543,7 +543,7 @@ export default function BookDetailDrawer() {
 
                     <div className="space-y-4">
                       <div className="text-sm text-walnut/70">
-                        You completed this {selectedBook.totalPages || selectedBook.pages || 0}-page journey.
+                        You completed this {selectedBook.pages || selectedBook.pages || 0}-page journey.
                       </div>
 
                       {/* Reading Time Summary */}
@@ -595,7 +595,7 @@ export default function BookDetailDrawer() {
                       </div>
                       <div>
                         <div className="font-semibold text-xl text-darkBrown">Start Reading</div>
-                        <div className="text-sm text-walnut/60">{selectedBook.totalPages || selectedBook.pages || 0} pages waiting</div>
+                        <div className="text-sm text-walnut/60">{selectedBook.pages || selectedBook.pages || 0} pages waiting</div>
                       </div>
                     </div>
 

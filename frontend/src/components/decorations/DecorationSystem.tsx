@@ -413,7 +413,7 @@ export function renderDecoration(deco: ShelfDecoration | DecorationKind, key?: s
   const kind = typeof deco === 'string' ? deco : deco.kind
   const customData = typeof deco === 'string' ? undefined : deco.customData
 
-  const map: Record<DecorationKind, JSX.Element> = {
+  const map = {
     candle:        <Candle key={key} />,
     candle_pair:   <div key={key} style={{ display:'flex', gap:5, alignItems:'flex-end' }}><Candle /><Candle scale={0.8} /></div>,
     plant_pot:     <PlantPot key={key} />,
