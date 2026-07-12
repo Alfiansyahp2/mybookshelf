@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useAuthUser, useUpdateProfile, useUpdatePassword } from '../hooks/useAuth'
+import { useAuthUser } from '../hooks/useAuth'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   User,
@@ -9,28 +9,21 @@ import {
   Database,
   Shield,
   Info,
-  Moon,
-  Sun,
   Mail,
-  BookOpen,
-  Download,
-  Trash2,
   Settings as SettingsIcon,
-  LogOut,
-  Clock,
-  Award,
-  GitBranch,
-  TrendingUp,
-  Save,
-  Key
+  LogOut
 } from 'lucide-react'
+
+// Import extracted components
+import AccountSettings from '../components/settings/AccountSettings'
+import AppPreferences from '../components/settings/AppPreferences'
+import DataManagement from '../components/settings/DataManagement'
+import AboutSettings from '../components/settings/AboutSettings'
 
 export default function Settings() {
   const { data: authData } = useAuthUser()
-  const authUser = authData?.user
+  const authUser = authData?.user || authData?.data
   
-  const updateProfile = useUpdateProfile()
-  const updatePassword = useUpdatePassword()
   const queryClient = useQueryClient()
 
   const [settings, setSettings] = useState({
@@ -48,12 +41,6 @@ export default function Settings() {
     memberSince: '2024'
   })
 
-  const [passwordForm, setPasswordForm] = useState({
-    current_password: '',
-    password: '',
-    password_confirmation: ''
-  })
-
   useEffect(() => {
     if (authUser) {
       setUser({
@@ -69,31 +56,9 @@ export default function Settings() {
 
   const handleLogout = async () => {
     console.log('Logging out...')
-    // Use clear/logout logic from auth if needed, but since AppLayout has it, we can just clear local storage
     localStorage.removeItem('user')
     queryClient.clear()
     window.location.href = '/login'
-  }
-
-  const handleProfileSubmit = () => {
-    updateProfile.mutate({ name: user.name, email: user.email }, {
-      onSuccess: () => alert('Profile updated successfully!'),
-      onError: () => alert('Failed to update profile.')
-    })
-  }
-
-  const handlePasswordSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    updatePassword.mutate(passwordForm, {
-      onSuccess: () => {
-        alert('Password updated successfully!')
-        setPasswordForm({ current_password: '', password: '', password_confirmation: '' })
-      },
-      onError: (err: any) => {
-        alert('Failed to update password. Check your current password.')
-        console.error(err)
-      }
-    })
   }
 
   const handleExportData = () => {
@@ -121,114 +86,19 @@ export default function Settings() {
   const sections = {
     account: {
       title: 'Account Settings',
-      icon: User,
-      items: [
-        {
-          label: 'Profile Information',
-          description: 'Update your personal information',
-          icon: User,
-          action: 'edit-profile'
-        },
-        {
-          label: 'Change Password',
-          description: 'Update your security credentials',
-          icon: Shield,
-          action: 'change-password'
-        },
-        {
-          label: 'Email Preferences',
-          description: 'Manage email notifications',
-          icon: Mail,
-          action: 'email-preferences'
-        }
-      ]
+      icon: User
     },
     preferences: {
       title: 'App Preferences',
-      icon: SettingsIcon,
-      items: [
-        {
-          label: 'Theme',
-          description: 'Choose your preferred appearance',
-          icon: Palette,
-          type: 'toggle',
-          options: ['Light', 'Dark'],
-          value: settings.theme === 'dark'
-        },
-        {
-          label: 'Notifications',
-          description: 'Enable push notifications',
-          icon: Bell,
-          type: 'toggle',
-          value: settings.notifications
-        },
-        {
-          label: 'Email Updates',
-          description: 'Receive weekly reading summaries',
-          icon: Mail,
-          type: 'toggle',
-          value: settings.emailUpdates
-        },
-        {
-          label: 'Auto-save',
-          description: 'Automatically save changes',
-          icon: Database,
-          type: 'toggle',
-          value: settings.autoSave
-        },
-        {
-          label: 'Reading Reminders',
-          description: 'Get reminded to read daily',
-          icon: Clock,
-          type: 'toggle',
-          value: settings.readingReminders
-        }
-      ]
+      icon: SettingsIcon
     },
     data: {
       title: 'Data Management',
-      icon: Database,
-      items: [
-        {
-          label: 'Export Data',
-          description: 'Download your library data',
-          icon: Download,
-          action: 'export'
-        },
-        {
-          label: 'Clear All Data',
-          description: 'Delete all books and settings',
-          icon: Trash2,
-          action: 'clear',
-          danger: true
-        }
-      ]
+      icon: Database
     },
     about: {
       title: 'About',
-      icon: Info,
-      items: [
-        {
-          label: 'Version',
-          description: 'MyBookshelf v1.0.0',
-          icon: Info,
-          static: true
-        },
-        {
-          label: 'Website',
-          description: 'Visit our official website',
-          icon: BookOpen,
-          action: 'website',
-          external: true
-        },
-        {
-          label: 'GitHub',
-          description: 'View source code on GitHub',
-          icon: GitBranch,
-          action: 'github',
-          external: true
-        }
-      ]
+      icon: Info
     }
   }
 
@@ -300,304 +170,14 @@ export default function Settings() {
 
         {/* Main Content */}
         <div className="md:col-span-2">
-          {/* Account Section */}
-          {activeSection === 'account' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
-              <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                  <User className="w-5 h-5" />
-                  Profile Information
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-walnut mb-2">Display Name</label>
-                    <input
-                      type="text"
-                      value={user.name}
-                      onChange={(e) => setUser({ ...user, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-walnut mb-2">Email Address</label>
-                    <input
-                      type="email"
-                      value={user.email}
-                      onChange={(e) => setUser({ ...user, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-cream/30 rounded-xl">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-walnut font-semibold text-lg">
-                      {user.avatar}
-                    </div>
-                    <div>
-                      <p className="text-sm text-walnut/60">Avatar</p>
-                      <p className="text-xs text-walnut/50">First letter of your name</p>
-                    </div>
-                  </div>
-                  <div className="pt-2 flex justify-end">
-                    <button 
-                      onClick={handleProfileSubmit}
-                      disabled={updateProfile.isPending}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-walnut text-white rounded-xl hover:bg-darkBrown transition-colors font-medium disabled:opacity-50"
-                    >
-                      <Save className="w-4 h-4" />
-                      {updateProfile.isPending ? 'Saving...' : 'Save Profile'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mt-4">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                  <Key className="w-5 h-5" />
-                  Change Password
-                </h2>
-                <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-walnut mb-2">Current Password</label>
-                    <input
-                      type="password"
-                      required
-                      value={passwordForm.current_password}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
-                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-walnut mb-2">New Password</label>
-                    <input
-                      type="password"
-                      required
-                      minLength={8}
-                      value={passwordForm.password}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })}
-                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-walnut mb-2">Confirm New Password</label>
-                    <input
-                      type="password"
-                      required
-                      minLength={8}
-                      value={passwordForm.password_confirmation}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, password_confirmation: e.target.value })}
-                      className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
-                    />
-                  </div>
-                  <div className="pt-2 flex justify-end">
-                    <button 
-                      type="submit"
-                      disabled={updatePassword.isPending}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-darkBrown text-white rounded-xl hover:bg-[#2a1a10] transition-colors font-medium disabled:opacity-50"
-                    >
-                      <Save className="w-4 h-4" />
-                      {updatePassword.isPending ? 'Updating...' : 'Update Password'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Preferences Section */}
+          {activeSection === 'account' && <AccountSettings />}
           {activeSection === 'preferences' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
-              <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                  <SettingsIcon className="w-5 h-5" />
-                  App Preferences
-                </h2>
-                <div className="space-y-4">
-                  {sections.preferences.items.map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center justify-between p-4 bg-cream/30 rounded-xl hover:bg-cream/50 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          item.value ? 'bg-walnut text-white' : 'bg-walnut/20 text-walnut'
-                        }`}>
-                          <item.icon className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-darkBrown">{item.label}</p>
-                          <p className="text-sm text-walnut/70">{item.description}</p>
-                        </div>
-                      </div>
-
-                      {/* Toggle Switch */}
-                      <button
-                        onClick={() => {
-                          if (item.label === 'Theme') {
-                            setSettings({ ...settings, theme: item.value ? 'light' : 'dark' })
-                          } else {
-                            setSettings({ ...settings, [item.label.toLowerCase()]: !item.value })
-                          }
-                        }}
-                        className={`w-14 h-8 rounded-full transition-all duration-300 ${
-                          item.value ? 'bg-walnut' : 'bg-walnut/30'
-                        } relative`}
-                      >
-                        <div
-                          className={`w-6 h-6 bg-white rounded-full shadow transition-all duration-300 ${
-                            item.value ? 'translate-x-3' : 'translate-x-0.5'
-                          }`}
-                        />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Theme Preview */}
-              <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-                <h3 className="text-lg font-semibold text-darkBrown mb-4">Theme Preview</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-white border-2 border-walnut/20 rounded-xl">
-                    <Sun className="w-5 h-5 text-yellow-500 mb-2" />
-                    <p className="text-sm text-walnut/70">Light Mode</p>
-                  </div>
-                  <div className="p-4 bg-darkBrown border-2 border-walnut/30 rounded-xl">
-                    <Moon className="w-5 h-5 text-walnut/70 mb-2" />
-                    <p className="text-sm text-walnut/70">Dark Mode</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+            <AppPreferences settings={settings} setSettings={setSettings} />
           )}
-
-          {/* Data Section */}
           {activeSection === 'data' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
-              <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                  <Database className="w-5 h-5" />
-                  Data Management
-                </h2>
-                <div className="space-y-3">
-                  <button
-                    onClick={handleExportData}
-                    className="w-full flex items-center gap-3 px-4 py-4 bg-walnut text-white rounded-xl hover:bg-darkBrown transition-colors"
-                  >
-                    <Download className="w-5 h-5" />
-                    <span className="font-medium">Export All Data</span>
-                  </button>
-
-                  <div className="bg-cream/30 rounded-xl p-4">
-                    <p className="text-sm text-walnut/80 mb-2">
-                      This will download all your books, settings, and reading progress as a JSON file that you can import later.
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-walnut/60">
-                      <Database className="w-4 h-4" />
-                      <span>File size: ~50KB</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleClearData}
-                    className="w-full flex items-center gap-3 px-4 py-4 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors border-2 border-red-200"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                    <span className="font-medium">Clear All Data</span>
-                  </button>
-
-                  <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
-                    <p className="text-sm text-red-800">
-                      <strong>Warning:</strong> This will permanently delete all your books, settings, and reading progress. This action cannot be undone.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+            <DataManagement handleExportData={handleExportData} handleClearData={handleClearData} />
           )}
-
-          {/* About Section */}
-          {activeSection === 'about' && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-4"
-            >
-              <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                  <Info className="w-5 h-5" />
-                  About MyBookshelf
-                </h2>
-                <div className="space-y-4">
-                  <div className="p-4 bg-cream/30 rounded-xl">
-                    <p className="text-sm text-walnut/80 mb-3">
-                      MyBookshelf is a beautiful and intuitive digital library management system designed for book lovers.
-                    </p>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <BookOpen className="w-4 h-4 text-walnut" />
-                        <span className="text-walnut/80">Organize your personal library</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <TrendingUp className="w-4 h-4 text-walnut" />
-                        <span className="text-walnut/80">Track reading progress</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Award className="w-4 h-4 text-walnut" />
-                        <span className="text-walnut/80">Achieve reading goals</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-walnut/20 hover:border-walnut/40 transition-colors">
-                      <div>
-                        <p className="font-medium text-darkBrown">Version</p>
-                        <p className="text-sm text-walnut/70">1.0.0</p>
-                      </div>
-                      <Info className="w-5 h-5 text-walnut/40" />
-                    </div>
-
-                    <a
-                      href="https://mybookshelf.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-4 bg-white rounded-xl border border-walnut/20 hover:border-walnut/40 hover:bg-walnut/5 transition-colors group"
-                    >
-                      <div>
-                        <p className="font-medium text-darkBrown group-hover:text-walnut transition-colors">Website</p>
-                        <p className="text-sm text-walnut/70">Visit our official website</p>
-                      </div>
-                      <BookOpen className="w-5 h-5 text-walnut/40 group-hover:text-walnut transition-colors" />
-                    </a>
-
-                    <a
-                      href="https://github.com/mybookshelf"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-4 bg-white rounded-xl border border-walnut/20 hover:border-walnut/40 hover:bg-walnut/5 transition-colors group"
-                    >
-                      <div>
-                        <p className="font-medium text-darkBrown group-hover:text-walnut transition-colors">GitHub</p>
-                        <p className="text-sm text-walnut/70">View source code</p>
-                      </div>
-                      <GitBranch className="w-5 h-5 text-walnut/40 group-hover:text-walnut transition-colors" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
+          {activeSection === 'about' && <AboutSettings />}
         </div>
       </div>
     </div>
