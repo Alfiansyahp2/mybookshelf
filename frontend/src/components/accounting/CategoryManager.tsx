@@ -102,10 +102,10 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
           className="bg-cream border border-beige rounded-lg shadow-sm-xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
+          <div className="flex items-center justify-between p-6 border-b border-beige">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                <FolderOpen className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 bg-beige rounded-lg">
+                <FolderOpen className="w-6 h-6 text-walnut" />
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-darkBrown">
@@ -119,16 +119,16 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
             <div className="flex items-center gap-2">
               <button
                 onClick={openCreateModal}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 New Category
               </button>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-beige rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-walnut/80" />
               </button>
             </div>
           </div>
@@ -143,11 +143,11 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
               </div>
             ) : categories.length === 0 ? (
               <div className="text-center py-12">
-                <FolderOpen className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <FolderOpen className="w-12 h-12 mx-auto text-walnut/40 mb-4" />
                 <p className="text-walnut/80 mb-4">No categories yet</p>
                 <button
                   onClick={openCreateModal}
-                  className="text-purple-600 hover:text-purple-700 font-medium"
+                  className="text-walnut hover:text-darkBrown font-medium"
                 >
                   Create your first category
                 </button>
@@ -199,7 +199,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow"
+      className="bg-white border border-beige rounded-lg p-4 hover:shadow-md transition-shadow"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -221,15 +221,15 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
             <>
               <button
                 onClick={onEdit}
-                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                className="p-1.5 hover:bg-beige rounded-lg transition-colors"
               >
-                <Edit className="w-4 h-4 text-gray-500" />
+                <Edit className="w-4 h-4 text-walnut/70" />
               </button>
               <button
                 onClick={onDelete}
-                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors"
+                className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
               >
-                <Trash2 className="w-4 h-4 text-gray-500" />
+                <Trash2 className="w-4 h-4 text-red-400" />
               </button>
             </>
           )}
@@ -237,7 +237,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
       </div>
 
       {category.description && (
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+        <p className="text-sm text-walnut/70 mb-3 line-clamp-2">
           {category.description}
         </p>
       )}
@@ -252,7 +252,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
       )}
 
       {category.total_expenses !== undefined && (
-        <div className="mt-3 pt-3 border-t dark:border-gray-600">
+        <div className="mt-3 pt-3 border-t border-beige">
           <div className="flex items-center justify-between text-sm mb-2">
             <span className="text-walnut/80">Total Spent</span>
             <span className="font-semibold text-darkBrown">
@@ -260,7 +260,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
             </span>
           </div>
           {category.monthly_budget && (
-            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+            <div className="w-full bg-beige rounded-full h-2">
               <div
                 className={`h-2 rounded-full ${
                   (category.budget_usage_percentage || 0) > 80 ? 'bg-red-500' : 'bg-green-500'
@@ -326,7 +326,7 @@ function CategoryFormModal({
           onClick={(e) => e.stopPropagation()}
           className="bg-cream border border-beige rounded-lg shadow-sm-xl max-w-md w-full"
         >
-          <div className="p-6 border-b dark:border-gray-700">
+          <div className="p-6 border-b border-beige">
             <h3 className="text-lg font-semibold text-darkBrown">
               {isEditing ? 'Edit Category' : 'New Category'}
             </h3>
@@ -342,7 +342,7 @@ function CategoryFormModal({
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 bg-white border border-beige rounded-lg focus:ring-2 focus:ring-walnut focus:outline-none"
                 placeholder="e.g., Books, Shipping"
               />
             </div>
@@ -355,7 +355,7 @@ function CategoryFormModal({
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={2}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 bg-white border border-beige rounded-lg focus:ring-2 focus:ring-walnut focus:outline-none"
                 placeholder="Optional description"
               />
             </div>
@@ -368,7 +368,7 @@ function CategoryFormModal({
                 <select
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2 bg-white border border-beige rounded-lg focus:ring-2 focus:ring-walnut focus:outline-none"
                 >
                   {ICONS.map((icon) => (
                     <option key={icon} value={icon}>
@@ -409,16 +409,16 @@ function CategoryFormModal({
                 Monthly Budget
               </label>
               <div className="relative">
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={formData.monthly_budget}
-                  onChange={(e) => setFormData({ ...formData, monthly_budget: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="0.00"
-                />
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.monthly_budget}
+                    onChange={(e) => setFormData({ ...formData, monthly_budget: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 pl-10 bg-white border border-beige rounded-lg focus:ring-2 focus:ring-walnut focus:outline-none"
+                    placeholder="0.00"
+                  />
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-walnut/50" />
               </div>
             </div>
 
@@ -426,13 +426,13 @@ function CategoryFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="px-4 py-2 border border-beige bg-white text-walnut rounded-lg hover:bg-beige transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                className="px-4 py-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown transition-colors"
               >
                 {isEditing ? 'Update' : 'Create'}
               </button>
