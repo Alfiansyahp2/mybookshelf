@@ -55,10 +55,10 @@ export default function Accounting() {
           </button>
           <button
             onClick={() => setShowExpenseModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown shadow-sm transition"
+            className="p-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown shadow-sm transition"
+            title="Add Expense"
           >
-            <Plus className="w-4 h-4" />
-            Add Expense
+            <Plus className="w-5 h-5" />
           </button>
         </div>
       </div>

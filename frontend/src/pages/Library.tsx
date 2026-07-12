@@ -155,7 +155,7 @@ export default function Library() {
         </div>
 
         {/* Widgets sitting exactly on the bookshelf rail */}
-        <div className="flex flex-shrink-0 items-end justify-end gap-3 md:gap-5 relative z-10 w-full scale-90 md:scale-100 origin-bottom-right mb-[-2px]">
+        <div className="flex flex-shrink-0 items-end justify-end gap-3 md:gap-5 relative z-10 w-full md:w-auto scale-90 md:scale-100 origin-bottom-right mb-[-2px]">
           <FlipCalendar onClick={() => setIsCalendarModalOpen(true)} />
           <div className="pb-1">
             <BigDigitalClock />

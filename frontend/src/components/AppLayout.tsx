@@ -258,9 +258,9 @@ export default function AppLayout() {
               {/* Mobile Search Toggle */}
               <button
                 onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="sm:hidden w-10 h-10 flex items-center justify-center rounded-xl text-walnut/70 hover:bg-walnut/10 hover:text-walnut transition-all"
+                className="sm:hidden w-8 h-8 flex items-center justify-center rounded-lg text-walnut/70 hover:bg-walnut/10 hover:text-walnut transition-all"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-4 h-4" />
               </button>
 
               {/* Search - Live with dropdown */}
@@ -373,17 +373,16 @@ export default function AppLayout() {
               {/* Add Bookshelf Button - Icon Only */}
               <motion.button
                 onClick={() => setIsAddShelfModalOpen(true)}
-                className="w-10 h-10 bg-walnut text-white rounded-xl flex items-center justify-center hover:bg-darkBrown transition-colors relative shadow-lg"
-                title="Add Bookshelf"
+                className="w-8 h-8 md:w-10 md:h-10 bg-walnut/80 backdrop-blur-md rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg border border-walnut/20"
                 whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
+                whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.2 }}
               >
                 <motion.div
                   whileHover={{ rotate: 360 }}
                   transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
                 >
-                  <Layers className="w-5 h-5" />
+                  <Layers className="w-4 h-4 md:w-5 md:h-5" />
                 </motion.div>
               </motion.button>
 
@@ -396,7 +395,7 @@ export default function AppLayout() {
               <div className="relative" ref={profileRef}>
                 <motion.button
                   onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-walnut to-darkBrown rounded-xl flex items-center justify-center text-white font-semibold text-xs md:text-sm relative shadow-lg"
+                  className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-walnut to-darkBrown rounded-lg md:rounded-xl flex items-center justify-center text-white font-semibold text-xs md:text-sm relative shadow-lg"
                   whileHover={{ scale: 1.15 }}
                   whileTap={{ scale: 0.95 }}
                   animate={{

@@ -46,7 +46,7 @@ export default function Dashboard() {
   )
 
   return (
-    <div style={{ padding: '20px 20px 40px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className="px-4 md:px-5 py-5 pb-10 max-w-[1200px] mx-auto">
 
       {/* ─── Hero header ──────────────────────────── */}
       <DashboardHeroSection bookColors={stats.bookColors} />
@@ -55,7 +55,7 @@ export default function Dashboard() {
       <DashboardStatCardsSection stats={stats} />
 
       {/* ─── Main content area ────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 20, marginBottom: 20 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5 mb-5">
         
         {/* LEFT — Currently reading + unread */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
