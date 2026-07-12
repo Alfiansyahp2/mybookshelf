@@ -11,8 +11,12 @@ interface BudgetTrackerProps {
 }
 
 export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrackerProps) {
-  const { data: budgets = [], isLoading } = useBudgets({ is_active: true, period });
-  const { data: summary } = useBudgetSummary();
+  const { data: budgetsResponse, isLoading } = useBudgets({ is_active: true, period });
+  const { data: summaryResponse } = useBudgetSummary();
+  
+  const budgets = Array.isArray(budgetsResponse?.data?.data) ? budgetsResponse.data.data : Array.isArray(budgetsResponse?.data) ? budgetsResponse.data : [];
+  const summary = summaryResponse?.data || null;
+
   const createBudget = useCreateBudget();
   const updateBudget = useUpdateBudget();
   const deleteBudget = useDeleteBudget();

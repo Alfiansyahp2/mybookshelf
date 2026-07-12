@@ -28,7 +28,8 @@ export default function ExpenseModal({
 }: ExpenseModalProps) {
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
-  const { data: categories = [] } = useExpenseCategories();
+  const { data: categoriesResponse } = useExpenseCategories();
+  const categories = categoriesResponse?.data || [];
   const { data: books = [] } = useBooks();
 
   const [formData, setFormData] = useState<ExpenseFormData>({

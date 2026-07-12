@@ -36,9 +36,10 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
 
   const { data: expensesData, isLoading } = useExpenses(filters);
   const deleteExpense = useDeleteExpense();
-  const { data: categories = [] } = useExpenseCategories();
+  const { data: categoriesResponse } = useExpenseCategories();
+  const categories = categoriesResponse?.data || [];
 
-  const expenses = Array.isArray(expensesData?.data) ? expensesData.data : [];
+  const expenses = Array.isArray(expensesData?.data?.data) ? expensesData.data.data : Array.isArray(expensesData?.data) ? expensesData.data : [];
 
   const handleFilterChange = (key: keyof ExpenseFilters, value: any) => {
     setFilters({ ...filters, [key]: value });
