@@ -62,3 +62,14 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--color-walnut) transparent;
 }
+
+/* Sortable Shelf Responsive Grid */
+.sortable-shelf-grid {
+  grid-column: span 12;
+}
+
+@media (min-width: 768px) {
+  .sortable-shelf-grid {
+    grid-column: span var(--shelf-span, 12);
+  }
+}

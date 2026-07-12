@@ -36,14 +36,14 @@ export function SortableShelf({
 
   const span = shelf.span || 12
   const style = {
+    '--shelf-span': span,
     transform: CSS.Transform.toString(transform),
     transition,
     ...(isDragging ? { zIndex: 50, opacity: 0.8 } : {}),
-    gridColumn: `span ${span}`,
-  }
+  } as React.CSSProperties
 
   return (
-    <div ref={setNodeRef} style={style} className={`relative group ${isDragging ? '' : 'z-10 hover:z-40'}`}>
+    <div ref={setNodeRef} style={style} className={`sortable-shelf-grid relative group ${isDragging ? '' : 'z-10 hover:z-40'}`}>
       {isEditMode && (
         <div className="absolute inset-0 z-20 border-2 border-dashed border-[#0078d4]/50 rounded-[14px] pointer-events-none transition-all group-hover:border-[#0078d4]" />
       )}

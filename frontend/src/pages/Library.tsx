@@ -79,7 +79,7 @@ export default function Library() {
 
   return (
     <div 
-      className="p-3 md:p-5 flex flex-col h-full min-h-screen relative"
+      className="p-3 md:p-5 flex flex-col min-h-full relative"
       style={{
         background: 'linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)',
       }}
@@ -155,9 +155,9 @@ export default function Library() {
         </div>
 
         {/* Widgets sitting exactly on the bookshelf rail */}
-        <div className="flex flex-shrink-0 items-end justify-between md:justify-end gap-3 md:gap-5 relative z-10 w-full md:w-auto scale-90 md:scale-100 origin-bottom-right mb-[-2px]">
+        <div className="flex flex-shrink-0 items-end justify-end gap-3 md:gap-5 relative z-10 w-full scale-90 md:scale-100 origin-bottom-right mb-[-2px]">
           <FlipCalendar onClick={() => setIsCalendarModalOpen(true)} />
-          <div className="hidden sm:block pb-1">
+          <div className="pb-1">
             <BigDigitalClock />
           </div>
           <div className="pb-0.5">

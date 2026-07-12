@@ -68,9 +68,9 @@ export default function AppLayout() {
   const profileRef = useRef<HTMLDivElement>(null)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
-  // Search state
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -255,8 +255,22 @@ export default function AppLayout() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-2 md:gap-4">
+              {/* Mobile Search Toggle */}
+              <button
+                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                className="sm:hidden w-10 h-10 flex items-center justify-center rounded-xl text-walnut/70 hover:bg-walnut/10 hover:text-walnut transition-all"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+
               {/* Search - Live with dropdown */}
-              <div className="hidden sm:block relative" ref={searchRef}>
+              <div 
+                ref={searchRef}
+                className={`
+                  absolute sm:relative inset-x-4 top-14 sm:inset-auto sm:top-auto z-[70] sm:z-auto
+                  ${isMobileSearchOpen ? 'block' : 'hidden'} sm:block
+                `}
+              >
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut/50 pointer-events-none z-10" />
                 <input
                   ref={searchInputRef}
@@ -264,8 +278,7 @@ export default function AppLayout() {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}
-                  placeholder="Cari buku, penulis..."
-                  className="w-48 md:w-64 pl-10 pr-7 py-2 md:py-2.5 bg-white border border-walnut/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 transition-all"
+                  className="w-full sm:w-48 md:w-64 pl-10 pr-7 py-2.5 bg-white border border-walnut/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 shadow-lg sm:shadow-none transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -281,7 +294,7 @@ export default function AppLayout() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.97 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-full mt-2 left-0 w-80 bg-white rounded-2xl shadow-2xl border border-walnut/10 overflow-hidden z-50"
+                      className="absolute top-full mt-2 left-0 right-0 sm:right-auto sm:w-80 bg-white rounded-2xl shadow-2xl border border-walnut/10 overflow-hidden z-[80]"
                     >
                       {searchBooks.length === 0 ? (
                         <div className="p-5 text-center text-sm text-walnut/50">
@@ -488,7 +501,7 @@ export default function AppLayout() {
             animate={{ rotateY: 0, filter: 'brightness(1)' }}
             exit={{ rotateY: 90, filter: 'brightness(0.2)' }}
             transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-            className="w-full h-full absolute inset-0 overflow-auto bg-cream pb-16 md:pb-0"
+            className="w-full h-full absolute inset-0 overflow-auto bg-cream"
             style={{ 
               transformOrigin: '50% 50% 50vw',
               transformStyle: 'preserve-3d',
@@ -541,7 +554,7 @@ export default function AppLayout() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="absolute bottom-16 right-0 mb-4 bg-cream/95 backdrop-blur-md rounded-2xl shadow-2xl border border-walnut/20 p-2 flex flex-col gap-2 min-w-[160px]"
+              className="absolute bottom-16 right-0 mb-4 bg-cream/95 backdrop-blur-md rounded-full shadow-2xl border border-walnut/20 p-1.5 flex flex-col gap-1.5"
             >
               {navItems.map((item) => {
                 const Icon = item.icon
@@ -551,12 +564,11 @@ export default function AppLayout() {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      isActive ? 'bg-walnut/10 text-walnut font-bold' : 'text-walnut/70 hover:bg-walnut/5 hover:text-walnut font-medium'
+                    className={`flex items-center justify-center w-12 h-12 rounded-full transition-all ${
+                      isActive ? 'bg-walnut/10 text-walnut' : 'text-walnut/70 hover:bg-walnut/5 hover:text-walnut'
                     }`}
                   >
                     <Icon className={`w-5 h-5 ${isActive ? 'fill-walnut/10' : ''}`} />
-                    <span className="text-sm">{item.label}</span>
                   </Link>
                 )
               })}
