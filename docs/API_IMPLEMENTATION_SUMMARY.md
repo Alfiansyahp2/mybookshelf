@@ -24,13 +24,13 @@
 
 ### 🔑 API Test Credentials
 
-**User:** test@example.com  
-**Password:** password  
-**API Token:** `1|ONgl7IghQMowMjDWklkCIAGTwaN6ML93wdMaf1A37722f768`
+**User:** <YOUR_TEST_EMAIL>  
+**Password:** <YOUR_TEST_PASSWORD>  
+**API Token:** `<YOUR_API_TOKEN>`
 
 **Test Command:**
 ```bash
-curl -H "Authorization: Bearer 1|ONgl7IghQMowMjDWklkCIAGTwaN6ML93wdMaf1A37722f768" \
+curl -H "Authorization: Bearer <YOUR_API_TOKEN>" \
      -H "Accept: application/json" \
      http://localhost:8000/api/v1/books
 ```

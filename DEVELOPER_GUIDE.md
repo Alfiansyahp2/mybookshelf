@@ -1,0 +1,11 @@
+# 📚 Developer Guide
+
+This document serves as an index to the detailed technical specifications and guides for the MyBookshelf system.
+
+- [ACCOUNTING_USER_GUIDE.md](docs/ACCOUNTING_USER_GUIDE.md)
+- [API_IMPLEMENTATION_SUMMARY.md](docs/API_IMPLEMENTATION_SUMMARY.md)
+- [AUTHENTICATION_FIX.md](docs/AUTHENTICATION_FIX.md)
+- [BOOK_ASSETS_GUIDE.md](docs/BOOK_ASSETS_GUIDE.md)
+- [BOOK_DETAIL_SEEDER_GUIDE.md](docs/BOOK_DETAIL_SEEDER_GUIDE.md)
+- [MODAL_SYSTEM_GUIDE.md](docs/MODAL_SYSTEM_GUIDE.md)
+- [READING_SESSION_IMPLEMENTATION_SUMMARY.md](docs/READING_SESSION_IMPLEMENTATION_SUMMARY.md)

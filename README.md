@@ -10,11 +10,11 @@ A modern personal library management application with a beautiful 3D bookshelf v
 - **Library Management**: Organize books into shelves, track reading progress, and manage borrowed books.
 - **Personalization**: Decorate your shelves with plants, candles, and pixel art cats.
 - **Analytics**: Visualize your reading habits with charts and statistics.
-- **Drag & Drop**: Easily move books between shelves.
+- **Drag & Drop**: Easily reorder and organize your shelves.
 
 ## 🔧 Tech Stack
 
-- **Backend**: Laravel 12, PHP 8.2+, SQLite
+- **Backend**: Laravel 12, PHP 8.2+, PostgreSQL
 - **Frontend**: React 19, TypeScript, Tailwind CSS, Zustand, TanStack Query, Framer Motion
 
 ## 🚀 Quick Start
@@ -49,3 +49,7 @@ A modern personal library management application with a beautiful 3D bookshelf v
 ## 📝 License
 
 This project is open-sourced software licensed under the MIT license.
+
+## 📖 Documentation
+
+For detailed technical documentation, API summaries, and system architecture, please refer to the [Developer Guide](DEVELOPER_GUIDE.md).
