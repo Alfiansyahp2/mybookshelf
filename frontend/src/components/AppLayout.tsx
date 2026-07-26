@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate, useOutlet } from 'react-router-dom'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import {
   BookOpen,
   Library,
@@ -28,13 +29,14 @@ import NotificationCenter from './NotificationCenter'
 import { useAchievementTracker } from '../hooks/useAchievementTracker'
 
 const navItems = [
-  { path: '/library', icon: Library, label: 'My Library' },
-  { path: '/reading', icon: BookOpen, label: 'Reading' },
-  { path: '/wishlist', icon: ShoppingCart, label: 'Wishlist' },
-  { path: '/accounting', icon: DollarSign, label: 'Accounting' },
+  { path: '/library', icon: Library, labelKey: 'nav.library' },
+  { path: '/reading', icon: BookOpen, labelKey: 'nav.reading' },
+  { path: '/wishlist', icon: ShoppingCart, labelKey: 'nav.wishlist' },
+  { path: '/accounting', icon: DollarSign, labelKey: 'nav.accounting' },
 ]
 
 export default function AppLayout() {
+  const { t, i18n } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const currentOutlet = useOutlet()
@@ -236,7 +238,7 @@ export default function AppLayout() {
                           : 'text-walnut/70 hover:bg-walnut/10 hover:text-walnut'
                         }
                       `}
-                      title={item.label}
+                      title={t(item.labelKey as any)}
                     >
                       <motion.div
                         whileHover={{ rotate: 360 }}
@@ -299,13 +301,13 @@ export default function AppLayout() {
                       {searchBooks.length === 0 ? (
                         <div className="p-5 text-center text-sm text-walnut/50">
                           <Search className="w-6 h-6 mx-auto mb-2 opacity-30" />
-                          Tidak ada hasil untuk <strong>"{searchQuery}"</strong>
+                          {t('search.no_results')} <strong>"{searchQuery}"</strong>
                         </div>
                       ) : (
                         <>
                           <div className="px-3 py-2 border-b border-walnut/8">
                             <span className="text-[10px] font-semibold uppercase tracking-widest text-walnut/40">
-                              {searchBooks.length} hasil ditemukan
+                              {searchBooks.length} {t('search.results_found')}
                             </span>
                           </div>
                           <div className="max-h-72 overflow-y-auto">
@@ -360,7 +362,7 @@ export default function AppLayout() {
                               }}
                               className="w-full text-center text-xs text-walnut/60 hover:text-walnut py-1 transition-colors"
                             >
-                              Lihat semua hasil di Library →
+                              {t('search.view_all')}
                             </button>
                           </div>
                         </>
@@ -369,6 +371,18 @@ export default function AppLayout() {
                   )}
                 </AnimatePresence>
               </div>
+
+              {/* Language Switcher */}
+              <motion.button
+                onClick={() => i18n.changeLanguage(i18n.language.startsWith('en') ? 'id' : 'en')}
+                className="w-8 h-8 md:w-10 md:h-10 bg-walnut/10 hover:bg-walnut/20 rounded-lg md:rounded-xl flex items-center justify-center text-walnut font-bold text-xs md:text-sm transition-colors border border-transparent hover:border-walnut/20 shadow-sm mr-1"
+                whileHover={{ scale: 1.15 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                title={i18n.language.startsWith('en') ? 'Ganti ke Bahasa Indonesia' : 'Switch to English'}
+              >
+                {i18n.language.startsWith('en') ? 'EN' : 'ID'}
+              </motion.button>
 
               {/* Add Bookshelf Button - Icon Only */}
               <motion.button

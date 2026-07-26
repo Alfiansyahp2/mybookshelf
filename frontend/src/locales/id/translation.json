@@ -1,1 +1,13 @@
-{}
+{
+  "nav": {
+    "library": "Koleksi",
+    "reading": "Membaca",
+    "wishlist": "Daftar Ingin",
+    "accounting": "Keuangan"
+  },
+  "search": {
+    "no_results": "Tidak ada hasil untuk",
+    "results_found": "hasil ditemukan",
+    "view_all": "Lihat semua hasil di Library →"
+  }
+}

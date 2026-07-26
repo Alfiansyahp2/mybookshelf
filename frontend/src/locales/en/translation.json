@@ -1,1 +1,13 @@
-{}
+{
+  "nav": {
+    "library": "My Library",
+    "reading": "Reading",
+    "wishlist": "Wishlist",
+    "accounting": "Accounting"
+  },
+  "search": {
+    "no_results": "No results for",
+    "results_found": "results found",
+    "view_all": "View all results in Library →"
+  }
+}
