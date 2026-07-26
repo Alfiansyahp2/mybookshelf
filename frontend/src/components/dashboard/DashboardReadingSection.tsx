@@ -10,7 +10,7 @@ interface DashboardReadingSectionProps {
 export default function DashboardReadingSection({ currentlyReading }: DashboardReadingSectionProps) {
   return (
     <motion.div {...fadeUp(0.35)}>
-      <Card style={{ maxHeight: 400, display: 'flex', flexDirection: 'column' }}>
+      <Card style={{ maxHeight: 300, display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid rgba(139,99,56,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 15, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown, display: 'flex', alignItems: 'center', gap: 8 }}>
             <BookOpen size={16} color={BRAND.walnut} /> Sedang & Belum Dibaca
@@ -20,7 +20,7 @@ export default function DashboardReadingSection({ currentlyReading }: DashboardR
           </Link>
         </div>
 
-        <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', flex: 1 }}>
+        <div className="hide-scrollbar" style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 12, overflowY: 'auto', flex: 1 }}>
           {currentlyReading.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '24px 0', color: 'rgba(122,92,66,0.45)' }}>
               <BookOpen size={32} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.4 }} />

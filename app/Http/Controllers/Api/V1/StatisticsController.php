@@ -94,11 +94,16 @@ class StatisticsController extends Controller
             $sessions = $sessionsByDate->get($date, collect());
             $finished = $finishedByDate->get($date, collect());
             
+            $booksRead = $sessions->map(function($session) {
+                return $session->book ? $session->book->title : null;
+            })->filter()->unique()->values();
+
             return [
                 'date' => $date,
                 'duration' => $sessions->sum('duration'),
                 'pages' => $sessions->sum('end_page') - $sessions->sum('start_page'),
-                'books_finished' => $finished->count()
+                'books_finished' => $finished->count(),
+                'books_read' => $booksRead,
             ];
         });
 

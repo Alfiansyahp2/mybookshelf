@@ -122,7 +122,7 @@ export function MiniSpines({ colors }: { colors: string[] }) {
 export function ContributionGraph({ data, books, onClick }: { data: any[], books?: any[], onClick?: () => void }) {
   const activityMap = new Map();
   data.forEach(d => {
-    activityMap.set(d.date, { pages: d.pages || 0, finished: 0, finishedTitles: [] });
+    activityMap.set(d.date, { pages: d.pages || 0, finished: 0, finishedBooks: [], booksRead: d.books_read || [] });
   });
 
   if (books) {
@@ -162,11 +162,9 @@ export function ContributionGraph({ data, books, onClick }: { data: any[], books
   const currentYear = today.getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
-  const targetEndDate = selectedYear === currentYear ? new Date(today) : new Date(selectedYear, 11, 31);
+  const startDate = new Date(selectedYear, 0, 1);
   
   const allSquares = [];
-  const startDate = new Date(targetEndDate);
-  startDate.setDate(startDate.getDate() - 364);
   const startDay = startDate.getDay();
 
   // Pad the start of the first week
@@ -174,16 +172,25 @@ export function ContributionGraph({ data, books, onClick }: { data: any[], books
     allSquares.push(null);
   }
 
-  for (let i = 364; i >= 0; i--) {
-    const d = new Date(targetEndDate);
-    d.setDate(d.getDate() - i);
+  const isCurrentYear = selectedYear === currentYear;
+  const isLeapYear = (selectedYear % 4 === 0 && selectedYear % 100 !== 0) || (selectedYear % 400 === 0);
+  const daysInYear = isLeapYear ? 366 : 365;
+
+  for (let i = 0; i < daysInYear; i++) {
+    const d = new Date(selectedYear, 0, 1);
+    d.setDate(d.getDate() + i);
+    
+    if (isCurrentYear && d > today) {
+      break;
+    }
+
     // Format YYYY-MM-DD
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
     const dateStr = `${yyyy}-${mm}-${dd}`;
-    const activity = activityMap.get(dateStr) || { pages: 0, finished: 0, finishedBooks: [] };
-    allSquares.push({ date: dateStr, pages: activity.pages, finished: activity.finished, finishedBooks: activity.finishedBooks || [], rawDate: d });
+    const activity = activityMap.get(dateStr) || { pages: 0, finished: 0, finishedBooks: [], booksRead: [] };
+    allSquares.push({ date: dateStr, pages: activity.pages, finished: activity.finished, finishedBooks: activity.finishedBooks || [], booksRead: activity.booksRead || [], rawDate: d });
   }
 
   const monthLabels: { month: string; x: number }[] = [];
@@ -264,7 +271,19 @@ export function ContributionGraph({ data, books, onClick }: { data: any[], books
                  </div>
                );
              })}
-             <div style={{ marginTop: day.finished > 0 ? 8 : 0, paddingTop: day.finished > 0 ? 8 : 0, borderTop: day.finished > 0 ? '1px dashed rgba(139,99,56,0.2)' : 'none', fontSize: 11.5, color: '#4A3B2F', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+             
+             {day.booksRead && day.booksRead.length > 0 && (
+               <div style={{ marginBottom: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                 {day.booksRead.map((title: string, i: number) => (
+                    <div key={i} style={{ fontSize: 11, color: '#655038', display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                      <span style={{ color: '#c29b71', marginTop: 1 }}>•</span> 
+                      <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</span>
+                    </div>
+                 ))}
+               </div>
+             )}
+
+             <div style={{ marginTop: day.finished > 0 || (day.booksRead && day.booksRead.length > 0) ? 6 : 0, paddingTop: day.finished > 0 || (day.booksRead && day.booksRead.length > 0) ? 8 : 0, borderTop: day.finished > 0 || (day.booksRead && day.booksRead.length > 0) ? '1px dashed rgba(139,99,56,0.2)' : 'none', fontSize: 11.5, color: '#4A3B2F', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                <BookOpen size={13} color="#7A5C42" /> {day.pages} Halaman Dibaca
              </div>
            </div>
