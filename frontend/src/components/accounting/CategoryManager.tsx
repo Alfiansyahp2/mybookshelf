@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Edit, Trash2, FolderOpen, DollarSign, Settings } from 'lucide-react';
 import { useExpenseCategories, useCreateExpenseCategory, useUpdateExpenseCategory, useDeleteExpenseCategory } from '../../hooks/accounting/useExpenseCategories';
 import type { ExpenseCategory } from '../../types/accounting';
-
+import { useTranslation } from 'react-i18next';
 interface CategoryManagerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 export default function CategoryManager({ isOpen, onClose }: CategoryManagerProps) {
+  const { t } = useTranslation();
   const { data: categoriesResponse, isLoading } = useExpenseCategories();
   const categories = categoriesResponse?.data || [];
   const createCategory = useCreateExpenseCategory();
@@ -46,7 +47,7 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
   };
 
   const handleDelete = async (categoryId: string) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
+    if (window.confirm(t('accounting.category_manager.confirm_delete', 'Are you sure you want to delete this category?'))) {
       try {
         await deleteCategory.mutateAsync(categoryId);
       } catch (error) {
@@ -109,10 +110,10 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-darkBrown">
-                  Expense Categories
+                  {t('accounting.category_manager.title', 'Expense Categories')}
                 </h2>
                 <p className="text-sm text-walnut/80">
-                  Manage your expense categories and budgets
+                  {t('accounting.category_manager.subtitle', 'Manage your expense categories and budgets')}
                 </p>
               </div>
             </div>
@@ -122,7 +123,7 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
                 className="flex items-center gap-2 px-4 py-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                New Category
+                {t('accounting.category_manager.new_category', 'New Category')}
               </button>
               <button
                 onClick={onClose}
@@ -144,12 +145,12 @@ export default function CategoryManager({ isOpen, onClose }: CategoryManagerProp
             ) : categories.length === 0 ? (
               <div className="text-center py-12">
                 <FolderOpen className="w-12 h-12 mx-auto text-walnut/40 mb-4" />
-                <p className="text-walnut/80 mb-4">No categories yet</p>
+                <p className="text-walnut/80 mb-4">{t('accounting.category_manager.no_categories', 'No categories yet')}</p>
                 <button
                   onClick={openCreateModal}
                   className="text-walnut hover:text-darkBrown font-medium"
                 >
-                  Create your first category
+                  {t('accounting.category_manager.create_first', 'Create your first category')}
                 </button>
               </div>
             ) : (
@@ -195,6 +196,7 @@ interface CategoryCardProps {
 }
 
 function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -212,7 +214,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
           <div>
             <h4 className="font-semibold text-darkBrown">{category.name}</h4>
             {category.is_default && (
-              <span className="text-xs text-walnut/80">Default</span>
+              <span className="text-xs text-walnut/80">{t('accounting.category_manager.default', 'Default')}</span>
             )}
           </div>
         </div>
@@ -244,7 +246,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
 
       {category.monthly_budget && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-walnut/80">Monthly Budget</span>
+          <span className="text-walnut/80">{t('accounting.category_manager.monthly_budget', 'Monthly Budget')}</span>
           <span className="font-semibold text-darkBrown">
             Rp {category.monthly_budget.toLocaleString()}
           </span>
@@ -254,7 +256,7 @@ function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) {
       {category.total_expenses !== undefined && (
         <div className="mt-3 pt-3 border-t border-beige">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-walnut/80">Total Spent</span>
+            <span className="text-walnut/80">{t('accounting.category_manager.total_spent', 'Total Spent')}</span>
             <span className="font-semibold text-darkBrown">
               Rp {category.total_expenses.toLocaleString()}
             </span>
@@ -301,6 +303,7 @@ function CategoryFormModal({
   onSubmit,
   isEditing,
 }: CategoryFormModalProps) {
+  const { t } = useTranslation();
   const COLORS = [
     '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
     '#EC4899', '#6366F1', '#14B8A6', '#F97316', '#84CC16',
@@ -328,14 +331,14 @@ function CategoryFormModal({
         >
           <div className="p-6 border-b border-beige">
             <h3 className="text-lg font-semibold text-darkBrown">
-              {isEditing ? 'Edit Category' : 'New Category'}
+              {isEditing ? t('accounting.category_manager.edit_category', 'Edit Category') : t('accounting.category_manager.new_category', 'New Category')}
             </h3>
           </div>
 
           <form onSubmit={onSubmit} className="p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Name *
+                {t('accounting.category_manager.name', 'Name *')}
               </label>
               <input
                 type="text"
@@ -343,27 +346,27 @@ function CategoryFormModal({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-4 py-2 bg-white border border-beige rounded-lg focus:ring-2 focus:ring-walnut focus:outline-none"
-                placeholder="e.g., Books, Shipping"
+                placeholder={t('accounting.category_manager.name_placeholder', 'e.g., Books, Shipping')}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Description
+                {t('accounting.category_manager.description', 'Description')}
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={2}
                 className="w-full px-4 py-2 bg-white border border-beige rounded-lg focus:ring-2 focus:ring-walnut focus:outline-none"
-                placeholder="Optional description"
+                placeholder={t('accounting.category_manager.desc_placeholder', 'Optional description')}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Icon
+                  {t('accounting.category_manager.icon', 'Icon')}
                 </label>
                 <select
                   value={formData.icon}
@@ -380,7 +383,7 @@ function CategoryFormModal({
 
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Color
+                  {t('accounting.category_manager.color', 'Color')}
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -406,7 +409,7 @@ function CategoryFormModal({
 
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Monthly Budget
+                {t('accounting.category_manager.monthly_budget', 'Monthly Budget')}
               </label>
               <div className="relative">
                   <input
@@ -428,13 +431,13 @@ function CategoryFormModal({
                 onClick={onClose}
                 className="px-4 py-2 border border-beige bg-white text-walnut rounded-lg hover:bg-beige transition-colors"
               >
-                Cancel
+                {t('accounting.category_manager.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
                 className="px-4 py-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown transition-colors"
               >
-                {isEditing ? 'Update' : 'Create'}
+                {isEditing ? t('accounting.category_manager.update', 'Update') : t('accounting.category_manager.create', 'Create')}
               </button>
             </div>
           </form>

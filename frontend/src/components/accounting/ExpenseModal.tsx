@@ -5,7 +5,7 @@ import { useCreateExpense, useUpdateExpense } from '../../hooks/accounting/useEx
 import { useExpenseCategories } from '../../hooks/accounting/useExpenseCategories';
 import { useBooks } from '../../hooks/useBooks';
 import type { Expense, ExpenseFormData, PaymentMethod } from '../../types/accounting';
-
+import { useTranslation } from 'react-i18next';
 interface ExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,6 +26,7 @@ export default function ExpenseModal({
   expense,
   mode = 'create',
 }: ExpenseModalProps) {
+  const { t } = useTranslation();
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
   const { data: categoriesResponse } = useExpenseCategories();
@@ -177,10 +178,10 @@ export default function ExpenseModal({
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {mode === 'create' ? 'Add New Expense' : 'Edit Expense'}
+                  {mode === 'create' ? t('accounting.expense_modal.add_new', 'Add New Expense') : t('accounting.expense_modal.edit', 'Edit Expense')}
                 </h2>
                 <p className="text-sm text-walnut/80">
-                  {mode === 'create' ? 'Track your book-related expenses' : 'Update expense details'}
+                  {mode === 'create' ? t('accounting.expense_modal.add_desc', 'Track your book-related expenses') : t('accounting.expense_modal.edit_desc', 'Update expense details')}
                 </p>
               </div>
             </div>
@@ -197,7 +198,7 @@ export default function ExpenseModal({
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Title *
+                {t('accounting.expense_modal.title', 'Title *')}
               </label>
               <input
                 type="text"
@@ -205,7 +206,7 @@ export default function ExpenseModal({
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                placeholder="e.g., 'The Great Gatsby - Paperback'"
+                placeholder={t('accounting.expense_modal.title_placeholder', "e.g., 'The Great Gatsby - Paperback'")}
               />
             </div>
 
@@ -213,7 +214,7 @@ export default function ExpenseModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Amount *
+                  {t('accounting.expense_modal.amount', 'Amount *')}
                 </label>
                 <div className="relative">
                   <input
@@ -232,7 +233,7 @@ export default function ExpenseModal({
 
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Currency
+                  {t('accounting.expense_modal.currency', 'Currency')}
                 </label>
                 <select
                   value={formData.currency}
@@ -253,14 +254,14 @@ export default function ExpenseModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Category
+                  {t('accounting.expense_modal.category', 'Category')}
                 </label>
                 <select
                   value={formData.category_id}
                   onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">Select category</option>
+                  <option value="">{t('accounting.expense_modal.select_category', 'Select category')}</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.icon} {category.name}
@@ -271,7 +272,7 @@ export default function ExpenseModal({
 
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Payment Method
+                  {t('accounting.expense_modal.payment_method', 'Payment Method')}
                 </label>
                 <select
                   value={formData.payment_method}
@@ -291,14 +292,14 @@ export default function ExpenseModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Related Book (Optional)
+                  {t('accounting.expense_modal.related_book', 'Related Book (Optional)')}
                 </label>
                 <select
                   value={formData.book_id}
                   onChange={(e) => setFormData({ ...formData, book_id: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">Select book</option>
+                  <option value="">{t('accounting.expense_modal.select_book', 'Select book')}</option>
                   {books.slice(0, 50).map((book) => (
                     <option key={book.id} value={book.id}>
                       {book.title} by {book.author}
@@ -309,7 +310,7 @@ export default function ExpenseModal({
 
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Expense Date *
+                  {t('accounting.expense_modal.expense_date', 'Expense Date *')}
                 </label>
                 <input
                   type="date"
@@ -324,14 +325,14 @@ export default function ExpenseModal({
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Description
+                {t('accounting.expense_modal.description', 'Description')}
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                placeholder="Add notes about this expense..."
+                placeholder={t('accounting.expense_modal.desc_placeholder', 'Add notes about this expense...')}
               />
             </div>
 
@@ -339,27 +340,27 @@ export default function ExpenseModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Vendor
+                  {t('accounting.expense_modal.vendor', 'Vendor')}
                 </label>
                 <input
                   type="text"
                   value={formData.vendor}
                   onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="e.g., Amazon, Local Bookstore"
+                  placeholder={t('accounting.expense_modal.vendor_placeholder', 'e.g., Amazon, Local Bookstore')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-darkBrown mb-2">
-                  Location
+                  {t('accounting.expense_modal.location', 'Location')}
                 </label>
                 <input
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="e.g., Online, Jakarta"
+                  placeholder={t('accounting.expense_modal.location_placeholder', 'e.g., Online, Jakarta')}
                 />
               </div>
             </div>
@@ -377,7 +378,7 @@ export default function ExpenseModal({
                 <div className="flex-1">
                   <label htmlFor="is_recurring" className="flex items-center gap-2 text-sm font-medium text-darkBrown cursor-pointer">
                     <Repeat className="w-4 h-4" />
-                    Recurring Expense
+                    {t('accounting.expense_modal.recurring', 'Recurring Expense')}
                   </label>
                   {formData.is_recurring && (
                     <select
@@ -385,10 +386,10 @@ export default function ExpenseModal({
                       onChange={(e) => setFormData({ ...formData, recurring_period: e.target.value as any })}
                       className="mt-2 w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     >
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="monthly">Monthly</option>
-                      <option value="yearly">Yearly</option>
+                      <option value="daily">{t('accounting.expense_modal.daily', 'Daily')}</option>
+                      <option value="weekly">{t('accounting.expense_modal.weekly', 'Weekly')}</option>
+                      <option value="monthly">{t('accounting.expense_modal.monthly', 'Monthly')}</option>
+                      <option value="yearly">{t('accounting.expense_modal.yearly', 'Yearly')}</option>
                     </select>
                   )}
                 </div>
@@ -405,7 +406,7 @@ export default function ExpenseModal({
                 <div className="flex-1">
                   <label htmlFor="has_reminder" className="flex items-center gap-2 text-sm font-medium text-darkBrown cursor-pointer">
                     <Bell className="w-4 h-4" />
-                    Payment Reminder
+                    {t('accounting.expense_modal.payment_reminder', 'Payment Reminder')}
                   </label>
                   {formData.has_reminder && (
                     <input
@@ -422,7 +423,7 @@ export default function ExpenseModal({
             {/* Receipt Upload */}
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Receipt/Proof of Purchase
+                {t('accounting.expense_modal.receipt', 'Receipt/Proof of Purchase')}
               </label>
               <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                 {receiptPreview ? (
@@ -440,7 +441,7 @@ export default function ExpenseModal({
                       }}
                       className="text-sm text-red-600 hover:text-red-700"
                     >
-                      Remove receipt
+                      {t('accounting.expense_modal.remove_receipt', 'Remove receipt')}
                     </button>
                   </div>
                 ) : (
@@ -448,7 +449,7 @@ export default function ExpenseModal({
                     <Receipt className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                     <label className="cursor-pointer">
                       <span className="text-blue-600 hover:text-blue-700 font-medium">
-                        Upload receipt
+                        {t('accounting.expense_modal.upload_receipt', 'Upload receipt')}
                       </span>
                       <input
                         type="file"
@@ -457,7 +458,7 @@ export default function ExpenseModal({
                         className="hidden"
                       />
                     </label>
-                    <p className="text-sm text-gray-500 mt-2">PNG, JPG up to 10MB</p>
+                    <p className="text-sm text-gray-500 mt-2">{t('accounting.expense_modal.receipt_format', 'PNG, JPG up to 10MB')}</p>
                   </div>
                 )}
               </div>
@@ -470,7 +471,7 @@ export default function ExpenseModal({
                 onClick={onClose}
                 className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Cancel
+                {t('accounting.expense_modal.cancel', 'Cancel')}
               </button>
               <button
                 type="submit"
@@ -478,11 +479,10 @@ export default function ExpenseModal({
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2"
               >
                 {isSubmitting ? (
-                  'Saving...'
+                  t('accounting.expense_modal.saving', 'Saving...')
                 ) : (
                   <>
-                    <Save className="w-4 h-4" />
-                    {mode === 'create' ? 'Create Expense' : 'Update Expense'}
+                    {mode === 'create' ? t('accounting.expense_modal.create_btn', 'Create Expense') : t('accounting.expense_modal.update_btn', 'Update Expense')}
                   </>
                 )}
               </button>

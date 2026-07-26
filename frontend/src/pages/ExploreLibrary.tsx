@@ -5,8 +5,10 @@ import { useBooks } from '../hooks/useBooks'
 import { useShelves } from '../hooks/useShelves'
 import { useState, useEffect } from 'react'
 import type { Book } from '../types'
+import { useTranslation } from 'react-i18next'
 
 export default function ExploreLibrary() {
+  const { t } = useTranslation()
   const { data: booksResponse } = useBooks()
   const books = booksResponse?.data?.data || []
   const { data: shelves = [], isLoading } = useShelves()
@@ -60,20 +62,20 @@ export default function ExploreLibrary() {
   const currentBooks = booksDistribution.get(currentShelfData?.id) || []
 
   if (isLoading) {
-    return <div className="p-8">Memuat rak...</div>
+    return <div className="p-8">{t('explore.loading_shelves', 'Memuat rak...')}</div>
   }
 
   if (shelves.length === 0) {
-    return <div className="p-8 text-center text-walnut/60">Tidak ada rak. Silakan tambahkan rak di perpustakaan.</div>
+    return <div className="p-8 text-center text-walnut/60">{t('explore.no_shelves', 'Tidak ada rak. Silakan tambahkan rak di perpustakaan.')}</div>
   }
 
   return (
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-serif text-darkBrown mb-2">Explore Library</h1>
+        <h1 className="text-3xl font-serif text-darkBrown mb-2">{t('explore.title', 'Explore Library')}</h1>
         <p className="text-walnut/70 text-lg">
-          Walk through your personal collection. Use arrow keys or buttons to navigate between shelves.
+          {t('explore.subtitle', 'Walk through your personal collection. Use arrow keys or buttons to navigate between shelves.')}
         </p>
       </div>
 
@@ -81,8 +83,8 @@ export default function ExploreLibrary() {
       <div className="bg-white rounded-2xl p-6 mb-8 border border-walnut/10 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-serif text-darkBrown mb-1">Main Library Room</h2>
-            <p className="text-walnut/70">{shelves.length} Shelves · {books.length} Books</p>
+            <h2 className="text-2xl font-serif text-darkBrown mb-1">{t('explore.main_room', 'Main Library Room')}</h2>
+            <p className="text-walnut/70">{t('explore.room_stats', '{{shelves}} Shelves · {{books}} Books', { shelves: shelves.length, books: books.length })}</p>
           </div>
           <div className="flex gap-2">
             {shelves.map((_, index) => (
@@ -119,7 +121,7 @@ export default function ExploreLibrary() {
             className="px-4 py-2 bg-white border border-walnut/20 rounded-xl flex items-center gap-2 hover:bg-walnut/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft size={20} />
-            Previous Shelf
+            {t('explore.prev_shelf', 'Previous Shelf')}
           </button>
 
           <h3 className="text-xl font-serif text-darkBrown">
@@ -131,7 +133,7 @@ export default function ExploreLibrary() {
             disabled={currentShelf === shelves.length - 1}
             className="px-4 py-2 bg-white border border-walnut/20 rounded-xl flex items-center gap-2 hover:bg-walnut/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Next Shelf
+            {t('explore.next_shelf', 'Next Shelf')}
             <ChevronRight size={20} />
           </button>
         </div>
@@ -148,7 +150,7 @@ export default function ExploreLibrary() {
 
       {/* Keyboard Instructions */}
       <div className="mt-8 bg-walnut/5 rounded-xl p-4 text-center text-sm text-walnut/60">
-        <p>💡 Tip: Use <kbd className="px-2 py-1 bg-white rounded">←</kbd> and <kbd className="px-2 py-1 bg-white rounded">→</kbd> arrow keys to navigate between shelves</p>
+        <p>💡 {t('explore.tip', 'Tip: Use <kbd className="px-2 py-1 bg-white rounded">←</kbd> and <kbd className="px-2 py-1 bg-white rounded">→</kbd> arrow keys to navigate between shelves', { interpolation: { escapeValue: false } })}</p>
       </div>
 
       {/* Keyboard Navigation Hook */}

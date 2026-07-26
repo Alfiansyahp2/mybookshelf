@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion'
 import { BookOpen } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface AuthLeftPageProps {
   isLogin: boolean;
 }
 
 export default function AuthLeftPage({ isLogin }: AuthLeftPageProps) {
+  const { t } = useTranslation()
   return (
     <div className="w-1/2 bg-gradient-to-br from-[#fdfbf7] to-[#f4f1ea] border-r border-walnut/20 p-10 flex flex-col justify-center relative overflow-hidden" style={{
       boxShadow: 'inset -20px 0 30px -20px rgba(0,0,0,0.15)'
@@ -25,13 +27,13 @@ export default function AuthLeftPage({ isLogin }: AuthLeftPageProps) {
           <BookOpen size={48} />
         </motion.div>
         
-        <h1 className="text-4xl font-serif font-bold text-darkBrown mb-4 leading-tight">
-          {isLogin ? 'Welcome Back\nto Your Library' : 'Begin Your\nReading Journey'}
+        <h1 className="text-4xl font-serif font-bold text-darkBrown mb-4 leading-tight whitespace-pre-line">
+          {isLogin ? t('login.welcome_back', 'Welcome Back\nto Your Library') : t('login.begin_journey', 'Begin Your\nReading Journey')}
         </h1>
         <p className="text-walnut/80 text-sm leading-relaxed max-w-xs mx-auto">
           {isLogin
-            ? 'Open the pages of your collection and continue exactly where you left off.'
-            : 'Create your personal catalog and organize your reading life beautifully.'}
+            ? t('login.welcome_desc', 'Open the pages of your collection and continue exactly where you left off.')
+            : t('login.begin_desc', 'Create your personal catalog and organize your reading life beautifully.')}
         </p>
 
         {/* Decorative Element */}

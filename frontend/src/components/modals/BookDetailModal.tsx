@@ -8,6 +8,7 @@ import {
 import type { Book } from '../../types'
 import BookDetailLeftPage from '../book-details/BookDetailLeftPage'
 import BookDetailRightPage from '../book-details/BookDetailRightPage'
+import { useTranslation } from 'react-i18next'
 
 interface BookDetailModalProps {
   book: Book | null
@@ -17,12 +18,12 @@ interface BookDetailModalProps {
   onDelete?: (bookId: string) => void
 }
 
-const STATUS_CFG: Record<string, { label: string; color: string; bg: string; border: string; dot: string }> = {
-  reading:  { label: 'Sedang Dibaca', color: '#065f46', bg: '#d1fae5', border: '#6ee7b7', dot: '#10b981' },
-  finished: { label: 'Selesai',       color: '#1e40af', bg: '#dbeafe', border: '#93c5fd', dot: '#3b82f6' },
-  unread:   { label: 'Belum Dibaca',  color: '#374151', bg: '#f3f4f6', border: '#d1d5db', dot: '#9ca3af' },
-  wishlist: { label: 'Wishlist',      color: '#6b21a8', bg: '#f3e8ff', border: '#c4b5fd', dot: '#a855f7' },
-  borrowed: { label: 'Dipinjam',      color: '#92400e', bg: '#fef3c7', border: '#fcd34d', dot: '#f59e0b' },
+const STATUS_CFG: Record<string, { labelKey: string; color: string; bg: string; border: string; dot: string }> = {
+  reading:  { labelKey: 'status.reading', color: '#065f46', bg: '#d1fae5', border: '#6ee7b7', dot: '#10b981' },
+  finished: { labelKey: 'status.finished', color: '#1e40af', bg: '#dbeafe', border: '#93c5fd', dot: '#3b82f6' },
+  unread:   { labelKey: 'status.unread', color: '#374151', bg: '#f3f4f6', border: '#d1d5db', dot: '#9ca3af' },
+  wishlist: { labelKey: 'status.wishlist', color: '#6b21a8', bg: '#f3e8ff', border: '#c4b5fd', dot: '#a855f7' },
+  borrowed: { labelKey: 'status.borrowed', color: '#92400e', bg: '#fef3c7', border: '#fcd34d', dot: '#f59e0b' },
 }
 
 type RightTab = 'progress' | 'session' | 'notes' | 'info'
@@ -30,6 +31,7 @@ type RightTab = 'progress' | 'session' | 'notes' | 'info'
 export default function BookDetailModal({
   book, isOpen, onClose, onEdit, onDelete
 }: BookDetailModalProps) {
+  const { t } = useTranslation()
   const updateProgress = useUpdateProgress()
   const toggleFavorite = useToggleFavorite()
   const updateNotes    = useUpdateNotes()
@@ -60,7 +62,8 @@ export default function BookDetailModal({
 
   if (!book) return null
 
-  const cfg      = STATUS_CFG[book.status] ?? STATUS_CFG['unread']
+  const baseCfg  = STATUS_CFG[book.status] ?? STATUS_CFG['unread']
+  const cfg = { ...baseCfg, label: t(baseCfg.labelKey) }
   const progress = book.pages && book.pages > 0
     ? Math.round(((book.currentPage || 0) / book.pages) * 100) : 0
   const c0 = book.spineColors?.[0] || '#8B7355'
@@ -68,10 +71,10 @@ export default function BookDetailModal({
   const c2 = book.spineColors?.[2] || '#5C4532'
 
   const tabs: { id: RightTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'progress', label: 'Progress', icon: <BookOpen className="w-3.5 h-3.5" /> },
-    { id: 'session',  label: 'Sesi',     icon: <Clock    className="w-3.5 h-3.5" /> },
-    { id: 'notes',    label: 'Catatan',  icon: <Edit     className="w-3.5 h-3.5" /> },
-    { id: 'info',     label: 'Info',     icon: <Hash     className="w-3.5 h-3.5" /> },
+    { id: 'progress', label: t('bookDetail.tabs.progress', 'Progress'), icon: <BookOpen className="w-3.5 h-3.5" /> },
+    { id: 'session',  label: t('bookDetail.tabs.session', 'Sesi'),     icon: <Clock    className="w-3.5 h-3.5" /> },
+    { id: 'notes',    label: t('bookDetail.tabs.notes', 'Catatan'),  icon: <Edit     className="w-3.5 h-3.5" /> },
+    { id: 'info',     label: t('bookDetail.tabs.info', 'Info'),     icon: <Hash     className="w-3.5 h-3.5" /> },
   ]
   const tabIdx = tabs.findIndex(t => t.id === activeTab)
 

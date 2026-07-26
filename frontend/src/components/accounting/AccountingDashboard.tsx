@@ -3,7 +3,7 @@ import { DollarSign, TrendingUp, Calendar, PieChart, BarChart3, Wallet, AlertCir
 import { useAccountingOverview } from '../../hooks/accounting/useAccountingReports';
 import type { ExpenseByCategory } from '../../types/accounting';
 import PurchaseHistoryChart from './MonthlyExpensesChart';
-
+import { useTranslation } from 'react-i18next';
 interface AccountingDashboardProps {
   period?: 'today' | 'week' | 'month' | 'year' | 'all';
   onCreateExpense?: () => void;
@@ -15,6 +15,7 @@ export default function AccountingDashboard({
   onCreateExpense,
   onCreateBudget,
 }: AccountingDashboardProps) {
+  const { t } = useTranslation();
   const { data: overview, isLoading } = useAccountingOverview({ period });
 
   if (isLoading) {
@@ -43,7 +44,7 @@ export default function AccountingDashboard({
     <div className="space-y-6">
       {/* Quick Actions */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold font-serif text-darkBrown tracking-wide">Accounting Overview</h2>
+        <h2 className="text-3xl font-bold font-serif text-darkBrown tracking-wide">{t('accounting.dashboard.overview', 'Accounting Overview')}</h2>
         <div className="flex items-center gap-3">
           {onCreateBudget && (
             <button
@@ -51,7 +52,7 @@ export default function AccountingDashboard({
               className="flex items-center gap-2 px-5 py-2.5 bg-gold text-darkBrown rounded-lg hover:bg-gold/80 transition-colors text-sm font-medium"
             >
               <Wallet className="w-4 h-4" />
-              New Budget
+              {t('accounting.dashboard.new_budget', 'New Budget')}
             </button>
           )}
           {onCreateExpense && (
@@ -60,7 +61,7 @@ export default function AccountingDashboard({
               className="flex items-center gap-2 px-5 py-2.5 bg-walnut text-cream rounded-lg hover:bg-darkBrown shadow-sm transition-colors text-sm font-medium"
             >
               <Plus className="w-4 h-4" />
-              Add Expense
+              {t('accounting.dashboard.add_expense', 'Add Expense')}
             </button>
           )}
         </div>
@@ -77,13 +78,13 @@ export default function AccountingDashboard({
             <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <DollarSign size={18} color="#f59e0b" />
             </div>
-            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>Total Expenses</span>
+            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>{t('accounting.dashboard.total_expenses', 'Total Expenses')}</span>
           </div>
           <div style={{ fontSize: 28, fontWeight: 800, color: '#4A3B2F', lineHeight: 1, marginBottom: 3 }}>
             {summary?.formatted_total || 'Rp 0'}
           </div>
           <div style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>
-            {summary?.period_type === 'month' ? 'This month' : 'Selected period'}
+            {summary?.period_type === 'month' ? t('accounting.dashboard.this_month', 'This month') : t('accounting.dashboard.selected_period', 'Selected period')}
           </div>
         </motion.div>
 
@@ -97,12 +98,12 @@ export default function AccountingDashboard({
             <div style={{ width: 36, height: 36, borderRadius: 10, background: '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Calendar size={18} color="#ef4444" />
             </div>
-            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>Pending</span>
+            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>{t('accounting.dashboard.pending', 'Pending')}</span>
           </div>
           <div style={{ fontSize: 28, fontWeight: 800, color: '#4A3B2F', lineHeight: 1, marginBottom: 3 }}>
             {summary?.pending_expenses || 0}
           </div>
-          <div style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>Unpaid expenses</div>
+          <div style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>{t('accounting.dashboard.unpaid_expenses', 'Unpaid expenses')}</div>
         </motion.div>
 
         <motion.div
@@ -115,13 +116,13 @@ export default function AccountingDashboard({
             <div style={{ width: 36, height: 36, borderRadius: 10, background: (summary?.month_over_month_change || 0) >= 0 ? '#d1fae5' : '#fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <TrendingUp size={18} color={(summary?.month_over_month_change || 0) >= 0 ? '#10b981' : '#ef4444'} />
             </div>
-            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>vs Last Month</span>
+            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>{t('accounting.dashboard.vs_last_month', 'vs Last Month')}</span>
           </div>
           <div style={{ fontSize: 28, fontWeight: 800, color: (summary?.month_over_month_change || 0) >= 0 ? '#10b981' : '#ef4444', lineHeight: 1, marginBottom: 3 }}>
             {(summary?.month_over_month_change || 0) >= 0 ? '+' : ''}
             {summary?.month_over_month_change?.toFixed(1)}%
           </div>
-          <div style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>Change</div>
+          <div style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>{t('accounting.dashboard.change', 'Change')}</div>
         </motion.div>
 
         <motion.div
@@ -134,12 +135,12 @@ export default function AccountingDashboard({
             <div style={{ width: 36, height: 36, borderRadius: 10, background: '#ede9fe', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Wallet size={18} color="#8b5cf6" />
             </div>
-            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>Budget Status</span>
+            <span style={{ fontSize: 11, color: '#7A5C42', fontWeight: 500, lineHeight: 1.3 }}>{t('accounting.dashboard.budget_status', 'Budget Status')}</span>
           </div>
           <div style={{ fontSize: 28, fontWeight: 800, color: '#4A3B2F', lineHeight: 1, marginBottom: 3 }}>
             {budgetData?.healthy_count || 0}/{budgetData?.active_budgets_count || 0}
           </div>
-          <div style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>Healthy budgets</div>
+          <div style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>{t('accounting.dashboard.healthy_budgets', 'Healthy budgets')}</div>
         </motion.div>
       </div>
 
@@ -156,10 +157,10 @@ export default function AccountingDashboard({
           </div>
           <div>
             <p style={{ fontSize: 14, fontWeight: 700, color: '#991b1b', margin: '0 0 2px' }}>
-              Budget Alerts Active
+              {t('accounting.dashboard.budget_alerts_active', 'Budget Alerts Active')}
             </p>
             <p style={{ fontSize: 12, color: '#b91c1c', margin: 0 }}>
-              {budgetData.exceeded_count} exceeded, {budgetData.warning_count} at warning level
+              {t('accounting.dashboard.budget_alerts_desc', '{{exceeded}} exceeded, {{warning}} at warning level', { exceeded: budgetData.exceeded_count, warning: budgetData.warning_count })}
             </p>
           </div>
         </motion.div>
@@ -185,13 +186,13 @@ export default function AccountingDashboard({
           <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(139,99,56,0.1)' }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: '#4A3B2F', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
               <PieChart size={18} color="#7A5C42" />
-              Expenses by Category
+              {t('accounting.dashboard.expenses_by_category', 'Expenses by Category')}
             </h3>
           </div>
           <div className="p-6">
             {categoriesData.length === 0 ? (
               <p className="text-center text-walnut/80 py-8">
-                No expense data available
+                {t('accounting.dashboard.no_expense_data', 'No expense data available')}
               </p>
             ) : (
               <div className="space-y-4">
@@ -212,13 +213,13 @@ export default function AccountingDashboard({
           <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(139,99,56,0.1)' }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: '#4A3B2F', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
               <BarChart3 size={18} color="#7A5C42" />
-              Recent Expenses
+              {t('accounting.dashboard.recent_expenses', 'Recent Expenses')}
             </h3>
           </div>
           <div className="p-6">
             {recentExpenses.length === 0 ? (
               <p className="text-center text-walnut/80 py-8">
-                No recent expenses
+                {t('accounting.dashboard.no_recent_expenses', 'No recent expenses')}
               </p>
             ) : (
               <div className="space-y-3">
@@ -230,7 +231,7 @@ export default function AccountingDashboard({
                     <div className="flex-1">
                       <p style={{ margin: '0 0 2px', fontSize: 13, fontWeight: 700, color: '#4A3B2F' }}>{expense.title}</p>
                       <p style={{ margin: 0, fontSize: 11, color: 'rgba(122,92,66,0.8)' }}>
-                        {expense.category?.name || 'Uncategorized'} • {new Date(expense.expense_date).toLocaleDateString()}
+                        {expense.category?.name || t('accounting.dashboard.uncategorized', 'Uncategorized')} • {new Date(expense.expense_date).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="text-right">
@@ -256,7 +257,7 @@ export default function AccountingDashboard({
         <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(139,99,56,0.1)' }}>
           <h3 style={{ fontSize: 16, fontWeight: 700, color: '#4A3B2F', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
             <Wallet size={18} color="#7A5C42" />
-            Budget Overview
+            {t('accounting.dashboard.budget_overview', 'Budget Overview')}
           </h3>
         </div>
         <div className="p-6">
@@ -267,7 +268,7 @@ export default function AccountingDashboard({
                   {budgetData?.healthy_count || 0}
                 </span>
               </div>
-              <p className="text-sm text-walnut leading-relaxed">On Track</p>
+              <p className="text-sm text-walnut leading-relaxed">{t('accounting.dashboard.on_track', 'On Track')}</p>
             </div>
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 rounded-full mb-3">
@@ -275,7 +276,7 @@ export default function AccountingDashboard({
                   {budgetData?.warning_count || 0}
                 </span>
               </div>
-              <p className="text-sm text-walnut leading-relaxed">Warning</p>
+              <p className="text-sm text-walnut leading-relaxed">{t('accounting.dashboard.warning', 'Warning')}</p>
             </div>
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full mb-3">
@@ -283,25 +284,25 @@ export default function AccountingDashboard({
                   {budgetData?.exceeded_count || 0}
                 </span>
               </div>
-              <p className="text-sm text-walnut leading-relaxed">Exceeded</p>
+              <p className="text-sm text-walnut leading-relaxed">{t('accounting.dashboard.exceeded', 'Exceeded')}</p>
             </div>
           </div>
 
           <div className="mt-6 pt-6 border-t dark:border-gray-700">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-walnut leading-relaxed">Total Budget Allocation</span>
+              <span className="text-walnut leading-relaxed">{t('accounting.dashboard.total_budget_allocation', 'Total Budget Allocation')}</span>
               <span className="font-semibold text-darkBrown">
                 Rp {(budgetData?.total_budget || 0).toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="text-walnut leading-relaxed">Total Spent</span>
+              <span className="text-walnut leading-relaxed">{t('accounting.dashboard.total_spent', 'Total Spent')}</span>
               <span className="font-semibold text-darkBrown">
                 Rp {(budgetData?.total_spent || 0).toLocaleString()}
               </span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-walnut leading-relaxed">Overall Usage</span>
+              <span className="text-walnut leading-relaxed">{t('accounting.dashboard.overall_usage', 'Overall Usage')}</span>
               <span className={`font-semibold leading-relaxed ${
                 (budgetData?.overall_usage_percentage || 0) > 80 ? 'text-red-600' : 'text-green-600'
               }`}>
@@ -323,6 +324,7 @@ interface CategoryBarProps {
 }
 
 function CategoryBar({ category, index, allCategories }: CategoryBarProps) {
+  const { t } = useTranslation();
   // Calculate percentage relative to total
   const maxAmount = Math.max(...allCategories.map(c => c.total_amount));
   const percentage = maxAmount > 0 ? (category.total_amount / maxAmount) * 100 : 0;
@@ -338,7 +340,7 @@ function CategoryBar({ category, index, allCategories }: CategoryBarProps) {
           <p className="font-semibold text-darkBrown leading-relaxed">
             Rp {category.total_amount.toLocaleString()}
           </p>
-          <p className="text-xs text-walnut/70 leading-relaxed">{category.expense_count} expenses</p>
+          <p className="text-xs text-walnut/70 leading-relaxed">{category.expense_count} {t('accounting.dashboard.expenses_count', 'expenses')}</p>
         </div>
       </div>
       <div className="relative">

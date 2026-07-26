@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Modal from './Modal'
+import { useTranslation } from 'react-i18next'
 
 const TIMEZONES = [
-  { id: 'local', label: 'Waktu Lokal (Perangkat)', tz: '' },
-  { id: 'id-wib', label: 'Indonesia (WIB)', tz: 'Asia/Jakarta' },
-  { id: 'jp', label: 'Jepang (JST)', tz: 'Asia/Tokyo' },
-  { id: 'kr', label: 'Korea Selatan (KST)', tz: 'Asia/Seoul' },
-  { id: 'uk', label: 'Inggris (GMT/BST)', tz: 'Europe/London' },
-  { id: 'us-ny', label: 'Amerika Serikat (EST/EDT)', tz: 'America/New_York' },
-  { id: 'au-syd', label: 'Australia (AEST/AEDT)', tz: 'Australia/Sydney' },
+  { id: 'local', labelKey: 'time_settings.local_time', fallback: 'Waktu Lokal (Perangkat)', tz: '' },
+  { id: 'id-wib', labelKey: 'time_settings.indonesia', fallback: 'Indonesia (WIB)', tz: 'Asia/Jakarta' },
+  { id: 'jp', labelKey: 'time_settings.japan', fallback: 'Jepang (JST)', tz: 'Asia/Tokyo' },
+  { id: 'kr', labelKey: 'time_settings.korea', fallback: 'Korea Selatan (KST)', tz: 'Asia/Seoul' },
+  { id: 'uk', labelKey: 'time_settings.uk', fallback: 'Inggris (GMT/BST)', tz: 'Europe/London' },
+  { id: 'us-ny', labelKey: 'time_settings.usa', fallback: 'Amerika Serikat (EST/EDT)', tz: 'America/New_York' },
+  { id: 'au-syd', labelKey: 'time_settings.australia', fallback: 'Australia (AEST/AEDT)', tz: 'Australia/Sydney' },
 ]
 
 export default function BigDigitalClock() {
+  const { t } = useTranslation()
   const [time, setTime] = useState(new Date())
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [format, setFormat] = useState<'24h' | '12h'>(
@@ -97,7 +99,7 @@ export default function BigDigitalClock() {
       <Modal 
         isOpen={isSettingsOpen} 
         onClose={() => setIsSettingsOpen(false)} 
-        title="Pengaturan Jam" 
+        title={t('time_settings.title', 'Pengaturan Jam')} 
         size="md"
       >
         <div className="p-4 space-y-6">
@@ -105,7 +107,7 @@ export default function BigDigitalClock() {
           {/* Negara / Zona Waktu */}
           <div className="space-y-3">
             <h3 className="font-semibold text-darkBrown flex items-center gap-2">
-              🌍 Negara / Zona Waktu
+              🌍 {t('time_settings.timezone_label', 'Negara / Zona Waktu')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {TIMEZONES.map((tz) => (
@@ -118,7 +120,7 @@ export default function BigDigitalClock() {
                     onChange={() => handleTimezoneChange(tz.id)}
                     className="w-4 h-4 text-walnut focus:ring-walnut border-gray-300"
                   />
-                  <div className="font-medium text-darkBrown text-sm">{tz.label}</div>
+                  <div className="font-medium text-darkBrown text-sm">{t(tz.labelKey, tz.fallback)}</div>
                 </label>
               ))}
             </div>
@@ -129,7 +131,7 @@ export default function BigDigitalClock() {
           {/* Format Waktu */}
           <div className="space-y-3">
             <h3 className="font-semibold text-darkBrown flex items-center gap-2">
-              ⏱️ Format Waktu
+              ⏱️ {t('time_settings.format_label', 'Format Waktu')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <label className="flex items-center gap-3 p-3 rounded-xl border border-walnut/10 hover:bg-cream/40 cursor-pointer transition-colors">
@@ -142,8 +144,8 @@ export default function BigDigitalClock() {
                   className="w-4 h-4 text-walnut focus:ring-walnut border-gray-300"
                 />
                 <div>
-                  <div className="font-semibold text-darkBrown text-sm">Format 24 Jam</div>
-                  <div className="text-xs text-walnut/60">Contoh: 14:30</div>
+                  <div className="font-semibold text-darkBrown text-sm">{t('time_settings.format_24', 'Format 24 Jam')}</div>
+                  <div className="text-xs text-walnut/60">{t('time_settings.format_24_example', 'Contoh: 14:30')}</div>
                 </div>
               </label>
               <label className="flex items-center gap-3 p-3 rounded-xl border border-walnut/10 hover:bg-cream/40 cursor-pointer transition-colors">
@@ -156,8 +158,8 @@ export default function BigDigitalClock() {
                   className="w-4 h-4 text-walnut focus:ring-walnut border-gray-300"
                 />
                 <div>
-                  <div className="font-semibold text-darkBrown text-sm">Format 12 Jam</div>
-                  <div className="text-xs text-walnut/60">Contoh: 02:30 PM</div>
+                  <div className="font-semibold text-darkBrown text-sm">{t('time_settings.format_12', 'Format 12 Jam')}</div>
+                  <div className="text-xs text-walnut/60">{t('time_settings.format_12_example', 'Contoh: 02:30 PM')}</div>
                 </div>
               </label>
             </div>
@@ -168,7 +170,7 @@ export default function BigDigitalClock() {
               onClick={() => setIsSettingsOpen(false)}
               className="px-6 py-2.5 bg-walnut text-white rounded-lg text-sm font-medium hover:bg-darkBrown transition-colors"
             >
-              Simpan & Tutup
+              {t('time_settings.save_close', 'Simpan & Tutup')}
             </button>
           </div>
         </div>

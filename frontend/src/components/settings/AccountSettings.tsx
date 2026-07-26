@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Key, Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthUser, useUpdateProfile, useUpdatePassword } from '../../hooks/useAuth';
 
 export default function AccountSettings() {
+  const { t } = useTranslation();
   const { data: authData } = useAuthUser();
   const authUser = authData?.user || (authData as any)?.data?.user;
   
@@ -36,8 +38,8 @@ export default function AccountSettings() {
 
   const handleProfileSubmit = () => {
     updateProfile.mutate({ name: user.name, email: user.email }, {
-      onSuccess: () => alert('Profile updated successfully!'),
-      onError: () => alert('Failed to update profile.')
+      onSuccess: () => alert(t('settings.account.profile_success', 'Profile updated successfully!')),
+      onError: () => alert(t('settings.account.profile_error', 'Failed to update profile.'))
     });
   };
 
@@ -45,11 +47,11 @@ export default function AccountSettings() {
     e.preventDefault();
     updatePassword.mutate(passwordForm, {
       onSuccess: () => {
-        alert('Password updated successfully!');
+        alert(t('settings.account.password_success', 'Password updated successfully!'));
         setPasswordForm({ current_password: '', password: '', password_confirmation: '' });
       },
       onError: (err: any) => {
-        alert('Failed to update password. Check your current password.');
+        alert(t('settings.account.password_error', 'Failed to update password. Check your current password.'));
         console.error(err);
       }
     });
@@ -64,11 +66,11 @@ export default function AccountSettings() {
       <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
         <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
           <User className="w-5 h-5" />
-          Profile Information
+          {t('settings.account.profile_info', 'Profile Information')}
         </h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-walnut mb-2">Display Name</label>
+            <label className="block text-sm font-medium text-walnut mb-2">{t('settings.account.display_name', 'Display Name')}</label>
             <input
               type="text"
               value={user.name}
@@ -77,7 +79,7 @@ export default function AccountSettings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-walnut mb-2">Email Address</label>
+            <label className="block text-sm font-medium text-walnut mb-2">{t('settings.account.email_address', 'Email Address')}</label>
             <input
               type="email"
               value={user.email}
@@ -90,8 +92,8 @@ export default function AccountSettings() {
               {user.avatar}
             </div>
             <div>
-              <p className="text-sm text-walnut/60">Avatar</p>
-              <p className="text-xs text-walnut/50">First letter of your name</p>
+              <p className="text-sm text-walnut/60">{t('settings.account.avatar', 'Avatar')}</p>
+              <p className="text-xs text-walnut/50">{t('settings.account.avatar_desc', 'First letter of your name')}</p>
             </div>
           </div>
           <div className="pt-2 flex justify-end">
@@ -101,7 +103,7 @@ export default function AccountSettings() {
               className="flex items-center gap-2 px-6 py-2.5 bg-walnut text-white rounded-xl hover:bg-darkBrown transition-colors font-medium disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {updateProfile.isPending ? 'Saving...' : 'Save Profile'}
+              {updateProfile.isPending ? t('settings.account.saving', 'Saving...') : t('settings.account.save_profile', 'Save Profile')}
             </button>
           </div>
         </div>
@@ -110,11 +112,11 @@ export default function AccountSettings() {
       <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mt-4">
         <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
           <Key className="w-5 h-5" />
-          Change Password
+          {t('settings.account.change_password', 'Change Password')}
         </h2>
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-walnut mb-2">Current Password</label>
+            <label className="block text-sm font-medium text-walnut mb-2">{t('settings.account.current_password', 'Current Password')}</label>
             <input
               type="password"
               required
@@ -124,7 +126,7 @@ export default function AccountSettings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-walnut mb-2">New Password</label>
+            <label className="block text-sm font-medium text-walnut mb-2">{t('settings.account.new_password', 'New Password')}</label>
             <input
               type="password"
               required
@@ -135,7 +137,7 @@ export default function AccountSettings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-walnut mb-2">Confirm New Password</label>
+            <label className="block text-sm font-medium text-walnut mb-2">{t('settings.account.confirm_password', 'Confirm New Password')}</label>
             <input
               type="password"
               required
@@ -152,7 +154,7 @@ export default function AccountSettings() {
               className="flex items-center gap-2 px-6 py-2.5 bg-darkBrown text-white rounded-xl hover:bg-[#2a1a10] transition-colors font-medium disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {updatePassword.isPending ? 'Updating...' : 'Update Password'}
+              {updatePassword.isPending ? t('settings.account.updating', 'Updating...') : t('settings.account.update_password', 'Update Password')}
             </button>
           </div>
         </form>

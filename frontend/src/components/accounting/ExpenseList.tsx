@@ -4,7 +4,7 @@ import { Filter, Search, Receipt, Edit, Trash2 } from 'lucide-react';
 import { useExpenses, useDeleteExpense } from '../../hooks/accounting/useExpenses';
 import { useExpenseCategories } from '../../hooks/accounting/useExpenseCategories';
 import type { Expense, ExpenseFilters, ExpenseStatus } from '../../types/accounting';
-
+import { useTranslation } from 'react-i18next';
 // Helper functions - defined outside components to be reused
 const getStatusColor = (status: ExpenseStatus) => {
   switch (status) {
@@ -26,6 +26,7 @@ interface ExpenseListProps {
 }
 
 export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: ExpenseListProps) {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState<ExpenseFilters>({
     per_page: 20,
     sort_by: 'expense_date',
@@ -46,7 +47,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
   };
 
   const handleDelete = async (expenseId: string) => {
-    if (window.confirm('Are you sure you want to delete this expense?')) {
+    if (window.confirm(t('accounting.expense_list.confirm_delete', 'Are you sure you want to delete this expense?'))) {
       try {
         await deleteExpense.mutateAsync(expenseId);
       } catch (error) {
@@ -60,7 +61,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
       {/* Header */}
       <div className="p-6 border-b dark:border-gray-700">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-darkBrown">Expenses</h3>
+          <h3 className="text-lg font-semibold text-darkBrown">{t('accounting.expense_list.expenses', 'Expenses')}</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -78,7 +79,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
-            placeholder="Search expenses..."
+            placeholder={t('accounting.expense_list.search_placeholder', 'Search expenses...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
@@ -93,14 +94,14 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
             {/* Category Filter */}
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Category
+                {t('accounting.expense_list.category', 'Category')}
               </label>
               <select
                 value={filters.category_id || ''}
                 onChange={(e) => handleFilterChange('category_id', e.target.value || undefined)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
               >
-                <option value="">All Categories</option>
+                <option value="">{t('accounting.expense_list.all_categories', 'All Categories')}</option>
                 {categories.map((category: any) => (
                   <option key={category.id} value={category.id}>
                     {category.icon} {category.name}
@@ -112,24 +113,24 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
             {/* Status Filter */}
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                Status
+                {t('accounting.expense_list.status', 'Status')}
               </label>
               <select
                 value={filters.status || ''}
                 onChange={(e) => handleFilterChange('status', e.target.value as ExpenseStatus)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
               >
-                <option value="">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="">{t('accounting.expense_list.all_status', 'All Status')}</option>
+                <option value="completed">{t('accounting.expense_list.status_completed', 'Completed')}</option>
+                <option value="pending">{t('accounting.expense_list.status_pending', 'Pending')}</option>
+                <option value="cancelled">{t('accounting.expense_list.status_cancelled', 'Cancelled')}</option>
               </select>
             </div>
 
             {/* Date Range */}
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                From Date
+                {t('accounting.expense_list.from_date', 'From Date')}
               </label>
               <input
                 type="date"
@@ -141,7 +142,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
 
             <div>
               <label className="block text-sm font-medium text-darkBrown mb-2">
-                To Date
+                {t('accounting.expense_list.to_date', 'To Date')}
               </label>
               <input
                 type="date"
@@ -165,9 +166,9 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
         ) : expenses.length === 0 ? (
           <div className="p-12 text-center">
             <Receipt className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-            <p className="text-walnut/80">No expenses found</p>
+            <p className="text-walnut/80">{t('accounting.expense_list.no_expenses', 'No expenses found')}</p>
             <p className="text-sm text-walnut/60 mt-2">
-              {searchTerm || filters.category_id ? 'Try adjusting your filters' : 'Add your first expense to get started'}
+              {searchTerm || filters.category_id ? t('accounting.expense_list.adjust_filters', 'Try adjusting your filters') : t('accounting.expense_list.add_first', 'Add your first expense to get started')}
             </p>
           </div>
         ) : (
@@ -187,7 +188,7 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
       {expensesData && expensesData.last_page > 1 && (
         <div className="p-4 border-t dark:border-gray-700 flex items-center justify-between">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Page {expensesData.current_page} of {expensesData.last_page}
+            {t('accounting.expense_list.page', 'Page {{current}} of {{last}}', { current: expensesData.current_page, last: expensesData.last_page })}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -195,14 +196,14 @@ export default function ExpenseList({ userId, onExpenseClick, onEditExpense }: E
               disabled={expensesData.current_page === 1}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm"
             >
-              Previous
+              {t('accounting.expense_list.previous', 'Previous')}
             </button>
             <button
               onClick={() => handleFilterChange('per_page', filters.per_page)}
               disabled={expensesData.current_page === expensesData.last_page}
               className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm"
             >
-              Next
+              {t('accounting.expense_list.next', 'Next')}
             </button>
           </div>
         </div>
@@ -220,6 +221,7 @@ interface ExpenseRowProps {
 }
 
 function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -235,13 +237,13 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
               <h4 className="font-semibold text-darkBrown">{expense.title}</h4>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`text-xs px-2 py-0.5 rounded ${getStatusColor(expense.status)}`}>
-                  {expense.status}
+                  {t(`accounting.expense_list.status_${expense.status}`, expense.status)}
                 </span>
                 {expense.is_recurring && (
-                  <span className="text-xs text-gray-500">🔄 Recurring</span>
+                  <span className="text-xs text-gray-500">🔄 {t('accounting.expense_list.recurring', 'Recurring')}</span>
                 )}
                 {expense.has_reminder && (
-                  <span className="text-xs text-gray-500">🔔 Reminder</span>
+                  <span className="text-xs text-gray-500">🔔 {t('accounting.expense_list.reminder', 'Reminder')}</span>
                 )}
               </div>
             </div>
@@ -249,25 +251,25 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
             <div>
-              <p className="text-walnut/80">Amount</p>
+              <p className="text-walnut/80">{t('accounting.expense_list.amount', 'Amount')}</p>
               <p className="font-semibold text-darkBrown">
                 {expense.currency} {expense.amount.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-walnut/80">Category</p>
+              <p className="text-walnut/80">{t('accounting.expense_list.category', 'Category')}</p>
               <p className="text-darkBrown">
-                {expense.category?.name || 'Uncategorized'}
+                {expense.category?.name || t('accounting.dashboard.uncategorized', 'Uncategorized')}
               </p>
             </div>
             <div>
-              <p className="text-walnut/80">Date</p>
+              <p className="text-walnut/80">{t('accounting.expense_list.date', 'Date')}</p>
               <p className="text-darkBrown">
                 {new Date(expense.expense_date).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <p className="text-walnut/80">Payment</p>
+              <p className="text-walnut/80">{t('accounting.expense_list.payment', 'Payment')}</p>
               <p className="text-darkBrown capitalize">
                 {expense.payment_method.replace('_', ' ')}
               </p>

@@ -11,10 +11,12 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Lightbulb, LightbulbOff, X, Sun, Moon } from 'lucide-react'
 import { useLighting, TEMP_COLORS, type ColorTemp } from '../hooks/useLighting'
+import { useTranslation } from 'react-i18next'
 
 const TEMPS: ColorTemp[] = ['warm', 'neutral', 'cool', 'rose', 'mint']
 
 export default function LightingControl() {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const { on, brightness, colorTemp, toggle, setBrightness, setColorTemp } = useLighting()
 
@@ -152,10 +154,10 @@ export default function LightingControl() {
                 </div>
                 <div>
                   <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#2a1a08', fontFamily: "'Georgia',serif" }}>
-                    LED Rak
+                    {t('shelf_led.title', 'LED Rak')}
                   </p>
                   <p style={{ margin: 0, fontSize: 9.5, color: 'rgba(122,92,66,0.6)' }}>
-                    {on ? `${brightness}% · ${ct.label}` : 'Mati'}
+                    {on ? `${brightness}% · ${t(`shelf_led.${colorTemp}`, ct.label)}` : 'Mati'}
                   </p>
                 </div>
               </div>
@@ -199,7 +201,7 @@ export default function LightingControl() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                     <Moon size={11} color="rgba(122,92,66,0.5)" />
-                    <span style={{ fontSize: 11, fontWeight: 600, color: '#4a3020' }}>Kecerahan</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#4a3020' }}>{t('shelf_led.brightness', 'Kecerahan')}</span>
                     <Sun size={11} color="rgba(122,92,66,0.5)" />
                   </div>
                   <span style={{
@@ -263,13 +265,13 @@ export default function LightingControl() {
 
               {/* Colour temperature */}
               <div>
-                <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 600, color: '#4a3020' }}>Warna Cahaya</p>
+                <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 600, color: '#4a3020' }}>{t('shelf_led.color', 'Warna Cahaya')}</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 5 }}>
-                  {TEMPS.map(t => {
-                    const tc = TEMP_COLORS[t]
-                    const isActive = colorTemp === t
+                  {TEMPS.map(temp => {
+                    const tc = TEMP_COLORS[temp]
+                    const isActive = colorTemp === temp
                     return (
-                      <button key={t} onClick={() => setColorTemp(t)}
+                      <button key={temp} onClick={() => setColorTemp(temp)}
                         style={{
                           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
                           padding: '7px 3px', borderRadius: 10, border: 'none', cursor: 'pointer',
@@ -286,7 +288,7 @@ export default function LightingControl() {
                           transition: 'box-shadow 0.3s',
                         }} />
                         <span style={{ fontSize: 8.5, color: isActive ? '#2a1a08' : 'rgba(122,92,66,0.5)', fontWeight: isActive ? 700 : 400 }}>
-                          {tc.label}
+                          {t(`shelf_led.${temp}`, tc.label)}
                         </span>
                         <span style={{ fontSize: 11 }}>{tc.emoji}</span>
                       </button>

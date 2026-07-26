@@ -1,4 +1,5 @@
 import { BookOpen, Clock, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { Book } from '../../types'
 
 interface ReadingProgressSectionProps {
@@ -8,6 +9,7 @@ interface ReadingProgressSectionProps {
 }
 
 export default function ReadingProgressSection({ book, onProgressChange, onAddReadDate }: ReadingProgressSectionProps) {
+  const { t } = useTranslation()
   const progress = book.pages && book.pages > 0
     ? Math.round(((book.currentPage || 0) / book.pages) * 100)
     : 0
@@ -20,12 +22,12 @@ export default function ReadingProgressSection({ book, onProgressChange, onAddRe
     <div className="p-4 bg-white rounded-xl border border-walnut/10 shadow-sm">
       <h3 className="font-semibold text-darkBrown mb-3 flex items-center gap-2">
         <BookOpen className="w-5 h-5 text-walnut" />
-        Reading Progress
+        {t('bookDetail.progress.reading_progress', 'Reading Progress')}
       </h3>
 
       <div className="mb-3">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-walnut/60">Progress</span>
+          <span className="text-walnut/60">{t('bookDetail.progress.label', 'Progress')}</span>
           <span className="font-medium text-darkBrown">{progress}%</span>
         </div>
         <div className="h-2 bg-walnut/20 rounded-full overflow-hidden">
@@ -39,14 +41,14 @@ export default function ReadingProgressSection({ book, onProgressChange, onAddRe
         </div>
         {book.currentPage && book.pages && (
           <div className="flex justify-between text-xs mt-1 text-walnut/60">
-            <span>Page {book.currentPage}</span>
-            <span>of {book.pages}</span>
+            <span>{t('bookDetail.progress.page_full', 'Page')} {book.currentPage}</span>
+            <span>{t('bookDetail.progress.of', 'of')} {book.pages}</span>
           </div>
         )}
       </div>
 
       <div className="mb-3">
-        <label className="text-xs text-walnut/60 block mb-1">Update Progress</label>
+        <label className="text-xs text-walnut/60 block mb-1">{t('bookDetail.progress.update_progress', 'Update Progress')}</label>
         <input
           type="range"
           min="0"
@@ -61,7 +63,7 @@ export default function ReadingProgressSection({ book, onProgressChange, onAddRe
         <div className="flex items-center gap-2 p-2 bg-walnut/10 rounded-lg text-xs mb-3">
           <Clock className="w-4 h-4 text-walnut" />
           <span className="text-walnut/70">
-            Reading since {new Date(book.startedDate).toLocaleDateString()}
+            {t('bookDetail.progress.reading_since', 'Reading since {{date}}', { date: new Date(book.startedDate).toLocaleDateString(t('locale', 'id-ID')) })}
           </span>
         </div>
       )}
@@ -71,7 +73,7 @@ export default function ReadingProgressSection({ book, onProgressChange, onAddRe
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-darkBrown flex items-center gap-2 text-sm">
               <Clock className="w-4 h-4 text-walnut" />
-              Reading History
+              {t('bookDetail.info.reading_history', 'Reading History')}
             </h4>
             <div className="relative">
               <input 
@@ -95,7 +97,7 @@ export default function ReadingProgressSection({ book, onProgressChange, onAddRe
               {book.readDates.map((date, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-xs text-walnut/80 bg-walnut/5 p-2 rounded border border-walnut/10">
                   <span className="w-1.5 h-1.5 rounded-full bg-walnut/40" />
-                  {new Date(date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                  {new Date(date).toLocaleDateString(t('locale', 'id-ID'), { year: 'numeric', month: 'long', day: 'numeric' })}
                 </li>
               ))}
             </ul>

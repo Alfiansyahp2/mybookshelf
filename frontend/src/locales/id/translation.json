@@ -1,4 +1,5 @@
 {
+  "locale": "id-ID",
   "nav": {
     "library": "Koleksi",
     "reading": "Membaca",
@@ -117,5 +118,639 @@
     "saving": "Menyimpan...",
     "save": "Simpan Buku",
     "alert_shelf": "Pilih rak terlebih dahulu"
+  },
+  "book_form": {
+    "basic": {
+      "title_section": "Informasi Buku",
+      "title": "Judul *",
+      "title_placeholder": "Masukkan judul buku",
+      "author": "Penulis *",
+      "author_placeholder": "Masukkan nama penulis",
+      "isbn": "ISBN",
+      "genre": "Genre *",
+      "custom_genre": "Atau ketik genre kustom lalu tekan Enter",
+      "publisher": "Penerbit",
+      "publisher_placeholder": "Nama Penerbit",
+      "language": "Bahasa",
+      "year": "Tahun *",
+      "pages": "Halaman *",
+      "pages_placeholder": "Jumlah halaman",
+      "format": "Format"
+    },
+    "appearance": {
+      "title_section": "Tampilan Buku",
+      "height": "Tinggi Buku",
+      "height_short": "Pendek",
+      "height_medium": "Sedang",
+      "height_tall": "Tinggi",
+      "thickness": "Ketebalan Buku",
+      "thickness_thin": "Tipis",
+      "thickness_regular": "Biasa",
+      "thickness_thick": "Tebal",
+      "spine": "Warna Punggung Buku (Spine)",
+      "current": "Saat Ini:",
+      "color_light": "Warna Terang",
+      "color_medium": "Warna Sedang",
+      "color_dark": "Warna Gelap"
+    },
+    "purchase": {
+      "title_section": "Detail Perolehan",
+      "acquisition_type": "Tipe Perolehan",
+      "type_purchased": "Beli Sendiri",
+      "type_gift": "Hadiah",
+      "type_borrowed": "Pinjaman",
+      "date": "Tanggal",
+      "price": "Harga",
+      "currency": "Mata Uang",
+      "location": "Lokasi / Toko",
+      "location_placeholder": "Mis. Gramedia, Shopee",
+      "gift_from": "Dari Siapa",
+      "gift_placeholder": "Siapa yang memberikan?",
+      "borrowed_from": "Pinjam Dari",
+      "borrowed_placeholder": "Pinjam dari siapa?"
+    }
+  },
+  "settings": {
+    "account": {
+      "profile_success": "Profil berhasil diperbarui!",
+      "profile_error": "Gagal memperbarui profil.",
+      "password_success": "Kata sandi berhasil diperbarui!",
+      "password_error": "Gagal memperbarui kata sandi. Periksa kata sandi saat ini.",
+      "profile_info": "Informasi Profil",
+      "display_name": "Nama Tampilan",
+      "email_address": "Alamat Email",
+      "avatar": "Avatar",
+      "avatar_desc": "Huruf pertama dari nama Anda",
+      "saving": "Menyimpan...",
+      "save_profile": "Simpan Profil",
+      "change_password": "Ubah Kata Sandi",
+      "current_password": "Kata Sandi Saat Ini",
+      "new_password": "Kata Sandi Baru",
+      "confirm_password": "Konfirmasi Kata Sandi Baru",
+      "updating": "Memperbarui...",
+      "update_password": "Perbarui Kata Sandi"
+    },
+    "data": {
+      "data_management": "Manajemen Data",
+      "export_data": "Ekspor Semua Data",
+      "export_desc": "Ini akan mengunduh semua buku, pengaturan, dan progres membaca Anda sebagai file JSON yang dapat Anda impor nanti.",
+      "file_size": "Ukuran file: ~50KB",
+      "clear_data": "Hapus Semua Data",
+      "warning": "Peringatan",
+      "warning_desc": "Ini akan menghapus semua buku, pengaturan, dan progres membaca Anda secara permanen. Tindakan ini tidak dapat dibatalkan."
+    },
+    "about": {
+      "title": "Tentang MyBookshelf",
+      "description": "MyBookshelf adalah sistem manajemen perpustakaan digital yang indah dan intuitif yang dirancang untuk pecinta buku.",
+      "feature1": "Kelola perpustakaan pribadi Anda",
+      "feature2": "Lacak progres membaca",
+      "feature3": "Capai tujuan membaca",
+      "version": "Versi",
+      "website": "Situs Web",
+      "website_desc": "Kunjungi situs web resmi kami",
+      "github": "GitHub",
+      "github_desc": "Lihat kode sumber"
+    }
+  },
+  "accounting": {
+    "title": "Akuntansi",
+    "subtitle": "Keuangan & Pengeluaran",
+    "overview": "Ringkasan",
+    "expenses": "Pengeluaran",
+    "budgets": "Anggaran",
+    "categories": "Kategori",
+    "add_expense": "Tambah Pengeluaran",
+    "dashboard": {
+      "overview": "Ringkasan Akuntansi",
+      "track_expenses": "Lacak pengeluaran terkait buku Anda",
+      "view_all": "Lihat Semua",
+      "new_budget": "Anggaran Baru",
+      "add_expense": "Tambah Pengeluaran",
+      "total_expenses": "Total Pengeluaran",
+      "this_month": "Bulan ini",
+      "selected_period": "Periode terpilih",
+      "pending": "Tertunda",
+      "unpaid_expenses": "Pengeluaran belum dibayar",
+      "vs_last_month": "vs Bulan Lalu",
+      "change": "Perubahan",
+      "budget_status": "Status Anggaran",
+      "healthy_budgets": "Anggaran sehat",
+      "budget_alerts_active": "Peringatan Anggaran Aktif",
+      "budget_alerts_desc": "{{exceeded}} terlampaui, {{warning}} pada tingkat peringatan",
+      "expenses_by_category": "Pengeluaran berdasarkan Kategori",
+      "no_expense_data": "Tidak ada data pengeluaran",
+      "recent_expenses": "Pengeluaran Terakhir",
+      "no_recent_expenses": "Tidak ada pengeluaran terakhir",
+      "uncategorized": "Belum dikategorikan",
+      "budget_overview": "Ringkasan Anggaran",
+      "on_track": "Sesuai Jalur",
+      "warning": "Peringatan",
+      "exceeded": "Terlampaui",
+      "total_budget_allocation": "Total Alokasi Anggaran",
+      "total_spent": "Total Dihabiskan",
+      "overall_usage": "Penggunaan Keseluruhan",
+      "expenses_count": "pengeluaran"
+    },
+    "expense_list": {
+      "confirm_delete": "Apakah Anda yakin ingin menghapus pengeluaran ini?",
+      "expenses": "Pengeluaran",
+      "search_placeholder": "Cari pengeluaran...",
+      "category": "Kategori",
+      "all_categories": "Semua Kategori",
+      "status": "Status",
+      "all_status": "Semua Status",
+      "status_completed": "Selesai",
+      "status_pending": "Tertunda",
+      "status_cancelled": "Dibatalkan",
+      "from_date": "Dari Tanggal",
+      "to_date": "Hingga Tanggal",
+      "no_expenses": "Tidak ada pengeluaran",
+      "adjust_filters": "Coba sesuaikan filter Anda",
+      "add_first": "Tambahkan pengeluaran pertama Anda untuk memulai",
+      "page": "Halaman {{current}} dari {{last}}",
+      "previous": "Sebelumnya",
+      "next": "Selanjutnya",
+      "recurring": "Berulang",
+      "reminder": "Pengingat",
+      "amount": "Jumlah",
+      "date": "Tanggal",
+      "payment": "Pembayaran"
+    },
+    "budget_tracker": {
+      "total_budget": "Total Anggaran",
+      "total_spent": "Total Dihabiskan",
+      "remaining": "Sisa",
+      "usage": "Penggunaan",
+      "active_budgets": "Anggaran Aktif",
+      "add_budget": "Tambah Anggaran",
+      "no_budgets": "Belum ada anggaran",
+      "create_first": "Buat anggaran pertama Anda",
+      "budget_alerts": "Peringatan Anggaran",
+      "budgets_exceeded": "{{count}} Anggaran Terlampaui",
+      "exceeded_desc": "Anda telah menghabiskan lebih dari alokasi anggaran",
+      "budgets_warning": "{{count}} Anggaran pada Tingkat Peringatan",
+      "warning_desc": "Anda telah menggunakan 80% atau lebih dari anggaran",
+      "progress": "Progres",
+      "budget": "Anggaran",
+      "spent": "Dihabiskan"
+    },
+    "expense_modal": {
+      "add_new": "Tambah Pengeluaran Baru",
+      "edit": "Edit Pengeluaran",
+      "add_desc": "Lacak pengeluaran terkait buku Anda",
+      "edit_desc": "Perbarui detail pengeluaran",
+      "title": "Judul *",
+      "title_placeholder": "mis. 'The Great Gatsby - Paperback'",
+      "amount": "Jumlah *",
+      "currency": "Mata Uang",
+      "category": "Kategori",
+      "select_category": "Pilih kategori",
+      "payment_method": "Metode Pembayaran",
+      "related_book": "Buku Terkait (Opsional)",
+      "select_book": "Pilih buku",
+      "expense_date": "Tanggal Pengeluaran *",
+      "description": "Deskripsi",
+      "desc_placeholder": "Tambahkan catatan tentang pengeluaran ini...",
+      "vendor": "Penjual",
+      "vendor_placeholder": "mis. Amazon, Toko Buku Lokal",
+      "location": "Lokasi",
+      "location_placeholder": "mis. Online, Jakarta",
+      "recurring": "Pengeluaran Berulang",
+      "daily": "Harian",
+      "weekly": "Mingguan",
+      "monthly": "Bulanan",
+      "yearly": "Tahunan",
+      "payment_reminder": "Pengingat Pembayaran",
+      "receipt": "Struk/Bukti Pembelian",
+      "remove_receipt": "Hapus struk",
+      "upload_receipt": "Unggah struk",
+      "receipt_format": "PNG, JPG hingga 10MB",
+      "cancel": "Batal",
+      "saving": "Menyimpan...",
+      "create_btn": "Buat Pengeluaran",
+      "update_btn": "Perbarui Pengeluaran"
+    },
+    "category_manager": {
+      "confirm_delete": "Apakah Anda yakin ingin menghapus kategori ini?",
+      "title": "Kategori Pengeluaran",
+      "subtitle": "Kelola kategori dan anggaran pengeluaran Anda",
+      "new_category": "Kategori Baru",
+      "no_categories": "Belum ada kategori",
+      "create_first": "Buat kategori pertama Anda",
+      "default": "Bawaan",
+      "monthly_budget": "Anggaran Bulanan",
+      "total_spent": "Total Dihabiskan",
+      "edit_category": "Edit Kategori",
+      "name": "Nama *",
+      "name_placeholder": "mis., Buku, Pengiriman",
+      "description": "Deskripsi",
+      "desc_placeholder": "Deskripsi opsional",
+      "icon": "Ikon",
+      "color": "Warna",
+      "cancel": "Batal",
+      "update": "Perbarui",
+      "create": "Buat"
+    },
+    "purchase_chart": {
+      "total": "Total:",
+      "books_purchased": "buku dibeli",
+      "avg": "Rata-rata:",
+      "purchase_history": "Riwayat Pembelian",
+      "error_loading": "Kesalahan memuat riwayat pembelian",
+      "refresh_page": "Silakan coba segarkan halaman",
+      "no_data": "Tidak ada data pembelian untuk periode yang dipilih",
+      "book_purchase_history": "Riwayat Pembelian Buku",
+      "avg_monthly": "Rata-rata Bulanan",
+      "trend_3_month": "Tren 3 Bulan",
+      "total_purchases": "Total Pembelian",
+      "highest": "Tertinggi",
+      "lowest": "Terendah",
+      "average": "Rata-rata",
+      "total_books": "Total Buku"
+    }
+  },
+  "achievements": {
+    "loading": "Memuat pencapaian...",
+    "title": "Pencapaian",
+    "subtitle": "Lacak progres dan koleksi medali membaca kamu.",
+    "total_achievements": "Total Pencapaian",
+    "progress": "Progres",
+    "new_achievement": "Pencapaian Baru!",
+    "data": {
+      "Langkah Pertama": {
+        "title": "Langkah Pertama",
+        "description": "Menambahkan buku pertama ke perpustakaan."
+      },
+      "Kamu telah menambahkan buku pertama ke perpustakaanmu!": "Kamu telah menambahkan buku pertama ke perpustakaanmu!",
+      "Kutu Buku Pemula": {
+        "title": "Kutu Buku Pemula",
+        "description": "Menyelesaikan 5 buku."
+      },
+      "Berhasil menyelesaikan 5 buku_": "Berhasil menyelesaikan 5 buku.",
+      "Kutu Buku Pro": {
+        "title": "Kutu Buku Pro",
+        "description": "Menyelesaikan 20 buku."
+      },
+      "Berhasil menyelesaikan 20 buku!": "Berhasil menyelesaikan 20 buku!",
+      "Marathon Membaca": {
+        "title": "Marathon Membaca",
+        "description": "Membaca lebih dari 1.000 halaman."
+      },
+      "Telah membaca lebih dari 1_000 halaman_": "Telah membaca lebih dari 1.000 halaman.",
+      "Ultra Marathon": {
+        "title": "Ultra Marathon",
+        "description": "Membaca lebih dari 5.000 halaman!"
+      },
+      "Telah membaca lebih dari 5_000 halaman!": "Telah membaca lebih dari 5.000 halaman!",
+      "Kolektor": {
+        "title": "Kolektor",
+        "description": "Perpustakaanmu memiliki 20 buku."
+      },
+      "Perpustakaanmu kini memiliki 20 buku_": "Perpustakaanmu kini memiliki 20 buku.",
+      "Master Kolektor": {
+        "title": "Master Kolektor",
+        "description": "Luar biasa, kamu memiliki 50 buku!"
+      },
+      "Luar biasa, kamu memiliki 50 buku!": "Luar biasa, kamu memiliki 50 buku!",
+      "Arsitek Rak": {
+        "title": "Arsitek Rak",
+        "description": "Membuat 3 rak berbeda untuk koleksimu."
+      },
+      "Membuat 3 rak berbeda untuk koleksimu_": "Membuat 3 rak berbeda untuk koleksimu.",
+      "Eksplorator Genre": {
+        "title": "Eksplorator Genre",
+        "description": "Membaca buku dari 3 genre berbeda."
+      },
+      "Membaca buku dari 3 genre yang berbeda_": "Membaca buku dari 3 genre yang berbeda.",
+      "Master Genre": {
+        "title": "Master Genre",
+        "description": "Membaca buku dari 7 genre yang berbeda."
+      },
+      "Membaca buku dari 7 genre yang berbeda_": "Membaca buku dari 7 genre yang berbeda.",
+      "Kurator Sempurna": {
+        "title": "Kurator Sempurna",
+        "description": "Memberikan rating bintang 5 pada sebuah buku."
+      },
+      "Memberikan rating bintang 5 pada sebuah buku_": "Memberikan rating bintang 5 pada sebuah buku.",
+      "Kritikus Sastra": {
+        "title": "Kritikus Sastra",
+        "description": "Memberikan rating pada 5 buku."
+      },
+      "Memberikan rating pada 5 buku_": "Memberikan rating pada 5 buku.",
+      "Penggemar Setia": {
+        "title": "Penggemar Setia",
+        "description": "Menandai 5 buku sebagai favorit."
+      },
+      "Menandai 5 buku sebagai favorit_": "Menandai 5 buku sebagai favorit.",
+      "Sang Pemimpi": {
+        "title": "Sang Pemimpi",
+        "description": "Menambahkan 5 buku ke Wishlist."
+      },
+      "Menambahkan 5 buku ke Wishlist_": "Menambahkan 5 buku ke Wishlist.",
+      "Super Marathon": {
+        "title": "Super Marathon",
+        "description": "Membaca lebih dari 10.000 halaman! Kamu luar biasa!"
+      },
+      "Desainer Rak": {
+        "title": "Desainer Rak",
+        "description": "Membuat 5 rak berbeda untuk koleksimu."
+      },
+      "Kritikus Buku": {
+        "title": "Kritikus Buku",
+        "description": "Memberikan rating pada 10 buku yang berbeda."
+      }
+    }
+  },
+  "borrow": {
+    "title": "Pinjam & Meminjam",
+    "coming_soon": "Segera hadir..."
+  },
+  "collections": {
+    "title": "Koleksi",
+    "coming_soon": "Segera hadir..."
+  },
+  "explore": {
+    "loading_shelves": "Memuat rak...",
+    "no_shelves": "Tidak ada rak. Silakan tambahkan rak di perpustakaan.",
+    "title": "Jelajahi Perpustakaan",
+    "subtitle": "Susuri koleksi pribadi Anda. Gunakan tombol panah atau navigasi untuk berpindah rak.",
+    "main_room": "Ruang Perpustakaan Utama",
+    "room_stats": "{{shelves}} Rak · {{books}} Buku",
+    "prev_shelf": "Rak Sebelumnya",
+    "next_shelf": "Rak Selanjutnya",
+    "tip": "Tip: Gunakan tombol panah <kbd className=\"px-2 py-1 bg-white rounded\">←</kbd> dan <kbd className=\"px-2 py-1 bg-white rounded\">→</kbd> untuk berpindah antar rak"
+  },
+  "notes": {
+    "title": "Catatan",
+    "coming_soon": "Segera hadir..."
+  },
+  "login": {
+    "failed": "Login gagal",
+    "register_failed": "Pendaftaran gagal",
+    "sign_in": "Masuk",
+    "register": "Daftar",
+    "no_account": "Belum punya kartu perpustakaan? Buat sekarang",
+    "has_account": "Sudah punya kartu perpustakaan? Masuk",
+    "email": "Alamat Email",
+    "password": "Kata Sandi",
+    "sign_in_btn": "Masuk ke Perpustakaan",
+    "full_name": "Nama Lengkap",
+    "confirm_password": "Konfirmasi Kata Sandi",
+    "register_btn": "Buat Kartu Perpustakaan",
+    "welcome_back": "Selamat Datang\ndi Perpustakaan Anda",
+    "begin_journey": "Mulai Perjalanan\nMembaca Anda",
+    "welcome_desc": "Buka kembali koleksi Anda dan lanjutkan tepat di tempat Anda berhenti.",
+    "begin_desc": "Buat katalog pribadi Anda dan kelola kehidupan membaca Anda dengan indah."
+  },
+  "reading": {
+    "loading": "Memuat progres membaca...",
+    "currently_reading": "Sedang Dibaca",
+    "track_progress": "Lacak progres pada {{count}} buku",
+    "books_read_in_year": "Buku yang Dibaca Tahun {{year}}",
+    "reading_status": "Sedang Dibaca",
+    "avg_progress": "Rata-rata Progres",
+    "pages_read": "Halaman Dibaca",
+    "total_progress": "Total Progres",
+    "reading_shelf": "Sedang Dibaca",
+    "unread_shelf": "Belum Dibaca",
+    "browse_library": "Jelajahi Perpustakaan",
+    "no_books": "Belum ada buku",
+    "start_journey": "Mulai perjalanan membaca dari perpustakaan kamu",
+    "target": "Target {{year}}",
+    "target_achieved": "🎉 Target tercapai!",
+    "books_left_for_target": "{{count}} buku lagi untuk target tahun ini",
+    "total_pages": "Total Halaman",
+    "percent_read": "% Terbaca"
+  },
+  "statistics": {
+    "title": "Statistik",
+    "coming_soon": "Analitik perjalanan membaca segera hadir..."
+  },
+  "wishlist": {
+    "loading": "Memuat wishlist...",
+    "title": "Wishlist",
+    "subtitle": "Antrean bacaan Anda - {{count}} buku menunggu untuk dibaca",
+    "wishlist": "Wishlist",
+    "total_pages": "Total Halaman",
+    "est_reading": "Est. Membaca",
+    "avg_pages": "Rata-rata Halaman",
+    "reading_queue": "Antrean Bacaan Anda",
+    "genre": "Genre:",
+    "pages": "Halaman:",
+    "est_time": "Est. Waktu:",
+    "start_reading": "Mulai Membaca",
+    "browse_library": "Jelajahi Perpustakaan",
+    "empty": "Wishlist Anda kosong",
+    "empty_desc": "Simpan buku yang ingin Anda baca nanti",
+    "add_to_wishlist": "Tambah ke Wishlist"
+  },
+  "status": {
+    "reading": "Sedang Dibaca",
+    "finished": "Selesai",
+    "unread": "Belum Dibaca",
+    "wishlist": "Wishlist",
+    "borrowed": "Dipinjam"
+  },
+  "bookDetail": {
+    "tabs": {
+      "progress": "Progress",
+      "session": "Sesi",
+      "notes": "Catatan",
+      "info": "Info"
+    },
+    "badges": {
+      "gift": "Hadiah",
+      "purchased": "Dibeli",
+      "borrowed": "Pinjaman"
+    },
+    "stats": {
+      "pages": "Halaman",
+      "year": "Tahun",
+      "language": "Bahasa",
+      "format": "Format"
+    },
+    "progress": {
+      "label": "Progress",
+      "page": "Hal.",
+      "of": "dari",
+      "start_to_see": "Mulai membaca untuk melihat progress",
+      "choose_finish_date": "Pilih Tanggal Selesai Dibaca:"
+    },
+    "your_rating": "Rating Kamu",
+    "actions": {
+      "favorite": "Favorit",
+      "start_reading": "Mulai Membaca",
+      "start": "Mulai",
+      "mark_finished": "Tandai Sudah Dibaca",
+      "finish": "Selesai",
+      "reread": "Baca Ulang",
+      "edit": "Edit",
+      "delete": "Hapus",
+      "close": "Tutup",
+      "save": "Simpan",
+      "cancel": "Batal",
+      "already_read": "Sudah Baca"
+    },
+    "confirm_delete": "Hapus \"{{title}}\"?",
+    "info": {
+      "publisher": "Penerbit",
+      "isbn": "ISBN",
+      "language": "Bahasa",
+      "purchase_info": "Informasi Pembelian",
+      "date": "Tanggal",
+      "location": "Tempat",
+      "status": "Status",
+      "price": "Harga",
+      "reading_history": "Riwayat Membaca",
+      "started": "Mulai membaca",
+      "finished": "Selesai"
+    },
+    "notes": {
+      "personal_notes": "Catatan Pribadi",
+      "no_notes": "Belum ada catatan. Tambahkan pemikiranmu tentang buku ini...",
+      "placeholder": "Tambahkan pemikiran, kutipan, atau kenangan..."
+    },
+    "session": {
+      "mood": {
+        "great": "Luar Biasa",
+        "good": "Baik",
+        "okay": "Biasa",
+        "difficult": "Berat"
+      },
+      "session_number": "Sesi #{{index}}",
+      "active": "Aktif",
+      "pages": "Halaman",
+      "duration": "Durasi",
+      "speed": "Kecepatan",
+      "speed_unit": "hlm/j",
+      "paused": "Dijeda",
+      "pages_short": "hlm",
+      "history": "Riwayat",
+      "starting": "Memulai...",
+      "start": "Mulai Sesi",
+      "resume": "Lanjutkan",
+      "pause": "Jeda",
+      "finish": "Selesai",
+      "from_page": "Dari hal. {{start}} · {{count}} halaman dibaca",
+      "finish_session": "Selesaikan Sesi",
+      "end_page": "Halaman Akhir (mulai: {{start}} / maks: {{max}})",
+      "notes_optional": "Catatan (opsional)",
+      "notes_placeholder": "Bagaimana sesi membacamu?",
+      "saving": "Menyimpan...",
+      "save": "Simpan",
+      "cancel": "Batal",
+      "error": "Gagal menyimpan sesi. Coba lagi.",
+      "total_sessions": "Total Sesi",
+      "sessions_finished": "{{count}} selesai",
+      "total_time": "Total Waktu",
+      "reading_time": "waktu membaca",
+      "total_pages_read": "Total Halaman",
+      "pages_read": "halaman dibaca",
+      "avg_speed": "Kecepatan",
+      "avg_speed_unit": "hlm/jam rata-rata",
+      "history_title": "Riwayat Sesi",
+      "no_sessions": "Belum ada sesi membaca",
+      "start_first": "Mulai sesi pertamamu!"
+    }
+  },
+  "modals": {
+    "editBook": {
+      "title": "Edit Detail Buku",
+      "file_too_large": "Ukuran file terlalu besar! Maksimal 5MB.",
+      "upload_error": "Gagal mengupload cover. Pesan dari server: {{msg}}",
+      "confirm_delete": "Apakah Anda yakin ingin menghapus \"{{title}}\"?",
+      "uploading": "Mengupload...",
+      "upload_cover": "Upload Cover",
+      "change_cover": "Ganti Cover",
+      "upload_hint": "Klik cover untuk {{action}} foto",
+      "upload": "upload",
+      "change": "mengganti",
+      "pages": "Halaman",
+      "year": "Tahun",
+      "edit_info": "Edit Informasi Buku",
+      "delete": "Hapus buku",
+      "cancel": "Batal",
+      "save": "Simpan perubahan"
+    },
+    "addShelf": {
+      "title": "Tambah Rak Baru",
+      "shelf_name": "Nama Rak *",
+      "capacity": "Kapasitas (maks buku)",
+      "cancel": "Batal",
+      "add_shelf": "Tambah Rak",
+      "error_default": "Gagal membuat rak",
+      "error": "Kesalahan"
+    },
+    "editShelf": {
+      "title": "Edit Rak",
+      "shelf_info": "Informasi Rak",
+      "shelf_name": "Nama Rak *",
+      "capacity": "Kapasitas (buku) *",
+      "capacity_hint": "Jumlah maksimal buku yang bisa ditampung rak ini",
+      "cancel": "Batal",
+      "save": "Simpan Perubahan"
+    },
+    "readingCalendar": {
+      "title": "Kalender",
+      "today": "Hari Ini",
+      "finished_reading": "Selesai membaca",
+      "pages": "halaman"
+    }
+  },
+  "notification": {
+    "title": "Notifikasi",
+    "mark_all_read": "Tandai semua dibaca",
+    "clear_all": "Hapus semua",
+    "just_now": "Baru saja",
+    "mins_ago": "{{count}} mnt lalu",
+    "hours_ago": "{{count}} jam lalu",
+    "yesterday": "Kemarin",
+    "empty": "Belum ada notifikasi",
+    "view_details": "Lihat detail"
+  },
+  "time_settings": {
+    "title": "Pengaturan Jam",
+    "timezone_label": "Negara / Zona Waktu",
+    "local_time": "Waktu Lokal (Perangkat)",
+    "indonesia": "Indonesia (WIB)",
+    "japan": "Jepang (JST)",
+    "korea": "Korea Selatan (KST)",
+    "uk": "Inggris (GMT/BST)",
+    "usa": "Amerika Serikat (EST/EDT)",
+    "australia": "Australia (AEST/AEDT)",
+    "format_label": "Format Waktu",
+    "format_24": "Format 24 Jam",
+    "format_24_example": "Contoh: 14:30",
+    "format_12": "Format 12 Jam",
+    "format_12_example": "Contoh: 02:30 PM",
+    "save_close": "Simpan & Tutup"
+  },
+  "shelf_led": {
+    "title": "LED Rak",
+    "brightness": "Kecerahan",
+    "color": "Warna Cahaya",
+    "neutral": "Netral",
+    "cool": "Sejuk",
+    "rose": "Rose",
+    "mint": "Mint",
+    "warm": "Warm"
+  },
+  "shelf_decoration": {
+    "title_left": "Hiasan Rak (Sisi Kiri)",
+    "title_right": "Hiasan Rak (Sisi Kanan)",
+    "subtitle": "Pilih dekorasi untuk mempercantik rakmu",
+    "remove": "Hapus Hiasan",
+    "candle": "Lilin",
+    "candle_desc": "Lilin hangat menyala",
+    "duo_candle": "Duo Lilin",
+    "duo_candle_desc": "Dua lilin berdampingan",
+    "potted_plant": "Tanaman Pot",
+    "potted_plant_desc": "Tanaman hijau dalam pot",
+    "hanging_plant": "Tanaman Gantung",
+    "hanging_plant_desc": "Tanaman rambat menggantung",
+    "succulent": "Sukulen",
+    "succulent_desc": "Kaktus mini lucu",
+    "tall_vase": "Vas Tinggi",
+    "tall_vase_desc": "Vas elegan dengan bunga kering"
   }
 }

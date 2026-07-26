@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Settings as SettingsIcon, Sun, Moon, Palette, Bell, Mail, Database, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface AppPreferencesProps {
   settings: any;
@@ -7,38 +8,45 @@ interface AppPreferencesProps {
 }
 
 export default function AppPreferences({ settings, setSettings }: AppPreferencesProps) {
+  const { t } = useTranslation();
+  
   const preferencesItems = [
     {
       label: 'Theme',
-      description: 'Choose your preferred appearance',
+      title: t('settings.theme.title', 'Theme'),
+      description: t('settings.theme.desc', 'Choose your preferred appearance'),
       icon: Palette,
       type: 'toggle',
       value: settings.theme === 'dark'
     },
     {
       label: 'Notifications',
-      description: 'Enable push notifications',
+      title: t('settings.notifications.title', 'Notifications'),
+      description: t('settings.notifications.desc', 'Enable push notifications'),
       icon: Bell,
       type: 'toggle',
       value: settings.notifications
     },
     {
       label: 'Email Updates',
-      description: 'Receive weekly reading summaries',
+      title: t('settings.email.title', 'Email Updates'),
+      description: t('settings.email.desc', 'Receive weekly reading summaries'),
       icon: Mail,
       type: 'toggle',
       value: settings.emailUpdates
     },
     {
       label: 'AutoSave',
-      description: 'Automatically save changes',
+      title: t('settings.autosave.title', 'AutoSave'),
+      description: t('settings.autosave.desc', 'Automatically save changes'),
       icon: Database,
       type: 'toggle',
       value: settings.autoSave
     },
     {
       label: 'Reading Reminders',
-      description: 'Get reminded to read daily',
+      title: t('settings.reminders.title', 'Reading Reminders'),
+      description: t('settings.reminders.desc', 'Get reminded to read daily'),
       icon: Clock,
       type: 'toggle',
       value: settings.readingReminders
@@ -54,7 +62,7 @@ export default function AppPreferences({ settings, setSettings }: AppPreferences
       <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
         <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
           <SettingsIcon className="w-5 h-5" />
-          App Preferences
+          {t('settings.sections.preferences', 'App Preferences')}
         </h2>
         <div className="space-y-4">
           {preferencesItems.map((item) => (
@@ -69,7 +77,7 @@ export default function AppPreferences({ settings, setSettings }: AppPreferences
                   <item.icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-medium text-darkBrown">{item.label}</p>
+                  <p className="font-medium text-darkBrown">{item.title}</p>
                   <p className="text-sm text-walnut/70">{item.description}</p>
                 </div>
               </div>
@@ -100,15 +108,15 @@ export default function AppPreferences({ settings, setSettings }: AppPreferences
 
       {/* Theme Preview */}
       <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-        <h3 className="text-lg font-semibold text-darkBrown mb-4">Theme Preview</h3>
+        <h3 className="text-lg font-semibold text-darkBrown mb-4">{t('settings.theme_preview', 'Theme Preview')}</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 bg-white border-2 border-walnut/20 rounded-xl">
             <Sun className="w-5 h-5 text-yellow-500 mb-2" />
-            <p className="text-sm text-walnut/70">Light Mode</p>
+            <p className="text-sm text-walnut/70">{t('settings.light_mode', 'Light Mode')}</p>
           </div>
           <div className="p-4 bg-darkBrown border-2 border-walnut/30 rounded-xl">
             <Moon className="w-5 h-5 text-walnut/70 mb-2" />
-            <p className="text-sm text-walnut/70">Dark Mode</p>
+            <p className="text-sm text-walnut/70">{t('settings.dark_mode', 'Dark Mode')}</p>
           </div>
         </div>
       </div>

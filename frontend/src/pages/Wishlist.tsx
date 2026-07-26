@@ -6,6 +6,7 @@ import { useBookstore } from '../store/useBookstore'
 import Bookshelf from '../components/Bookshelf'
 import type { Book } from '../types'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import {
   ShoppingCart,
   Heart,
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react'
 
 export default function Wishlist() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
 
@@ -51,7 +53,7 @@ export default function Wishlist() {
   if (isLoading || shelvesLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <div className="text-walnut">Loading wishlist...</div>
+        <div className="text-walnut">{t('wishlist.loading', 'Loading wishlist...')}</div>
       </div>
     )
   }
@@ -75,10 +77,10 @@ export default function Wishlist() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
-          Wishlist
+          {t('wishlist.title', 'Wishlist')}
         </h1>
         <p className="text-walnut/70">
-          Your reading queue - {totalWishlist} book{totalWishlist !== 1 ? 's' : ''} waiting to be read
+          {t('wishlist.subtitle', 'Your reading queue - {{count}} book{{s}} waiting to be read', { count: totalWishlist, s: totalWishlist !== 1 ? 's' : '' })}
         </p>
       </div>
 
@@ -96,7 +98,7 @@ export default function Wishlist() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-darkBrown">{totalWishlist}</div>
-                <div className="text-sm text-walnut/70">Wishlist</div>
+                <div className="text-sm text-walnut/70">{t('wishlist.wishlist', 'Wishlist')}</div>
               </div>
             </div>
           </motion.div>
@@ -115,7 +117,7 @@ export default function Wishlist() {
                 <div className="text-2xl font-bold text-darkBrown">
                   {estimatedPages.toLocaleString()}
                 </div>
-                <div className="text-sm text-walnut/70">Total Pages</div>
+                <div className="text-sm text-walnut/70">{t('wishlist.total_pages', 'Total Pages')}</div>
               </div>
             </div>
           </motion.div>
@@ -132,7 +134,7 @@ export default function Wishlist() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-darkBrown">{estimatedHours}h</div>
-                <div className="text-sm text-walnut/70">Est. Reading</div>
+                <div className="text-sm text-walnut/70">{t('wishlist.est_reading', 'Est. Reading')}</div>
               </div>
             </div>
           </motion.div>
@@ -151,7 +153,7 @@ export default function Wishlist() {
                 <div className="text-2xl font-bold text-darkBrown">
                   {totalWishlist > 0 ? Math.round(estimatedPages / totalWishlist) : 0}
                 </div>
-                <div className="text-sm text-walnut/70">Avg Pages</div>
+                <div className="text-sm text-walnut/70">{t('wishlist.avg_pages', 'Avg Pages')}</div>
               </div>
             </div>
           </motion.div>
@@ -168,7 +170,7 @@ export default function Wishlist() {
         >
           <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
             <Target className="w-5 h-5" />
-            Your Reading Queue
+            {t('wishlist.reading_queue', 'Your Reading Queue')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {wishlistBooks.map((book: Book, index: number) => {
@@ -203,15 +205,15 @@ export default function Wishlist() {
                   {/* Book Details */}
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-xs text-walnut/60">
-                      <span>Genre:</span>
+                      <span>{t('wishlist.genre', 'Genre:')}</span>
                       <span className="font-medium text-darkBrown">{book.genre}</span>
                     </div>
                     <div className="flex justify-between text-xs text-walnut/60">
-                      <span>Pages:</span>
+                      <span>{t('wishlist.pages', 'Pages:')}</span>
                       <span className="font-medium text-darkBrown">{book.pages}</span>
                     </div>
                     <div className="flex justify-between text-xs text-walnut/60">
-                      <span>Est. Time:</span>
+                      <span>{t('wishlist.est_time', 'Est. Time:')}</span>
                       <span className="font-medium text-darkBrown">{estimatedTime}h</span>
                     </div>
                   </div>
@@ -222,7 +224,7 @@ export default function Wishlist() {
                     className="w-full py-2 bg-walnut text-white rounded-lg font-medium hover:bg-darkBrown transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <BookOpen className="w-4 h-4" />
-                    Start Reading
+                    {t('wishlist.start_reading', 'Start Reading')}
                   </button>
                 </motion.div>
               )
@@ -257,7 +259,7 @@ export default function Wishlist() {
             className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
-            Browse Library
+            {t('wishlist.browse_library', 'Browse Library')}
           </button>
         </motion.div>
       )}
@@ -273,23 +275,23 @@ export default function Wishlist() {
             <ShoppingCart className="w-10 h-10 text-walnut/30" />
           </div>
           <h3 className="text-xl font-serif text-darkBrown mb-2">
-            Your wishlist is empty
+            {t('wishlist.empty', 'Your wishlist is empty')}
           </h3>
           <p className="text-walnut/70 mb-6">
-            Save books you want to read later
+            {t('wishlist.empty_desc', 'Save books you want to read later')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => navigate('/library')}
               className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors"
             >
-              Browse Library
+              {t('wishlist.browse_library', 'Browse Library')}
             </button>
             <button
               onClick={() => navigate('/library')}
               className="px-6 py-3 bg-white text-walnut rounded-xl font-medium hover:bg-walnut/10 transition-colors border border-walnut/20"
             >
-              Add to Wishlist
+              {t('wishlist.add_to_wishlist', 'Add to Wishlist')}
             </button>
           </div>
         </motion.div>

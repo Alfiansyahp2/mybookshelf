@@ -1,4 +1,5 @@
 {
+  "locale": "en-US",
   "nav": {
     "library": "My Library",
     "reading": "Reading",
@@ -117,5 +118,639 @@
     "saving": "Saving...",
     "save": "Save Book",
     "alert_shelf": "Please select a shelf first"
+  },
+  "book_form": {
+    "basic": {
+      "title_section": "Basic Information",
+      "title": "Title *",
+      "title_placeholder": "Enter book title",
+      "author": "Author *",
+      "author_placeholder": "Enter author name",
+      "isbn": "ISBN",
+      "genre": "Genre *",
+      "custom_genre": "Or type custom genre and press Enter",
+      "publisher": "Publisher",
+      "publisher_placeholder": "Publisher Name",
+      "language": "Language",
+      "year": "Year *",
+      "pages": "Pages *",
+      "pages_placeholder": "Number of pages",
+      "format": "Format"
+    },
+    "appearance": {
+      "title_section": "Book Appearance",
+      "height": "Book Height",
+      "height_short": "Short",
+      "height_medium": "Medium",
+      "height_tall": "Tall",
+      "thickness": "Book Thickness",
+      "thickness_thin": "Thin",
+      "thickness_regular": "Regular",
+      "thickness_thick": "Thick",
+      "spine": "Spine Colors",
+      "current": "Current:",
+      "color_light": "Light Color",
+      "color_medium": "Medium Color",
+      "color_dark": "Dark Color"
+    },
+    "purchase": {
+      "title_section": "Acquisition Details",
+      "acquisition_type": "Acquisition Type",
+      "type_purchased": "Purchased",
+      "type_gift": "Gift",
+      "type_borrowed": "Borrowed",
+      "date": "Date",
+      "price": "Price",
+      "currency": "Currency",
+      "location": "Location / Store",
+      "location_placeholder": "e.g., Gramedia, Amazon",
+      "gift_from": "Gift From",
+      "gift_placeholder": "Who gave this book?",
+      "borrowed_from": "Borrowed From",
+      "borrowed_placeholder": "Who did you borrow it from?"
+    }
+  },
+  "settings": {
+    "account": {
+      "profile_success": "Profile updated successfully!",
+      "profile_error": "Failed to update profile.",
+      "password_success": "Password updated successfully!",
+      "password_error": "Failed to update password. Check your current password.",
+      "profile_info": "Profile Information",
+      "display_name": "Display Name",
+      "email_address": "Email Address",
+      "avatar": "Avatar",
+      "avatar_desc": "First letter of your name",
+      "saving": "Saving...",
+      "save_profile": "Save Profile",
+      "change_password": "Change Password",
+      "current_password": "Current Password",
+      "new_password": "New Password",
+      "confirm_password": "Confirm New Password",
+      "updating": "Updating...",
+      "update_password": "Update Password"
+    },
+    "data": {
+      "data_management": "Data Management",
+      "export_data": "Export All Data",
+      "export_desc": "This will download all your books, settings, and reading progress as a JSON file that you can import later.",
+      "file_size": "File size: ~50KB",
+      "clear_data": "Clear All Data",
+      "warning": "Warning",
+      "warning_desc": "This will permanently delete all your books, settings, and reading progress. This action cannot be undone."
+    },
+    "about": {
+      "title": "About MyBookshelf",
+      "description": "MyBookshelf is a beautiful and intuitive digital library management system designed for book lovers.",
+      "feature1": "Organize your personal library",
+      "feature2": "Track reading progress",
+      "feature3": "Achieve reading goals",
+      "version": "Version",
+      "website": "Website",
+      "website_desc": "Visit our official website",
+      "github": "GitHub",
+      "github_desc": "View source code"
+    }
+  },
+  "accounting": {
+    "title": "Accounting",
+    "subtitle": "Finance & Expenses",
+    "overview": "Overview",
+    "expenses": "Expenses",
+    "budgets": "Budgets",
+    "categories": "Categories",
+    "add_expense": "Add Expense",
+    "dashboard": {
+      "overview": "Accounting Overview",
+      "track_expenses": "Track your book-related expenses",
+      "view_all": "View All",
+      "new_budget": "New Budget",
+      "add_expense": "Add Expense",
+      "total_expenses": "Total Expenses",
+      "this_month": "This month",
+      "selected_period": "Selected period",
+      "pending": "Pending",
+      "unpaid_expenses": "Unpaid expenses",
+      "vs_last_month": "vs Last Month",
+      "change": "Change",
+      "budget_status": "Budget Status",
+      "healthy_budgets": "Healthy budgets",
+      "budget_alerts_active": "Budget Alerts Active",
+      "budget_alerts_desc": "{{exceeded}} exceeded, {{warning}} at warning level",
+      "expenses_by_category": "Expenses by Category",
+      "no_expense_data": "No expense data available",
+      "recent_expenses": "Recent Expenses",
+      "no_recent_expenses": "No recent expenses",
+      "uncategorized": "Uncategorized",
+      "budget_overview": "Budget Overview",
+      "on_track": "On Track",
+      "warning": "Warning",
+      "exceeded": "Exceeded",
+      "total_budget_allocation": "Total Budget Allocation",
+      "total_spent": "Total Spent",
+      "overall_usage": "Overall Usage",
+      "expenses_count": "expenses"
+    },
+    "expense_list": {
+      "confirm_delete": "Are you sure you want to delete this expense?",
+      "expenses": "Expenses",
+      "search_placeholder": "Search expenses...",
+      "category": "Category",
+      "all_categories": "All Categories",
+      "status": "Status",
+      "all_status": "All Status",
+      "status_completed": "Completed",
+      "status_pending": "Pending",
+      "status_cancelled": "Cancelled",
+      "from_date": "From Date",
+      "to_date": "To Date",
+      "no_expenses": "No expenses found",
+      "adjust_filters": "Try adjusting your filters",
+      "add_first": "Add your first expense to get started",
+      "page": "Page {{current}} of {{last}}",
+      "previous": "Previous",
+      "next": "Next",
+      "recurring": "Recurring",
+      "reminder": "Reminder",
+      "amount": "Amount",
+      "date": "Date",
+      "payment": "Payment"
+    },
+    "budget_tracker": {
+      "total_budget": "Total Budget",
+      "total_spent": "Total Spent",
+      "remaining": "Remaining",
+      "usage": "Usage",
+      "active_budgets": "Active Budgets",
+      "add_budget": "Add Budget",
+      "no_budgets": "No budgets set up yet",
+      "create_first": "Create your first budget",
+      "budget_alerts": "Budget Alerts",
+      "budgets_exceeded": "{{count}} Budget(s) Exceeded",
+      "exceeded_desc": "You've spent more than your allocated budget",
+      "budgets_warning": "{{count}} Budget(s) at Warning Level",
+      "warning_desc": "You've used 80% or more of your budget",
+      "progress": "Progress",
+      "budget": "Budget",
+      "spent": "Spent"
+    },
+    "expense_modal": {
+      "add_new": "Add New Expense",
+      "edit": "Edit Expense",
+      "add_desc": "Track your book-related expenses",
+      "edit_desc": "Update expense details",
+      "title": "Title *",
+      "title_placeholder": "e.g., 'The Great Gatsby - Paperback'",
+      "amount": "Amount *",
+      "currency": "Currency",
+      "category": "Category",
+      "select_category": "Select category",
+      "payment_method": "Payment Method",
+      "related_book": "Related Book (Optional)",
+      "select_book": "Select book",
+      "expense_date": "Expense Date *",
+      "description": "Description",
+      "desc_placeholder": "Add notes about this expense...",
+      "vendor": "Vendor",
+      "vendor_placeholder": "e.g., Amazon, Local Bookstore",
+      "location": "Location",
+      "location_placeholder": "e.g., Online, Jakarta",
+      "recurring": "Recurring Expense",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "payment_reminder": "Payment Reminder",
+      "receipt": "Receipt/Proof of Purchase",
+      "remove_receipt": "Remove receipt",
+      "upload_receipt": "Upload receipt",
+      "receipt_format": "PNG, JPG up to 10MB",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "create_btn": "Create Expense",
+      "update_btn": "Update Expense"
+    },
+    "category_manager": {
+      "confirm_delete": "Are you sure you want to delete this category?",
+      "title": "Expense Categories",
+      "subtitle": "Manage your expense categories and budgets",
+      "new_category": "New Category",
+      "no_categories": "No categories yet",
+      "create_first": "Create your first category",
+      "default": "Default",
+      "monthly_budget": "Monthly Budget",
+      "total_spent": "Total Spent",
+      "edit_category": "Edit Category",
+      "name": "Name *",
+      "name_placeholder": "e.g., Books, Shipping",
+      "description": "Description",
+      "desc_placeholder": "Optional description",
+      "icon": "Icon",
+      "color": "Color",
+      "cancel": "Cancel",
+      "update": "Update",
+      "create": "Create"
+    },
+    "purchase_chart": {
+      "total": "Total:",
+      "books_purchased": "books purchased",
+      "avg": "Avg:",
+      "purchase_history": "Purchase History",
+      "error_loading": "Error loading purchase history",
+      "refresh_page": "Please try refreshing the page",
+      "no_data": "No purchase data available for the selected period",
+      "book_purchase_history": "Book Purchase History",
+      "avg_monthly": "Avg Monthly",
+      "trend_3_month": "3-Month Trend",
+      "total_purchases": "Total Purchases",
+      "highest": "Highest",
+      "lowest": "Lowest",
+      "average": "Average",
+      "total_books": "Total Books"
+    }
+  },
+  "achievements": {
+    "loading": "Loading achievements...",
+    "title": "Achievements",
+    "subtitle": "Track your progress and collect reading badges.",
+    "total_achievements": "Total Achievements",
+    "progress": "Progress",
+    "new_achievement": "New Achievement!",
+    "data": {
+      "Langkah Pertama": {
+        "title": "First Step",
+        "description": "Added your first book to the library."
+      },
+      "Kamu telah menambahkan buku pertama ke perpustakaanmu!": "You have added your first book to your library!",
+      "Kutu Buku Pemula": {
+        "title": "Beginner Bookworm",
+        "description": "Finished reading 5 books."
+      },
+      "Berhasil menyelesaikan 5 buku_": "Successfully finished 5 books.",
+      "Kutu Buku Pro": {
+        "title": "Pro Bookworm",
+        "description": "Finished reading 20 books."
+      },
+      "Berhasil menyelesaikan 20 buku!": "Successfully finished 20 books!",
+      "Marathon Membaca": {
+        "title": "Reading Marathon",
+        "description": "Read more than 1,000 pages."
+      },
+      "Telah membaca lebih dari 1_000 halaman_": "Read more than 1,000 pages.",
+      "Ultra Marathon": {
+        "title": "Ultra Marathon",
+        "description": "Read more than 5,000 pages!"
+      },
+      "Telah membaca lebih dari 5_000 halaman!": "Read more than 5,000 pages!",
+      "Kolektor": {
+        "title": "Collector",
+        "description": "Your library has 20 books."
+      },
+      "Perpustakaanmu kini memiliki 20 buku_": "Your library now has 20 books.",
+      "Master Kolektor": {
+        "title": "Master Collector",
+        "description": "Amazing, you have 50 books!"
+      },
+      "Luar biasa, kamu memiliki 50 buku!": "Amazing, you have 50 books!",
+      "Arsitek Rak": {
+        "title": "Shelf Architect",
+        "description": "Created 3 different shelves for your collection."
+      },
+      "Membuat 3 rak berbeda untuk koleksimu_": "Created 3 different shelves for your collection.",
+      "Eksplorator Genre": {
+        "title": "Genre Explorer",
+        "description": "Read books from 3 different genres."
+      },
+      "Membaca buku dari 3 genre yang berbeda_": "Read books from 3 different genres.",
+      "Master Genre": {
+        "title": "Genre Master",
+        "description": "Read books from 7 different genres."
+      },
+      "Membaca buku dari 7 genre yang berbeda_": "Read books from 7 different genres.",
+      "Kurator Sempurna": {
+        "title": "Perfect Curator",
+        "description": "Gave a 5-star rating to a book."
+      },
+      "Memberikan rating bintang 5 pada sebuah buku_": "Gave a 5-star rating to a book.",
+      "Kritikus Sastra": {
+        "title": "Literature Critic",
+        "description": "Rated 5 books."
+      },
+      "Memberikan rating pada 5 buku_": "Rated 5 books.",
+      "Penggemar Setia": {
+        "title": "Loyal Fan",
+        "description": "Marked 5 books as favorites."
+      },
+      "Menandai 5 buku sebagai favorit_": "Marked 5 books as favorites.",
+      "Sang Pemimpi": {
+        "title": "The Dreamer",
+        "description": "Added 5 books to Wishlist."
+      },
+      "Menambahkan 5 buku ke Wishlist_": "Added 5 books to Wishlist.",
+      "Super Marathon": {
+        "title": "Super Marathon",
+        "description": "Read more than 10,000 pages! You are amazing!"
+      },
+      "Desainer Rak": {
+        "title": "Shelf Designer",
+        "description": "Created 5 different shelves for your collection."
+      },
+      "Kritikus Buku": {
+        "title": "Book Critic",
+        "description": "Rated 10 different books."
+      }
+    }
+  },
+  "borrow": {
+    "title": "Borrow & Loan",
+    "coming_soon": "Coming soon..."
+  },
+  "collections": {
+    "title": "Collections",
+    "coming_soon": "Coming soon..."
+  },
+  "explore": {
+    "loading_shelves": "Loading shelves...",
+    "no_shelves": "No shelves. Please add a shelf in the library.",
+    "title": "Explore Library",
+    "subtitle": "Walk through your personal collection. Use arrow keys or buttons to navigate between shelves.",
+    "main_room": "Main Library Room",
+    "room_stats": "{{shelves}} Shelves · {{books}} Books",
+    "prev_shelf": "Previous Shelf",
+    "next_shelf": "Next Shelf",
+    "tip": "Tip: Use <kbd className=\"px-2 py-1 bg-white rounded\">←</kbd> and <kbd className=\"px-2 py-1 bg-white rounded\">→</kbd> arrow keys to navigate between shelves"
+  },
+  "notes": {
+    "title": "Notes",
+    "coming_soon": "Coming soon..."
+  },
+  "login": {
+    "failed": "Login failed",
+    "register_failed": "Registration failed",
+    "sign_in": "Sign In",
+    "register": "Register",
+    "no_account": "Don't have a library card? Create one",
+    "has_account": "Already have a library card? Sign in",
+    "email": "Email Address",
+    "password": "Password",
+    "sign_in_btn": "Sign In to Library",
+    "full_name": "Full Name",
+    "confirm_password": "Confirm Password",
+    "register_btn": "Create Library Card",
+    "welcome_back": "Welcome Back\nto Your Library",
+    "begin_journey": "Begin Your\nReading Journey",
+    "welcome_desc": "Open the pages of your collection and continue exactly where you left off.",
+    "begin_desc": "Create your personal catalog and organize your reading life beautifully."
+  },
+  "reading": {
+    "loading": "Loading reading progress...",
+    "currently_reading": "Currently Reading",
+    "track_progress": "Track your progress on {{count}} book{{s}}",
+    "books_read_in_year": "Books Read in {{year}}",
+    "reading_status": "Reading",
+    "avg_progress": "Avg Progress",
+    "pages_read": "Pages Read",
+    "total_progress": "Total Progress",
+    "reading_shelf": "Currently Reading",
+    "unread_shelf": "Unread",
+    "browse_library": "Browse Library",
+    "no_books": "No books yet",
+    "start_journey": "Start your reading journey from your library",
+    "target": "Target {{year}}",
+    "target_achieved": "🎉 Target achieved!",
+    "books_left_for_target": "{{count}} more books for this year's target",
+    "total_pages": "Total Pages",
+    "percent_read": "% Read"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "coming_soon": "Reading journey analytics coming soon..."
+  },
+  "wishlist": {
+    "loading": "Loading wishlist...",
+    "title": "Wishlist",
+    "subtitle": "Your reading queue - {{count}} book{{s}} waiting to be read",
+    "wishlist": "Wishlist",
+    "total_pages": "Total Pages",
+    "est_reading": "Est. Reading",
+    "avg_pages": "Avg Pages",
+    "reading_queue": "Your Reading Queue",
+    "genre": "Genre:",
+    "pages": "Pages:",
+    "est_time": "Est. Time:",
+    "start_reading": "Start Reading",
+    "browse_library": "Browse Library",
+    "empty": "Your wishlist is empty",
+    "empty_desc": "Save books you want to read later",
+    "add_to_wishlist": "Add to Wishlist"
+  },
+  "status": {
+    "reading": "Reading",
+    "finished": "Finished",
+    "unread": "Unread",
+    "wishlist": "Wishlist",
+    "borrowed": "Borrowed"
+  },
+  "bookDetail": {
+    "tabs": {
+      "progress": "Progress",
+      "session": "Session",
+      "notes": "Notes",
+      "info": "Info"
+    },
+    "badges": {
+      "gift": "Gift",
+      "purchased": "Purchased",
+      "borrowed": "Borrowed"
+    },
+    "stats": {
+      "pages": "Pages",
+      "year": "Year",
+      "language": "Language",
+      "format": "Format"
+    },
+    "progress": {
+      "label": "Progress",
+      "page": "Pg.",
+      "of": "of",
+      "start_to_see": "Start reading to see progress",
+      "choose_finish_date": "Choose Finish Date:"
+    },
+    "your_rating": "Your Rating",
+    "actions": {
+      "favorite": "Favorite",
+      "start_reading": "Start Reading",
+      "start": "Start",
+      "mark_finished": "Mark as Read",
+      "finish": "Finish",
+      "reread": "Reread",
+      "edit": "Edit",
+      "delete": "Delete",
+      "close": "Close",
+      "save": "Save",
+      "cancel": "Cancel",
+      "already_read": "Already Read"
+    },
+    "confirm_delete": "Delete \"{{title}}\"?",
+    "info": {
+      "publisher": "Publisher",
+      "isbn": "ISBN",
+      "language": "Language",
+      "purchase_info": "Purchase Info",
+      "date": "Date",
+      "location": "Location",
+      "status": "Status",
+      "price": "Price",
+      "reading_history": "Reading History",
+      "started": "Started",
+      "finished": "Finished"
+    },
+    "notes": {
+      "personal_notes": "Personal Notes",
+      "no_notes": "No notes yet. Add your thoughts about this book...",
+      "placeholder": "Add your thoughts, quotes, or memories..."
+    },
+    "session": {
+      "mood": {
+        "great": "Great",
+        "good": "Good",
+        "okay": "Okay",
+        "difficult": "Difficult"
+      },
+      "session_number": "Session #{{index}}",
+      "active": "Active",
+      "pages": "Pages",
+      "duration": "Duration",
+      "speed": "Speed",
+      "speed_unit": "pg/h",
+      "paused": "Paused",
+      "pages_short": "pgs",
+      "history": "History",
+      "starting": "Starting...",
+      "start": "Start Session",
+      "resume": "Resume",
+      "pause": "Pause",
+      "finish": "Finish",
+      "from_page": "From pg. {{start}} · {{count}} pages read",
+      "finish_session": "Finish Session",
+      "end_page": "End Page (start: {{start}} / max: {{max}})",
+      "notes_optional": "Notes (optional)",
+      "notes_placeholder": "How was your reading session?",
+      "saving": "Saving...",
+      "save": "Save",
+      "cancel": "Cancel",
+      "error": "Failed to save session. Try again.",
+      "total_sessions": "Total Sessions",
+      "sessions_finished": "{{count}} finished",
+      "total_time": "Total Time",
+      "reading_time": "reading time",
+      "total_pages_read": "Total Pages",
+      "pages_read": "pages read",
+      "avg_speed": "Speed",
+      "avg_speed_unit": "pg/h average",
+      "history_title": "Session History",
+      "no_sessions": "No reading sessions yet",
+      "start_first": "Start your first session!"
+    }
+  },
+  "modals": {
+    "editBook": {
+      "title": "Edit Book Details",
+      "file_too_large": "File size too large! Maximum 5MB.",
+      "upload_error": "Failed to upload cover. Server message: {{msg}}",
+      "confirm_delete": "Are you sure you want to delete \"{{title}}\"?",
+      "uploading": "Uploading...",
+      "upload_cover": "Upload Cover",
+      "change_cover": "Change Cover",
+      "upload_hint": "Click cover to {{action}} photo",
+      "upload": "upload",
+      "change": "change",
+      "pages": "Pages",
+      "year": "Year",
+      "edit_info": "Edit Book Information",
+      "delete": "Delete book",
+      "cancel": "Cancel",
+      "save": "Save changes"
+    },
+    "addShelf": {
+      "title": "Add New Shelf",
+      "shelf_name": "Shelf Name *",
+      "capacity": "Capacity (max books)",
+      "cancel": "Cancel",
+      "add_shelf": "Add Shelf",
+      "error_default": "Failed to create shelf",
+      "error": "Error"
+    },
+    "editShelf": {
+      "title": "Edit Shelf",
+      "shelf_info": "Shelf Information",
+      "shelf_name": "Shelf Name *",
+      "capacity": "Capacity (books) *",
+      "capacity_hint": "Maximum number of books this shelf can hold",
+      "cancel": "Cancel",
+      "save": "Save Changes"
+    },
+    "readingCalendar": {
+      "title": "Calendar",
+      "today": "Today",
+      "finished_reading": "Finished reading",
+      "pages": "pages"
+    }
+  },
+  "notification": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "clear_all": "Clear all",
+    "just_now": "Just now",
+    "mins_ago": "{{count}} mins ago",
+    "hours_ago": "{{count}} hours ago",
+    "yesterday": "Yesterday",
+    "empty": "No notifications yet",
+    "view_details": "View details"
+  },
+  "time_settings": {
+    "title": "Time Settings",
+    "timezone_label": "Country / Timezone",
+    "local_time": "Local Time (Device)",
+    "indonesia": "Indonesia (WIB)",
+    "japan": "Japan (JST)",
+    "korea": "South Korea (KST)",
+    "uk": "United Kingdom (GMT/BST)",
+    "usa": "United States (EST/EDT)",
+    "australia": "Australia (AEST/AEDT)",
+    "format_label": "Time Format",
+    "format_24": "24-Hour Format",
+    "format_24_example": "Example: 14:30",
+    "format_12": "12-Hour Format",
+    "format_12_example": "Example: 02:30 PM",
+    "save_close": "Save & Close"
+  },
+  "shelf_led": {
+    "title": "Shelf LED",
+    "brightness": "Brightness",
+    "color": "Light Color",
+    "neutral": "Neutral",
+    "cool": "Cool",
+    "rose": "Rose",
+    "mint": "Mint",
+    "warm": "Warm"
+  },
+  "shelf_decoration": {
+    "title_left": "Shelf Decoration (Left)",
+    "title_right": "Shelf Decoration (Right)",
+    "subtitle": "Choose a decoration for your shelf",
+    "remove": "Remove Decoration",
+    "candle": "Candle",
+    "candle_desc": "Warm glowing candle",
+    "duo_candle": "Duo Candle",
+    "duo_candle_desc": "Two candles side by side",
+    "potted_plant": "Potted Plant",
+    "potted_plant_desc": "Green plant in a pot",
+    "hanging_plant": "Hanging Plant",
+    "hanging_plant_desc": "Hanging vine plant",
+    "succulent": "Succulent",
+    "succulent_desc": "Cute mini cactus",
+    "tall_vase": "Tall Vase",
+    "tall_vase_desc": "Elegant vase with dried flowers"
   }
 }

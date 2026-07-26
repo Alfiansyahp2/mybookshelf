@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { useAuthUser } from '../hooks/useAuth'
 import { useQueryClient } from '@tanstack/react-query'
@@ -17,6 +18,7 @@ import DataManagement from '../components/settings/DataManagement'
 import AboutSettings from '../components/settings/AboutSettings'
 
 export default function Settings() {
+  const { t } = useTranslation()
   const { data: authData } = useAuthUser()
   const authUser = authData?.user || (authData as any)?.data?.user
   
@@ -51,7 +53,7 @@ export default function Settings() {
   const [activeSection, setActiveSection] = useState('account')
 
   const handleLogout = async () => {
-    console.log('Logging out...')
+    console.log(t('settings.logging_out'))
     localStorage.removeItem('user')
     queryClient.clear()
     window.location.href = '/login'
@@ -73,7 +75,7 @@ export default function Settings() {
   }
 
   const handleClearData = () => {
-    if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+    if (confirm(t('settings.confirm_clear'))) {
       localStorage.clear()
       window.location.reload()
     }
@@ -81,19 +83,19 @@ export default function Settings() {
 
   const sections = {
     account: {
-      title: 'Account Settings',
+      title: t('settings.sections.account'),
       icon: User
     },
     preferences: {
-      title: 'App Preferences',
+      title: t('settings.sections.preferences'),
       icon: SettingsIcon
     },
     data: {
-      title: 'Data Management',
+      title: t('settings.sections.data'),
       icon: Database
     },
     about: {
-      title: 'About',
+      title: t('settings.sections.about'),
       icon: Info
     }
   }
@@ -103,10 +105,10 @@ export default function Settings() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
-          Settings
+          {t('settings.title')}
         </h1>
         <p className="text-walnut/70">
-          Manage your account and app preferences
+          {t('settings.subtitle')}
         </p>
       </div>
 
@@ -123,7 +125,7 @@ export default function Settings() {
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-white">{user.name}</h3>
                   <p className="text-sm text-walnut/70">{user.email}</p>
-                  <p className="text-xs text-walnut/60 mt-1">Member since {user.memberSince}</p>
+                  <p className="text-xs text-walnut/60 mt-1">{t('settings.member_since', { year: user.memberSince })}</p>
                 </div>
               </div>
             </div>
@@ -159,7 +161,7 @@ export default function Settings() {
               className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
             >
               <LogOut className="w-5 h-5" />
-              <span className="font-medium">Sign Out</span>
+              <span className="font-medium">{t('settings.sign_out')}</span>
             </button>
           </div>
         </div>

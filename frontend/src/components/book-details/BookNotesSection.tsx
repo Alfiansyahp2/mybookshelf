@@ -1,4 +1,5 @@
 import { MessageSquare, Edit3 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface BookNotesSectionProps {
   userNotes: string
@@ -21,12 +22,13 @@ export default function BookNotesSection({
   onCancel,
   onTempNotesChange
 }: BookNotesSectionProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex-1 flex flex-col p-4 bg-white rounded-xl border border-walnut/10 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-darkBrown flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-walnut" />
-          Personal Notes
+          {t('bookDetail.notes.personal_notes', 'Personal Notes')}
         </h3>
         {!isEditingNotes ? (
           <button
@@ -34,7 +36,7 @@ export default function BookNotesSection({
             className="text-xs text-walnut hover:text-darkBrown flex items-center gap-1 transition-colors"
           >
             <Edit3 size={14} />
-            Edit
+            {t('bookDetail.actions.edit', 'Edit')}
           </button>
         ) : (
           <div className="flex items-center gap-2">
@@ -43,13 +45,13 @@ export default function BookNotesSection({
               disabled={updateNotes.isPending}
               className="text-xs text-green-600 hover:text-green-700 font-medium disabled:opacity-50"
             >
-              Save
+              {t('bookDetail.actions.save', 'Save')}
             </button>
             <button
               onClick={onCancel}
               className="text-xs text-red-600 hover:text-red-700 font-medium"
             >
-              Cancel
+              {t('bookDetail.actions.cancel', 'Cancel')}
             </button>
           </div>
         )}
@@ -58,7 +60,7 @@ export default function BookNotesSection({
       {!isEditingNotes ? (
         <div className="flex-1 p-3 bg-walnut/10 rounded-lg overflow-y-auto min-h-0">
           <p className="text-sm text-darkBrown whitespace-pre-wrap">
-            {userNotes || 'No notes yet. Add your thoughts about this book...'}
+            {userNotes || t('bookDetail.notes.no_notes', 'No notes yet. Add your thoughts about this book...')}
           </p>
         </div>
       ) : (
@@ -66,7 +68,7 @@ export default function BookNotesSection({
           value={tempNotes}
           onChange={(e) => onTempNotesChange(e.target.value)}
           className="flex-1 w-full p-3 bg-white border border-walnut/20 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 resize-none min-h-0"
-          placeholder="Add your thoughts, quotes, or memories..."
+          placeholder={t('bookDetail.notes.placeholder', 'Add your thoughts, quotes, or memories...')}
         />
       )}
     </div>

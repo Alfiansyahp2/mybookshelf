@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Target } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface YearlyTargetCardsProps {
   yearlyStats: any[];
@@ -9,6 +10,7 @@ interface YearlyTargetCardsProps {
 }
 
 export default function YearlyTargetCards({ yearlyStats, selectedYear, setSelectedYear }: YearlyTargetCardsProps) {
+  const { t } = useTranslation()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const speedRef = useRef(0)
   const isScrolling = useRef(false)
@@ -74,7 +76,7 @@ export default function YearlyTargetCards({ yearlyStats, selectedYear, setSelect
               <div style={{ padding: '16px 18px', background: 'linear-gradient(135deg, #4A3320 0%, #6b4528 100%)' }}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="m-0 text-sm font-bold text-amber-100/90 font-serif flex items-center gap-2">
-                    <Target size={16} /> Target {stat.year}
+                    <Target size={16} /> {t('reading.target', 'Target {{year}}', { year: stat.year })}
                   </h3>
                   <span className="text-xl font-extrabold text-white">{stat.finished} / 12</span>
                 </div>
@@ -86,22 +88,24 @@ export default function YearlyTargetCards({ yearlyStats, selectedYear, setSelect
                   />
                 </div>
                 <p className="mt-2 text-xs text-amber-100/60 m-0">
-                  {stat.goalPct >= 100 ? '🎉 Target tercapai!' : `${12 - stat.finished} buku lagi untuk target tahun ini`}
+                  {stat.goalPct >= 100 
+                    ? t('reading.target_achieved', '🎉 Target tercapai!') 
+                    : t('reading.books_left_for_target', '{{count}} buku lagi untuk target tahun ini', { count: 12 - stat.finished })}
                 </p>
               </div>
               
               <div className="flex justify-between gap-2 p-4 bg-white">
                 <div className="text-center flex-1">
                   <div className="text-xl font-extrabold text-darkBrown">{stat.pagesRead.toLocaleString()}</div>
-                  <div className="text-xs text-walnut/60 mt-1">Halaman Dibaca</div>
+                  <div className="text-xs text-walnut/60 mt-1">{t('reading.pages_read', 'Halaman Dibaca')}</div>
                 </div>
                 <div className="text-center flex-1">
                   <div className="text-xl font-extrabold text-darkBrown">{stat.totalPages.toLocaleString()}</div>
-                  <div className="text-xs text-walnut/60 mt-1">Total Halaman</div>
+                  <div className="text-xs text-walnut/60 mt-1">{t('reading.total_pages', 'Total Halaman')}</div>
                 </div>
                 <div className="text-center flex-1">
                   <div className="text-xl font-extrabold text-darkBrown">{stat.readPct}%</div>
-                  <div className="text-xs text-walnut/60 mt-1">% Terbaca</div>
+                  <div className="text-xs text-walnut/60 mt-1">{t('reading.percent_read', '% Terbaca')}</div>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface LoginFormProps {
   formData: any;
@@ -10,6 +11,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ formData, setFormData, onSubmit, isLoading }: LoginFormProps) {
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
 
   return (
@@ -17,7 +19,7 @@ export default function LoginForm({ formData, setFormData, onSubmit, isLoading }
       {/* Email */}
       <div>
         <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
-          Email Address
+          {t('login.email', 'Email Address')}
         </label>
         <div className="relative">
           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
@@ -36,7 +38,7 @@ export default function LoginForm({ formData, setFormData, onSubmit, isLoading }
       {/* Password */}
       <div>
         <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
-          Password
+          {t('login.password', 'Password')}
         </label>
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
@@ -68,7 +70,7 @@ export default function LoginForm({ formData, setFormData, onSubmit, isLoading }
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            'Sign In to Library'
+            t('login.sign_in_btn', 'Sign In to Library')
           )}
         </button>
       </div>

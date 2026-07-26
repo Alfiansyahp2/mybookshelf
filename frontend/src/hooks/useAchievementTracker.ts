@@ -4,6 +4,7 @@ import { useShelves } from './useShelves'
 import { useNotifications } from './useNotifications'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { useTranslation } from 'react-i18next'
 
 interface AchievementState {
   unlockedIds: string[]
@@ -26,6 +27,7 @@ export const useAchievementStore = create<AchievementState>()(
 )
 
 export function useAchievementTracker() {
+  const { t } = useTranslation()
   const { data: booksResponse } = useBooks()
   const { data: shelves = [] } = useShelves()
   const { unlock } = useAchievementStore()
@@ -41,8 +43,8 @@ export function useAchievementTracker() {
         const isNew = unlock(id)
         if (isNew) {
           addNotification({
-            title: 'Pencapaian Baru!',
-            message: `${title} - ${message}`,
+            title: t('achievements.new_achievement', 'Pencapaian Baru!'),
+            message: `${t(`achievements.data.${title.replace(/\\./g, '_')}.title`, title)} - ${t(`achievements.data.${message.replace(/\\./g, '_')}`, message)}`,
             type: 'achievement',
             link: '/achievements'
           })

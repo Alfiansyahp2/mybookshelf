@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useLogin, useRegister, useAuthUser } from '../hooks/useAuth'
 import { useNotifications } from '../hooks/useNotifications'
 import LoginForm from '../components/auth/LoginForm'
@@ -9,6 +10,7 @@ import AuthDecoration from '../components/auth/AuthDecoration'
 import AuthLeftPage from '../components/auth/AuthLeftPage'
 
 export default function Login() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const login = useLogin()
   const register = useRegister()
@@ -53,7 +55,7 @@ export default function Login() {
       onError: (error: any) => {
         const errorMessage = error.response?.data?.message || error.message || 'Unknown error'
         addNotification({
-          title: `${isLogin ? 'Login' : 'Registration'} failed`,
+          title: isLogin ? t('login.failed', 'Login failed') : t('login.register_failed', 'Registration failed'),
           message: errorMessage,
           type: 'warning'
         })
@@ -112,7 +114,7 @@ export default function Login() {
 
                 <div className="relative z-10 w-full max-w-sm mx-auto">
                   <h2 className="text-2xl font-serif font-bold text-darkBrown mb-6 text-center">
-                    {isLogin ? 'Sign In' : 'Register'}
+                    {isLogin ? t('login.sign_in', 'Sign In') : t('login.register', 'Register')}
                   </h2>
                   
                   {isLogin ? (
@@ -137,7 +139,7 @@ export default function Login() {
                       onClick={toggleMode}
                       className="text-walnut/70 hover:text-walnut text-sm font-medium transition-colors"
                     >
-                      {isLogin ? "Don't have a library card? Create one" : 'Already have a library card? Sign in'}
+                      {isLogin ? t('login.no_account', "Don't have a library card? Create one") : t('login.has_account', 'Already have a library card? Sign in')}
                     </button>
                   </div>
                 </div>

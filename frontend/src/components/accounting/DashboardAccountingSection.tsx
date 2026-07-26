@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { DollarSign, ChevronRight } from 'lucide-react';
 import { useAccountingOverview } from '../../hooks/accounting/useAccountingReports';
+import { useTranslation } from 'react-i18next';
 
 export default function DashboardAccountingSection() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data: overview, isLoading } = useAccountingOverview({ period: 'month' });
 
   if (isLoading) {
@@ -23,16 +25,18 @@ export default function DashboardAccountingSection() {
       {/* Header */}
       <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(139,99,56,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h3 style={{ margin: 0, fontSize: 15, fontFamily: "'Georgia',serif", fontWeight: 700, color: '#4A3B2F' }}>Accounting Overview</h3>
+          <h3 style={{ margin: 0, fontSize: 15, fontFamily: "'Georgia',serif", fontWeight: 700, color: '#4A3B2F' }}>
+            {t('accounting.dashboard.overview', 'Accounting Overview')}
+          </h3>
           <p style={{ margin: 0, fontSize: 11, color: '#7A5C42', opacity: 0.8, marginTop: 2 }}>
-            Track your book-related expenses
+            {t('accounting.dashboard.track_expenses', 'Track your book-related expenses')}
           </p>
         </div>
         <button
           onClick={() => navigate('/accounting')}
           style={{ fontSize: 11, color: '#7A5C42', display: 'flex', alignItems: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', opacity: 0.7 }}
         >
-          View All <ChevronRight size={13} />
+          {t('accounting.dashboard.view_all', 'View All')} <ChevronRight size={13} />
         </button>
       </div>
 
@@ -42,7 +46,9 @@ export default function DashboardAccountingSection() {
             <DollarSign size={22} color="#f59e0b" />
           </div>
           <div>
-            <p style={{ margin: 0, fontSize: 12, color: '#7A5C42', fontWeight: 600, opacity: 0.8 }}>Total Expenses</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#7A5C42', fontWeight: 600, opacity: 0.8 }}>
+              {t('accounting.dashboard.total_expenses', 'Total Expenses')}
+            </p>
             <p style={{ margin: '2px 0 0', fontSize: 24, fontWeight: 700, fontFamily: "'Georgia',serif", color: '#4A3B2F' }}>
               {summary?.formatted_total || 'Rp 0'}
             </p>

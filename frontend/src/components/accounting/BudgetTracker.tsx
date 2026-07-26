@@ -4,13 +4,14 @@ import { Wallet, TrendingUp, TrendingDown, AlertCircle, Target, Plus, Edit, Tras
 import { useBudgets, useBudgetProgress, useDeleteBudget, useCreateBudget, useUpdateBudget } from '../../hooks/accounting/useBudgets';
 import { useBudgetSummary } from '../../hooks/accounting/useBudgets';
 import type { Budget, BudgetFormData } from '../../types/accounting';
-
+import { useTranslation } from 'react-i18next';
 interface BudgetTrackerProps {
   userId?: string;
   period?: 'monthly' | 'yearly' | 'all';
 }
 
 export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrackerProps) {
+  const { t } = useTranslation();
   const { data: budgetsResponse, isLoading } = useBudgets({ is_active: true, period });
   const { data: summaryResponse } = useBudgetSummary();
   
@@ -68,7 +69,7 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
         <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-walnut/80">Total Budget</p>
+              <p className="text-sm text-walnut/80">{t('accounting.budget_tracker.total_budget', 'Total Budget')}</p>
               <p className="text-2xl font-bold font-serif text-darkBrown">
                 Rp {(summary?.total_budget || 0).toLocaleString()}
               </p>
@@ -80,7 +81,7 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
         <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-walnut/80">Total Spent</p>
+              <p className="text-sm text-walnut/80">{t('accounting.budget_tracker.total_spent', 'Total Spent')}</p>
               <p className="text-2xl font-bold font-serif text-darkBrown">
                 Rp {(summary?.total_spent || 0).toLocaleString()}
               </p>
@@ -92,7 +93,7 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
         <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-walnut/80">Remaining</p>
+              <p className="text-sm text-walnut/80">{t('accounting.budget_tracker.remaining', 'Remaining')}</p>
               <p className="text-2xl font-bold font-serif text-darkBrown">
                 Rp {(summary?.total_remaining || 0).toLocaleString()}
               </p>
@@ -104,7 +105,7 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
         <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-walnut/80">Usage</p>
+              <p className="text-sm text-walnut/80">{t('accounting.budget_tracker.usage', 'Usage')}</p>
               <p className="text-2xl font-bold font-serif text-darkBrown">
                 {summary?.overall_usage_percentage?.toFixed(1) || 0}%
               </p>
@@ -124,14 +125,14 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
       <div className="bg-cream border border-beige rounded-lg shadow-sm">
         <div className="p-6 border-b dark:border-gray-700 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-darkBrown">
-            Active Budgets
+            {t('accounting.budget_tracker.active_budgets', 'Active Budgets')}
           </h3>
           <button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Budget
+            {t('accounting.budget_tracker.add_budget', 'Add Budget')}
           </button>
         </div>
 
@@ -139,12 +140,12 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
           {budgets.length === 0 ? (
             <div className="text-center py-12">
               <Wallet className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-walnut/80 mb-4">No budgets set up yet</p>
+              <p className="text-walnut/80 mb-4">{t('accounting.budget_tracker.no_budgets', 'No budgets set up yet')}</p>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
-                Create your first budget
+                {t('accounting.budget_tracker.create_first', 'Create your first budget')}
               </button>
             </div>
           ) : (
@@ -166,7 +167,7 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
       {/* Alerts Summary */}
       {summary?.data?.exceeded_count > 0 || summary?.data?.warning_count > 0 ? (
         <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
-          <h4 className="text-lg font-semibold text-darkBrown mb-4">Budget Alerts</h4>
+          <h4 className="text-lg font-semibold text-darkBrown mb-4">{t('accounting.budget_tracker.budget_alerts', 'Budget Alerts')}</h4>
           <div className="space-y-3">
             {summary?.data?.exceeded_count > 0 && (
               <motion.div
@@ -179,10 +180,10 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
                 </div>
                 <div>
                   <p className="font-medium text-red-900 dark:text-red-100">
-                    {summary.data.exceeded_count} Budget{summary.data.exceeded_count > 1 ? 's' : ''} Exceeded
+                    {t('accounting.budget_tracker.budgets_exceeded', '{{count}} Budget(s) Exceeded', { count: summary.data.exceeded_count })}
                   </p>
                   <p className="text-sm text-red-700 dark:text-red-300">
-                    You've spent more than your allocated budget
+                    {t('accounting.budget_tracker.exceeded_desc', "You've spent more than your allocated budget")}
                   </p>
                 </div>
               </motion.div>
@@ -199,10 +200,10 @@ export default function BudgetTracker({ userId, period = 'monthly' }: BudgetTrac
                 </div>
                 <div>
                   <p className="font-medium text-yellow-900 dark:text-yellow-100">
-                    {summary.data.warning_count} Budget{summary.data.warning_count > 1 ? 's' : ''} at Warning Level
+                    {t('accounting.budget_tracker.budgets_warning', '{{count}} Budget(s) at Warning Level', { count: summary.data.warning_count })}
                   </p>
                   <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                    You've used 80% or more of your budget
+                    {t('accounting.budget_tracker.warning_desc', "You've used 80% or more of your budget")}
                   </p>
                 </div>
               </motion.div>
@@ -223,6 +224,7 @@ interface BudgetCardProps {
 }
 
 function BudgetCard({ budget, onViewDetails, onEdit, onDelete }: BudgetCardProps) {
+  const { t } = useTranslation();
   const { data: progress } = useBudgetProgress(budget.id);
   const StatusIcon = budget.status === 'exceeded' ? TrendingUp :
                     budget.status === 'warning' ? AlertCircle : Target;
@@ -279,7 +281,7 @@ function BudgetCard({ budget, onViewDetails, onEdit, onDelete }: BudgetCardProps
       {/* Progress Bar */}
       <div className="mb-3">
         <div className="flex justify-between text-sm mb-1">
-          <span className="text-gray-600 dark:text-gray-300">Progress</span>
+          <span className="text-gray-600 dark:text-gray-300">{t('accounting.budget_tracker.progress', 'Progress')}</span>
           <span className={`font-medium ${
             (progress?.usage_percentage || 0) > 80 ? 'text-red-600' : 'text-darkBrown'
           }`}>
@@ -300,19 +302,19 @@ function BudgetCard({ budget, onViewDetails, onEdit, onDelete }: BudgetCardProps
       {/* Amount Details */}
       <div className="grid grid-cols-3 gap-4 text-sm">
         <div>
-          <p className="text-walnut/80">Budget</p>
+          <p className="text-walnut/80">{t('accounting.budget_tracker.budget', 'Budget')}</p>
           <p className="font-medium text-darkBrown">
             Rp {progress?.budget_amount?.toLocaleString() || 0}
           </p>
         </div>
         <div>
-          <p className="text-walnut/80">Spent</p>
+          <p className="text-walnut/80">{t('accounting.budget_tracker.spent', 'Spent')}</p>
           <p className="font-medium text-darkBrown">
             Rp {progress?.total_spent?.toLocaleString() || 0}
           </p>
         </div>
         <div>
-          <p className="text-walnut/80">Remaining</p>
+          <p className="text-walnut/80">{t('accounting.budget_tracker.remaining', 'Remaining')}</p>
           <p className={`font-medium ${
             (progress?.remaining_amount || 0) < 0 ? 'text-red-600' : 'text-green-600'
           }`}>

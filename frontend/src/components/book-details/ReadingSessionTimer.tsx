@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { Book } from '../../types'
 import { useStartReadingSession, useEndReadingSession, useBookReadingSessions, usePauseReadingSession } from '../../hooks/useReadingSessions'
 import type { ReadingSession } from '../../lib/api/readingSessions'
+import { useTranslation } from 'react-i18next'
 
 interface ReadingSessionTimerProps {
   book: Book
@@ -28,18 +29,24 @@ function formatDateTime(dateStr: string): string {
   })
 }
 
-const MOOD_CFG = {
-  great:    { label: 'Luar Biasa', emoji: '🤩', color: '#065f46', bg: '#d1fae5' },
-  good:     { label: 'Baik',       emoji: '😊', color: '#1e40af', bg: '#dbeafe' },
-  okay:     { label: 'Biasa',      emoji: '😐', color: '#92400e', bg: '#fef3c7' },
-  difficult:{ label: 'Berat',      emoji: '😓', color: '#7f1d1d', bg: '#fee2e2' },
+// Will map mood later using t() in component
+
+function getMoodCfg(t: any) {
+  return {
+    great:    { label: t('bookDetail.session.mood.great', 'Luar Biasa'), emoji: '🤩', color: '#065f46', bg: '#d1fae5' },
+    good:     { label: t('bookDetail.session.mood.good', 'Baik'),       emoji: '😊', color: '#1e40af', bg: '#dbeafe' },
+    okay:     { label: t('bookDetail.session.mood.okay', 'Biasa'),      emoji: '😐', color: '#92400e', bg: '#fef3c7' },
+    difficult:{ label: t('bookDetail.session.mood.difficult', 'Berat'),      emoji: '😓', color: '#7f1d1d', bg: '#fee2e2' },
+  }
 }
 
 // ── SessionCard (inline, compact) ─────────────────────────
 function SessionCard({ session, index }: { session: ReadingSession; index: number }) {
+  const { t } = useTranslation()
   const isActive   = session.end_time === null
   const pagesRead  = session.end_page != null ? session.end_page - session.start_page : null
-  const mood       = session.mood ? MOOD_CFG[session.mood as keyof typeof MOOD_CFG] : null
+  const moodCfg = getMoodCfg(t)
+  const mood       = session.mood ? moodCfg[session.mood as keyof typeof moodCfg] : null
 
   return (
     <motion.div
@@ -63,7 +70,7 @@ function SessionCard({ session, index }: { session: ReadingSession; index: numbe
             <BookOpen className="w-3.5 h-3.5" style={{ color: isActive ? '#059669' : '#8B7355' }} />
           </div>
           <span className="text-xs font-semibold" style={{ color: '#2a1a08' }}>
-            Sesi #{index + 1}
+            {t('bookDetail.session.session_number', 'Sesi #{{index}}', { index: index + 1 })}
           </span>
           {mood && (
             <span
@@ -80,7 +87,7 @@ function SessionCard({ session, index }: { session: ReadingSession; index: numbe
             style={{ background: '#d1fae5', color: '#065f46' }}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            Aktif
+            {t('bookDetail.session.active', 'Aktif')}
           </span>
         ) : session.end_time ? (
           <span className="text-[9px]" style={{ color: '#9c6d3a' }}>
@@ -98,7 +105,7 @@ function SessionCard({ session, index }: { session: ReadingSession; index: numbe
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-1.5">
         <div className="rounded-lg p-1.5 text-center" style={{ background: 'rgba(139,115,85,0.08)' }}>
-          <div className="text-[8px] mb-0.5" style={{ color: '#9c6d3a' }}>Halaman</div>
+          <div className="text-[8px] mb-0.5" style={{ color: '#9c6d3a' }}>{t('bookDetail.session.pages', 'Halaman')}</div>
           <div className="text-xs font-bold" style={{ color: '#2a1a08' }}>
             {session.start_page} → {session.end_page ?? '…'}
           </div>
@@ -108,20 +115,20 @@ function SessionCard({ session, index }: { session: ReadingSession; index: numbe
         </div>
 
         <div className="rounded-lg p-1.5 text-center" style={{ background: 'rgba(139,115,85,0.08)' }}>
-          <div className="text-[8px] mb-0.5" style={{ color: '#9c6d3a' }}>Durasi</div>
+          <div className="text-[8px] mb-0.5" style={{ color: '#9c6d3a' }}>{t('bookDetail.session.duration', 'Durasi')}</div>
           <div className="text-xs font-bold font-mono" style={{ color: '#2a1a08' }}>
             {formatDuration(session.duration)}
           </div>
         </div>
 
         <div className="rounded-lg p-1.5 text-center" style={{ background: 'rgba(139,115,85,0.08)' }}>
-          <div className="text-[8px] mb-0.5" style={{ color: '#9c6d3a' }}>Kecepatan</div>
+          <div className="text-[8px] mb-0.5" style={{ color: '#9c6d3a' }}>{t('bookDetail.session.speed', 'Kecepatan')}</div>
           <div className="text-xs font-bold" style={{ color: '#2a1a08' }}>
             {session.duration && pagesRead
               ? ((pagesRead / (session.duration / 3600)).toFixed(0))
               : '—'}
           </div>
-          <div className="text-[8px]" style={{ color: '#9c6d3a' }}>hlm/j</div>
+          <div className="text-[8px]" style={{ color: '#9c6d3a' }}>{t('bookDetail.session.speed_unit', 'hlm/j')}</div>
         </div>
       </div>
 
@@ -140,6 +147,7 @@ function SessionCard({ session, index }: { session: ReadingSession; index: numbe
 
 // ── Main component ─────────────────────────────────────────
 export default function ReadingSessionTimer({ book, updateProgress }: ReadingSessionTimerProps) {
+  const { t } = useTranslation()
   const [isReadingSession,    setIsReadingSession]    = useState(false)
   const [sessionDuration,     setSessionDuration]     = useState(0)
   const [targetMinutes,       setTargetMinutes]       = useState<number | null>(null)
@@ -261,7 +269,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
             Reading Session
             {activeSession?.is_paused && (
               <span className="ml-1 text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider" style={{ background: '#fef3c7', color: '#92400e' }}>
-                Dijeda
+                {t('bookDetail.session.paused', 'Dijeda')}
               </span>
             )}
           </h3>
@@ -270,7 +278,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
             {isReadingSession && (
               <span className="text-xs" style={{ color: '#9c6d3a' }}>
                 <BookOpen className="w-3 h-3 inline mr-1" />
-                {pagesRead} hlm
+                {pagesRead} {t('bookDetail.session.pages_short', 'hlm')}
               </span>
             )}
 
@@ -284,7 +292,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
               }}
             >
               <Activity className="w-3.5 h-3.5" />
-              Riwayat
+              {t('bookDetail.session.history', 'Riwayat')}
               {showHistory
                 ? <ChevronUp className="w-3 h-3" />
                 : <ChevronDown className="w-3 h-3" />
@@ -319,7 +327,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
           
           {isReadingSession && sessionDuration > 60 && (
             <div className="text-xs mt-0.5" style={{ color: '#9c6d3a' }}>
-              {readingSpeed} hlm/jam
+              {readingSpeed} {t('bookDetail.session.speed_unit', 'hlm/j')}
             </div>
           )}
         </div>
@@ -351,7 +359,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
             style={{ background: 'linear-gradient(135deg, #16a34a, #15803d)' }}
           >
             <Play className="w-4 h-4" />
-            {startSessionMutation.isPending ? 'Memulai...' : 'Start Session'}
+            {startSessionMutation.isPending ? t('bookDetail.session.starting', 'Memulai...') : t('bookDetail.session.start', 'Start Session')}
           </button>
           </>
         ) : !isEndingSession ? (
@@ -371,7 +379,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
                 }}
               >
                 {activeSession?.is_paused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-                {activeSession?.is_paused ? 'Lanjutkan' : 'Jeda'}
+                {activeSession?.is_paused ? t('bookDetail.session.resume', 'Lanjutkan') : t('bookDetail.session.pause', 'Jeda')}
               </button>
               <button
                 onClick={handleStop}
@@ -379,22 +387,22 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
                 style={{ background: 'linear-gradient(135deg, #dc2626, #b91c1c)' }}
               >
                 <Check className="w-4 h-4" />
-                Selesai
+                {t('bookDetail.session.finish', 'Selesai')}
               </button>
             </div>
             <div className="mt-2 text-center text-[10px]" style={{ color: '#9c6d3a' }}>
-              Dari hal. {startingPage} · {pagesRead} halaman dibaca
+              {t('bookDetail.session.from_page', 'Dari hal. {{start}} · {{count}} halaman dibaca', { start: startingPage, count: pagesRead })}
             </div>
           </>
         ) : (
           <div className="rounded-lg p-3 space-y-2.5" style={{ background: 'rgba(139,115,85,0.06)', border: '1px solid rgba(139,115,85,0.12)' }}>
             <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c6d3a' }}>
-              Selesaikan Sesi
+              {t('bookDetail.session.finish_session', 'Selesaikan Sesi')}
             </p>
 
             <div>
               <label className="text-xs block mb-1" style={{ color: '#9c6d3a' }}>
-                Halaman Akhir (mulai: {startingPage} / maks: {book.pages})
+                {t('bookDetail.session.end_page', 'Halaman Akhir (mulai: {{start}} / maks: {{max}})', { start: startingPage, max: book.pages })}
               </label>
               <input
                 type="number"
@@ -408,11 +416,11 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
             </div>
 
             <div>
-              <label className="text-xs block mb-1" style={{ color: '#9c6d3a' }}>Catatan (opsional)</label>
+              <label className="text-xs block mb-1" style={{ color: '#9c6d3a' }}>{t('bookDetail.session.notes_optional', 'Catatan (opsional)')}</label>
               <textarea
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
-                placeholder="Bagaimana sesi membacamu?"
+                placeholder={t('bookDetail.session.notes_placeholder', 'Bagaimana sesi membacamu?')}
                 rows={2}
                 className="w-full px-2 py-1 text-xs rounded-lg border resize-none focus:outline-none"
                 style={{ borderColor: 'rgba(139,115,85,0.25)', background: 'white' }}
@@ -427,7 +435,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
                 style={{ background: 'linear-gradient(135deg, #16a34a, #15803d)' }}
               >
                 <Check className="w-3.5 h-3.5" />
-                {endSessionMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                {endSessionMutation.isPending ? t('bookDetail.session.saving', 'Menyimpan...') : t('bookDetail.session.save', 'Simpan')}
               </button>
               <button
                 onClick={handleCancel}
@@ -435,7 +443,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
                 style={{ background: 'rgba(107,83,68,0.12)', color: '#6b4c2a' }}
               >
                 <X className="w-3.5 h-3.5" />
-                Batal
+                {t('bookDetail.session.cancel', 'Batal')}
               </button>
             </div>
           </div>
@@ -444,7 +452,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
         {/* Error */}
         {(startSessionMutation.error || endSessionMutation.error) && (
           <div className="mt-2 p-2 rounded-lg text-xs text-red-700" style={{ background: '#fee2e2' }}>
-            Gagal menyimpan sesi. Coba lagi.
+            {t('bookDetail.session.error', 'Gagal menyimpan sesi. Coba lagi.')}
           </div>
         )}
       </div>
@@ -464,10 +472,10 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
             {stats && (
               <div className="grid grid-cols-2 gap-1.5 mb-2">
                 {[
-                  { icon: <BarChart2 className="w-3 h-3" />, label: 'Total Sesi',   val: stats.total_sessions,           sub: `${completedSessions.length} selesai` },
-                  { icon: <Clock     className="w-3 h-3" />, label: 'Total Waktu',  val: stats.total_duration_formatted || formatDuration(stats.total_duration_seconds), sub: 'waktu membaca', mono: true },
-                  { icon: <BookOpen  className="w-3 h-3" />, label: 'Total Halaman',val: stats.total_pages_read,          sub: 'halaman dibaca' },
-                  { icon: <TrendingUp className="w-3 h-3" />,label: 'Kecepatan',   val: (stats.average_reading_speed_pages_per_hour?.toFixed(1) ?? '—'), sub: 'hlm/jam rata-rata' },
+                  { icon: <BarChart2 className="w-3 h-3" />, label: t('bookDetail.session.total_sessions', 'Total Sesi'),   val: stats.total_sessions,           sub: t('bookDetail.session.sessions_finished', '{{count}} selesai', { count: completedSessions.length }) },
+                  { icon: <Clock     className="w-3 h-3" />, label: t('bookDetail.session.total_time', 'Total Waktu'),  val: stats.total_duration_formatted || formatDuration(stats.total_duration_seconds), sub: t('bookDetail.session.reading_time', 'waktu membaca'), mono: true },
+                  { icon: <BookOpen  className="w-3 h-3" />, label: t('bookDetail.session.total_pages_read', 'Total Halaman'),val: stats.total_pages_read,          sub: t('bookDetail.session.pages_read', 'halaman dibaca') },
+                  { icon: <TrendingUp className="w-3 h-3" />,label: t('bookDetail.session.avg_speed', 'Kecepatan'),   val: (stats.average_reading_speed_pages_per_hour?.toFixed(1) ?? '—'), sub: t('bookDetail.session.avg_speed_unit', 'hlm/jam rata-rata') },
                 ].map((s, i) => (
                   <div key={i}
                     className="rounded-xl p-2.5 border"
@@ -488,7 +496,7 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
             <div className="flex items-center gap-2 mb-2">
               <div className="flex-1 h-px" style={{ background: 'rgba(139,115,85,0.15)' }} />
               <span className="text-[9px] uppercase tracking-widest font-semibold" style={{ color: '#9c6d3a' }}>
-                Riwayat Sesi
+                {t('bookDetail.session.history_title', 'Riwayat Sesi')}
               </span>
               <div className="flex-1 h-px" style={{ background: 'rgba(139,115,85,0.15)' }} />
             </div>
@@ -499,8 +507,8 @@ export default function ReadingSessionTimer({ book, updateProgress }: ReadingSes
                 style={{ background: 'rgba(255,255,255,0.7)', borderColor: 'rgba(139,115,85,0.1)' }}
               >
                 <BookOpen className="w-8 h-8 mb-2" style={{ color: 'rgba(139,115,85,0.3)' }} />
-                <p className="text-xs font-medium" style={{ color: '#9c6d3a' }}>Belum ada sesi membaca</p>
-                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(139,115,85,0.5)' }}>Mulai sesi pertamamu!</p>
+                <p className="text-xs font-medium" style={{ color: '#9c6d3a' }}>{t('bookDetail.session.no_sessions', 'Belum ada sesi membaca')}</p>
+                <p className="text-[9px] mt-0.5" style={{ color: 'rgba(139,115,85,0.5)' }}>{t('bookDetail.session.start_first', 'Mulai sesi pertamamu!')}</p>
               </div>
             ) : (
               <div className="space-y-2">

@@ -1,5 +1,6 @@
 import { BookOpen, FileText, Hash, Globe, Calendar, Package } from 'lucide-react'
 import { BOOK_GENRES } from '../../constants/genres'
+import { useTranslation } from 'react-i18next'
 
 interface BookBasicInfoInputProps {
   formData: any;
@@ -7,16 +8,17 @@ interface BookBasicInfoInputProps {
 }
 
 export default function BookBasicInfoInput({ formData, setFormData }: BookBasicInfoInputProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-walnut/80 uppercase tracking-wider">Informasi Buku</h3>
+      <h3 className="text-sm font-semibold text-walnut/80 uppercase tracking-wider">{t('book_form.basic.title_section')}</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Title */}
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-walnut mb-1.5">
             <BookOpen className="w-4 h-4 inline mr-1" />
-            Judul *
+            {t('book_form.basic.title')}
           </label>
           <input
             type="text"
@@ -24,7 +26,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
-            placeholder="Masukkan judul buku"
+            placeholder={t('book_form.basic.title_placeholder')}
           />
         </div>
 
@@ -32,7 +34,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-walnut mb-1.5">
             <FileText className="w-4 h-4 inline mr-1" />
-            Penulis *
+            {t('book_form.basic.author')}
           </label>
           <input
             type="text"
@@ -40,7 +42,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
             value={formData.author}
             onChange={(e) => setFormData({ ...formData, author: e.target.value })}
             className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
-            placeholder="Masukkan nama penulis"
+            placeholder={t('book_form.basic.author_placeholder')}
           />
         </div>
 
@@ -48,7 +50,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
         <div>
           <label className="block text-sm font-medium text-walnut mb-1.5">
             <Hash className="w-4 h-4 inline mr-1" />
-            ISBN
+            {t('book_form.basic.isbn')}
           </label>
           <input
             type="text"
@@ -63,7 +65,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-walnut mb-1.5">
             <Globe className="w-4 h-4 inline mr-1" />
-            Genre *
+            {t('book_form.basic.genre')}
           </label>
           <div className="space-y-4">
             {BOOK_GENRES.map((group) => (
@@ -94,7 +96,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
             <div className="flex gap-2 pt-2 border-t border-walnut/10">
               <input
                 type="text"
-                placeholder="Atau ketik genre kustom lalu tekan Enter"
+                placeholder={t('book_form.basic.custom_genre')}
                 className="flex-1 px-4 py-2 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
@@ -114,21 +116,21 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
         {/* Publisher */}
         <div>
           <label className="block text-sm font-medium text-walnut mb-1.5">
-            Penerbit
+            {t('book_form.basic.publisher')}
           </label>
           <input
             type="text"
             value={formData.publisher}
             onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
             className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
-            placeholder="Nama Penerbit"
+            placeholder={t('book_form.basic.publisher_placeholder')}
           />
         </div>
 
         {/* Language */}
         <div>
           <label className="block text-sm font-medium text-walnut mb-1.5">
-            Bahasa
+            {t('book_form.basic.language')}
           </label>
           <select
             value={formData.language}
@@ -153,7 +155,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
         <div>
           <label className="block text-sm font-medium text-walnut mb-1.5">
             <Calendar className="w-4 h-4 inline mr-1" />
-            Tahun *
+            {t('book_form.basic.year')}
           </label>
           <input
             type="number"
@@ -169,7 +171,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
         {/* Pages */}
         <div>
           <label className="block text-sm font-medium text-walnut mb-1.5">
-            Halaman *
+            {t('book_form.basic.pages')}
           </label>
           <input
             type="number"
@@ -178,7 +180,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
             value={formData.pages || ''}
             onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
             className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
-            placeholder="Jumlah halaman"
+            placeholder={t('book_form.basic.pages_placeholder')}
           />
         </div>
 
@@ -186,7 +188,7 @@ export default function BookBasicInfoInput({ formData, setFormData }: BookBasicI
         <div>
           <label className="block text-sm font-medium text-walnut mb-1.5">
             <Package className="w-4 h-4 inline mr-1" />
-            Format
+            {t('book_form.basic.format')}
           </label>
           <select
             value={formData.format}

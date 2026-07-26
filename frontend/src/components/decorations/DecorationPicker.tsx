@@ -8,6 +8,7 @@ import {
   type ShelfDecoration,
 } from './DecorationSystem'
 import Modal from '../ui/Modal'
+import { useTranslation } from 'react-i18next'
 
 interface DecorationPickerProps {
   isOpen: boolean
@@ -21,6 +22,7 @@ interface DecorationPickerProps {
 export default function DecorationPicker({
   isOpen, onClose, slot, current, onSelect, onRemove,
 }: DecorationPickerProps) {
+  const { t } = useTranslation()
   const [preview, setPreview] = useState<DecorationKind | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -40,7 +42,7 @@ export default function DecorationPicker({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Hiasan Rak (Sisi ${slot === 'left' ? 'Kiri' : 'Kanan'})`}
+      title={slot === 'left' ? t('shelf_decoration.title_left', 'Hiasan Rak (Sisi Kiri)') : t('shelf_decoration.title_right', 'Hiasan Rak (Sisi Kanan)')}
       size="md"
     >
       <div className="flex flex-col h-full max-h-[60vh]">
@@ -50,14 +52,14 @@ export default function DecorationPicker({
         {/* Header Actions */}
         <div className="flex justify-between items-center mb-4">
           <p className="text-sm text-walnut/70">
-            Pilih dekorasi untuk mempercantik rakmu
+            {t('shelf_decoration.subtitle', 'Pilih dekorasi untuk mempercantik rakmu')}
           </p>
           {current && (
             <button
               onClick={() => { onRemove(); onClose() }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-500 border border-red-200 text-xs font-semibold hover:bg-red-100 transition-colors"
             >
-              <Trash2 size={14} /> Hapus Hiasan
+              <Trash2 size={14} /> {t('shelf_decoration.remove', 'Hapus Hiasan')}
             </button>
           )}
         </div>
@@ -103,8 +105,8 @@ export default function DecorationPicker({
                 onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = '' }}
               >
                 <span className="text-2xl leading-none mb-1">{item.emoji}</span>
-                <span className="text-[11px] font-bold text-darkBrown leading-tight">{item.label}</span>
-                <span className="text-[9px] text-walnut/70 leading-tight">{item.desc}</span>
+                <span className="text-[11px] font-bold text-darkBrown leading-tight">{t(`shelf_decoration.${item.kind}`, item.label)}</span>
+                <span className="text-[9px] text-walnut/70 leading-tight">{t(`shelf_decoration.${item.kind}_desc`, item.desc)}</span>
                 {item.kind === 'frame_photo' && (
                   <div className="absolute top-2 right-2 bg-cream text-walnut rounded-full p-1 border border-walnut/10">
                     <Upload size={10} />

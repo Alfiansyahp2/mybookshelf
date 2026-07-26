@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Layers, Package, FileText, Save } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useUpdateShelf } from '../../hooks/useShelves'
 import type { Shelf } from '../../types'
 
@@ -15,6 +16,7 @@ export default function EditShelfModal({
   isOpen,
   onClose,
 }: EditShelfModalProps) {
+  const { t } = useTranslation()
   const updateShelf = useUpdateShelf()
 
   const [formData, setFormData] = useState({
@@ -85,7 +87,7 @@ export default function EditShelfModal({
                     <Layers className="w-5 h-5 text-walnut" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-serif font-semibold text-darkBrown">Edit Shelf</h2>
+                    <h2 className="text-xl font-serif font-semibold text-darkBrown">{t('modals.editShelf.title', 'Edit Shelf')}</h2>
                     <p className="text-sm text-walnut/60">{shelf.name}</p>
                   </div>
                 </div>
@@ -102,14 +104,14 @@ export default function EditShelfModal({
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Shelf Information */}
                   <div className="space-y-4">
-                    <h3 className="text-sm font-semibold text-walnut/80 uppercase tracking-wider">Shelf Information</h3>
+                    <h3 className="text-sm font-semibold text-walnut/80 uppercase tracking-wider">{t('modals.editShelf.shelf_info', 'Shelf Information')}</h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Shelf Name */}
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-walnut mb-1.5">
                           <Layers className="w-4 h-4 inline mr-1" />
-                          Shelf Name *
+                          {t('modals.editShelf.shelf_name', 'Shelf Name *')}
                         </label>
                         <input
                           type="text"
@@ -125,7 +127,7 @@ export default function EditShelfModal({
                       <div>
                         <label className="block text-sm font-medium text-walnut mb-1.5">
                           <Package className="w-4 h-4 inline mr-1" />
-                          Capacity (books) *
+                          {t('modals.editShelf.capacity', 'Capacity (books) *')}
                         </label>
                         <input
                           type="number"
@@ -136,7 +138,7 @@ export default function EditShelfModal({
                           className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
                         />
                         <p className="text-xs text-walnut/60 mt-1">
-                          Maximum number of books this shelf can hold
+                          {t('modals.editShelf.capacity_hint', 'Maximum number of books this shelf can hold')}
                         </p>
                       </div>
                     </div>
@@ -149,7 +151,7 @@ export default function EditShelfModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  title="Cancel"
+                  title={t('modals.editShelf.cancel', 'Cancel')}
                   className="px-4 py-2 bg-transparent text-walnut/60 hover:bg-walnut/10 rounded-xl transition-colors"
                 >
                   <X className="w-5 h-5" />
@@ -158,7 +160,7 @@ export default function EditShelfModal({
                   type="submit"
                   onClick={handleSubmit}
                   disabled={updateShelf.isPending}
-                  title="Save Changes"
+                  title={t('modals.editShelf.save', 'Save Changes')}
                   className="px-4 py-2 bg-white text-darkBrown border border-walnut/20 rounded-xl hover:bg-cream transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                 >
                   <Save className="w-5 h-5" />

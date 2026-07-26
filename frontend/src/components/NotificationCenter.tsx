@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Bell, Trophy, Info, CheckCircle, AlertTriangle, X, Check, Trash2, ExternalLink } from 'lucide-react'
 import { useNotifications, type NotificationType } from '../hooks/useNotifications'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const ICONS: Record<NotificationType, any> = {
   achievement: Trophy,
@@ -19,6 +20,7 @@ const COLORS: Record<NotificationType, { icon: string, bg: string }> = {
 }
 
 export default function NotificationCenter() {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const { notifications, markAsRead, markAllAsRead, clearAll, removeNotification } = useNotifications()
@@ -43,11 +45,11 @@ export default function NotificationCenter() {
     const diffHours = Math.floor(diffMins / 60)
     const diffDays = Math.floor(diffHours / 24)
 
-    if (diffMins < 1) return 'Baru saja'
-    if (diffMins < 60) return `${diffMins} mnt lalu`
-    if (diffHours < 24) return `${diffHours} jam lalu`
-    if (diffDays === 1) return 'Kemarin'
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+    if (diffMins < 1) return t('notification.just_now', 'Baru saja')
+    if (diffMins < 60) return t('notification.mins_ago', '{{count}} mnt lalu', { count: diffMins })
+    if (diffHours < 24) return t('notification.hours_ago', '{{count}} jam lalu', { count: diffHours })
+    if (diffDays === 1) return t('notification.yesterday', 'Kemarin')
+    return date.toLocaleDateString(t('locale', 'id-ID'), { day: 'numeric', month: 'short' })
   }
 
   return (
@@ -56,7 +58,7 @@ export default function NotificationCenter() {
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-full transition-colors hover:bg-walnut/10 text-darkBrown focus:outline-none"
-        title="Notifikasi"
+        title={t('notification.title', 'Notifikasi')}
         whileHover={{ scale: 1.15 }}
         whileTap={{ scale: 0.9 }}
         transition={{ duration: 0.2 }}
@@ -87,15 +89,15 @@ export default function NotificationCenter() {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-walnut/10 bg-white/50">
-              <h3 className="font-serif font-bold text-darkBrown text-lg">Notifikasi</h3>
+              <h3 className="font-serif font-bold text-darkBrown text-lg">{t('notification.title', 'Notifikasi')}</h3>
               <div className="flex gap-2">
                 {unreadCount > 0 && (
-                  <button onClick={markAllAsRead} className="p-1.5 rounded-md hover:bg-walnut/10 text-walnut transition-colors" title="Tandai semua dibaca">
+                  <button onClick={markAllAsRead} className="p-1.5 rounded-md hover:bg-walnut/10 text-walnut transition-colors" title={t('notification.mark_all_read', 'Tandai semua dibaca')}>
                     <Check size={16} />
                   </button>
                 )}
                 {notifications.length > 0 && (
-                  <button onClick={clearAll} className="p-1.5 rounded-md hover:bg-red-50 text-red-500 transition-colors" title="Hapus semua">
+                  <button onClick={clearAll} className="p-1.5 rounded-md hover:bg-red-50 text-red-500 transition-colors" title={t('notification.clear_all', 'Hapus semua')}>
                     <Trash2 size={16} />
                   </button>
                 )}
@@ -107,7 +109,7 @@ export default function NotificationCenter() {
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 text-walnut/50">
                   <Bell size={32} className="mb-2 opacity-50" />
-                  <p className="text-sm font-medium">Belum ada notifikasi</p>
+                  <p className="text-sm font-medium">{t('notification.empty', 'Belum ada notifikasi')}</p>
                 </div>
               ) : (
                 <div className="flex flex-col gap-1">
@@ -153,7 +155,7 @@ export default function NotificationCenter() {
                               onClick={() => { setIsOpen(false); markAsRead(notif.id) }}
                               className="inline-flex items-center gap-1 mt-2 text-[11px] font-semibold text-walnut hover:text-darkBrown transition-colors"
                             >
-                              Lihat detail <ExternalLink size={10} />
+                              {t('notification.view_details', 'Lihat detail')} <ExternalLink size={10} />
                             </Link>
                           )}
                         </div>

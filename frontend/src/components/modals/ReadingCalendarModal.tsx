@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight, BookOpen } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { Book } from '../../types'
 
 interface ReadingCalendarModalProps {
@@ -14,6 +15,7 @@ const DAYS_OF_WEEK = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 export default function ReadingCalendarModal({ isOpen, onClose, books }: ReadingCalendarModalProps) {
+  const { t } = useTranslation()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedBook, setSelectedBook] = useState<{ book: Book, rect: DOMRect } | null>(null)
 
@@ -147,7 +149,7 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
                 <div className="w-8 h-8 bg-[#8B7355] rounded-md flex items-center justify-center text-white shadow-sm">
                   <span className="font-bold text-lg font-sans">{currentDate.getDate()}</span>
                 </div>
-                Calendar
+                {t('modals.readingCalendar.title', 'Calendar')}
               </h1>
             </div>
 
@@ -156,7 +158,7 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
                 onClick={handleToday}
                 className="px-3 md:px-4 py-1.5 md:py-2 border border-[#8B7355]/30 rounded-lg hover:bg-[#8B7355]/10 transition-colors text-xs md:text-sm font-semibold text-[#8B7355]"
               >
-                Today
+                {t('modals.readingCalendar.today', 'Today')}
               </button>
               
               <div className="flex items-center gap-4">
@@ -167,7 +169,7 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
                   <ChevronRight size={20} />
                 </button>
                 <h2 className="text-lg md:text-[22px] text-[#2a1a08] w-40 md:w-48 font-serif font-bold text-right md:text-left">
-                  {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
+                  {new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toLocaleDateString(t('locale', 'id-ID'), { month: 'long', year: 'numeric' })}
                 </h2>
               </div>
             </div>
@@ -177,11 +179,14 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
           <div className="flex-1 flex flex-col overflow-hidden bg-[#faf9f6]">
             {/* Days of week header */}
             <div className="grid grid-cols-7 border-b border-[#8B7355]/20 bg-[#fdfbf7]">
-              {DAYS_OF_WEEK.map((day, idx) => (
-                <div key={day} className="text-center py-2 text-[11px] font-bold text-[#8B7355] tracking-wider">
-                  {day}
-                </div>
-              ))}
+              {Array.from({ length: 7 }).map((_, idx) => {
+                const date = new Date(2023, 0, idx + 1); // Jan 1, 2023 was a Sunday
+                return (
+                  <div key={idx} className="text-center py-2 text-[11px] font-bold text-[#8B7355] tracking-wider uppercase">
+                    {date.toLocaleDateString(t('locale', 'id-ID'), { weekday: 'short' })}
+                  </div>
+                )
+              })}
             </div>
 
             {/* Grid cells */}
@@ -200,7 +205,7 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
                   >
                     <div className="flex justify-center mb-1">
                       <div className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold ${isToday ? 'bg-[#8B7355] text-white shadow-sm' : 'text-[#5C4532]'}`}>
-                        {cell.date.getDate() === 1 ? `${MONTHS[cell.date.getMonth()].slice(0,3)} ${cell.date.getDate()}` : cell.date.getDate()}
+                        {cell.date.getDate() === 1 ? `${cell.date.toLocaleDateString(t('locale', 'id-ID'), { month: 'short' })} ${cell.date.getDate()}` : cell.date.getDate()}
                       </div>
                     </div>
                     
@@ -275,7 +280,7 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
                       <span>{selectedBook.book.author}</span>
                       {selectedBook.book.finishedDate && (
                         <span>
-                          {new Date(selectedBook.book.finishedDate).toLocaleDateString('id-ID', {
+                          {new Date(selectedBook.book.finishedDate).toLocaleDateString(t('locale', 'id-ID'), {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
@@ -290,8 +295,8 @@ export default function ReadingCalendarModal({ isOpen, onClose, books }: Reading
                         <BookOpen size={18} className="text-[#8B7355]/60" />
                       </div>
                       <div className="text-[#2a1a08]">
-                        <div className="font-medium">Finished reading</div>
-                        <div className="text-[#8B7355]/80">{selectedBook.book.pages} pages • {selectedBook.book.genre}</div>
+                        <div className="font-medium">{t('modals.readingCalendar.finished_reading', 'Finished reading')}</div>
+                        <div className="text-[#8B7355]/80">{selectedBook.book.pages} {t('modals.readingCalendar.pages', 'pages')} • {selectedBook.book.genre}</div>
                       </div>
                     </div>
                   </div>

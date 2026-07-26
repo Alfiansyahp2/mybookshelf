@@ -4,6 +4,7 @@ import { useCreateShelf } from '../../hooks/useShelves'
 import { useNotifications } from '../../hooks/useNotifications'
 import type { Shelf } from '../../types'
 import { Plus, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface AddShelfModalProps {
   isOpen: boolean
@@ -16,6 +17,7 @@ export default function AddShelfModal({
   onClose,
   onShelfAdded
 }: AddShelfModalProps) {
+  const { t } = useTranslation()
   const createShelf = useCreateShelf()
   const { addNotification } = useNotifications()
 
@@ -37,9 +39,9 @@ export default function AddShelfModal({
         setFormData({ name: '', capacity: 10 })
       },
       onError: (error: any) => {
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to create shelf'
+        const errorMessage = error.response?.data?.message || error.message || t('modals.addShelf.error_default', 'Failed to create shelf')
         addNotification({
-          title: 'Error',
+          title: t('modals.addShelf.error', 'Error'),
           message: errorMessage,
           type: 'warning'
         })
@@ -51,13 +53,13 @@ export default function AddShelfModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Add New Shelf"
+      title={t('modals.addShelf.title', 'Add New Shelf')}
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-darkBrown mb-1">
-            Shelf Name *
+            {t('modals.addShelf.shelf_name', 'Shelf Name *')}
           </label>
           <input
             type="text"
@@ -71,7 +73,7 @@ export default function AddShelfModal({
 
         <div>
           <label className="block text-sm font-medium text-darkBrown mb-1">
-            Capacity (max books)
+            {t('modals.addShelf.capacity', 'Capacity (max books)')}
           </label>
           <input
             type="number"
@@ -88,7 +90,7 @@ export default function AddShelfModal({
           <button
             type="button"
             onClick={onClose}
-            title="Cancel"
+            title={t('modals.addShelf.cancel', 'Cancel')}
             className="px-4 py-2 bg-transparent text-walnut/60 hover:bg-walnut/10 rounded-xl transition-colors"
           >
             <X className="w-5 h-5" />
@@ -97,7 +99,7 @@ export default function AddShelfModal({
           <button
             type="submit"
             disabled={createShelf.isPending}
-            title="Add Shelf"
+            title={t('modals.addShelf.add_shelf', 'Add Shelf')}
             className="px-4 py-2 bg-white text-darkBrown border border-walnut/20 rounded-xl hover:bg-cream transition-colors disabled:opacity-50 flex items-center justify-center shadow-sm"
           >
             <Plus className="w-5 h-5" />

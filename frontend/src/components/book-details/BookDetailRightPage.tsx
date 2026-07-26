@@ -4,6 +4,7 @@ import type { Book } from '../../types'
 import ReadingProgressSection from './ReadingProgressSection'
 import ReadingSessionTimer from './ReadingSessionTimer'
 import BookNotesSection from './BookNotesSection'
+import { useTranslation } from 'react-i18next'
 
 interface BookDetailRightPageProps {
   book: Book;
@@ -50,6 +51,7 @@ export default function BookDetailRightPage({
   userNotes, tempNotes, isEditingNotes, setTempNotes, setIsEditingNotes, handleNotes,
   startReadingPending, updateBookPending, updateNotes, updateProgress
 }: BookDetailRightPageProps) {
+  const { t } = useTranslation()
   return (
     <motion.div
       key="right"
@@ -101,19 +103,19 @@ export default function BookDetailRightPage({
           {onEdit && (
             <button onClick={() => onEdit(book)}
               className="p-1.5 rounded-lg transition-colors hover:bg-blue-50"
-              title="Edit" style={{ color: '#3b82f6' }}
+              title={t('bookDetail.actions.edit', 'Edit')} style={{ color: '#3b82f6' }}
             ><Edit className="w-4 h-4" /></button>
           )}
           {onDelete && (
             <button
-              onClick={() => { if (window.confirm(`Hapus "${book.title}"?`)) { onDelete(book.id); onClose() } }}
+              onClick={() => { if (window.confirm(t('bookDetail.confirm_delete', 'Hapus "{{title}}"?', { title: book.title }))) { onDelete(book.id); onClose() } }}
               className="p-1.5 rounded-lg transition-colors hover:bg-red-50"
-              title="Hapus" style={{ color: '#ef4444' }}
+              title={t('bookDetail.actions.delete', 'Hapus')} style={{ color: '#ef4444' }}
             ><Trash2 className="w-4 h-4" /></button>
           )}
           <button onClick={onClose}
             className="p-1.5 rounded-lg transition-colors hover:bg-gray-100"
-            title="Tutup" style={{ color: '#9ca3af' }}
+            title={t('bookDetail.actions.close', 'Tutup')} style={{ color: '#9ca3af' }}
           ><X className="w-4 h-4" /></button>
         </div>
       </div>
@@ -133,7 +135,7 @@ export default function BookDetailRightPage({
                 <div className="flex flex-col items-center justify-center py-14 text-center">
                   <BookOpen className="w-12 h-12 mb-3" style={{ color: `${c1}40` }} />
                   <p className="text-sm" style={{ color: '#9c6d3a' }}>
-                    Mulai membaca untuk melihat progress
+                    {t('bookDetail.progress.start_to_see', 'Mulai membaca untuk melihat progress')}
                   </p>
                   {book.status === 'unread' && !showMarkAsReadDatePicker && (
                     <div className="flex gap-3 mt-5">
@@ -141,19 +143,19 @@ export default function BookDetailRightPage({
                         className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
                         style={{ background: `linear-gradient(135deg, ${c0}, ${c2})` }}
                       >
-                        Mulai Membaca
+                        {t('bookDetail.actions.start_reading', 'Mulai Membaca')}
                       </button>
                       <button onClick={() => setShowMarkAsReadDatePicker(true)}
                         className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all hover:scale-105 border-2"
                         style={{ color: c0, borderColor: c0, background: 'transparent' }}
                       >
-                        Sudah Baca
+                        {t('bookDetail.actions.already_read', 'Sudah Baca')}
                       </button>
                     </div>
                   )}
                   {book.status === 'unread' && showMarkAsReadDatePicker && (
                     <div className="flex flex-col items-center gap-3 mt-5 p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.6)', border: `1px solid ${c0}30` }}>
-                      <label className="text-sm font-medium" style={{ color: '#2a1a08' }}>Pilih Tanggal Selesai Dibaca:</label>
+                      <label className="text-sm font-medium" style={{ color: '#2a1a08' }}>{t('bookDetail.progress.choose_finish_date', 'Pilih Tanggal Selesai Dibaca:')}</label>
                       <input 
                         type="date" 
                         value={markAsReadDate}
@@ -166,13 +168,13 @@ export default function BookDetailRightPage({
                           className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
                           style={{ background: `linear-gradient(135deg, ${c0}, ${c2})` }}
                         >
-                          Simpan
+                          {t('bookDetail.actions.save', 'Simpan')}
                         </button>
                         <button onClick={() => setShowMarkAsReadDatePicker(false)}
                           className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:scale-105 border border-transparent"
                           style={{ color: c0, background: `${c0}15` }}
                         >
-                          Batal
+                          {t('bookDetail.actions.cancel', 'Batal')}
                         </button>
                       </div>
                     </div>
@@ -219,7 +221,7 @@ export default function BookDetailRightPage({
               <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.7)', border: `1px solid ${c0}22`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${c0}20`, color: c1 }}><BookOpen className="w-4 h-4" /></div>
                 <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9c6d3a' }}>Penerbit</div>
+                  <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9c6d3a' }}>{t('bookDetail.info.publisher', 'Penerbit')}</div>
                   <div className="text-sm font-medium truncate" style={{ color: '#2a1a08' }}>{book.publisher || '—'}</div>
                 </div>
               </div>
@@ -227,7 +229,7 @@ export default function BookDetailRightPage({
               <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.7)', border: `1px solid ${c0}22`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${c0}20`, color: c1 }}><BookOpen className="w-4 h-4" /></div>
                 <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9c6d3a' }}>ISBN</div>
+                  <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9c6d3a' }}>{t('bookDetail.info.isbn', 'ISBN')}</div>
                   <div className="text-sm font-medium truncate font-mono" style={{ color: '#2a1a08' }}>{book.isbn || '—'}</div>
                 </div>
               </div>
@@ -235,14 +237,14 @@ export default function BookDetailRightPage({
               <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.7)', border: `1px solid ${c0}22`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${c0}20`, color: c1 }}><BookOpen className="w-4 h-4" /></div>
                 <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9c6d3a' }}>Bahasa</div>
+                  <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9c6d3a' }}>{t('bookDetail.info.language', 'Bahasa')}</div>
                   <div className="text-sm font-medium truncate" style={{ color: '#2a1a08' }}>{book.language || '—'}</div>
                 </div>
               </div>
 
               {(book.purchaseDate || (book.purchasePrice !== undefined && book.purchasePrice !== null) || book.purchaseLocation || book.isGift) && (
                 <div className="mt-3">
-                  <p className="text-[10px] uppercase tracking-widest px-1 mb-2" style={{ color: '#9c6d3a' }}>Informasi Pembelian</p>
+                  <p className="text-[10px] uppercase tracking-widest px-1 mb-2" style={{ color: '#9c6d3a' }}>{t('bookDetail.info.purchase_info', 'Informasi Pembelian')}</p>
                   <div className="p-3 rounded-xl space-y-2"
                     style={{ background: '#fef9ec', border: '1px solid #fcd34d66' }}
                   >
@@ -250,7 +252,7 @@ export default function BookDetailRightPage({
                       <div className="flex justify-between items-center text-sm pb-1.5">
                         <div className="flex items-center gap-2">
                           <ShoppingBag className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#d97706' }} />
-                          <span style={{ color: '#9c6d3a' }}>Tanggal</span>
+                          <span style={{ color: '#9c6d3a' }}>{t('bookDetail.info.date', 'Tanggal')}</span>
                         </div>
                         <span className="font-medium" style={{ color: '#2a1a08' }}>
                           {new Date(book.purchaseDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -261,7 +263,7 @@ export default function BookDetailRightPage({
                       <div className="flex justify-between items-center text-sm pb-1.5">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#d97706' }} />
-                          <span style={{ color: '#9c6d3a' }}>Tempat</span>
+                          <span style={{ color: '#9c6d3a' }}>{t('bookDetail.info.location', 'Tempat')}</span>
                         </div>
                         <span className="font-medium text-right max-w-[60%] truncate" style={{ color: '#2a1a08' }}>
                           {book.purchaseLocation}
@@ -270,13 +272,13 @@ export default function BookDetailRightPage({
                     )}
                     {book.isGift ? (
                       <div className="flex justify-between items-center pt-1.5 border-t" style={{ borderColor: '#fcd34d66' }}>
-                        <span className="text-xs" style={{ color: '#9c6d3a' }}>Status</span>
-                        <span className="font-bold px-2 py-0.5 rounded-full bg-[#fcd34d66]" style={{ color: '#d97706', fontSize: '10px' }}>🎁 Hadiah / Gift</span>
+                        <span className="text-xs" style={{ color: '#9c6d3a' }}>{t('bookDetail.info.status', 'Status')}</span>
+                        <span className="font-bold px-2 py-0.5 rounded-full bg-[#fcd34d66]" style={{ color: '#d97706', fontSize: '10px' }}>🎁 {t('bookDetail.badges.gift', 'Hadiah')}</span>
                       </div>
                     ) : (
                       (book.purchasePrice !== undefined && book.purchasePrice !== null) && (
                         <div className="flex justify-between items-center pt-1.5 border-t" style={{ borderColor: '#fcd34d66' }}>
-                          <span className="text-xs" style={{ color: '#9c6d3a' }}>Harga</span>
+                          <span className="text-xs" style={{ color: '#9c6d3a' }}>{t('bookDetail.info.price', 'Harga')}</span>
                           <span className="font-bold" style={{ color: '#2a1a08' }}>
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: book.purchaseCurrency || 'IDR', minimumFractionDigits: 0 }).format(book.purchasePrice)}
                           </span>
@@ -289,20 +291,20 @@ export default function BookDetailRightPage({
 
               {(book.startedDate || book.finishedDate) && (
                 <div className="mt-2">
-                  <p className="text-[10px] uppercase tracking-widest px-1 mb-2" style={{ color: '#9c6d3a' }}>Riwayat Membaca</p>
+                  <p className="text-[10px] uppercase tracking-widest px-1 mb-2" style={{ color: '#9c6d3a' }}>{t('bookDetail.info.reading_history', 'Riwayat Membaca')}</p>
                   <div className="p-3 rounded-xl space-y-1.5"
                     style={{ background: 'rgba(255,255,255,0.7)', border: `1px solid ${c0}22` }}
                   >
                     {book.startedDate && (
                       <div className="flex justify-between text-sm">
-                        <span style={{ color: '#9c6d3a' }}>Mulai membaca</span>
-                        <span className="font-medium" style={{ color: '#2a1a08' }}>{new Date(book.startedDate).toLocaleDateString('id-ID')}</span>
+                        <span style={{ color: '#9c6d3a' }}>{t('bookDetail.info.started', 'Mulai membaca')}</span>
+                        <span className="font-medium" style={{ color: '#2a1a08' }}>{new Date(book.startedDate).toLocaleDateString(t('locale', 'id-ID'))}</span>
                       </div>
                     )}
                     {book.finishedDate && (
                       <div className="flex justify-between text-sm">
-                        <span style={{ color: '#9c6d3a' }}>Selesai</span>
-                        <span className="font-medium" style={{ color: '#2a1a08' }}>{new Date(book.finishedDate).toLocaleDateString('id-ID')}</span>
+                        <span style={{ color: '#9c6d3a' }}>{t('bookDetail.info.finished', 'Selesai')}</span>
+                        <span className="font-medium" style={{ color: '#2a1a08' }}>{new Date(book.finishedDate).toLocaleDateString(t('locale', 'id-ID'))}</span>
                       </div>
                     )}
                   </div>

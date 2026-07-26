@@ -11,6 +11,7 @@ import {
   PieChart,
   BarChart3
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAccountingOverview } from '../hooks/accounting/useAccountingReports';
 import { useBudgetSummary } from '../hooks/accounting/useBudgets';
 import AccountingDashboard from '../components/accounting/AccountingDashboard';
@@ -20,6 +21,7 @@ import BudgetTracker from '../components/accounting/BudgetTracker';
 import CategoryManager from '../components/accounting/CategoryManager';
 
 export default function Accounting() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'overview' | 'expenses' | 'budgets' | 'categories'>('overview');
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -28,10 +30,10 @@ export default function Accounting() {
   const { data: budgetSummary } = useBudgetSummary();
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: PieChart },
-    { id: 'expenses', label: 'Expenses', icon: DollarSign },
-    { id: 'budgets', label: 'Budgets', icon: Wallet },
-    { id: 'categories', label: 'Categories', icon: BarChart3 },
+    { id: 'overview', label: t('accounting.overview', 'Overview'), icon: PieChart },
+    { id: 'expenses', label: t('accounting.expenses', 'Expenses'), icon: DollarSign },
+    { id: 'budgets', label: t('accounting.budgets', 'Budgets'), icon: Wallet },
+    { id: 'categories', label: t('accounting.categories', 'Categories'), icon: BarChart3 },
   ];
 
   return (
@@ -40,10 +42,10 @@ export default function Accounting() {
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 28 }}>
         <div>
           <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7A5C42', opacity: 0.6, margin: '0 0 4px' }}>
-            Keuangan & Pengeluaran
+            {t('accounting.subtitle', 'Keuangan & Pengeluaran')}
           </p>
           <h1 style={{ fontSize: 28, fontFamily: "'Georgia',serif", fontWeight: 700, color: '#4A3B2F', margin: 0, lineHeight: 1.2 }}>
-            Accounting
+            {t('accounting.title', 'Accounting')}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -56,7 +58,7 @@ export default function Accounting() {
           <button
             onClick={() => setShowExpenseModal(true)}
             className="p-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown shadow-sm transition"
-            title="Add Expense"
+            title={t('accounting.add_expense', 'Add Expense')}
           >
             <Plus className="w-5 h-5" />
           </button>

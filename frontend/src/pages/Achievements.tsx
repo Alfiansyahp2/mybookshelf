@@ -1,5 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { useBooks } from '../hooks/useBooks'
 import { useShelves } from '../hooks/useShelves'
 import { useAchievements, useUnlockAchievement } from '../hooks/useAchievements'
@@ -28,6 +29,7 @@ const colorMap: Record<string, string> = {
 }
 
 export default function Achievements() {
+  const { t } = useTranslation()
   const { data: booksResponse } = useBooks()
   const { data: shelves = [] } = useShelves()
   
@@ -79,8 +81,8 @@ export default function Achievements() {
 
       return {
         id: ach.id,
-        title: ach.title,
-        description: ach.description,
+        title: t(`achievements.data.${ach.title.replace(/\\./g, '_')}.title`, ach.title),
+        description: t(`achievements.data.${ach.description.replace(/\\./g, '_')}`, ach.description),
         icon: iconMap[ach.icon] || Trophy,
         category: ach.category === 'special' ? 'special' : ach.category === 'collections' ? 'collection' : 'milestone',
         target: ach.requirement,
@@ -103,7 +105,7 @@ export default function Achievements() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <p style={{ color: BRAND.walnut, fontSize: 13 }}>Memuat pencapaian…</p>
+        <p style={{ color: BRAND.walnut, fontSize: 13 }}>{t('achievements.loading', 'Memuat pencapaian…')}</p>
       </div>
     )
   }
@@ -117,10 +119,10 @@ export default function Achievements() {
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 32 }}>
         <h1 style={{ fontSize: 28, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown, margin: '0 0 8px' }}>
-          Pencapaian
+          {t('achievements.title', 'Pencapaian')}
         </h1>
         <p style={{ margin: 0, color: BRAND.walnut, opacity: 0.8 }}>
-          Lacak progres dan koleksi medali membaca kamu.
+          {t('achievements.subtitle', 'Lacak progres dan koleksi medali membaca kamu.')}
         </p>
 
         {/* Progress Overview */}
@@ -130,7 +132,7 @@ export default function Achievements() {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: BRAND.darkBrown }}>Total Pencapaian</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: BRAND.darkBrown }}>{t('achievements.total_achievements', 'Total Pencapaian')}</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: BRAND.walnut }}>{unlockedCount} / {achievementsList.length}</span>
             </div>
             <div style={{ height: 8, background: 'rgba(139,99,56,0.1)', borderRadius: 4, overflow: 'hidden' }}>
@@ -178,17 +180,17 @@ export default function Achievements() {
               {/* Content */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h3 style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: ach.unlocked ? BRAND.darkBrown : 'rgba(74,59,47,0.5)' }}>
-                  {ach.title}
+                  {t(`achievements.items.${ach.id}.title`, ach.title)}
                 </h3>
                 <p style={{ margin: '0 0 12px', fontSize: 11, color: ach.unlocked ? BRAND.walnut : 'rgba(122,92,66,0.5)', lineHeight: 1.4 }}>
-                  {ach.description}
+                  {t(`achievements.items.${ach.id}.description`, ach.description)}
                 </p>
 
                 {/* Progress Bar (only if not unlocked) */}
                 {!ach.unlocked && (
                   <div style={{ marginTop: 'auto' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>Progres</span>
+                      <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)' }}>{t('achievements.progress', 'Progres')}</span>
                       <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(122,92,66,0.7)' }}>{ach.progress} / {ach.target}</span>
                     </div>
                     <div style={{ height: 4, background: 'rgba(139,99,56,0.1)', borderRadius: 2, overflow: 'hidden' }}>

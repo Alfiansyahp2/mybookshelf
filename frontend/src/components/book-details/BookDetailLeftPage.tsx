@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Play, Check, Heart, Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { Book } from '../../types'
 
 interface BookDetailLeftPageProps {
@@ -32,6 +33,7 @@ export default function BookDetailLeftPage({
   toggleFavoritePending, startReadingPending, finishReadingPending, updateBookPending,
   setActiveTab, setShowMarkAsReadDatePicker, updateBookMutate
 }: BookDetailLeftPageProps) {
+  const { t } = useTranslation()
   return (
     <motion.div
       key="left"
@@ -164,7 +166,7 @@ export default function BookDetailLeftPage({
                   className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold"
                   style={{ background: '#fce7f3', color: '#9d174d', border: '1px solid #fbcfe8' }}
                 >
-                  🎁 Hadiah
+                  🎁 {t('bookDetail.badges.gift', 'Hadiah')}
                 </div>
               )}
 
@@ -174,7 +176,7 @@ export default function BookDetailLeftPage({
                   className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold"
                   style={{ background: '#d1fae5', color: '#065f46', border: '1px solid #6ee7b7' }}
                 >
-                  🛒 Dibeli
+                  🛒 {t('bookDetail.badges.purchased', 'Dibeli')}
                 </div>
               )}
 
@@ -184,7 +186,7 @@ export default function BookDetailLeftPage({
                   className="inline-flex items-center gap-1 self-start px-2 py-0.5 rounded-full text-[9px] font-semibold"
                   style={{ background: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d' }}
                 >
-                  📚 Pinjaman
+                  📚 {t('bookDetail.badges.borrowed', 'Pinjaman')}
                 </div>
               )}
             </div>
@@ -203,10 +205,10 @@ export default function BookDetailLeftPage({
           {/* stats 2×2 grid */}
           <div className="grid grid-cols-2 gap-2">
             {[
-              { icon: '📖', label: 'Halaman', val: book.pages || '—' },
-              { icon: '📅', label: 'Tahun',   val: book.publishYear || '—' },
-              { icon: '🌐', label: 'Bahasa',  val: book.language || '—' },
-              { icon: '📦', label: 'Format',  val: book.format ? book.format.charAt(0).toUpperCase() + book.format.slice(1) : '—' },
+              { icon: '📖', label: t('bookDetail.stats.pages', 'Halaman'), val: book.pages || '—' },
+              { icon: '📅', label: t('bookDetail.stats.year', 'Tahun'),   val: book.publishYear || '—' },
+              { icon: '🌐', label: t('bookDetail.stats.language', 'Bahasa'),  val: book.language || '—' },
+              { icon: '📦', label: t('bookDetail.stats.format', 'Format'),  val: book.format ? book.format.charAt(0).toUpperCase() + book.format.slice(1) : '—' },
             ].map((s, i) => (
               <div key={i}
                 className="flex flex-col items-center justify-center py-2.5 rounded-lg"
@@ -226,7 +228,7 @@ export default function BookDetailLeftPage({
             return (
               <div>
                 <div className="flex justify-between text-xs mb-1" style={{ color: '#9c6d3a' }}>
-                  <span>Progress</span>
+                  <span>{t('bookDetail.progress.label', 'Progress')}</span>
                   <span className="font-bold" style={{ color: '#2a1a08' }}>{displayProgress}%</span>
                 </div>
                 <div className="h-2 rounded-full overflow-hidden" style={{ background: `${c0}30` }}>
@@ -239,8 +241,8 @@ export default function BookDetailLeftPage({
                   />
                 </div>
                 <div className="flex justify-between text-[10px] mt-0.5" style={{ color: '#9c6d3a' }}>
-                  <span>Hal. {displayPage}</span>
-                  <span>dari {book.pages || '?'}</span>
+                  <span>{t('bookDetail.progress.page', 'Hal.')} {displayPage}</span>
+                  <span>{t('bookDetail.progress.of', 'dari')} {book.pages || '?'}</span>
                 </div>
               </div>
             );
@@ -249,7 +251,7 @@ export default function BookDetailLeftPage({
           {/* Star rating */}
           <div>
             <p className="text-[10px] uppercase tracking-widest mb-1.5 text-center" style={{ color: '#9c6d3a' }}>
-              Rating Kamu
+              {t('bookDetail.your_rating', 'Rating Kamu')}
             </p>
             <div className="flex justify-center gap-1">
               {[1,2,3,4,5].map(s => (
@@ -275,7 +277,7 @@ export default function BookDetailLeftPage({
               }}
             >
               <Heart className={`w-3.5 h-3.5 ${book.isFavorite || book.favorite ? 'fill-red-500 text-red-500' : ''}`} />
-              Favorit
+              {t('bookDetail.actions.favorite', 'Favorit')}
             </button>
 
             {book.status === 'unread' && (
@@ -283,18 +285,18 @@ export default function BookDetailLeftPage({
                 <button onClick={handleStart} disabled={startReadingPending}
                   className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                   style={{ background: `linear-gradient(135deg, ${c0}, ${c2})`, color: 'white' }}
-                  title="Mulai Membaca"
+                  title={t('bookDetail.actions.start_reading', 'Mulai Membaca')}
                 >
                   <Play className="w-3 h-3 flex-shrink-0" />
-                  <span className="truncate">Mulai</span>
+                  <span className="truncate">{t('bookDetail.actions.start', 'Mulai')}</span>
                 </button>
                 <button onClick={() => { setActiveTab('progress'); setShowMarkAsReadDatePicker(true); }} disabled={updateBookPending}
                   className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 border border-transparent"
                   style={{ background: `${c0}15`, color: '#6b4c2a' }}
-                  title="Tandai Sudah Dibaca"
+                  title={t('bookDetail.actions.mark_finished', 'Tandai Sudah Dibaca')}
                 >
                   <Check className="w-3 h-3 flex-shrink-0" />
-                  <span className="truncate">Selesai</span>
+                  <span className="truncate">{t('bookDetail.actions.finish', 'Selesai')}</span>
                 </button>
               </div>
             )}
@@ -304,7 +306,7 @@ export default function BookDetailLeftPage({
                 style={{ background: 'linear-gradient(135deg, #059669, #047857)', color: 'white' }}
               >
                 <Check className="w-3.5 h-3.5" />
-                Selesai
+                {t('bookDetail.actions.finish', 'Selesai')}
               </button>
             )}
             {book.status === 'finished' && (
@@ -313,7 +315,7 @@ export default function BookDetailLeftPage({
                 style={{ background: `linear-gradient(135deg, ${c0}, ${c2})`, color: 'white' }}
               >
                 <Play className="w-3.5 h-3.5" />
-                Baca Ulang
+                {t('bookDetail.actions.reread', 'Baca Ulang')}
               </button>
             )}
           </div>

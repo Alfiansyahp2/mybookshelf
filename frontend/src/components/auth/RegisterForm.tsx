@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface RegisterFormProps {
   formData: any;
@@ -10,6 +11,7 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ formData, setFormData, onSubmit, isLoading }: RegisterFormProps) {
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -18,7 +20,7 @@ export default function RegisterForm({ formData, setFormData, onSubmit, isLoadin
       {/* Full Name */}
       <div>
         <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
-          Full Name
+          {t('login.full_name', 'Full Name')}
         </label>
         <div className="relative">
           <User className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
@@ -37,7 +39,7 @@ export default function RegisterForm({ formData, setFormData, onSubmit, isLoadin
       {/* Email */}
       <div>
         <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
-          Email Address
+          {t('login.email', 'Email Address')}
         </label>
         <div className="relative">
           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
@@ -56,7 +58,7 @@ export default function RegisterForm({ formData, setFormData, onSubmit, isLoadin
       {/* Password */}
       <div>
         <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
-          Password
+          {t('login.password', 'Password')}
         </label>
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
@@ -82,7 +84,7 @@ export default function RegisterForm({ formData, setFormData, onSubmit, isLoadin
       {/* Confirm Password */}
       <div>
         <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
-          Confirm Password
+          {t('login.confirm_password', 'Confirm Password')}
         </label>
         <div className="relative">
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
@@ -114,7 +116,7 @@ export default function RegisterForm({ formData, setFormData, onSubmit, isLoadin
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
-            'Create Library Card'
+            t('login.register_btn', 'Create Library Card')
           )}
         </button>
       </div>

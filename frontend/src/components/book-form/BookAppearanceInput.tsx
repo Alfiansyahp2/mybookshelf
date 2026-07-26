@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface BookAppearanceInputProps {
   formData: any;
   setFormData: (data: any) => void;
@@ -21,42 +23,43 @@ const colorPalettes = [
 ]
 
 export default function BookAppearanceInput({ formData, setFormData }: BookAppearanceInputProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-walnut/80 uppercase tracking-wider">Tampilan Buku</h3>
+      <h3 className="text-sm font-semibold text-walnut/80 uppercase tracking-wider">{t('book_form.appearance.title_section')}</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Height */}
         <div>
-          <label className="block text-sm font-medium text-walnut mb-1.5">Tinggi Buku</label>
+          <label className="block text-sm font-medium text-walnut mb-1.5">{t('book_form.appearance.height')}</label>
           <select
             value={formData.height}
             onChange={(e) => setFormData({ ...formData, height: e.target.value })}
             className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
           >
-            <option value="short">Pendek</option>
-            <option value="medium">Sedang</option>
-            <option value="tall">Tinggi</option>
+            <option value="short">{t('book_form.appearance.height_short')}</option>
+            <option value="medium">{t('book_form.appearance.height_medium')}</option>
+            <option value="tall">{t('book_form.appearance.height_tall')}</option>
           </select>
         </div>
 
         {/* Thickness */}
         <div>
-          <label className="block text-sm font-medium text-walnut mb-1.5">Ketebalan Buku</label>
+          <label className="block text-sm font-medium text-walnut mb-1.5">{t('book_form.appearance.thickness')}</label>
           <select
             value={formData.thickness}
             onChange={(e) => setFormData({ ...formData, thickness: e.target.value })}
             className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
           >
-            <option value="thin">Tipis</option>
-            <option value="regular">Biasa</option>
-            <option value="thick">Tebal</option>
+            <option value="thin">{t('book_form.appearance.thickness_thin')}</option>
+            <option value="regular">{t('book_form.appearance.thickness_regular')}</option>
+            <option value="thick">{t('book_form.appearance.thickness_thick')}</option>
           </select>
         </div>
 
         {/* Color Palette Picker */}
         <div className="md:col-span-3">
-          <label className="block text-sm font-medium text-walnut mb-1.5">Warna Punggung Buku (Spine)</label>
+          <label className="block text-sm font-medium text-walnut mb-1.5">{t('book_form.appearance.spine')}</label>
           <div className="space-y-3">
             {/* Predefined Palettes */}
             <div className="flex flex-wrap gap-2">
@@ -88,28 +91,28 @@ export default function BookAppearanceInput({ formData, setFormData }: BookAppea
 
             {/* Custom Color Preview */}
             <div className="flex items-center gap-2 p-3 bg-cream rounded-xl border border-walnut/20">
-              <span className="text-sm text-walnut/60">Saat Ini:</span>
+              <span className="text-sm text-walnut/60">{t('book_form.appearance.current')}</span>
               <div className="flex gap-1">
                 <input
                   type="color"
                   value={formData.color1}
                   onChange={(e) => setFormData({ ...formData, color1: e.target.value })}
                   className="w-8 h-8 p-0 border-0 rounded-lg shadow-sm cursor-pointer hover:scale-110 transition-transform"
-                  title="Warna Terang"
+                  title={t('book_form.appearance.color_light')}
                 />
                 <input
                   type="color"
                   value={formData.color2}
                   onChange={(e) => setFormData({ ...formData, color2: e.target.value })}
                   className="w-8 h-8 p-0 border-0 rounded-lg shadow-sm cursor-pointer hover:scale-110 transition-transform"
-                  title="Warna Sedang"
+                  title={t('book_form.appearance.color_medium')}
                 />
                 <input
                   type="color"
                   value={formData.color3}
                   onChange={(e) => setFormData({ ...formData, color3: e.target.value })}
                   className="w-8 h-8 p-0 border-0 rounded-lg shadow-sm cursor-pointer hover:scale-110 transition-transform"
-                  title="Warna Gelap"
+                  title={t('book_form.appearance.color_dark')}
                 />
               </div>
             </div>
