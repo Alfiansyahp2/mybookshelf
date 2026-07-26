@@ -40,7 +40,41 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
      return getBookDate(b).getTime() - getBookDate(a).getTime();
   });
 
-  const totalPagesInYear = dailyActivity
+  // Augment dailyActivity with fallback pages for finished books that have no tracking on their finish date
+  const activityMap = new Map();
+  dailyActivity.forEach(d => {
+    activityMap.set(d.date, { ...d });
+  });
+
+  books.forEach(b => {
+    if (b.status === 'finished') {
+      let finalDateStr = null;
+      if (b.finishedDate) {
+        const d = new Date(b.finishedDate);
+        finalDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      } else if (b.readDates && Array.isArray(b.readDates) && b.readDates.length > 0) {
+        const sorted = [...b.readDates].map(rd => new Date(rd).getTime()).sort();
+        const d = new Date(sorted[sorted.length - 1]);
+        finalDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+
+      if (finalDateStr) {
+        const existing = activityMap.get(finalDateStr) || { date: finalDateStr, pages: 0, books_read: [] };
+        if (!existing.pages || existing.pages === 0) {
+          if (!existing.fallbackPages) existing.fallbackPages = 0;
+          existing.fallbackPages += (b.totalPages || b.pages || 0);
+        }
+        activityMap.set(finalDateStr, existing);
+      }
+    }
+  });
+
+  const augmentedDailyActivity = Array.from(activityMap.values()).map(a => ({
+    ...a,
+    pages: a.pages > 0 ? a.pages : (a.fallbackPages || 0)
+  }));
+
+  const totalPagesInYear = augmentedDailyActivity
     .filter(d => new Date(d.date).getFullYear() === selectedYear)
     .reduce((sum, d) => sum + (d.pages || 0), 0);
 
@@ -66,10 +100,10 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
           </div>
           <Card style={{ padding: '16px 20px', border: '1px solid rgba(139,99,56,0.15)' }}>
             <div style={{ paddingBottom: 20 }}>
-              {dailyActivity.length === 0 ? (
+              {augmentedDailyActivity.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '24px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>{t('dashboard.activity.no_activity')}</div>
               ) : (
-                <ContributionGraph data={dailyActivity} books={books} selectedYear={selectedYear} onClick={() => setIsCalendarModalOpen(true)} />
+                <ContributionGraph data={augmentedDailyActivity} books={books} selectedYear={selectedYear} onClick={() => setIsCalendarModalOpen(true)} />
               )}
             </div>
 
