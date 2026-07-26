@@ -13,7 +13,6 @@ import DashboardGoalsSection from '../components/dashboard/DashboardGoalsSection
 import DashboardAuthorsSection from '../components/dashboard/DashboardAuthorsSection'
 import DashboardActivitySection from '../components/dashboard/DashboardActivitySection'
 import DashboardEmptyState from '../components/dashboard/DashboardEmptyState'
-import DashboardAccountingSection from '../components/accounting/DashboardAccountingSection'
 import ReadingCalendarModal from '../components/modals/ReadingCalendarModal'
 import { fadeUp, BRAND } from '../components/dashboard/DashboardWidgets'
 
@@ -61,10 +60,6 @@ export default function Dashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <DashboardReadingSection currentlyReading={stats.currentlyReading} />
           
-          <motion.div {...fadeUp(0.4)}>
-            <DashboardAccountingSection />
-          </motion.div>
-
           <DashboardChartsSection stats={stats} genreFilter={genreFilter} setGenreFilter={setGenreFilter} />
         </div>
 

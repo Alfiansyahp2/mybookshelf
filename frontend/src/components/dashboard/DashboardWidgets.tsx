@@ -178,10 +178,6 @@ export function ContributionGraph({ data, books, selectedYear, onClick }: { data
   for (let i = 0; i < daysInYear; i++) {
     const d = new Date(selectedYear, 0, 1);
     d.setDate(d.getDate() + i);
-    
-    if (isCurrentYear && d > today) {
-      break;
-    }
 
     // Format YYYY-MM-DD
     const yyyy = d.getFullYear();
@@ -308,7 +304,7 @@ export function ContributionGraph({ data, books, selectedYear, onClick }: { data
         
         <div style={{ display: 'flex', gap: 8 }}>
           {/* Left fixed column (Day labels) */}
-          <div style={{ display: 'flex', flexDirection: 'column', paddingTop: 20, paddingBottom: 8, fontSize: 10, color: 'rgba(122,92,66,0.8)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 20, paddingBottom: 8, fontSize: 10, color: 'rgba(122,92,66,0.8)' }}>
             <div style={{ height: 12 }}></div>
             <div style={{ height: 12, display: 'flex', alignItems: 'center' }}>Sen</div>
             <div style={{ height: 12 }}></div>
@@ -324,7 +320,7 @@ export function ContributionGraph({ data, books, selectedYear, onClick }: { data
             style={{ flex: 1, overflowX: 'auto', display: 'flex', flexDirection: 'column', gap: 4, paddingBottom: 8 }}
           >
             {/* Months header */}
-            <div style={{ position: 'relative', height: 16, minWidth: columnsCount * 16 }}>
+            <div style={{ position: 'relative', height: 16, minWidth: columnsCount * 16, width: 'max-content' }}>
               {monthLabels.map((label, idx) => (
                 <span key={idx} style={{ position: 'absolute', left: label.x, fontSize: 10, color: 'rgba(122,92,66,0.8)' }}>
                   {label.month}
@@ -337,7 +333,8 @@ export function ContributionGraph({ data, books, selectedYear, onClick }: { data
               display: 'grid', 
               gridTemplateRows: 'repeat(7, 12px)', 
               gridAutoFlow: 'column', 
-              gap: 4
+              gap: 4,
+              width: 'max-content'
             }}>
               {allSquares.map((day, i) => (
                 day ? (
