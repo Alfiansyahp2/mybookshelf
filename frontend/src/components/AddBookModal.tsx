@@ -6,6 +6,7 @@ import { useCreateBook } from '../hooks/useBooks'
 import BookBasicInfoInput from './book-form/BookBasicInfoInput'
 import BookAppearanceInput from './book-form/BookAppearanceInput'
 import BookPurchaseInput from './book-form/BookPurchaseInput'
+import { useTranslation } from 'react-i18next'
 
 interface AddBookModalProps {
   isOpen: boolean
@@ -15,6 +16,7 @@ interface AddBookModalProps {
 }
 
 export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: AddBookModalProps) {
+  const { t } = useTranslation();
   const createBook = useCreateBook()
 
   useEffect(() => {
@@ -59,7 +61,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
     e.preventDefault()
 
     if (!shelfId) {
-      alert('Please select a shelf first')
+      alert(t('add_book.alert_shelf'))
       return
     }
 
@@ -148,9 +150,9 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                     <BookOpen className="w-5 h-5 text-walnut" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-serif font-semibold text-darkBrown">Tambah Buku Baru</h2>
+                    <h2 className="text-xl font-serif font-semibold text-darkBrown">{t('add_book.title')}</h2>
                     {shelfName && (
-                      <p className="text-sm text-walnut/60">ke {shelfName}</p>
+                      <p className="text-sm text-walnut/60">{t('add_book.to_shelf', { shelfName })}</p>
                     )}
                   </div>
                 </div>
@@ -178,7 +180,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                   onClick={onClose}
                   className="px-6 py-2.5 bg-white border border-walnut/20 rounded-xl text-sm font-medium text-walnut hover:bg-walnut/5 transition-colors"
                 >
-                  Batal
+                  {t('add_book.cancel')}
                 </button>
                 <button
                   form="add-book-form"
@@ -187,11 +189,11 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
                   className="px-6 py-2.5 bg-walnut text-white rounded-xl text-sm font-medium hover:bg-darkBrown transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {createBook.isPending ? (
-                    <>Menyimpan...</>
+                    <>{t('add_book.saving')}</>
                   ) : (
                     <>
                       <BookOpen className="w-4 h-4" />
-                      Simpan Buku
+                      {t('add_book.save')}
                     </>
                   )}
                 </button>

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default function FlipCalendar({ onClick }: { onClick?: () => void }) {
+  const { i18n } = useTranslation()
   const [date, setDate] = useState(new Date())
 
   useEffect(() => {
@@ -20,7 +22,9 @@ export default function FlipCalendar({ onClick }: { onClick?: () => void }) {
   const dayStr = date.getDate().toString().padStart(2, '0')
   const digit1 = dayStr[0]
   const digit2 = dayStr[1]
-  const monthStr = date.toLocaleString('default', { month: 'short' }).toUpperCase()
+  
+  const locale = i18n.language === 'id' ? 'id-ID' : 'en-US'
+  const monthStr = date.toLocaleString(locale, { month: 'short' }).toUpperCase()
 
   return (
     <div 

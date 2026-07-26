@@ -76,5 +76,46 @@
       "no_genre": "Belum ada data genre",
       "books": "Buku"
     }
+  },
+  "library": {
+    "filters": {
+      "all": "Semua",
+      "reading": "Dibaca",
+      "finished": "Selesai",
+      "unread": "Belum Dibaca",
+      "borrowed": "Dipinjam"
+    },
+    "loading": "Memuat perpustakaan...",
+    "error_title": "Gagal memuat perpustakaan",
+    "error_desc": "Periksa koneksi dan coba lagi.",
+    "done": "Selesai",
+    "edit_layout": "Edit Layout",
+    "empty": {
+      "all_title": "Koleksimu masih kosong",
+      "all_desc": "Mulai bangun perpustakaan pribadimu",
+      "filter_title": "Tidak ada buku",
+      "filter_desc": "Tidak ada buku dengan status \"{{status}}\""
+    }
+  },
+  "shelf": {
+    "delete_title": "Hapus Rak?",
+    "delete_confirm_1": "Apakah Anda yakin ingin menghapus rak",
+    "delete_confirm_2": "Buku-buku di dalamnya tidak akan terhapus, namun akan kehilangan posisi raknya.",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "add_left_deco": "Tambah hiasan kiri",
+    "add_right_deco": "Tambah hiasan kanan",
+    "borrowed_by": "Dipinjam oleh {{name}}",
+    "add_book": "Tambah Buku",
+    "edit_shelf": "Edit Rak",
+    "delete_shelf": "Hapus Rak"
+  },
+  "add_book": {
+    "title": "Tambah Buku Baru",
+    "to_shelf": "ke {{shelfName}}",
+    "cancel": "Batal",
+    "saving": "Menyimpan...",
+    "save": "Simpan Buku",
+    "alert_shelf": "Pilih rak terlebih dahulu"
   }
 }

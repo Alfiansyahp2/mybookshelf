@@ -11,6 +11,7 @@ import {
 import { useUpdateShelf } from '../hooks/useShelves'
 import { useLighting, TEMP_COLORS } from '../hooks/useLighting'
 import type { Shelf, Book as BookType } from '../types'
+import { useTranslation } from 'react-i18next'
 
 interface ShelfProps {
   shelf: Shelf
@@ -47,6 +48,7 @@ export default function LibraryShelf({
   shelf, books, onBookClick, onAddBook, onEditShelf, onDeleteShelf,
   isDrawerOpen, selectedBookId, shelfIndex = 0,
 }: ShelfProps) {
+  const { t } = useTranslation();
   const [pickerSlot, setPickerSlot] = useState<'left' | 'right' | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const updateShelf = useUpdateShelf()
@@ -109,9 +111,9 @@ export default function LibraryShelf({
               className="relative rounded-2xl shadow-2xl p-6 max-w-sm w-full"
               style={{ background: '#fef9ec', border: '1px solid #fcd34d66' }}
             >
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#2a1a08' }}>Hapus Rak?</h3>
+              <h3 className="text-lg font-bold mb-2" style={{ color: '#2a1a08' }}>{t('shelf.delete_title')}</h3>
               <p className="text-sm mb-6" style={{ color: '#6b4c2a' }}>
-                Apakah Anda yakin ingin menghapus rak <strong>"{shelf.name}"</strong>? Buku-buku di dalamnya tidak akan terhapus, namun akan kehilangan posisi raknya.
+                {t('shelf.delete_confirm_1')} <strong>"{shelf.name}"</strong>? {t('shelf.delete_confirm_2')}
               </p>
               <div className="flex gap-3 justify-end">
                 <button
@@ -119,7 +121,7 @@ export default function LibraryShelf({
                   className="px-4 py-2 rounded-xl text-sm font-semibold transition-colors hover:bg-black/5"
                   style={{ color: '#6b4c2a' }}
                 >
-                  Batal
+                  {t('shelf.cancel')}
                 </button>
                 <button
                   onClick={() => {
@@ -129,7 +131,7 @@ export default function LibraryShelf({
                   className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-transform hover:scale-105 active:scale-95 shadow-md shadow-red-500/20"
                   style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}
                 >
-                  Hapus
+                  {t('shelf.delete')}
                 </button>
               </div>
             </motion.div>
@@ -207,7 +209,7 @@ export default function LibraryShelf({
             <div
               style={{ flexShrink:0, display:'flex', alignItems: leftDeco?.kind === 'plant_hanging' ? 'flex-start' : 'flex-end', height: '100%', paddingLeft:4, paddingRight:6, cursor:'pointer', position:'relative', minWidth:8 }}
               onClick={() => setPickerSlot('left')}
-              title="Tambah hiasan kiri"
+              title={t('shelf.add_left_deco')}
             >
               {leftDeco
                 ? <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} style={{ paddingBottom: leftDeco.kind === 'plant_hanging' ? 0 : 2 }}>
@@ -232,7 +234,7 @@ export default function LibraryShelf({
                 if (book.status === 'borrowed') {
                   return (
                     <div key={book.id} onClick={() => onBookClick(book)} className="cursor-pointer hover:border-white/40 transition-colors" style={{ width:22, height:BOOK_AREA_H*0.82, flexShrink:0, background:'repeating-linear-gradient(45deg,rgba(255,255,255,0.04),rgba(255,255,255,0.04) 3px,transparent 3px,transparent 7px)', border:'1px dashed rgba(255,255,255,0.15)', borderRadius:2, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      <span style={{ fontSize:11, opacity:0.4 }} title={`Dipinjam oleh ${book.borrowedBy || 'seseorang'}`}>📤</span>
+                      <span style={{ fontSize:11, opacity:0.4 }} title={t('shelf.borrowed_by', { name: book.borrowedBy || 'someone' })}>📤</span>
                     </div>
                   )
                 }
@@ -252,7 +254,7 @@ export default function LibraryShelf({
             <div
               style={{ flexShrink:0, display:'flex', alignItems: rightDeco?.kind === 'plant_hanging' ? 'flex-start' : 'flex-end', height: '100%', paddingLeft:6, paddingRight:4, cursor:'pointer', position:'relative', minWidth:8 }}
               onClick={() => setPickerSlot('right')}
-              title="Tambah hiasan kanan"
+              title={t('shelf.add_right_deco')}
             >
               {rightDeco
                 ? <motion.div initial={{ scale:0.8, opacity:0 }} animate={{ scale:1, opacity:1 }} style={{ paddingBottom: rightDeco.kind === 'plant_hanging' ? 0 : 2 }}>
@@ -310,9 +312,9 @@ export default function LibraryShelf({
 
           {/* Action buttons */}
           <div style={{ display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
-            <ActionBtn icon={<Plus size={12} />}   title="Tambah Buku" onClick={() => onAddBook?.(shelf.id)}    color="#ffffff" />
-            <ActionBtn icon={<Pencil size={11} />} title="Edit Rak"    onClick={() => onEditShelf?.(shelf.id)}  color="#60a5fa" />
-            <ActionBtn icon={<Trash2 size={11} />} title="Hapus Rak"   onClick={() => setIsDeleting(true)} color="#f87171" />
+            <ActionBtn icon={<Plus size={12} />}   title={t('shelf.add_book')} onClick={() => onAddBook?.(shelf.id)}    color="#ffffff" />
+            <ActionBtn icon={<Pencil size={11} />} title={t('shelf.edit_shelf')}    onClick={() => onEditShelf?.(shelf.id)}  color="#60a5fa" />
+            <ActionBtn icon={<Trash2 size={11} />} title={t('shelf.delete_shelf')}   onClick={() => setIsDeleting(true)} color="#f87171" />
           </div>
         </div>
       </motion.div>

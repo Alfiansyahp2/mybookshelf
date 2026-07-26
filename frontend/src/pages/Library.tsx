@@ -12,16 +12,18 @@ import ReadingCalendarModal from '../components/modals/ReadingCalendarModal'
 import LightingControl from '../components/LightingControl'
 import BigDigitalClock from '../components/ui/BigDigitalClock'
 import FlipCalendar from '../components/ui/FlipCalendar'
+import { useTranslation } from 'react-i18next'
 
 const FILTER_TABS = [
-  { key: 'all',      label: 'Semua' },
-  { key: 'reading',  label: 'Dibaca' },
-  { key: 'finished', label: 'Selesai' },
-  { key: 'unread',   label: 'Belum Dibaca' },
-  { key: 'borrowed', label: 'Dipinjam' },
+  { key: 'all',      labelKey: 'library.filters.all' },
+  { key: 'reading',  labelKey: 'library.filters.reading' },
+  { key: 'finished', labelKey: 'library.filters.finished' },
+  { key: 'unread',   labelKey: 'library.filters.unread' },
+  { key: 'borrowed', labelKey: 'library.filters.borrowed' },
 ]
 
 export default function Library() {
+  const { t } = useTranslation();
   const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
   const { mutate: updateLayout } = useUpdateShelfLayout()
 
@@ -41,7 +43,7 @@ export default function Library() {
       <div className="flex items-center justify-center py-20">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-3 border-walnut/30 border-t-walnut rounded-full animate-spin" />
-          <p className="text-sm text-walnut/60">Memuat perpustakaan...</p>
+          <p className="text-sm text-walnut/60">{t('library.loading')}</p>
         </div>
       </div>
     )
@@ -51,8 +53,8 @@ export default function Library() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <div className="text-5xl mb-4">⚠️</div>
-        <h3 className="text-lg font-serif text-darkBrown mb-1">Gagal memuat perpustakaan</h3>
-        <p className="text-sm text-walnut/60">Periksa koneksi dan coba lagi.</p>
+        <h3 className="text-lg font-serif text-darkBrown mb-1">{t('library.error_title')}</h3>
+        <p className="text-sm text-walnut/60">{t('library.error_desc')}</p>
       </div>
     )
   }
@@ -106,13 +108,13 @@ export default function Library() {
                 className="h-12 px-5 rounded-xl bg-green-600/90 text-white backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-green-500 shadow-xl transition-all"
               >
                 <Save size={18} />
-                <span className="text-sm font-bold">Selesai</span>
+                <span className="text-sm font-bold">{t('library.done')}</span>
               </button>
             ) : (
               <motion.button
                 onClick={() => setIsEditMode(true)}
                 className="w-12 h-12 rounded-xl bg-white/40 backdrop-blur-md border border-white/40 shadow-lg flex items-center justify-center text-[#5a3410] transition-all hover:bg-white/60"
-                title="Edit Layout"
+                title={t('library.edit_layout')}
                 whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.9 }}
                 transition={{ duration: 0.2 }}
@@ -142,7 +144,7 @@ export default function Library() {
                       : 'bg-transparent text-[#5a3410]/70 hover:bg-white/40 hover:text-[#5a3410]'
                   }`}
                 >
-                  {tab.label}
+                  {t(tab.labelKey as any)}
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${
                     active ? 'bg-[#5a3410]/10' : 'bg-black/5'
                   }`}>
@@ -188,12 +190,12 @@ export default function Library() {
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="text-5xl mb-3">📚</div>
           <h3 className="text-lg font-serif text-darkBrown mb-1">
-            {activeFilter === 'all' ? 'Koleksimu masih kosong' : 'Tidak ada buku'}
+            {activeFilter === 'all' ? t('library.empty.all_title') : t('library.empty.filter_title')}
           </h3>
           <p className="text-sm text-walnut/50">
             {activeFilter === 'all'
-              ? 'Mulai bangun perpustakaan pribadimu'
-              : `Tidak ada buku dengan status "${activeFilter}"`}
+              ? t('library.empty.all_desc')
+              : t('library.empty.filter_desc', { status: t(`library.filters.${activeFilter}`) })}
           </p>
         </div>
       )}

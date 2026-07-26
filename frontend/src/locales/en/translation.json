@@ -76,5 +76,46 @@
       "no_genre": "No genre data yet",
       "books": "Books"
     }
+  },
+  "library": {
+    "filters": {
+      "all": "All",
+      "reading": "Reading",
+      "finished": "Finished",
+      "unread": "Unread",
+      "borrowed": "Borrowed"
+    },
+    "loading": "Loading library...",
+    "error_title": "Failed to load library",
+    "error_desc": "Check your connection and try again.",
+    "done": "Done",
+    "edit_layout": "Edit Layout",
+    "empty": {
+      "all_title": "Your collection is empty",
+      "all_desc": "Start building your personal library",
+      "filter_title": "No books found",
+      "filter_desc": "No books with status \"{{status}}\""
+    }
+  },
+  "shelf": {
+    "delete_title": "Delete Shelf?",
+    "delete_confirm_1": "Are you sure you want to delete shelf",
+    "delete_confirm_2": "Books inside will not be deleted, but will lose their shelf position.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "add_left_deco": "Add left decoration",
+    "add_right_deco": "Add right decoration",
+    "borrowed_by": "Borrowed by {{name}}",
+    "add_book": "Add Book",
+    "edit_shelf": "Edit Shelf",
+    "delete_shelf": "Delete Shelf"
+  },
+  "add_book": {
+    "title": "Add New Book",
+    "to_shelf": "to {{shelfName}}",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save Book",
+    "alert_shelf": "Please select a shelf first"
   }
 }
