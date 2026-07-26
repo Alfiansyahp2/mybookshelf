@@ -119,7 +119,7 @@ export function MiniSpines({ colors }: { colors: string[] }) {
 }
 
 /* ── Github-style contribution graph ────────── */
-export function ContributionGraph({ data, books, onClick }: { data: any[], books?: any[], onClick?: () => void }) {
+export function ContributionGraph({ data, books, selectedYear, onClick }: { data: any[], books?: any[], selectedYear: number, onClick?: () => void }) {
   const activityMap = new Map();
   data.forEach(d => {
     activityMap.set(d.date, { pages: d.pages || 0, finished: 0, finishedBooks: [], booksRead: d.books_read || [] });
@@ -160,7 +160,6 @@ export function ContributionGraph({ data, books, onClick }: { data: any[], books
 
   const today = new Date();
   const currentYear = today.getFullYear();
-  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
   const startDate = new Date(selectedYear, 0, 1);
   
@@ -382,34 +381,6 @@ export function ContributionGraph({ data, books, onClick }: { data: any[], books
         </div>
       </div>
 
-      {/* Right section: Years filter */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingLeft: 16, borderLeft: '1px solid rgba(139,99,56,0.1)', minWidth: 60 }}>
-        {[0, 1, 2, 3].map(offset => {
-          const year = currentYear - offset;
-          const isActive = selectedYear === year;
-          return (
-            <div 
-              key={year} 
-              onClick={() => setSelectedYear(year)}
-              style={{ 
-                background: isActive ? '#7A5C42' : 'transparent', 
-                color: isActive ? 'white' : 'rgba(122,92,66,0.7)', 
-                padding: '6px 12px', 
-                borderRadius: 6, 
-                fontSize: 12, 
-                fontWeight: 600, 
-                cursor: 'pointer', 
-                textAlign: 'center', 
-                transition: 'all 0.2s' 
-              }} 
-              onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(139,99,56,0.05)' }} 
-              onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
-            >
-              {year}
-            </div>
-          )
-        })}
-      </div>
     </div>
   )
 }
