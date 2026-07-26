@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, BookOpen } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useCreateBook } from '../hooks/useBooks'
 import BookBasicInfoInput from './book-form/BookBasicInfoInput'
 import BookAppearanceInput from './book-form/BookAppearanceInput'
@@ -15,6 +16,20 @@ interface AddBookModalProps {
 
 export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: AddBookModalProps) {
   const createBook = useCreateBook()
+
+  useEffect(() => {
+    const mainContainer = document.getElementById('main-scroll-container')
+    if (!mainContainer) return
+
+    if (isOpen) {
+      mainContainer.style.overflow = 'hidden'
+    } else {
+      mainContainer.style.overflow = 'auto'
+    }
+    return () => {
+      mainContainer.style.overflow = 'auto'
+    }
+  }, [isOpen])
 
   const [formData, setFormData] = useState({
     title: '',
@@ -104,7 +119,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
 
   if (!isOpen) return null
 
-  return (
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -187,4 +202,6 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName }: Ad
       )}
     </AnimatePresence>
   )
+
+  return createPortal(modalContent, document.body)
 }

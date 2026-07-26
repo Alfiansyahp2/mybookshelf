@@ -500,6 +500,7 @@ export default function AppLayout() {
             animate={{ rotateY: 0, filter: 'brightness(1)' }}
             exit={{ rotateY: 90, filter: 'brightness(0.2)' }}
             transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+            id="main-scroll-container"
             className="w-full h-full absolute inset-0 overflow-auto bg-cream"
             style={{ 
               transformOrigin: '50% 50% 50vw',
