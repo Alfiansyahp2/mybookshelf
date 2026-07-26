@@ -3,12 +3,14 @@ import { Library, Bookmark, Heart, Users, BookMarked, DollarSign } from 'lucide-
 import { useNavigate } from 'react-router-dom'
 import { BRAND, Card, fadeUp } from './DashboardWidgets'
 import { useAccountingOverview } from '../../hooks/accounting/useAccountingReports'
+import { useTranslation } from 'react-i18next'
 
 interface DashboardStatCardsSectionProps {
   stats: any;
 }
 
 export default function DashboardStatCardsSection({ stats }: DashboardStatCardsSectionProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: accountingOverview } = useAccountingOverview({ period: 'month' });
   const totalExpenses = accountingOverview?.data?.summary?.formatted_total || 'Rp 0';
@@ -16,12 +18,12 @@ export default function DashboardStatCardsSection({ stats }: DashboardStatCardsS
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))', gap: 12, marginBottom: 24 }}>
       {[
-        { icon: Library,   label: 'Total Buku',     val: stats.total,     sub: `+${stats.addedThisMonth} bulan ini`, color: '#6366f1', bg: '#eef2ff' },
-        { icon: Heart,     label: 'Favorit',        val: stats.favorites, sub: 'buku favorit',                       color: '#ec4899', bg: '#fce7f3' },
-        { icon: Bookmark,  label: 'Selesai Dibaca', val: stats.finished,  sub: `${stats.finishedThisYear} tahun ini`, color: '#8b5cf6', bg: '#ede9fe' },
-        { icon: BookMarked,label: 'Belum Dibaca',   val: stats.unread,    sub: 'menunggu',                           color: '#64748b', bg: '#f1f5f9' },
-        { icon: Users,     label: 'Dipinjam',       val: stats.borrowed,  sub: 'belum kembali',                      color: '#f59e0b', bg: '#fef3c7' },
-        { icon: DollarSign,label: 'Accounting',     val: totalExpenses,   sub: 'total expenses',                     color: '#f59e0b', bg: '#fef3c7', valSize: 18, route: '/accounting' },
+        { icon: Library,   label: t('dashboard.stat_cards.total_books'),     val: stats.total,     sub: t('dashboard.stat_cards.total_books_sub', { count: stats.addedThisMonth }), color: '#6366f1', bg: '#eef2ff' },
+        { icon: Heart,     label: t('dashboard.stat_cards.favorites'),        val: stats.favorites, sub: t('dashboard.stat_cards.favorites_sub'),                       color: '#ec4899', bg: '#fce7f3' },
+        { icon: Bookmark,  label: t('dashboard.stat_cards.finished'), val: stats.finished,  sub: t('dashboard.stat_cards.finished_sub', { count: stats.finishedThisYear }), color: '#8b5cf6', bg: '#ede9fe' },
+        { icon: BookMarked,label: t('dashboard.stat_cards.unread'),   val: stats.unread,    sub: t('dashboard.stat_cards.unread_sub'),                           color: '#64748b', bg: '#f1f5f9' },
+        { icon: Users,     label: t('dashboard.stat_cards.borrowed'),       val: stats.borrowed,  sub: t('dashboard.stat_cards.borrowed_sub'),                      color: '#f59e0b', bg: '#fef3c7' },
+        { icon: DollarSign,label: t('dashboard.stat_cards.accounting'),     val: totalExpenses,   sub: t('dashboard.stat_cards.accounting_sub'),                     color: '#f59e0b', bg: '#fef3c7', valSize: 18, route: '/accounting' },
       ].map((s, i) => {
         const Icon = s.icon
         return (

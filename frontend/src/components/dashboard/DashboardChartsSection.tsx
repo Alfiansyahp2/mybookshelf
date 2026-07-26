@@ -3,6 +3,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, CartesianG
 import { BRAND, Card, ChartTooltip, fadeUp } from './DashboardWidgets'
 import { BOOK_GENRES } from '../../constants/genres'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface DashboardChartsSectionProps {
   stats: any;
@@ -11,6 +12,7 @@ interface DashboardChartsSectionProps {
 }
 
 export default function DashboardChartsSection({ stats, genreFilter, setGenreFilter }: DashboardChartsSectionProps) {
+  const { t } = useTranslation();
   
   const displayedGenres = useMemo(() => {
     let filtered = stats.genreChart;
@@ -31,7 +33,7 @@ export default function DashboardChartsSection({ stats, genreFilter, setGenreFil
       <motion.div {...fadeUp(0.5)} style={{ height: '100%' }}>
         <Card style={{ height: 280, display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
-            <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Distribusi Status</h3>
+            <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>{t('dashboard.charts.status_title')}</h3>
           </div>
           <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', gap: 20, flex: 1 }}>
             <ResponsiveContainer width={140} height={140}>
@@ -59,7 +61,7 @@ export default function DashboardChartsSection({ stats, genreFilter, setGenreFil
         <Card style={{ height: 280, display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '16px 20px 8px', borderBottom: '1px solid rgba(139,99,56,0.08)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>Genre Terbanyak</h3>
+              <h3 style={{ margin: 0, fontSize: 14, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown }}>{t('dashboard.charts.genre_title')}</h3>
             </div>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
               <button
@@ -71,7 +73,7 @@ export default function DashboardChartsSection({ stats, genreFilter, setGenreFil
                   transition: 'all 0.2s'
                 }}
               >
-                Semua
+                {t('dashboard.charts.all')}
               </button>
               {BOOK_GENRES.map((g: any) => (
                 <button
@@ -92,7 +94,7 @@ export default function DashboardChartsSection({ stats, genreFilter, setGenreFil
           </div>
           <div style={{ padding: '12px 16px 12px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             {displayedGenres.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Belum ada data genre</div>
+              <div style={{ textAlign: 'center', padding: '20px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>{t('dashboard.charts.no_genre')}</div>
             ) : (
               <div style={{ overflowY: 'auto', flex: 1, paddingRight: 4, display: 'flex', flexDirection: 'column' }} className="hide-scrollbar">
                 <div style={{ minHeight: Math.max(150, displayedGenres.length * 28), flex: 1 }}>
@@ -102,7 +104,7 @@ export default function DashboardChartsSection({ stats, genreFilter, setGenreFil
                     <XAxis type="number" hide />
                     <YAxis type="category" dataKey="displayName" tick={{ fontSize: 10, fill: BRAND.walnut }} axisLine={false} tickLine={false} width={80} />
                     <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(139,99,56,0.05)' }} />
-                    <Bar dataKey="count" name="Buku" fill={BRAND.walnut} radius={[0, 4, 4, 0]} barSize={14} />
+                    <Bar dataKey="count" name={t('dashboard.charts.books')} fill={BRAND.walnut} radius={[0, 4, 4, 0]} barSize={14} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

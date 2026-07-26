@@ -2,21 +2,23 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { BookOpen, ChevronRight } from 'lucide-react'
 import { BRAND, Card, fadeUp } from './DashboardWidgets'
+import { useTranslation } from 'react-i18next'
 
 interface DashboardReadingSectionProps {
   currentlyReading: any[];
 }
 
 export default function DashboardReadingSection({ currentlyReading }: DashboardReadingSectionProps) {
+  const { t } = useTranslation();
   return (
     <motion.div {...fadeUp(0.35)}>
       <Card style={{ maxHeight: 300, display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '18px 20px 14px', borderBottom: '1px solid rgba(139,99,56,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <h2 style={{ margin: 0, fontSize: 15, fontFamily: "'Georgia',serif", fontWeight: 700, color: BRAND.darkBrown, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BookOpen size={16} color={BRAND.walnut} /> Sedang & Belum Dibaca
+            <BookOpen size={16} color={BRAND.walnut} /> {t('dashboard.reading.title')}
           </h2>
           <Link to="/reading" style={{ fontSize: 11, color: BRAND.walnut, display: 'flex', alignItems: 'center', gap: 3, textDecoration: 'none', opacity: 0.7 }}>
-            Lihat semua <ChevronRight size={13} />
+            {t('dashboard.reading.view_all')} <ChevronRight size={13} />
           </Link>
         </div>
 
@@ -24,7 +26,7 @@ export default function DashboardReadingSection({ currentlyReading }: DashboardR
           {currentlyReading.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '24px 0', color: 'rgba(122,92,66,0.45)' }}>
               <BookOpen size={32} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.4 }} />
-              <p style={{ fontSize: 12, margin: 0 }}>Belum ada buku</p>
+              <p style={{ fontSize: 12, margin: 0 }}>{t('dashboard.reading.no_books')}</p>
             </div>
           ) : currentlyReading.map((b, i) => {
             const pct = b.pages > 0 ? Math.round((b.currentPage / b.pages) * 100) : 0
@@ -39,7 +41,7 @@ export default function DashboardReadingSection({ currentlyReading }: DashboardR
                       <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: BRAND.darkBrown, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{b.title}</p>
                       {isUnread && (
                         <span style={{ fontSize: 8.5, fontWeight: 700, padding: '1px 6px', borderRadius: 10, background: '#f3f4f6', color: '#6b7280', border: '1px solid #d1d5db', flexShrink: 0, whiteSpace: 'nowrap' }}>
-                          Belum Dibaca
+                          {t('dashboard.reading.unread_badge')}
                         </span>
                       )}
                     </div>
@@ -49,7 +51,7 @@ export default function DashboardReadingSection({ currentlyReading }: DashboardR
                         <div style={{ flex: 1, height: 4, borderRadius: 2, background: 'rgba(139,99,56,0.08)' }}>
                           <div style={{ width: 0, height: '100%', borderRadius: 2 }} />
                         </div>
-                        <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.4)', whiteSpace: 'nowrap' }}>{b.pages ? `${b.pages} hal.` : '—'}</span>
+                        <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.4)', whiteSpace: 'nowrap' }}>{b.pages ? t('dashboard.reading.pages', { count: b.pages }) : '—'}</span>
                       </div>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -61,7 +63,7 @@ export default function DashboardReadingSection({ currentlyReading }: DashboardR
                           />
                         </div>
                         <span style={{ fontSize: 10, fontWeight: 700, color: BRAND.walnut, whiteSpace: 'nowrap' }}>{pct}%</span>
-                        <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)', whiteSpace: 'nowrap' }}>hal. {b.currentPage}/{b.pages}</span>
+                        <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.5)', whiteSpace: 'nowrap' }}>{t('dashboard.reading.page_of', { current: b.currentPage, total: b.pages })}</span>
                       </div>
                     )}
                   </div>

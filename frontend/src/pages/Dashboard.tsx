@@ -4,6 +4,7 @@ import { useBooks } from '../hooks/useBooks'
 import { useShelves } from '../hooks/useShelves'
 import { useStatistics } from '../hooks/useStatistics'
 import { useDashboardStats } from '../hooks/useDashboardStats'
+import { useTranslation } from 'react-i18next'
 
 import DashboardHeroSection from '../components/dashboard/DashboardHeroSection'
 import DashboardStatCardsSection from '../components/dashboard/DashboardStatCardsSection'
@@ -20,6 +21,7 @@ import { fadeUp, BRAND } from '../components/dashboard/DashboardWidgets'
     MAIN DASHBOARD
    ══════════════════════════════════════════════ */
 export default function Dashboard() {
+  const { t } = useTranslation()
   const { data: booksResponse, isLoading } = useBooks()
   const { data: shelves = [] } = useShelves()
   const { data: statisticsResponse } = useStatistics()
@@ -39,7 +41,7 @@ export default function Dashboard() {
         <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
           style={{ width: 28, height: 28, border: '3px solid rgba(122,92,66,0.2)', borderTopColor: BRAND.walnut, borderRadius: '50%' }}
         />
-        <p style={{ color: BRAND.walnut, fontSize: 13 }}>Memuat dashboard…</p>
+        <p style={{ color: BRAND.walnut, fontSize: 13 }}>{t('dashboard.loading')}</p>
       </div>
     </div>
   )

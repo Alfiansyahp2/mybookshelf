@@ -9,5 +9,72 @@
     "no_results": "No results for",
     "results_found": "results found",
     "view_all": "View all results in Library →"
+  },
+  "dashboard": {
+    "loading": "Loading dashboard...",
+    "hero": {
+      "subtitle": "Personal Library",
+      "title": "Dashboard"
+    },
+    "stat_cards": {
+      "total_books": "Total Books",
+      "total_books_sub": "+{{count}} this month",
+      "favorites": "Favorites",
+      "favorites_sub": "favorite books",
+      "finished": "Finished",
+      "finished_sub": "{{count}} this year",
+      "unread": "Unread",
+      "unread_sub": "waiting",
+      "borrowed": "Borrowed",
+      "borrowed_sub": "not returned",
+      "accounting": "Accounting",
+      "accounting_sub": "total expenses"
+    },
+    "activity": {
+      "pages_read": "{{count}} pages read in {{year}}",
+      "no_activity": "No reading activity this year",
+      "read_activity": "Read activity",
+      "no_books": "No book history this year.",
+      "book_activities": "There are {{count}} book activities",
+      "finished": "Finished reading",
+      "added": "Added"
+    },
+    "empty": {
+      "title": "No books yet",
+      "desc": "Start adding your first book collection.",
+      "btn": "Go to Library"
+    },
+    "reading": {
+      "title": "Currently & Unread",
+      "view_all": "View all",
+      "no_books": "No books yet",
+      "unread_badge": "Unread",
+      "pages": "{{count}} pg.",
+      "page_of": "pg. {{current}}/{{total}}"
+    },
+    "goals": {
+      "target": "Target {{year}}",
+      "achieved": "{{pct}}% Achieved",
+      "books": "books",
+      "remaining": "{{count}} books remaining",
+      "quick_stats": "Quick Stats",
+      "fav_genre": "Favorite Genre",
+      "avg_rating": "Average Rating",
+      "total_shelves": "Total Shelves",
+      "shelves": "shelves",
+      "wishlist": "Wishlist"
+    },
+    "authors": {
+      "title": "Top Authors",
+      "no_data": "No author data yet",
+      "books": "Books"
+    },
+    "charts": {
+      "status_title": "Status Distribution",
+      "genre_title": "Top Genres",
+      "all": "All",
+      "no_genre": "No genre data yet",
+      "books": "Books"
+    }
   }
 }

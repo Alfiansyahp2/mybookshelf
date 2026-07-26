@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen } from 'lucide-react'
 import { BRAND, Card, ContributionGraph, fadeUp } from './DashboardWidgets'
+import { useTranslation } from 'react-i18next'
 
 interface DashboardActivitySectionProps {
   dailyActivity: any[];
@@ -11,6 +12,8 @@ interface DashboardActivitySectionProps {
 }
 
 export default function DashboardActivitySection({ dailyActivity, books, setIsCalendarModalOpen }: DashboardActivitySectionProps) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.startsWith('en') ? 'en-US' : 'id-ID';
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
@@ -43,8 +46,7 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
 
   const groupedByMonth = booksInYear.reduce((acc: any, book: any) => {
     const d = getBookDate(book);
-    // Use Indonesian month names
-    const month = d.toLocaleString('id-ID', { month: 'long' });
+    const month = d.toLocaleString(locale, { month: 'long' });
     if (!acc[month]) acc[month] = [];
     acc[month].push(book);
     return acc;
@@ -60,12 +62,12 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
         {/* Heatmap Card */}
         <motion.div {...fadeUp(0.6)}>
           <div style={{ fontSize: 14, color: BRAND.darkBrown, marginBottom: 12, paddingLeft: 4, fontWeight: 500 }}>
-            {totalPagesInYear} halaman dibaca pada {selectedYear}
+            {t('dashboard.activity.pages_read', { count: totalPagesInYear, year: selectedYear })}
           </div>
           <Card style={{ padding: '16px 20px', border: '1px solid rgba(139,99,56,0.15)' }}>
             <div style={{ paddingBottom: 20 }}>
               {dailyActivity.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '24px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>Tidak ada aktivitas membaca tahun ini</div>
+                <div style={{ textAlign: 'center', padding: '24px 0', color: 'rgba(122,92,66,0.4)', fontSize: 12 }}>{t('dashboard.activity.no_activity')}</div>
               ) : (
                 <ContributionGraph data={dailyActivity} books={books} selectedYear={selectedYear} onClick={() => setIsCalendarModalOpen(true)} />
               )}
@@ -88,7 +90,7 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
                    width: 'fit-content'
                  }}
               >
-                <span>Read activity</span>
+                <span>{t('dashboard.activity.read_activity')}</span>
                 <span style={{ 
                   fontSize: 14, 
                   color: 'rgba(139,99,56,0.6)', 
@@ -109,7 +111,7 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
                   >
                     <div style={{ paddingLeft: 36, borderLeft: '1px solid rgba(139,99,56,0.15)', display: 'flex', flexDirection: 'column', gap: 16 }}>
                       {Object.keys(groupedByMonth).length === 0 ? (
-                         <div style={{ fontSize: 12, color: 'rgba(122,92,66,0.5)', padding: '10px 0' }}>Tidak ada riwayat buku pada tahun ini.</div>
+                         <div style={{ fontSize: 12, color: 'rgba(122,92,66,0.5)', padding: '10px 0' }}>{t('dashboard.activity.no_books')}</div>
                       ) : (
                         Object.entries(groupedByMonth).map(([month, monthBooks]: any) => {
                           const isExpanded = expandedMonths[month];
@@ -143,7 +145,7 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
                                        userSelect: 'none'
                                      }}
                                    >
-                                     <span>Terdapat {monthBooks.length} aktivitas buku</span>
+                                     <span>{t('dashboard.activity.book_activities', { count: monthBooks.length })}</span>
                                      <span style={{ color: 'rgba(139,99,56,0.6)', transition: 'transform 0.2s', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                                        ▼
                                      </span>
@@ -169,7 +171,7 @@ export default function DashboardActivitySection({ dailyActivity, books, setIsCa
                                                       <span style={{ fontSize: 10, color: 'rgba(122,92,66,0.6)' }}>{b.author}</span>
                                                     </div>
                                                     <span style={{ fontSize: 10, fontWeight: 600, color: isFinished ? '#10b981' : '#6b7280', flexShrink: 0, paddingLeft: 12 }}>
-                                                      {isFinished ? 'Selesai dibaca' : 'Ditambahkan'}
+                                                      {isFinished ? t('dashboard.activity.finished') : t('dashboard.activity.added')}
                                                     </span>
                                                   </div>
                                                </div>

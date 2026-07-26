@@ -9,5 +9,72 @@
     "no_results": "Tidak ada hasil untuk",
     "results_found": "hasil ditemukan",
     "view_all": "Lihat semua hasil di Library →"
+  },
+  "dashboard": {
+    "loading": "Memuat dashboard...",
+    "hero": {
+      "subtitle": "Perpustakaan Pribadi",
+      "title": "Dashboard"
+    },
+    "stat_cards": {
+      "total_books": "Total Buku",
+      "total_books_sub": "+{{count}} bulan ini",
+      "favorites": "Favorit",
+      "favorites_sub": "buku favorit",
+      "finished": "Selesai Dibaca",
+      "finished_sub": "{{count}} tahun ini",
+      "unread": "Belum Dibaca",
+      "unread_sub": "menunggu",
+      "borrowed": "Dipinjam",
+      "borrowed_sub": "belum kembali",
+      "accounting": "Accounting",
+      "accounting_sub": "total pengeluaran"
+    },
+    "activity": {
+      "pages_read": "{{count}} halaman dibaca pada {{year}}",
+      "no_activity": "Tidak ada aktivitas membaca tahun ini",
+      "read_activity": "Riwayat bacaan",
+      "no_books": "Tidak ada riwayat buku pada tahun ini.",
+      "book_activities": "Terdapat {{count}} aktivitas buku",
+      "finished": "Selesai dibaca",
+      "added": "Ditambahkan"
+    },
+    "empty": {
+      "title": "Belum ada buku",
+      "desc": "Mulai tambahkan koleksi buku pertama Anda.",
+      "btn": "Ke Perpustakaan"
+    },
+    "reading": {
+      "title": "Sedang & Belum Dibaca",
+      "view_all": "Lihat semua",
+      "no_books": "Belum ada buku",
+      "unread_badge": "Belum Dibaca",
+      "pages": "{{count}} hal.",
+      "page_of": "hal. {{current}}/{{total}}"
+    },
+    "goals": {
+      "target": "Target {{year}}",
+      "achieved": "{{pct}}% Tercapai",
+      "books": "buku",
+      "remaining": "Sisa {{count}} buku",
+      "quick_stats": "Statistik Cepat",
+      "fav_genre": "Genre Favorit",
+      "avg_rating": "Rating Rata-rata",
+      "total_shelves": "Total Rak",
+      "shelves": "rak",
+      "wishlist": "Wishlist"
+    },
+    "authors": {
+      "title": "Penulis Terbanyak",
+      "no_data": "Belum ada data penulis",
+      "books": "Buku"
+    },
+    "charts": {
+      "status_title": "Distribusi Status",
+      "genre_title": "Genre Terbanyak",
+      "all": "Semua",
+      "no_genre": "Belum ada data genre",
+      "books": "Buku"
+    }
   }
 }
