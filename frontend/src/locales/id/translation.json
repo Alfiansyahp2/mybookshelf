@@ -529,7 +529,7 @@
   "wishlist": {
     "loading": "Memuat wishlist...",
     "title": "Wishlist",
-    "subtitle": "Antrean bacaan Anda - {{count}} buku menunggu untuk dibaca",
+    "subtitle": "Buku-buku yang berencana Anda miliki - {{count}} item",
     "wishlist": "Wishlist",
     "total_pages": "Total Halaman",
     "est_reading": "Est. Membaca",

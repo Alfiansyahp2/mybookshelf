@@ -4,6 +4,8 @@ import { useStartReading } from '../hooks/useBooks'
 import { useNavigate } from 'react-router-dom'
 import { useBookstore } from '../store/useBookstore'
 import Bookshelf from '../components/Bookshelf'
+import AddWishlistBookModal from '../components/AddWishlistBookModal'
+import { useState } from 'react'
 import type { Book } from '../types'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +23,9 @@ export default function Wishlist() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
+  const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false)
+  const [addShelfId, setAddShelfId] = useState<string | undefined>()
+  const [addShelfName, setAddShelfName] = useState<string | undefined>()
 
   // Fetch all books and shelves from API
   const { data: allBooksResponse, isLoading } = useBooks({})
@@ -32,8 +37,24 @@ export default function Wishlist() {
 
   // Calculate wishlist statistics
   const totalWishlist = wishlistBooks.length
-  const estimatedPages = wishlistBooks.reduce((sum: number, book: Book) => sum + (book.pages || 0), 0)
-  const estimatedHours = Math.round(estimatedPages / 30) // Assuming 30 pages per hour
+  
+  const genresCount = wishlistBooks.reduce((acc: any, book: Book) => {
+    if (book.genre) {
+       book.genre.split(',').map((g: string) => g.trim()).forEach((g: string) => {
+         if (g) acc[g] = (acc[g] || 0) + 1;
+       })
+    }
+    return acc;
+  }, {});
+  const topGenre = Object.keys(genresCount).sort((a, b) => genresCount[b] - genresCount[a])[0] || '-';
+
+  const authorsCount = wishlistBooks.reduce((acc: any, book: Book) => {
+    if (book.author) {
+       acc[book.author] = (acc[book.author] || 0) + 1;
+    }
+    return acc;
+  }, {});
+  const topAuthor = Object.keys(authorsCount).sort((a, b) => authorsCount[b] - authorsCount[a])[0] || '-';
 
   const handleStartReading = (bookId: string) => {
     startReadingMutation.mutate(bookId)
@@ -45,8 +66,9 @@ export default function Wishlist() {
   }
 
   const handleAddBook = (shelfId: string, shelfName?: string) => {
-    console.log('Add book to shelf:', shelfId, shelfName)
-    // TODO: Implement add book functionality
+    setAddShelfId(shelfId)
+    setAddShelfName(shelfName)
+    setIsAddBookModalOpen(true)
   }
 
   // Loading state
@@ -75,90 +97,36 @@ export default function Wishlist() {
       }} />
       <div className="max-w-7xl mx-auto w-full relative z-10">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
-          {t('wishlist.title', 'Wishlist')}
-        </h1>
-        <p className="text-walnut/70">
-          {t('wishlist.subtitle', 'Your reading queue - {{count}} book{{s}} waiting to be read', { count: totalWishlist, s: totalWishlist !== 1 ? 's' : '' })}
-        </p>
-      </div>
-
-      {/* Statistics Cards */}
-      {totalWishlist > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-pink-600 flex items-center justify-center">
-                <Heart className="w-6 h-6 text-white" />
+      <div className="mb-10 flex items-end justify-between">
+        <div>
+          <div className="flex items-center gap-4 mb-2">
+            <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown">
+              {t('wishlist.title', 'Wishlist')}
+            </h1>
+            
+            {/* Minimalist Count Badge */}
+            {totalWishlist > 0 && (
+              <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-walnut/10 shadow-sm text-sm">
+                <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
+                <span className="font-bold text-darkBrown">{totalWishlist}</span>
               </div>
-              <div>
-                <div className="text-2xl font-bold text-darkBrown">{totalWishlist}</div>
-                <div className="text-sm text-walnut/70">{t('wishlist.wishlist', 'Wishlist')}</div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-darkBrown">
-                  {estimatedPages.toLocaleString()}
-                </div>
-                <div className="text-sm text-walnut/70">{t('wishlist.total_pages', 'Total Pages')}</div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-darkBrown">{estimatedHours}h</div>
-                <div className="text-sm text-walnut/70">{t('wishlist.est_reading', 'Est. Reading')}</div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                <Gift className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-darkBrown">
-                  {totalWishlist > 0 ? Math.round(estimatedPages / totalWishlist) : 0}
-                </div>
-                <div className="text-sm text-walnut/70">{t('wishlist.avg_pages', 'Avg Pages')}</div>
-              </div>
-            </div>
-          </motion.div>
+            )}
+          </div>
+          
+          <p className="text-walnut/70">
+            {t('wishlist.subtitle', 'Books you are planning to acquire - {{count}} item{{s}}', { count: totalWishlist, s: totalWishlist !== 1 ? 's' : '' })}
+          </p>
         </div>
-      )}
+
+        {/* Add to Wishlist Button */}
+        <button
+          onClick={() => setIsAddBookModalOpen(true)}
+          className="px-6 py-2.5 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md flex items-center gap-2 text-sm whitespace-nowrap"
+        >
+          <Plus className="w-4 h-4" />
+          {t('wishlist.add_to_wishlist', 'Add Book')}
+        </button>
+      </div>
 
       {/* Wishlist Books Grid */}
       {totalWishlist > 0 && (
@@ -166,101 +134,63 @@ export default function Wishlist() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mb-8"
+          className="mb-8"
         >
-          <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-            <Target className="w-5 h-5" />
-            {t('wishlist.reading_queue', 'Your Reading Queue')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {wishlistBooks.map((book: Book, index: number) => {
-              const estimatedTime = Math.round((book.pages || 0) / 30)
               return (
                 <motion.div
                   key={book.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-gradient-to-br from-cream to-beige rounded-xl p-4 border border-walnut/10 hover:shadow-md transition-shadow"
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => handleBookClick(book)}
+                  className="group bg-white rounded-2xl p-5 border border-walnut/10 hover:border-walnut/30 hover:shadow-xl transition-all cursor-pointer flex flex-col h-full"
                 >
-                  {/* Book Cover Preview */}
-                  <div className="w-full h-32 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden"
-                    style={{
-                      background: `linear-gradient(135deg, ${book.spineColors[0]} 0%, ${book.spineColors[2]} 100%)`
-                    }}
-                  >
-                    <div className="text-white text-center p-2 z-10">
-                      <div className="text-sm font-semibold">{book.title}</div>
-                      <div className="text-xs opacity-90">{book.author}</div>
+                  {/* Book Cover Placeholder */}
+                  <div className="w-full aspect-[2/3] rounded-xl mb-4 flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-walnut/5 to-walnut/10 border border-walnut/10 group-hover:shadow-inner transition-all">
+                    <div className="text-center p-4 z-10 w-full">
+                      <div className="text-lg font-serif font-bold text-darkBrown leading-tight mb-2 line-clamp-3">{book.title}</div>
+                      <div className="text-sm font-medium text-walnut/80 line-clamp-2">{book.author}</div>
                     </div>
-                    <div className="absolute top-2 right-2 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
-                      <Heart className="w-3 h-3 text-white fill-white" />
+                    
+                    {/* Decorative Elements */}
+                    <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm">
+                      <Heart className="w-4 h-4 text-rose-500 fill-rose-500/20" />
                     </div>
+                    
+                    <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/5 to-transparent"></div>
                   </div>
 
                   {/* Book Info */}
-                  <h3 className="font-semibold text-darkBrown mb-2 truncate">{book.title}</h3>
-                  <p className="text-sm text-walnut/70 mb-3">{book.author}</p>
+                  <div className="flex-1 flex flex-col">
+                    <div className="space-y-3 mt-auto">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-walnut/60">{t('wishlist.genre', 'Genre')}</span>
+                        <span className="font-medium text-darkBrown bg-walnut/5 px-2 py-0.5 rounded-md truncate max-w-[120px]">{book.genre || '-'}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-walnut/60">{t('wishlist.pages', 'Pages')}</span>
+                        <span className="font-medium text-darkBrown">{book.pages || '-'}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-walnut/60">{t('wishlist.format', 'Format')}</span>
+                        <span className="font-medium text-darkBrown capitalize">{book.format || '-'}</span>
+                      </div>
+                    </div>
 
-                  {/* Book Details */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-xs text-walnut/60">
-                      <span>{t('wishlist.genre', 'Genre:')}</span>
-                      <span className="font-medium text-darkBrown">{book.genre}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-walnut/60">
-                      <span>{t('wishlist.pages', 'Pages:')}</span>
-                      <span className="font-medium text-darkBrown">{book.pages}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-walnut/60">
-                      <span>{t('wishlist.est_time', 'Est. Time:')}</span>
-                      <span className="font-medium text-darkBrown">{estimatedTime}h</span>
+                    {/* Action Button */}
+                    <div className="mt-5 pt-4 border-t border-walnut/10">
+                      <div className="w-full py-2.5 bg-cream group-hover:bg-walnut group-hover:text-white text-walnut rounded-xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
+                        <BookOpen className="w-4 h-4" />
+                        {t('wishlist.view_details', 'View Details')}
+                      </div>
                     </div>
                   </div>
-
-                  {/* Action Button */}
-                  <button
-                    onClick={() => handleStartReading(book.id)}
-                    className="w-full py-2 bg-walnut text-white rounded-lg font-medium hover:bg-darkBrown transition-colors flex items-center justify-center gap-2 text-sm"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    {t('wishlist.start_reading', 'Start Reading')}
-                  </button>
                 </motion.div>
               )
             })}
           </div>
-        </motion.div>
-      )}
-
-      {/* Wishlist Bookshelf - Only show if there are wishlist books */}
-      {totalWishlist > 0 && (
-        <Bookshelf
-          books={allBooks}
-          shelves={shelves}
-          onAddBook={handleAddBook}
-          filterStatus="wishlist"
-          selectedBookId={selectedBookId}
-          isDrawerOpen={isBookDetailOpen}
-          onBookClick={handleBookClick}
-        />
-      )}
-
-      {/* Action Buttons */}
-      {totalWishlist > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex justify-center mt-8"
-        >
-          <button
-            onClick={() => navigate('/library')}
-            className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            {t('wishlist.browse_library', 'Browse Library')}
-          </button>
         </motion.div>
       )}
 
@@ -288,7 +218,7 @@ export default function Wishlist() {
               {t('wishlist.browse_library', 'Browse Library')}
             </button>
             <button
-              onClick={() => navigate('/library')}
+              onClick={() => setIsAddBookModalOpen(true)}
               className="px-6 py-3 bg-white text-walnut rounded-xl font-medium hover:bg-walnut/10 transition-colors border border-walnut/20"
             >
               {t('wishlist.add_to_wishlist', 'Add to Wishlist')}
@@ -296,6 +226,15 @@ export default function Wishlist() {
           </div>
         </motion.div>
       )}
+      
+      <AddWishlistBookModal
+        isOpen={isAddBookModalOpen}
+        onClose={() => {
+          setIsAddBookModalOpen(false)
+          setAddShelfId(undefined)
+          setAddShelfName(undefined)
+        }}
+      />
       </div>
     </div>
   )

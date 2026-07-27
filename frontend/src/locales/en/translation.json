@@ -529,7 +529,7 @@
   "wishlist": {
     "loading": "Loading wishlist...",
     "title": "Wishlist",
-    "subtitle": "Your reading queue - {{count}} book{{s}} waiting to be read",
+    "subtitle": "Books you are planning to acquire - {{count}} item{{s}}",
     "wishlist": "Wishlist",
     "total_pages": "Total Pages",
     "est_reading": "Est. Reading",

@@ -4,21 +4,15 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useCreateBook } from '../hooks/useBooks'
 import BookBasicInfoInput from './book-form/BookBasicInfoInput'
-import BookAppearanceInput from './book-form/BookAppearanceInput'
-import BookPurchaseInput from './book-form/BookPurchaseInput'
-import BookStatusInput from './book-form/BookStatusInput'
 import { useTranslation } from 'react-i18next'
 
-interface AddBookModalProps {
+interface AddWishlistBookModalProps {
   isOpen: boolean
   onClose: () => void
-  shelfId?: string
-  shelfName?: string
-  initialStatus?: Book['status']
 }
 
-export default function AddBookModal({ isOpen, onClose, shelfId, shelfName, initialStatus = 'unread' }: AddBookModalProps) {
-  const { t } = useTranslation();
+export default function AddWishlistBookModal({ isOpen, onClose }: AddWishlistBookModalProps) {
+  const { t } = useTranslation()
   const createBook = useCreateBook()
 
   useEffect(() => {
@@ -41,48 +35,21 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName, init
     isbn: '',
     genres: [] as string[],
     language: 'Indonesian',
-    status: initialStatus,
     publisher: '',
     publishYear: new Date().getFullYear().toString(),
     pages: '0',
-    format: 'paperback',
-    height: 'medium',
-    thickness: 'regular',
-    color1: '#8B7355',
-    color2: '#6B5344',
-    color3: '#5C4532',
-    purchaseDate: new Date().toISOString().split('T')[0],
-    purchasePrice: '',
-    purchaseCurrency: 'IDR',
-    purchaseLocation: '',
-    acquisitionType: 'purchased' as 'purchased' | 'gift' | 'borrowed',
-    giftFrom: '',
-    borrowedFrom: '',
-    borrowedBy: '',
-    borrowedDate: new Date().toISOString().split('T')[0],
-    dueDate: '',
+    format: 'paperback'
   })
-
-  useEffect(() => {
-    if (isOpen) {
-      setFormData(prev => ({ ...prev, status: initialStatus }))
-    }
-  }, [isOpen, initialStatus])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!shelfId && formData.status !== 'wishlist') {
-      alert(t('add_book.alert_shelf', 'Pilih rak terlebih dahulu!'))
-      return
-    }
 
     // Create book object for API
     const bookData = {
       title: formData.title,
       author: formData.author,
-      shelfId: shelfId || undefined,
-      status: formData.status,
+      shelfId: undefined, // Wishlist books typically don't have a shelf
+      status: 'wishlist' as const,
       pages: formData.pages ? parseInt(formData.pages) : 0,
       currentPage: 0,
       isbn: formData.isbn,
@@ -91,18 +58,11 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName, init
       publisher: formData.publisher,
       publishYear: formData.publishYear ? parseInt(formData.publishYear) : undefined,
       format: formData.format as any,
-      height: formData.height as any,
-      thickness: formData.thickness as any,
-      spineColors: [formData.color1, formData.color2, formData.color3] as [string, string, string],
-      purchaseDate: formData.purchaseDate,
-      purchasePrice: formData.acquisitionType !== 'purchased' ? undefined : (formData.purchasePrice ? parseFloat(formData.purchasePrice) : undefined),
-      purchaseCurrency: formData.purchaseCurrency,
-      purchaseLocation: formData.acquisitionType === 'purchased' ? formData.purchaseLocation : undefined,
-      isGift: formData.acquisitionType === 'gift',
-      personalNotes: formData.acquisitionType === 'gift' && formData.giftFrom ? `Gift from: ${formData.giftFrom}` : (formData.acquisitionType === 'borrowed' && formData.borrowedFrom ? `Borrowed from: ${formData.borrowedFrom}` : ''),
-      borrowedBy: formData.status === 'borrowed' ? formData.borrowedBy : '',
-      borrowedDate: formData.status === 'borrowed' ? formData.borrowedDate : '',
-      dueDate: formData.status === 'borrowed' && formData.dueDate ? formData.dueDate : '',
+      
+      // Default appearance since wishlist doesn't require complex customization initially
+      height: 'medium' as any,
+      thickness: 'regular' as any,
+      spineColors: ['#8B7355', '#6B5344', '#5C4532'] as [string, string, string],
     }
 
     createBook.mutate(bookData)
@@ -118,22 +78,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName, init
       publisher: '',
       publishYear: new Date().getFullYear().toString(),
       pages: '0',
-      format: 'paperback',
-      height: 'medium',
-      thickness: 'regular',
-      color1: '#8B7355',
-      color2: '#6B5344',
-      color3: '#5C4532',
-      purchaseDate: new Date().toISOString().split('T')[0],
-      purchasePrice: '',
-      purchaseCurrency: 'IDR',
-      purchaseLocation: '',
-      acquisitionType: 'purchased',
-      giftFrom: '',
-      borrowedFrom: '',
-      borrowedBy: '',
-      borrowedDate: new Date().toISOString().split('T')[0],
-      dueDate: '',
+      format: 'paperback'
     })
   }
 
@@ -168,10 +113,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName, init
                     <BookOpen className="w-5 h-5 text-walnut" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-serif font-semibold text-darkBrown">{t('add_book.title')}</h2>
-                    {shelfName && (
-                      <p className="text-sm text-walnut/60">{t('add_book.to_shelf', { shelfName })}</p>
-                    )}
+                    <h2 className="text-xl font-serif font-semibold text-darkBrown">{t('add_book.title')} to Wishlist</h2>
                   </div>
                 </div>
                 <button
@@ -184,11 +126,8 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName, init
 
               {/* Form */}
               <div className="flex-1 overflow-y-auto p-6">
-                <form id="add-book-form" onSubmit={handleSubmit} className="space-y-6">
+                <form id="add-wishlist-book-form" onSubmit={handleSubmit} className="space-y-6">
                   <BookBasicInfoInput formData={formData} setFormData={setFormData} />
-                  <BookStatusInput formData={formData} setFormData={setFormData} />
-                  <BookAppearanceInput formData={formData} setFormData={setFormData} />
-                  <BookPurchaseInput formData={formData} setFormData={setFormData} />
                 </form>
               </div>
 
@@ -202,7 +141,7 @@ export default function AddBookModal({ isOpen, onClose, shelfId, shelfName, init
                   {t('add_book.cancel')}
                 </button>
                 <button
-                  form="add-book-form"
+                  form="add-wishlist-book-form"
                   type="submit"
                   disabled={createBook.isPending}
                   className="px-6 py-2.5 bg-walnut text-white rounded-xl text-sm font-medium hover:bg-darkBrown transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
