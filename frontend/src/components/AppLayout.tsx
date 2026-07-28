@@ -383,7 +383,12 @@ export default function AppLayout() {
                 transition={{ duration: 0.2 }}
                 title={i18n.language.startsWith('en') ? 'Ganti ke Bahasa Indonesia' : 'Switch to English'}
               >
-                {i18n.language.startsWith('en') ? 'EN' : 'ID'}
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+                >
+                  {i18n.language.startsWith('en') ? 'EN' : 'ID'}
+                </motion.div>
               </motion.button>
 
               {/* Add Bookshelf Button - Icon Only */}

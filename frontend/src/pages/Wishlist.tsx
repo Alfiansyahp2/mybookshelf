@@ -97,7 +97,7 @@ export default function Wishlist() {
       }} />
       <div className="max-w-7xl mx-auto w-full relative z-10">
       {/* Header */}
-      <div className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 md:gap-6">
+      <div className="mb-8 md:mb-10 flex items-center justify-between gap-4 md:gap-6">
         <div>
           <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-2">
             <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown">
@@ -119,13 +119,21 @@ export default function Wishlist() {
         </div>
 
         {/* Add to Wishlist Button */}
-        <button
+        <motion.button
           onClick={() => setIsAddBookModalOpen(true)}
-          className="px-6 py-2.5 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md flex items-center justify-center sm:justify-start gap-2 text-sm whitespace-nowrap w-full sm:w-auto"
+          className="w-10 h-10 bg-walnut text-white rounded-xl flex items-center justify-center hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md shrink-0"
+          title={t('wishlist.add_to_wishlist', 'Add Book')}
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
         >
-          <Plus className="w-4 h-4" />
-          {t('wishlist.add_to_wishlist', 'Add Book')}
-        </button>
+          <motion.div
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+          >
+            <Plus className="w-5 h-5" />
+          </motion.div>
+        </motion.button>
       </div>
 
       {/* Wishlist Books Grid */}
@@ -148,15 +156,10 @@ export default function Wishlist() {
                   className="group bg-white rounded-2xl p-5 border border-walnut/10 hover:border-walnut/30 hover:shadow-xl transition-all cursor-pointer flex flex-col h-full"
                 >
                   {/* Book Cover Placeholder */}
-                  <div className="w-full aspect-[2/3] rounded-xl mb-4 flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-walnut/5 to-walnut/10 border border-walnut/10 group-hover:shadow-inner transition-all">
+                  <div className="w-full aspect-video rounded-xl mb-4 flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-walnut/5 to-walnut/10 border border-walnut/10 group-hover:shadow-inner transition-all">
                     <div className="text-center p-4 z-10 w-full">
                       <div className="text-lg font-serif font-bold text-darkBrown leading-tight mb-2 line-clamp-3">{book.title}</div>
                       <div className="text-sm font-medium text-walnut/80 line-clamp-2">{book.author}</div>
-                    </div>
-                    
-                    {/* Decorative Elements */}
-                    <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm">
-                      <BookmarkHeart className="w-4 h-4 text-rose-500 fill-rose-500/20" />
                     </div>
                     
                     <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/5 to-transparent"></div>
@@ -165,9 +168,17 @@ export default function Wishlist() {
                   {/* Book Info */}
                   <div className="flex-1 flex flex-col">
                     <div className="space-y-3 mt-auto">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-walnut/60">{t('wishlist.genre', 'Genre')}</span>
-                        <span className="font-medium text-darkBrown bg-walnut/5 px-2 py-0.5 rounded-md truncate max-w-[120px]">{book.genre || '-'}</span>
+                      <div className="flex items-start justify-between text-sm gap-2">
+                        <span className="text-walnut/60 shrink-0">{t('wishlist.genre', 'Genre')}</span>
+                        <div className="flex flex-wrap gap-1.5 justify-end">
+                          {book.genre ? book.genre.split(',').map((g: string, i: number) => (
+                            <span key={i} className="font-medium text-[11px] text-darkBrown bg-walnut/10 px-2 py-0.5 rounded-full">
+                              {g.trim()}
+                            </span>
+                          )) : (
+                            <span className="font-medium text-darkBrown">-</span>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-walnut/60">{t('wishlist.pages', 'Pages')}</span>
