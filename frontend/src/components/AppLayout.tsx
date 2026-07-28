@@ -33,6 +33,7 @@ import { useDeleteShelf, useShelves } from "../hooks/useShelves";
 import BookmarkHeart from "./icons/BookmarkHeart";
 import MobileMenu from "./layout/MobileMenu";
 import AppHeader from "./layout/AppHeader";
+import { useAchievementTracker } from "../hooks/useAchievementTracker";
 
 const navItems = [
     { path: "/library", icon: Library, labelKey: "nav.library" },
