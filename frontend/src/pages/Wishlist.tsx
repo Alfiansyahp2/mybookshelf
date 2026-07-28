@@ -11,13 +11,13 @@ import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import {
   ShoppingCart,
-  Heart,
   Clock,
   BookOpen,
   Target,
   Gift,
   Plus
 } from 'lucide-react'
+import BookmarkHeart from '../components/icons/BookmarkHeart'
 
 export default function Wishlist() {
   const { t } = useTranslation()
@@ -82,7 +82,7 @@ export default function Wishlist() {
 
   return (
     <div 
-      className="p-4 md:p-8 flex flex-col h-full min-h-screen relative"
+      className="p-4 md:p-8 flex flex-col min-h-full relative"
       style={{
         background: 'linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)',
       }}
@@ -97,9 +97,9 @@ export default function Wishlist() {
       }} />
       <div className="max-w-7xl mx-auto w-full relative z-10">
       {/* Header */}
-      <div className="mb-10 flex items-end justify-between">
+      <div className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 md:gap-6">
         <div>
-          <div className="flex items-center gap-4 mb-2">
+          <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-2">
             <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown">
               {t('wishlist.title', 'Wishlist')}
             </h1>
@@ -107,7 +107,7 @@ export default function Wishlist() {
             {/* Minimalist Count Badge */}
             {totalWishlist > 0 && (
               <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-walnut/10 shadow-sm text-sm">
-                <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
+                <BookmarkHeart className="w-4 h-4 text-pink-500 fill-pink-500" />
                 <span className="font-bold text-darkBrown">{totalWishlist}</span>
               </div>
             )}
@@ -121,7 +121,7 @@ export default function Wishlist() {
         {/* Add to Wishlist Button */}
         <button
           onClick={() => setIsAddBookModalOpen(true)}
-          className="px-6 py-2.5 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md flex items-center gap-2 text-sm whitespace-nowrap"
+          className="px-6 py-2.5 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md flex items-center justify-center sm:justify-start gap-2 text-sm whitespace-nowrap w-full sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           {t('wishlist.add_to_wishlist', 'Add Book')}
@@ -156,7 +156,7 @@ export default function Wishlist() {
                     
                     {/* Decorative Elements */}
                     <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm">
-                      <Heart className="w-4 h-4 text-rose-500 fill-rose-500/20" />
+                      <BookmarkHeart className="w-4 h-4 text-rose-500 fill-rose-500/20" />
                     </div>
                     
                     <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/5 to-transparent"></div>
@@ -202,7 +202,7 @@ export default function Wishlist() {
           className="text-center py-16"
         >
           <div className="w-20 h-20 bg-walnut/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ShoppingCart className="w-10 h-10 text-walnut/30" />
+            <BookmarkHeart className="w-10 h-10 text-walnut/30" />
           </div>
           <h3 className="text-xl font-serif text-darkBrown mb-2">
             {t('wishlist.empty', 'Your wishlist is empty')}

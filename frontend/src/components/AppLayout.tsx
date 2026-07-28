@@ -28,10 +28,12 @@ import { useDeleteShelf, useShelves } from '../hooks/useShelves'
 import NotificationCenter from './NotificationCenter'
 import { useAchievementTracker } from '../hooks/useAchievementTracker'
 
+import BookmarkHeart from './icons/BookmarkHeart'
+
 const navItems = [
   { path: '/library', icon: Library, labelKey: 'nav.library' },
   { path: '/reading', icon: BookOpen, labelKey: 'nav.reading' },
-  { path: '/wishlist', icon: ShoppingCart, labelKey: 'nav.wishlist' },
+  { path: '/wishlist', icon: BookmarkHeart, labelKey: 'nav.wishlist' },
   { path: '/accounting', icon: DollarSign, labelKey: 'nav.accounting' },
 ]
 
