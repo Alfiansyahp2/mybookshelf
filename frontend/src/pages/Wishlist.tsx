@@ -1,208 +1,250 @@
-import { useBooks } from '../hooks/useBooks'
-import { useShelves } from '../hooks/useShelves'
-import { useStartReading } from '../hooks/useBooks'
-import { useNavigate } from 'react-router-dom'
-import { useBookstore } from '../store/useBookstore'
-import Bookshelf from '../components/Bookshelf'
-import AddWishlistBookModal from '../components/AddWishlistBookModal'
-import WishlistCard from '../components/assets/WishlistCard'
-import { useState } from 'react'
-import type { Book } from '../types'
-import { motion } from 'framer-motion'
-import { useTranslation } from 'react-i18next'
+import { useBooks } from "../hooks/useBooks";
+import { useShelves } from "../hooks/useShelves";
+import { useStartReading } from "../hooks/useBooks";
+import { useNavigate } from "react-router-dom";
+import { useBookstore } from "../store/useBookstore";
+import Bookshelf from "../components/Bookshelf";
+import AddWishlistBookModal from "../components/AddWishlistBookModal";
+import WishlistCard from "../components/assets/WishlistCard";
+import { useState } from "react";
+import type { Book } from "../types";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
-  ShoppingCart,
-  Clock,
-  BookOpen,
-  Target,
-  Gift,
-  Plus
-} from 'lucide-react'
-import BookmarkHeart from '../components/icons/BookmarkHeart'
+    ShoppingCart,
+    Clock,
+    BookOpen,
+    Target,
+    Gift,
+    Plus,
+} from "lucide-react";
+import BookmarkHeart from "../components/icons/BookmarkHeart";
 
 export default function Wishlist() {
-  const { t } = useTranslation()
-  const navigate = useNavigate()
-  const { selectedBookId, isBookDetailOpen, toggleBookDetail, setSelectedBookId } = useBookstore()
-  const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false)
-  const [addShelfId, setAddShelfId] = useState<string | undefined>()
-  const [addShelfName, setAddShelfName] = useState<string | undefined>()
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const {
+        selectedBookId,
+        isBookDetailOpen,
+        toggleBookDetail,
+        setSelectedBookId,
+    } = useBookstore();
+    const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
+    const [addShelfId, setAddShelfId] = useState<string | undefined>();
+    const [addShelfName, setAddShelfName] = useState<string | undefined>();
 
-  // Fetch all books and shelves from API
-  const { data: allBooksResponse, isLoading } = useBooks({})
-  const { data: shelves = [], isLoading: shelvesLoading } = useShelves()
-  const startReadingMutation = useStartReading()
+    // Fetch all books and shelves from API
+    const { data: allBooksResponse, isLoading } = useBooks({});
+    const { data: shelves = [], isLoading: shelvesLoading } = useShelves();
+    const startReadingMutation = useStartReading();
 
-  const allBooks = allBooksResponse?.data?.data || []
-  const wishlistBooks = allBooks.filter((book: Book) => book.status === 'wishlist')
+    const allBooks = allBooksResponse?.data?.data || [];
+    const wishlistBooks = allBooks.filter(
+        (book: Book) => book.status === "wishlist",
+    );
 
-  // Calculate wishlist statistics
-  const totalWishlist = wishlistBooks.length
-  
-  const genresCount = wishlistBooks.reduce((acc: any, book: Book) => {
-    if (book.genre) {
-       book.genre.split(',').map((g: string) => g.trim()).forEach((g: string) => {
-         if (g) acc[g] = (acc[g] || 0) + 1;
-       })
+    // Calculate wishlist statistics
+    const totalWishlist = wishlistBooks.length;
+
+    const genresCount = wishlistBooks.reduce((acc: any, book: Book) => {
+        if (book.genre) {
+            book.genre
+                .split(",")
+                .map((g: string) => g.trim())
+                .forEach((g: string) => {
+                    if (g) acc[g] = (acc[g] || 0) + 1;
+                });
+        }
+        return acc;
+    }, {});
+    const topGenre =
+        Object.keys(genresCount).sort(
+            (a, b) => genresCount[b] - genresCount[a],
+        )[0] || "-";
+
+    const authorsCount = wishlistBooks.reduce((acc: any, book: Book) => {
+        if (book.author) {
+            acc[book.author] = (acc[book.author] || 0) + 1;
+        }
+        return acc;
+    }, {});
+    const topAuthor =
+        Object.keys(authorsCount).sort(
+            (a, b) => authorsCount[b] - authorsCount[a],
+        )[0] || "-";
+
+    const handleStartReading = (bookId: string) => {
+        startReadingMutation.mutate(bookId);
+    };
+
+    const handleBookClick = (book: any) => {
+        setSelectedBookId(book.id);
+        toggleBookDetail(book.id);
+    };
+
+    const handleAddBook = (shelfId: string, shelfName?: string) => {
+        setAddShelfId(shelfId);
+        setAddShelfName(shelfName);
+        setIsAddBookModalOpen(true);
+    };
+
+    // Loading state
+    if (isLoading || shelvesLoading) {
+        return (
+            <div className="flex items-center justify-center py-16">
+                <div className="text-walnut">
+                    {t("wishlist.loading", "Loading wishlist...")}
+                </div>
+            </div>
+        );
     }
-    return acc;
-  }, {});
-  const topGenre = Object.keys(genresCount).sort((a, b) => genresCount[b] - genresCount[a])[0] || '-';
 
-  const authorsCount = wishlistBooks.reduce((acc: any, book: Book) => {
-    if (book.author) {
-       acc[book.author] = (acc[book.author] || 0) + 1;
-    }
-    return acc;
-  }, {});
-  const topAuthor = Object.keys(authorsCount).sort((a, b) => authorsCount[b] - authorsCount[a])[0] || '-';
-
-  const handleStartReading = (bookId: string) => {
-    startReadingMutation.mutate(bookId)
-  }
-
-  const handleBookClick = (book: any) => {
-    setSelectedBookId(book.id)
-    toggleBookDetail(book.id)
-  }
-
-  const handleAddBook = (shelfId: string, shelfName?: string) => {
-    setAddShelfId(shelfId)
-    setAddShelfName(shelfName)
-    setIsAddBookModalOpen(true)
-  }
-
-  // Loading state
-  if (isLoading || shelvesLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-walnut">{t('wishlist.loading', 'Loading wishlist...')}</div>
-      </div>
-    )
-  }
-
-  return (
-    <div 
-      className="p-4 md:p-8 flex flex-col min-h-full relative"
-      style={{
-        background: 'linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)',
-      }}
-    >
-      {/* Plaster / linen wall texture */}
-      <div style={{
-        position:'absolute', inset:0, pointerEvents:'none', opacity:0.18,
-        backgroundImage:`
+        <div
+            className="p-4 md:p-8 flex flex-col min-h-full relative"
+            style={{
+                background:
+                    "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
+            }}
+        >
+            {/* Plaster / linen wall texture */}
+            <div
+                style={{
+                    position: "absolute",
+                    inset: 0,
+                    pointerEvents: "none",
+                    opacity: 0.18,
+                    backgroundImage: `
           repeating-linear-gradient(0deg,  transparent, transparent 5px, rgba(0,0,0,0.02) 5px, rgba(0,0,0,0.02) 6px),
           repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.02) 9px)
         `,
-      }} />
-      <div className="max-w-7xl mx-auto w-full relative z-10">
-      {/* Header */}
-      <div className="mb-8 md:mb-10 flex items-center justify-between gap-4 md:gap-6">
-        <div>
-          <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-2">
-            <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown">
-              {t('wishlist.title', 'Wishlist')}
-            </h1>
-            
-            {/* Minimalist Count Badge */}
-            {totalWishlist > 0 && (
-              <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-walnut/10 shadow-sm text-sm">
-                <BookmarkHeart className="w-4 h-4 text-pink-500 fill-pink-500" />
-                <span className="font-bold text-darkBrown">{totalWishlist}</span>
-              </div>
-            )}
-          </div>
-          
-          <p className="text-walnut/70">
-            {t('wishlist.subtitle', 'Books you are planning to acquire - {{count}} item{{s}}', { count: totalWishlist, s: totalWishlist !== 1 ? 's' : '' })}
-          </p>
-        </div>
+                }}
+            />
+            <div className="max-w-7xl mx-auto w-full relative z-10">
+                {/* Header */}
+                <div className="mb-8 md:mb-10 flex items-center justify-between gap-4 md:gap-6">
+                    <div>
+                        <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-2">
+                            <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown">
+                                {t("wishlist.title", "Wishlist")}
+                            </h1>
 
-        {/* Add to Wishlist Button */}
-        <motion.button
-          onClick={() => setIsAddBookModalOpen(true)}
-          className="w-10 h-10 bg-walnut text-white rounded-xl flex items-center justify-center hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md shrink-0"
-          title={t('wishlist.add_to_wishlist', 'Add Book')}
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ duration: 0.2 }}
-        >
-          <motion.div
-            whileHover={{ rotate: 360 }}
-            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
-          >
-            <Plus className="w-5 h-5" />
-          </motion.div>
-        </motion.button>
-      </div>
+                            {/* Minimalist Count Badge */}
+                            {totalWishlist > 0 && (
+                                <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-walnut/10 shadow-sm text-sm">
+                                    <BookmarkHeart className="w-4 h-4 text-pink-500 fill-pink-500" />
+                                    <span className="font-bold text-darkBrown">
+                                        {totalWishlist}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
 
-      {/* Wishlist Books Grid */}
-      {totalWishlist > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-8"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {wishlistBooks.map((book: Book, index: number) => {
-              return (
-                <WishlistCard
-                  key={book.id}
-                  book={book}
-                  index={index}
-                  onClick={handleBookClick}
-                  t={t}
+                        <p className="text-walnut/70">
+                            {t(
+                                "wishlist.subtitle",
+                                "Books you are planning to acquire - {{count}} item{{s}}",
+                                {
+                                    count: totalWishlist,
+                                    s: totalWishlist !== 1 ? "s" : "",
+                                },
+                            )}
+                        </p>
+                    </div>
+
+                    {/* Add to Wishlist Button */}
+                    <motion.button
+                        onClick={() => setIsAddBookModalOpen(true)}
+                        className="w-10 h-10 bg-walnut text-white rounded-xl flex items-center justify-center hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md shrink-0"
+                        title={t("wishlist.add_to_wishlist", "Add Book")}
+                        whileHover={{ scale: 1.15 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <motion.div
+                            whileHover={{ rotate: 360 }}
+                            transition={{
+                                duration: 0.6,
+                                ease: [0.34, 1.56, 0.64, 1],
+                            }}
+                        >
+                            <Plus className="w-5 h-5" />
+                        </motion.div>
+                    </motion.button>
+                </div>
+
+                {/* Wishlist Books Grid */}
+                {totalWishlist > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="mb-8"
+                    >
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {wishlistBooks.map((book: Book, index: number) => {
+                                return (
+                                    <WishlistCard
+                                        key={book.id}
+                                        book={book}
+                                        index={index}
+                                        onClick={handleBookClick}
+                                        t={t}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Empty State */}
+                {totalWishlist === 0 && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-center py-16"
+                    >
+                        <div className="w-20 h-20 bg-walnut/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <BookmarkHeart className="w-10 h-10 text-walnut/30" />
+                        </div>
+                        <h3 className="text-xl font-serif text-darkBrown mb-2">
+                            {t("wishlist.empty", "Your wishlist is empty")}
+                        </h3>
+                        <p className="text-walnut/70 mb-6">
+                            {t(
+                                "wishlist.empty_desc",
+                                "Save books you want to read later",
+                            )}
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button
+                                onClick={() => navigate("/library")}
+                                className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors"
+                            >
+                                {t("wishlist.browse_library", "Browse Library")}
+                            </button>
+                            <button
+                                onClick={() => setIsAddBookModalOpen(true)}
+                                className="px-6 py-3 bg-white text-walnut rounded-xl font-medium hover:bg-walnut/10 transition-colors border border-walnut/20"
+                            >
+                                {t(
+                                    "wishlist.add_to_wishlist",
+                                    "Add to Wishlist",
+                                )}
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                <AddWishlistBookModal
+                    isOpen={isAddBookModalOpen}
+                    onClose={() => {
+                        setIsAddBookModalOpen(false);
+                        setAddShelfId(undefined);
+                        setAddShelfName(undefined);
+                    }}
                 />
-              )
-            })}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Empty State */}
-      {totalWishlist === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-16"
-        >
-          <div className="w-20 h-20 bg-walnut/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <BookmarkHeart className="w-10 h-10 text-walnut/30" />
-          </div>
-          <h3 className="text-xl font-serif text-darkBrown mb-2">
-            {t('wishlist.empty', 'Your wishlist is empty')}
-          </h3>
-          <p className="text-walnut/70 mb-6">
-            {t('wishlist.empty_desc', 'Save books you want to read later')}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button
-              onClick={() => navigate('/library')}
-              className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors"
-            >
-              {t('wishlist.browse_library', 'Browse Library')}
-            </button>
-            <button
-              onClick={() => setIsAddBookModalOpen(true)}
-              className="px-6 py-3 bg-white text-walnut rounded-xl font-medium hover:bg-walnut/10 transition-colors border border-walnut/20"
-            >
-              {t('wishlist.add_to_wishlist', 'Add to Wishlist')}
-            </button>
-          </div>
-        </motion.div>
-      )}
-      
-      <AddWishlistBookModal
-        isOpen={isAddBookModalOpen}
-        onClose={() => {
-          setIsAddBookModalOpen(false)
-          setAddShelfId(undefined)
-          setAddShelfName(undefined)
-        }}
-      />
-      </div>
-    </div>
-  )
+            </div>
+        </div>
+    );
 }

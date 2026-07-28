@@ -1,7 +1,7 @@
-import { apiClient } from '../apiClient';
+import { apiClient } from "../apiClient";
 
 export const statisticsApi = {
-  getStatistics: async () => {
-    return await apiClient.get('/v1/statistics');
-  }
+    getStatistics: async () => {
+        return await apiClient.get("/v1/statistics");
+    },
 };

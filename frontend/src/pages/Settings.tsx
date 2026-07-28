@@ -1,183 +1,203 @@
-import { useState, useEffect } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
-import { useAuthUser } from '../hooks/useAuth'
-import { useQueryClient } from '@tanstack/react-query'
+import { useAuthUser } from "../hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  User,
-  Database,
-  Info,
-  Settings as SettingsIcon,
-  LogOut
-} from 'lucide-react'
+    User,
+    Database,
+    Info,
+    Settings as SettingsIcon,
+    LogOut,
+} from "lucide-react";
 
 // Import extracted components
-import AccountSettings from '../components/settings/AccountSettings'
-import AppPreferences from '../components/settings/AppPreferences'
-import DataManagement from '../components/settings/DataManagement'
-import AboutSettings from '../components/settings/AboutSettings'
+import AccountSettings from "../components/settings/AccountSettings";
+import AppPreferences from "../components/settings/AppPreferences";
+import DataManagement from "../components/settings/DataManagement";
+import AboutSettings from "../components/settings/AboutSettings";
 
 export default function Settings() {
-  const { t } = useTranslation()
-  const { data: authData } = useAuthUser()
-  const authUser = authData?.user || (authData as any)?.data?.user
-  
-  const queryClient = useQueryClient()
+    const { t } = useTranslation();
+    const { data: authData } = useAuthUser();
+    const authUser = authData?.user || (authData as any)?.data?.user;
 
-  const [settings, setSettings] = useState({
-    theme: 'light',
-    notifications: true,
-    emailUpdates: false,
-    autoSave: true,
-    readingReminders: true
-  })
+    const queryClient = useQueryClient();
 
-  const [user, setUser] = useState({
-    name: 'User Name',
-    email: 'booklover@email.com',
-    avatar: 'U',
-    memberSince: '2024'
-  })
+    const [settings, setSettings] = useState({
+        theme: "light",
+        notifications: true,
+        emailUpdates: false,
+        autoSave: true,
+        readingReminders: true,
+    });
 
-  useEffect(() => {
-    if (authUser) {
-      setUser({
-        name: authUser.name,
-        email: authUser.email,
-        avatar: authUser.name.charAt(0).toUpperCase(),
-        memberSince: authUser.created_at ? new Date(authUser.created_at).getFullYear().toString() : '2024'
-      })
-    }
-  }, [authUser])
+    const [user, setUser] = useState({
+        name: "User Name",
+        email: "booklover@email.com",
+        avatar: "U",
+        memberSince: "2024",
+    });
 
-  const [activeSection, setActiveSection] = useState('account')
+    useEffect(() => {
+        if (authUser) {
+            setUser({
+                name: authUser.name,
+                email: authUser.email,
+                avatar: authUser.name.charAt(0).toUpperCase(),
+                memberSince: authUser.created_at
+                    ? new Date(authUser.created_at).getFullYear().toString()
+                    : "2024",
+            });
+        }
+    }, [authUser]);
 
-  const handleLogout = async () => {
-    console.log(t('settings.logging_out'))
-    localStorage.removeItem('user')
-    queryClient.clear()
-    window.location.href = '/login'
-  }
+    const [activeSection, setActiveSection] = useState("account");
 
-  const handleExportData = () => {
-    const data = {
-      settings,
-      user,
-      exportDate: new Date().toISOString()
-    }
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'mybookshelf-data.json'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+    const handleLogout = async () => {
+        console.log(t("settings.logging_out"));
+        localStorage.removeItem("user");
+        queryClient.clear();
+        window.location.href = "/login";
+    };
 
-  const handleClearData = () => {
-    if (confirm(t('settings.confirm_clear'))) {
-      localStorage.clear()
-      window.location.reload()
-    }
-  }
+    const handleExportData = () => {
+        const data = {
+            settings,
+            user,
+            exportDate: new Date().toISOString(),
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+            type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "mybookshelf-data.json";
+        a.click();
+        URL.revokeObjectURL(url);
+    };
 
-  const sections = {
-    account: {
-      title: t('settings.sections.account'),
-      icon: User
-    },
-    preferences: {
-      title: t('settings.sections.preferences'),
-      icon: SettingsIcon
-    },
-    data: {
-      title: t('settings.sections.data'),
-      icon: Database
-    },
-    about: {
-      title: t('settings.sections.about'),
-      icon: Info
-    }
-  }
+    const handleClearData = () => {
+        if (confirm(t("settings.confirm_clear"))) {
+            localStorage.clear();
+            window.location.reload();
+        }
+    };
 
-  return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
-          {t('settings.title')}
-        </h1>
-        <p className="text-walnut/70">
-          {t('settings.subtitle')}
-        </p>
-      </div>
+    const sections = {
+        account: {
+            title: t("settings.sections.account"),
+            icon: User,
+        },
+        preferences: {
+            title: t("settings.sections.preferences"),
+            icon: SettingsIcon,
+        },
+        data: {
+            title: t("settings.sections.data"),
+            icon: Database,
+        },
+        about: {
+            title: t("settings.sections.about"),
+            icon: Info,
+        },
+    };
 
-      <div className="grid md:grid-cols-3 gap-8">
-        {/* Sidebar Navigation */}
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-2xl border border-walnut/10 shadow-sm overflow-hidden">
-            {/* User Profile Card */}
-            <div className="p-6 border-b border-walnut/10 bg-gradient-to-br from-walnut to-darkBrown">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                  {user.avatar}
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white">{user.name}</h3>
-                  <p className="text-sm text-walnut/70">{user.email}</p>
-                  <p className="text-xs text-walnut/60 mt-1">{t('settings.member_since', { year: user.memberSince })}</p>
-                </div>
-              </div>
+    return (
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="mb-8">
+                <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
+                    {t("settings.title")}
+                </h1>
+                <p className="text-walnut/70">{t("settings.subtitle")}</p>
             </div>
 
-            {/* Navigation */}
-            <nav className="p-2">
-              {Object.entries(sections).map(([key, section]) => {
-                const Icon = section.icon
-                const isActive = activeSection === key
+            <div className="grid md:grid-cols-3 gap-8">
+                {/* Sidebar Navigation */}
+                <div className="md:col-span-1">
+                    <div className="bg-white rounded-2xl border border-walnut/10 shadow-sm overflow-hidden">
+                        {/* User Profile Card */}
+                        <div className="p-6 border-b border-walnut/10 bg-gradient-to-br from-walnut to-darkBrown">
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                    {user.avatar}
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-white">
+                                        {user.name}
+                                    </h3>
+                                    <p className="text-sm text-walnut/70">
+                                        {user.email}
+                                    </p>
+                                    <p className="text-xs text-walnut/60 mt-1">
+                                        {t("settings.member_since", {
+                                            year: user.memberSince,
+                                        })}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setActiveSection(key)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                      isActive
-                        ? 'bg-walnut text-white shadow-md'
-                        : 'text-walnut/70 hover:bg-walnut/10'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-medium">{section.title}</span>
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
+                        {/* Navigation */}
+                        <nav className="p-2">
+                            {Object.entries(sections).map(([key, section]) => {
+                                const Icon = section.icon;
+                                const isActive = activeSection === key;
 
-          {/* Quick Actions */}
-          <div className="mt-4 space-y-3">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">{t('settings.sign_out')}</span>
-            </button>
-          </div>
+                                return (
+                                    <button
+                                        key={key}
+                                        onClick={() => setActiveSection(key)}
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                                            isActive
+                                                ? "bg-walnut text-white shadow-md"
+                                                : "text-walnut/70 hover:bg-walnut/10"
+                                        }`}
+                                    >
+                                        <Icon className="w-5 h-5" />
+                                        <span className="font-medium">
+                                            {section.title}
+                                        </span>
+                                    </button>
+                                );
+                            })}
+                        </nav>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="mt-4 space-y-3">
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            <span className="font-medium">
+                                {t("settings.sign_out")}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="md:col-span-2">
+                    {activeSection === "account" && <AccountSettings />}
+                    {activeSection === "preferences" && (
+                        <AppPreferences
+                            settings={settings}
+                            setSettings={setSettings}
+                        />
+                    )}
+                    {activeSection === "data" && (
+                        <DataManagement
+                            handleExportData={handleExportData}
+                            handleClearData={handleClearData}
+                        />
+                    )}
+                    {activeSection === "about" && <AboutSettings />}
+                </div>
+            </div>
         </div>
-
-        {/* Main Content */}
-        <div className="md:col-span-2">
-          {activeSection === 'account' && <AccountSettings />}
-          {activeSection === 'preferences' && (
-            <AppPreferences settings={settings} setSettings={setSettings} />
-          )}
-          {activeSection === 'data' && (
-            <DataManagement handleExportData={handleExportData} handleClearData={handleClearData} />
-          )}
-          {activeSection === 'about' && <AboutSettings />}
-        </div>
-      </div>
-    </div>
-  )
+    );
 }
