@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useBooks } from './useBooks'
 import { useShelves } from './useShelves'
 import { useNotifications } from './useNotifications'
@@ -33,7 +33,7 @@ export function useAchievementTracker() {
   const { unlock } = useAchievementStore()
   const { addNotification } = useNotifications()
 
-  const books = booksResponse?.data?.data || []
+  const books = useMemo(() => booksResponse?.data?.data || [], [booksResponse?.data?.data])
 
   useEffect(() => {
     if (!books.length && !shelves.length) return
@@ -96,5 +96,5 @@ export function useAchievementTracker() {
     // 10. Daftar Keinginan
     checkAchievement('pemimpi', 'Sang Pemimpi', 'Menambahkan 5 buku ke Wishlist.', wishlistBooks.length >= 5)
 
-  }, [books, shelves, unlock, addNotification])
+  }, [books, shelves, unlock, addNotification, t])
 }
