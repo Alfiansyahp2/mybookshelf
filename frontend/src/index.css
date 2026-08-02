@@ -7,10 +7,15 @@
 
 :root {
     --color-cream: #f8f5f0;
+    --color-cream-rgb: 248 245 240;
     --color-dark-brown: #4a3b2f;
+    --color-dark-brown-rgb: 74 59 47;
     --color-walnut: #7a5c42;
+    --color-walnut-rgb: 122 92 66;
     --color-gold: #d4a574;
+    --color-gold-rgb: 212 165 116;
     --color-beige: #e8e0d5;
+    --color-beige-rgb: 232 224 213;
 }
 
 body {
