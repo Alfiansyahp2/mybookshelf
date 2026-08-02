@@ -81,7 +81,7 @@ export default function ExploreLibrary() {
     }
 
     return (
-        <div className="p-8">
+        <div className="p-8 pt-[88px] md:pt-[100px]">
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl font-serif text-darkBrown mb-2">

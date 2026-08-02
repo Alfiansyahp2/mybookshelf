@@ -105,7 +105,7 @@ export default function Settings() {
     };
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto">
+        <div className="p-4 md:p-8 pt-[88px] md:pt-[100px] max-w-7xl mx-auto">
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">

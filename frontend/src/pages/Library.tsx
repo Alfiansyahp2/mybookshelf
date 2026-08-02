@@ -97,7 +97,7 @@ export default function Library() {
 
     return (
         <div
-            className="p-3 md:p-5 flex flex-col min-h-full relative"
+            className="p-3 md:p-5 pt-[88px] md:pt-[100px] flex flex-col min-h-full relative"
             style={{
                 background:
                     "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",

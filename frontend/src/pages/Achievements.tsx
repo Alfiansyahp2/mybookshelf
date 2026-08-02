@@ -177,8 +177,11 @@ export default function Achievements() {
 
     return (
         <div
+            className="pt-[88px] md:pt-[100px]"
             style={{
-                padding: "20px 20px 40px",
+                paddingBottom: "40px",
+                paddingLeft: "20px",
+                paddingRight: "20px",
                 maxWidth: 1000,
                 margin: "0 auto",
             }}

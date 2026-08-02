@@ -65,7 +65,7 @@ export default function Dashboard() {
         );
 
     return (
-        <div className="px-4 md:px-5 py-5 pb-10 max-w-[1200px] mx-auto">
+        <div className="px-4 md:px-5 pt-[88px] md:pt-[100px] pb-10 max-w-[1200px] mx-auto">
             {/* ─── Hero header ──────────────────────────── */}
             <DashboardHeroSection bookColors={stats.bookColors} />
 

@@ -65,7 +65,7 @@ export default function AppHeader({
 
     return (
         <header
-            className={`sticky top-0 z-50 transition-all duration-500 ease-in-out pt-2 pb-2 ${
+            className={`fixed w-full top-0 z-50 transition-all duration-500 ease-in-out pt-2 pb-2 ${
                 isHeaderVisible ? "translate-y-0" : "-translate-y-full"
             } ${
                 isScrolled 
@@ -77,7 +77,7 @@ export default function AppHeader({
                 className={`transition-all duration-500 ease-in-out mx-auto ${
                     isScrolled 
                         ? "bg-white/90 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-walnut/10 py-2 px-6 max-w-6xl" 
-                        : "bg-cream/95 backdrop-blur-sm border-b border-walnut/10 py-3 md:py-4 px-4 md:px-8 w-full max-w-none"
+                        : "bg-transparent py-3 md:py-4 px-4 md:px-8 w-full max-w-none"
                 }`}
             >
                 <div className="flex items-center gap-4 md:gap-8">
@@ -212,7 +212,7 @@ export default function AppHeader({
                         </motion.button>
 
                         {/* Notification Center */}
-                        <div className="hidden sm:block mt-1.5">
+                        <div className="mt-1.5">
                             <NotificationCenter />
                         </div>
 
