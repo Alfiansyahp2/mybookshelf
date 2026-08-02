@@ -43,24 +43,31 @@ const CustomTooltip = ({ active, payload }: any) => {
 
     const data = payload[0].payload;
     return (
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-beige dark:border-gray-700">
-            <p className="font-semibold text-darkBrown dark:text-gray-100 mb-2 leading-relaxed">
+        <div 
+            className="p-3 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.12)] border"
+            style={{
+                background: "rgba(255,251,245,0.97)", // Cream backdrop
+                borderColor: "rgba(139,99,56,0.15)", // Walnut border
+                backdropFilter: "blur(8px)"
+            }}
+        >
+            <p className="font-bold text-darkBrown mb-1.5 text-sm">
                 {data.month_name}
             </p>
-            <p className="text-sm text-walnut dark:text-gray-300 mb-1 leading-relaxed">
+            <p className="text-sm font-medium text-walnut mb-1">
                 {t("accounting.purchase_chart.total", "Total:")}{" "}
-                {data.formatted_amount}
+                <span className="font-bold text-darkBrown">{data.formatted_amount}</span>
             </p>
-            <p className="text-xs text-walnut/70 dark:text-gray-400 mb-1 leading-relaxed">
-                {data.book_count}{" "}
+            <p className="text-xs font-medium text-walnut/80 mb-1">
+                <span className="font-bold text-darkBrown">{data.book_count}</span>{" "}
                 {t(
                     "accounting.purchase_chart.books_purchased",
                     "books purchased",
                 )}
             </p>
-            <p className="text-xs text-walnut/70 dark:text-gray-400 leading-relaxed">
+            <p className="text-xs font-medium text-walnut/80">
                 {t("accounting.purchase_chart.avg", "Avg:")}{" "}
-                {formatCurrency(data.average_price)}
+                <span className="font-semibold text-walnut">{formatCurrency(data.average_price)}</span>
             </p>
         </div>
     );

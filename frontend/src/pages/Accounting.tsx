@@ -26,6 +26,7 @@ export default function Accounting() {
         "overview" | "expenses" | "budgets" | "categories"
     >("overview");
     const [showExpenseModal, setShowExpenseModal] = useState(false);
+    const [expenseToEdit, setExpenseToEdit] = useState<any>(null);
     const [showFilters, setShowFilters] = useState(false);
 
     const { data: overview } = useAccountingOverview({ period: "month" });
@@ -111,7 +112,10 @@ export default function Accounting() {
                         <Filter className="w-5 h-5" />
                     </button>
                     <button
-                        onClick={() => setShowExpenseModal(true)}
+                        onClick={() => {
+                            setExpenseToEdit(null);
+                            setShowExpenseModal(true);
+                        }}
                         className="p-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown shadow-sm transition"
                         title={t("accounting.add_expense", "Add Expense")}
                     >
@@ -157,7 +161,14 @@ export default function Accounting() {
 
                 <div className="p-6">
                     {activeTab === "overview" && <AccountingDashboard />}
-                    {activeTab === "expenses" && <ExpenseList />}
+                    {activeTab === "expenses" && (
+                        <ExpenseList 
+                            onEditExpense={(expense) => {
+                                setExpenseToEdit(expense);
+                                setShowExpenseModal(true);
+                            }}
+                        />
+                    )}
                     {activeTab === "budgets" && <BudgetTracker />}
                     {activeTab === "categories" && (
                         <CategoryManager
@@ -170,7 +181,15 @@ export default function Accounting() {
 
             {/* Expense Modal */}
             {showExpenseModal && (
-                <ExpenseModal onClose={() => setShowExpenseModal(false)} />
+                <ExpenseModal 
+                    isOpen={showExpenseModal}
+                    mode={expenseToEdit ? "edit" : "create"}
+                    expense={expenseToEdit}
+                    onClose={() => {
+                        setShowExpenseModal(false);
+                        setExpenseToEdit(null);
+                    }} 
+                />
             )}
         </div>
     );

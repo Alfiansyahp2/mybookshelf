@@ -10,6 +10,8 @@ interface ModalProps {
     children: ReactNode;
     size?: "sm" | "md" | "lg" | "xl";
     showCloseButton?: boolean;
+    footer?: ReactNode;
+    contentClassName?: string;
 }
 
 export default function Modal({
@@ -19,6 +21,8 @@ export default function Modal({
     children,
     size = "md",
     showCloseButton = true,
+    footer,
+    contentClassName = "",
 }: ModalProps) {
     if (!isOpen) return null;
 
@@ -74,9 +78,16 @@ export default function Modal({
                             )}
 
                             {/* Content */}
-                            <div className="flex-1 overflow-y-auto p-6">
+                            <div className={`flex-1 overflow-y-auto p-6 ${contentClassName}`}>
                                 {children}
                             </div>
+                            
+                            {/* Footer */}
+                            {footer && (
+                                <div className="p-6 border-t border-walnut/10 bg-white/40 shrink-0">
+                                    {footer}
+                                </div>
+                            )}
                         </motion.div>
                     </div>
                 </>

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
 import { useBookstore } from "../store/useBookstore";
 import type { Book } from "../types";
 import Bookshelf from "../components/Bookshelf";
 import AddBookModal from "../components/AddBookModal";
-import { LayoutGrid, Save } from "lucide-react";
+import { LayoutGrid, Save, Filter, X } from "lucide-react";
 import { useUpdateShelfLayout } from "../hooks/useShelves";
 import ReadingCalendarModal from "../components/modals/ReadingCalendarModal";
 import LightingControl from "../components/LightingControl";
@@ -42,6 +42,7 @@ export default function Library() {
     const [selectedShelfName, setSelectedShelfName] = useState<
         string | undefined
     >();
+    const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
     const filterParams =
         activeFilter === "all" ? {} : { status: activeFilter as any };
@@ -155,40 +156,99 @@ export default function Library() {
                         )}
                     </div>
 
-                    {/* Filter Tabs (Glassmorphism Plaque) */}
-                    <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 p-1.5 rounded-2xl shadow-lg">
-                        {FILTER_TABS.filter(
-                            (t) =>
-                                t.key === "all" ||
-                                counts[t.key as keyof typeof counts] > 0,
-                        ).map((tab) => {
-                            const count =
-                                counts[tab.key as keyof typeof counts];
-                            const active = activeFilter === tab.key;
-                            return (
-                                <button
-                                    key={tab.key}
-                                    onClick={() => setActiveFilter(tab.key)}
-                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                                        active
-                                            ? "bg-white/90 text-[#5a3410] shadow-sm"
-                                            : "bg-transparent text-[#5a3410]/70 hover:bg-white/40 hover:text-[#5a3410]"
-                                    }`}
-                                >
-                                    {t(tab.labelKey as any)}
-                                    <span
-                                        className={`text-[10px] px-1.5 py-0.5 rounded-md ${
-                                            active
-                                                ? "bg-[#5a3410]/10"
-                                                : "bg-black/5"
-                                        }`}
+                    {/* Filter Tabs (Animated Expandable Sliding Pill) */}
+                    <motion.div 
+                        layout
+                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                        className="flex items-center bg-white/30 backdrop-blur-md border border-white/50 p-1 md:p-1.5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.05)]"
+                    >
+                        {/* Toggle Button */}
+                        <motion.button
+                            layout
+                            transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                            className={`flex items-center justify-center h-9 md:h-10 px-3 md:px-4 rounded-xl transition-all shrink-0 ${
+                                isFilterExpanded 
+                                    ? "bg-white/40 text-darkBrown hover:bg-white/60" 
+                                    : "bg-white/80 text-darkBrown shadow-sm hover:bg-white"
+                            }`}
+                        >
+                            <motion.div layout transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}>
+                                {isFilterExpanded ? <X size={18} /> : <Filter size={18} />}
+                            </motion.div>
+                            <AnimatePresence mode="popLayout">
+                                {!isFilterExpanded && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, width: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, width: "auto", scale: 1 }}
+                                        exit={{ opacity: 0, width: 0, scale: 0.95 }}
+                                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                                        className="ml-2 flex items-center gap-1.5 overflow-hidden whitespace-nowrap"
                                     >
-                                        {count}
+                                    <span className="text-xs md:text-sm font-bold">
+                                        {t(FILTER_TABS.find(t => t.key === activeFilter)?.labelKey as any)}
                                     </span>
-                                </button>
-                            );
-                        })}
-                    </div>
+                                    <span className="text-[10px] md:text-[11px] px-1.5 bg-walnut/10 text-darkBrown font-bold rounded-full">
+                                        {counts[activeFilter as keyof typeof counts]}
+                                    </span>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.button>
+
+                        {/* Expandable Tabs */}
+                        <AnimatePresence mode="popLayout">
+                            {isFilterExpanded && (
+                                <motion.div
+                                    initial={{ width: 0, opacity: 0, scale: 0.95 }}
+                                    animate={{ width: "auto", opacity: 1, scale: 1 }}
+                                    exit={{ width: 0, opacity: 0, scale: 0.95 }}
+                                    transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="flex items-center pl-1.5 md:pl-2 gap-1 w-max">
+                                        {FILTER_TABS.filter(
+                                            (t) =>
+                                                t.key === "all" ||
+                                                counts[t.key as keyof typeof counts] > 0,
+                                        ).map((tab) => {
+                                            const count = counts[tab.key as keyof typeof counts];
+                                            const active = activeFilter === tab.key;
+                                            return (
+                                                <button
+                                                    key={tab.key}
+                                                    onClick={() => setActiveFilter(tab.key)}
+                                                    className={`relative flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
+                                                        active
+                                                            ? "text-darkBrown"
+                                                            : "text-walnut/70 hover:text-darkBrown"
+                                                    }`}
+                                                >
+                                                    {active && (
+                                                        <motion.div
+                                                            layoutId="activeFilterTab"
+                                                            className="absolute inset-0 bg-white rounded-xl shadow-sm z-[-1]"
+                                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                        />
+                                                    )}
+                                                    <span className="relative z-10">{t(tab.labelKey as any)}</span>
+                                                    <span
+                                                        className={`relative z-10 text-[10px] md:text-[11px] px-1.5 md:px-2 py-0.5 rounded-full transition-colors ${
+                                                            active
+                                                                ? "bg-walnut/10 text-darkBrown font-bold"
+                                                                : "bg-walnut/10 text-walnut/60 font-medium"
+                                                        }`}
+                                                    >
+                                                        {count}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
                 </div>
 
                 {/* Widgets sitting exactly on the bookshelf rail */}

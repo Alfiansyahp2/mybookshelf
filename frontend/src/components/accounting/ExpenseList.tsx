@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { Filter, Search, Receipt, Edit, Trash2 } from "lucide-react";
 import {
     useExpenses,
@@ -45,6 +46,7 @@ export default function ExpenseList({
     });
     const [searchTerm, setSearchTerm] = useState("");
     const [showFilters, setShowFilters] = useState(false);
+    const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
 
     const { data: expensesData, isLoading } = useExpenses(filters);
     const deleteExpense = useDeleteExpense();
@@ -61,27 +63,24 @@ export default function ExpenseList({
         setFilters({ ...filters, [key]: value });
     };
 
-    const handleDelete = async (expenseId: string) => {
-        if (
-            window.confirm(
-                t(
-                    "accounting.expense_list.confirm_delete",
-                    "Are you sure you want to delete this expense?",
-                ),
-            )
-        ) {
-            try {
-                await deleteExpense.mutateAsync(expenseId);
-            } catch (error) {
-                console.error("Error deleting expense:", error);
-            }
+    const handleDelete = (expenseId: string) => {
+        setExpenseToDelete(expenseId);
+    };
+
+    const confirmDelete = async () => {
+        if (!expenseToDelete) return;
+        try {
+            await deleteExpense.mutateAsync(expenseToDelete);
+            setExpenseToDelete(null);
+        } catch (error) {
+            console.error("Error deleting expense:", error);
         }
     };
 
     return (
         <div className="bg-cream border border-beige rounded-lg shadow-sm">
             {/* Header */}
-            <div className="p-6 border-b dark:border-gray-700">
+            <div className="p-6 border-b border-walnut/10">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-darkBrown">
                         {t("accounting.expense_list.expenses", "Expenses")}
@@ -91,8 +90,8 @@ export default function ExpenseList({
                             onClick={() => setShowFilters(!showFilters)}
                             className={`p-2 rounded-lg transition-colors ${
                                 showFilters
-                                    ? "bg-blue-100 text-blue-600"
-                                    : "hover:bg-gray-100 text-gray-600"
+                                    ? "bg-walnut/20 text-darkBrown"
+                                    : "hover:bg-walnut/10 text-walnut"
                             }`}
                         >
                             <Filter className="w-4 h-4" />
@@ -111,14 +110,14 @@ export default function ExpenseList({
                         )}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                        className="w-full pl-10 pr-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                     />
                 </div>
             </div>
 
             {/* Filters */}
             {showFilters && (
-                <div className="p-6 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+                <div className="p-6 border-b border-walnut/10 bg-cream/50">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         {/* Category Filter */}
                         <div>
@@ -136,7 +135,7 @@ export default function ExpenseList({
                                         e.target.value || undefined,
                                     )
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+                                className="w-full px-3 py-2 border border-walnut/20 bg-white/50 rounded-lg focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown text-sm"
                             >
                                 <option value="">
                                     {t(
@@ -168,7 +167,7 @@ export default function ExpenseList({
                                         e.target.value as ExpenseStatus,
                                     )
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+                                className="w-full px-3 py-2 border border-walnut/20 bg-white/50 rounded-lg focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown text-sm"
                             >
                                 <option value="">
                                     {t(
@@ -214,7 +213,7 @@ export default function ExpenseList({
                                         e.target.value,
                                     )
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+                                className="w-full px-3 py-2 border border-walnut/20 bg-white/50 rounded-lg focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown text-sm"
                             />
                         </div>
 
@@ -234,7 +233,7 @@ export default function ExpenseList({
                                         e.target.value,
                                     )
                                 }
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-sm"
+                                className="w-full px-3 py-2 border border-walnut/20 bg-white/50 rounded-lg focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown text-sm"
                             />
                         </div>
                     </div>
@@ -242,13 +241,13 @@ export default function ExpenseList({
             )}
 
             {/* Expense List */}
-            <div className="divide-y dark:divide-gray-700">
+            <div className="divide-y divide-walnut/10">
                 {isLoading ? (
                     <div className="p-6 space-y-4">
                         {[1, 2, 3].map((i) => (
                             <div
                                 key={i}
-                                className="animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg h-20"
+                                className="animate-pulse bg-walnut/10 rounded-xl h-20"
                             ></div>
                         ))}
                     </div>
@@ -288,8 +287,8 @@ export default function ExpenseList({
 
             {/* Pagination */}
             {expensesData && expensesData.last_page > 1 && (
-                <div className="p-4 border-t dark:border-gray-700 flex items-center justify-between">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="p-4 border-t border-walnut/10 flex items-center justify-between">
+                    <p className="text-sm text-walnut">
                         {t(
                             "accounting.expense_list.page",
                             "Page {{current}} of {{last}}",
@@ -305,7 +304,7 @@ export default function ExpenseList({
                                 handleFilterChange("per_page", filters.per_page)
                             }
                             disabled={expensesData.current_page === 1}
-                            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm"
+                            className="px-3 py-1 border border-walnut/20 rounded-lg hover:bg-walnut/10 text-darkBrown disabled:opacity-50 transition-colors text-sm"
                         >
                             {t("accounting.expense_list.previous", "Previous")}
                         </button>
@@ -317,13 +316,50 @@ export default function ExpenseList({
                                 expensesData.current_page ===
                                 expensesData.last_page
                             }
-                            className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors text-sm"
+                            className="px-3 py-1 border border-walnut/20 rounded-lg hover:bg-walnut/10 text-darkBrown disabled:opacity-50 transition-colors text-sm"
                         >
                             {t("accounting.expense_list.next", "Next")}
                         </button>
                     </div>
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <AnimatePresence>
+                {expenseToDelete && createPortal(
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+                            className="bg-cream/95 backdrop-blur-md p-6 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-walnut/20 max-w-sm w-full"
+                        >
+                            <h3 className="text-lg font-bold text-darkBrown mb-2">
+                                {t("accounting.expense_list.delete_title", "Hapus Pengeluaran")}
+                            </h3>
+                            <p className="text-walnut/80 text-sm mb-6">
+                                {t("accounting.expense_list.confirm_delete", "Are you sure you want to delete this expense?")}
+                            </p>
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => setExpenseToDelete(null)}
+                                    className="px-4 py-2 rounded-xl text-sm font-bold text-walnut bg-walnut/10 hover:bg-walnut/20 transition-colors"
+                                >
+                                    {t("common.cancel", "Batal")}
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-red-600/90 hover:bg-red-600 transition-colors shadow-sm"
+                                >
+                                    {t("common.delete", "Hapus")}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>,
+                    document.body
+                )}
+            </AnimatePresence>
         </div>
     );
 }
@@ -365,7 +401,7 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
                                     )}
                                 </span>
                                 {expense.is_recurring && (
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-walnut/70">
                                         🔄{" "}
                                         {t(
                                             "accounting.expense_list.recurring",
@@ -374,7 +410,7 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
                                     </span>
                                 )}
                                 {expense.has_reminder && (
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-walnut/70">
                                         🔔{" "}
                                         {t(
                                             "accounting.expense_list.reminder",
@@ -435,7 +471,7 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
                     </div>
 
                     {expense.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-1">
+                        <p className="text-sm text-walnut/80 mt-2 line-clamp-1">
                             {expense.description}
                         </p>
                     )}
@@ -444,10 +480,10 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
                 <div className="flex items-center gap-2 ml-4">
                     {expense.receipt_data && (
                         <div
-                            className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg"
+                            className="p-1.5 bg-walnut/10 rounded-lg"
                             title="Has receipt"
                         >
-                            <Receipt className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <Receipt className="w-4 h-4 text-walnut" />
                         </div>
                     )}
                     <button
@@ -455,23 +491,24 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
                             e.stopPropagation();
                             onEdit();
                         }}
-                        className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                        className="p-1.5 hover:bg-walnut/10 rounded-lg transition-colors"
                         title="Edit"
                     >
-                        <Edit className="w-4 h-4 text-gray-500" />
+                        <Edit className="w-4 h-4 text-walnut/70" />
                     </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onDelete();
                         }}
-                        className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors"
+                        className="p-1.5 hover:bg-red-50:bg-red-900 rounded-lg transition-colors"
                         title="Delete"
                     >
-                        <Trash2 className="w-4 h-4 text-gray-500" />
+                        <Trash2 className="w-4 h-4 text-walnut/70" />
                     </button>
                 </div>
             </div>
         </motion.div>
     );
 }
+

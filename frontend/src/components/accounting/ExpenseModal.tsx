@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import Modal from "../ui/Modal";
 import {
     X,
     DollarSign,
@@ -48,7 +48,14 @@ export default function ExpenseModal({
     const updateExpense = useUpdateExpense();
     const { data: categoriesResponse } = useExpenseCategories();
     const categories = categoriesResponse?.data || [];
-    const { data: books = [] } = useBooks();
+    const { data: booksResponse } = useBooks();
+    const books = Array.isArray(booksResponse?.data?.data)
+        ? booksResponse.data.data
+        : Array.isArray(booksResponse?.data)
+          ? booksResponse.data
+          : Array.isArray(booksResponse)
+            ? booksResponse
+            : [];
 
     const [formData, setFormData] = useState<ExpenseFormData>({
         title: "",
@@ -173,64 +180,49 @@ export default function ExpenseModal({
 
     if (!isOpen) return null;
 
-    return (
-        <AnimatePresence>
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-                onClick={onClose}
-            >
-                <motion.div
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="bg-cream rounded-lg shadow-xl border border-beige max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-                >
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                                <DollarSign className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                    {mode === "create"
-                                        ? t(
-                                              "accounting.expense_modal.add_new",
-                                              "Add New Expense",
-                                          )
-                                        : t(
-                                              "accounting.expense_modal.edit",
-                                              "Edit Expense",
-                                          )}
-                                </h2>
-                                <p className="text-sm text-walnut/80">
-                                    {mode === "create"
-                                        ? t(
-                                              "accounting.expense_modal.add_desc",
-                                              "Track your book-related expenses",
-                                          )
-                                        : t(
-                                              "accounting.expense_modal.edit_desc",
-                                              "Update expense details",
-                                          )}
-                                </p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={onClose}
-                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                        >
-                            <X className="w-5 h-5 text-gray-500" />
-                        </button>
-                    </div>
+    const modalTitle = mode === "create" 
+        ? t("accounting.expense_modal.add_new", "Add New Expense") 
+        : t("accounting.expense_modal.edit", "Edit Expense");
 
-                    {/* Form */}
-                    <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                        {/* Title */}
+    const modalFooter = (
+        <div className="flex items-center justify-end gap-4 w-full">
+            <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-2 border border-walnut/20 text-walnut rounded-lg hover:bg-walnut/5 transition-colors"
+            >
+                {t("accounting.expense_modal.cancel", "Cancel")}
+            </button>
+            <button
+                type="submit"
+                form="expense-form"
+                disabled={isSubmitting}
+                className="px-6 py-2 bg-walnut text-cream rounded-lg hover:bg-darkBrown disabled:opacity-50 transition-colors flex items-center gap-2"
+            >
+                {isSubmitting ? (
+                    t("accounting.expense_modal.saving", "Saving...")
+                ) : (
+                    <>
+                        {mode === "create"
+                            ? t("accounting.expense_modal.create_btn", "Create Expense")
+                            : t("accounting.expense_modal.update_btn", "Update Expense")}
+                    </>
+                )}
+            </button>
+        </div>
+    );
+
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={modalTitle}
+            size="lg"
+            footer={modalFooter}
+            contentClassName="!p-0" // We'll handle padding inside the form
+        >
+            <form id="expense-form" onSubmit={handleSubmit} className="p-6 space-y-6">
+                            {/* Title */}
                         <div>
                             <label className="block text-sm font-medium text-darkBrown mb-2">
                                 {t("accounting.expense_modal.title", "Title *")}
@@ -245,7 +237,7 @@ export default function ExpenseModal({
                                         title: e.target.value,
                                     })
                                 }
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                 placeholder={t(
                                     "accounting.expense_modal.title_placeholder",
                                     "e.g., 'The Great Gatsby - Paperback'",
@@ -278,7 +270,7 @@ export default function ExpenseModal({
                                                     ) || 0,
                                             })
                                         }
-                                        className="w-full px-4 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2 pl-10 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                         placeholder="0.00"
                                     />
                                     <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -300,7 +292,7 @@ export default function ExpenseModal({
                                             currency: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                 >
                                     <option value="IDR">
                                         IDR - Indonesian Rupiah
@@ -337,7 +329,7 @@ export default function ExpenseModal({
                                             category_id: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                 >
                                     <option value="">
                                         {t(
@@ -372,7 +364,7 @@ export default function ExpenseModal({
                                                 .value as PaymentMethod,
                                         })
                                     }
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                 >
                                     {PAYMENT_METHODS.map((method) => (
                                         <option
@@ -403,7 +395,7 @@ export default function ExpenseModal({
                                             book_id: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                 >
                                     <option value="">
                                         {t(
@@ -436,7 +428,7 @@ export default function ExpenseModal({
                                             expense_date: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                 />
                             </div>
                         </div>
@@ -458,7 +450,7 @@ export default function ExpenseModal({
                                     })
                                 }
                                 rows={3}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                 placeholder={t(
                                     "accounting.expense_modal.desc_placeholder",
                                     "Add notes about this expense...",
@@ -484,7 +476,7 @@ export default function ExpenseModal({
                                             vendor: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                     placeholder={t(
                                         "accounting.expense_modal.vendor_placeholder",
                                         "e.g., Amazon, Local Bookstore",
@@ -508,7 +500,7 @@ export default function ExpenseModal({
                                             location: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-walnut/20 bg-white/50 rounded-xl focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                     placeholder={t(
                                         "accounting.expense_modal.location_placeholder",
                                         "e.g., Online, Jakarta",
@@ -530,7 +522,7 @@ export default function ExpenseModal({
                                             is_recurring: e.target.checked,
                                         })
                                     }
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                    className="w-4 h-4 text-walnut rounded border-walnut/30 focus:ring-walnut/30"
                                 />
                                 <div className="flex-1">
                                     <label
@@ -553,7 +545,7 @@ export default function ExpenseModal({
                                                         .value as any,
                                                 })
                                             }
-                                            className="mt-2 w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                            className="mt-2 w-full px-3 py-1 text-sm border border-walnut/20 bg-white/50 rounded-lg focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                         >
                                             <option value="daily">
                                                 {t(
@@ -595,7 +587,7 @@ export default function ExpenseModal({
                                             has_reminder: e.target.checked,
                                         })
                                     }
-                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                    className="w-4 h-4 text-walnut rounded border-walnut/30 focus:ring-walnut/30"
                                 />
                                 <div className="flex-1">
                                     <label
@@ -619,7 +611,7 @@ export default function ExpenseModal({
                                                         e.target.value,
                                                 })
                                             }
-                                            className="mt-2 w-full px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                            className="mt-2 w-full px-3 py-1 text-sm border border-walnut/20 bg-white/50 rounded-lg focus:ring-2 focus:ring-walnut/30 focus:border-walnut focus:bg-white transition-all text-darkBrown"
                                         />
                                     )}
                                 </div>
@@ -634,7 +626,7 @@ export default function ExpenseModal({
                                     "Receipt/Proof of Purchase",
                                 )}
                             </label>
-                            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
+                            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-walnut transition-colors">
                                 {receiptPreview ? (
                                     <div className="space-y-4">
                                         <img
@@ -660,7 +652,7 @@ export default function ExpenseModal({
                                     <div>
                                         <Receipt className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                                         <label className="cursor-pointer">
-                                            <span className="text-blue-600 hover:text-blue-700 font-medium">
+                                            <span className="text-walnut hover:text-darkBrown font-medium">
                                                 {t(
                                                     "accounting.expense_modal.upload_receipt",
                                                     "Upload receipt",
@@ -684,43 +676,8 @@ export default function ExpenseModal({
                             </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="flex items-center justify-end gap-4 pt-4 border-t dark:border-gray-700">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                {t("accounting.expense_modal.cancel", "Cancel")}
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-2"
-                            >
-                                {isSubmitting ? (
-                                    t(
-                                        "accounting.expense_modal.saving",
-                                        "Saving...",
-                                    )
-                                ) : (
-                                    <>
-                                        {mode === "create"
-                                            ? t(
-                                                  "accounting.expense_modal.create_btn",
-                                                  "Create Expense",
-                                              )
-                                            : t(
-                                                  "accounting.expense_modal.update_btn",
-                                                  "Update Expense",
-                                              )}
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </form>
-                </motion.div>
-            </motion.div>
-        </AnimatePresence>
+            </form>
+        </Modal>
     );
 }
+
