@@ -53,7 +53,7 @@ class BookController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
-            'isbn' => 'required|string|max:50',
+            'isbn' => 'nullable|string|max:50',
             'genre' => 'nullable|string|max:100',
             'language' => 'nullable|string|max:50',
             'publisher' => 'nullable|string|max:255',
@@ -109,9 +109,9 @@ class BookController extends Controller
         $book = $this->bookService->getBook($id, $request->user()->id);
 
         $data = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'author' => 'sometimes|string|max:255',
-            'isbn' => 'sometimes|string|max:50',
+            'title' => 'sometimes|required|string|max:255',
+            'author' => 'sometimes|required|string|max:255',
+            'isbn' => 'nullable|string|max:50',
             'genre' => 'nullable|string|max:100',
             'language' => 'nullable|string|max:50',
             'publisher' => 'nullable|string|max:255',

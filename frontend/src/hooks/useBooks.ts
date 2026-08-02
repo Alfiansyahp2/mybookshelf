@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { booksApi } from "../lib/api/books";
+import { useNotifications } from "./useNotifications";
 import type { Book, BookStatus } from "../types";
 
 /**
@@ -40,7 +41,20 @@ export function useCreateBook() {
         onSuccess: () => {
             // Invalidate books queries to refetch
             queryClient.invalidateQueries({ queryKey: ["books"] });
+            useNotifications.getState().addNotification({
+                title: "Success",
+                message: "Book added successfully",
+                type: "success"
+            });
         },
+        onError: (error: any) => {
+            const message = error.response?.data?.message || "Failed to create book. Please check your inputs.";
+            useNotifications.getState().addNotification({
+                title: "Validation Error",
+                message,
+                type: "warning"
+            });
+        }
     });
 }
 
@@ -58,7 +72,20 @@ export function useUpdateBook() {
             // Invalidate both the specific book and the books list
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({ queryKey: ["books", id] });
+            useNotifications.getState().addNotification({
+                title: "Success",
+                message: "Book updated successfully",
+                type: "success"
+            });
         },
+        onError: (error: any) => {
+            const message = error.response?.data?.message || "Failed to update book. Please check your inputs.";
+            useNotifications.getState().addNotification({
+                title: "Validation Error",
+                message,
+                type: "warning"
+            });
+        }
     });
 }
 

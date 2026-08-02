@@ -13,6 +13,8 @@ import type {
     ExpenseStatus,
 } from "../../types/accounting";
 import { useTranslation } from "react-i18next";
+import Modal from "../ui/Modal";
+
 // Helper functions - defined outside components to be reused
 const getStatusColor = (status: ExpenseStatus) => {
     switch (status) {
@@ -74,6 +76,9 @@ export default function ExpenseList({
             setExpenseToDelete(null);
         } catch (error) {
             console.error("Error deleting expense:", error);
+            alert("Gagal menghapus pengeluaran. " + (error as any)?.message);
+        } finally {
+            setExpenseToDelete(null);
         }
     };
 
@@ -325,41 +330,37 @@ export default function ExpenseList({
             )}
 
             {/* Delete Confirmation Modal */}
-            <AnimatePresence>
-                {expenseToDelete && createPortal(
-                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
-                            className="bg-cream/95 backdrop-blur-md p-6 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] border border-walnut/20 max-w-sm w-full"
+            <Modal
+                isOpen={!!expenseToDelete}
+                onClose={() => setExpenseToDelete(null)}
+                title={t("accounting.expense_list.delete_title", "Hapus Pengeluaran")}
+                size="sm"
+                contentClassName="!p-0"
+                footer={
+                    <div className="flex justify-end gap-3 w-full">
+                        <button
+                            onClick={() => setExpenseToDelete(null)}
+                            className="px-4 py-2 rounded-xl text-sm font-bold text-walnut bg-walnut/10 hover:bg-walnut/20 transition-colors"
                         >
-                            <h3 className="text-lg font-bold text-darkBrown mb-2">
-                                {t("accounting.expense_list.delete_title", "Hapus Pengeluaran")}
-                            </h3>
-                            <p className="text-walnut/80 text-sm mb-6">
-                                {t("accounting.expense_list.confirm_delete", "Are you sure you want to delete this expense?")}
-                            </p>
-                            <div className="flex justify-end gap-3">
-                                <button
-                                    onClick={() => setExpenseToDelete(null)}
-                                    className="px-4 py-2 rounded-xl text-sm font-bold text-walnut bg-walnut/10 hover:bg-walnut/20 transition-colors"
-                                >
-                                    {t("common.cancel", "Batal")}
-                                </button>
-                                <button
-                                    onClick={confirmDelete}
-                                    className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-red-600/90 hover:bg-red-600 transition-colors shadow-sm"
-                                >
-                                    {t("common.delete", "Hapus")}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>,
-                    document.body
-                )}
-            </AnimatePresence>
+                            {t("common.cancel", "Batal")}
+                        </button>
+                        <button
+                            onClick={confirmDelete}
+                            disabled={deleteExpense.isPending}
+                            className="px-4 py-2 rounded-xl text-sm font-bold text-white bg-red-600/90 hover:bg-red-600 transition-colors shadow-sm disabled:opacity-50"
+                        >
+                            {t("common.delete", "Hapus")}
+                        </button>
+                    </div>
+                }
+            >
+                <div className="p-6 text-center">
+                    <Trash2 className="w-12 h-12 text-red-400 mx-auto mb-4" />
+                    <p className="text-walnut/80 text-sm">
+                        {t("accounting.expense_list.confirm_delete", "Are you sure you want to delete this expense?")}
+                    </p>
+                </div>
+            </Modal>
         </div>
     );
 }

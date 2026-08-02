@@ -10,10 +10,13 @@ import {
     Wallet,
     Repeat,
     Bell,
+    Trash2,
 } from "lucide-react";
 import {
     useCreateExpense,
     useUpdateExpense,
+    useDeleteExpense,
+    useUploadReceipt,
 } from "../../hooks/accounting/useExpenses";
 import { useExpenseCategories } from "../../hooks/accounting/useExpenseCategories";
 import { useBooks } from "../../hooks/useBooks";
@@ -46,6 +49,8 @@ export default function ExpenseModal({
     const { t } = useTranslation();
     const createExpense = useCreateExpense();
     const updateExpense = useUpdateExpense();
+    const deleteExpense = useDeleteExpense();
+    const uploadReceipt = useUploadReceipt();
     const { data: categoriesResponse } = useExpenseCategories();
     const categories = categoriesResponse?.data || [];
     const { data: booksResponse } = useBooks();
@@ -178,6 +183,18 @@ export default function ExpenseModal({
         }
     };
 
+    const handleDelete = async () => {
+        if (!expense || !window.confirm(t("accounting.expense_modal.confirm_delete", "Are you sure you want to delete this expense?"))) return;
+        
+        try {
+            await deleteExpense.mutateAsync(expense.id);
+            onClose();
+        } catch (error) {
+            console.error("Error deleting expense:", error);
+            alert("Gagal menghapus pengeluaran. " + (error as any)?.message);
+        }
+    };
+
     if (!isOpen) return null;
 
     const modalTitle = mode === "create" 
@@ -185,11 +202,23 @@ export default function ExpenseModal({
         : t("accounting.expense_modal.edit", "Edit Expense");
 
     const modalFooter = (
-        <div className="flex items-center justify-end gap-4 w-full">
+        <div className="flex items-center gap-4 w-full">
+            {mode === "edit" && (
+                <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={deleteExpense.isPending}
+                    className="w-10 h-10 bg-transparent text-red-400 hover:bg-red-50 hover:text-red-500 rounded-xl flex items-center justify-center transition-colors mr-auto"
+                    title={t("common.delete", "Delete")}
+                >
+                    <Trash2 className="w-5 h-5" />
+                </button>
+            )}
+            <div className={mode === "create" ? "flex-1" : ""} />
             <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2 border border-walnut/20 text-walnut rounded-lg hover:bg-walnut/5 transition-colors"
+                className="px-6 py-2 border border-walnut/20 text-walnut rounded-lg hover:bg-walnut/5 transition-colors ml-auto"
             >
                 {t("accounting.expense_modal.cancel", "Cancel")}
             </button>
