@@ -230,358 +230,146 @@ export default function DashboardActivitySection({
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        style={{
-                                            overflow: "hidden",
-                                            paddingLeft: 20,
-                                            marginLeft: -20,
-                                        }}
+                                        style={{ overflow: "hidden" }}
                                     >
                                         <div
                                             style={{
-                                                paddingLeft: 36,
-                                                borderLeft:
-                                                    "1px solid rgba(139,99,56,0.15)",
                                                 display: "flex",
                                                 flexDirection: "column",
                                                 gap: 16,
                                             }}
                                         >
-                                            {Object.keys(groupedByMonth)
-                                                .length === 0 ? (
-                                                <div
-                                                    style={{
-                                                        fontSize: 12,
-                                                        color: "rgba(122,92,66,0.5)",
-                                                        padding: "10px 0",
-                                                    }}
-                                                >
-                                                    {t(
-                                                        "dashboard.activity.no_books",
-                                                    )}
+                                            {Object.keys(groupedByMonth).length === 0 ? (
+                                                <div style={{ fontSize: 13, color: "rgba(139,99,56,0.6)", padding: "20px 0", textAlign: "center" }}>
+                                                    {t("dashboard.activity.no_books")}
                                                 </div>
                                             ) : (
-                                                Object.entries(
-                                                    groupedByMonth,
-                                                ).map(
-                                                    ([
-                                                        month,
-                                                        monthBooks,
-                                                    ]: any) => {
-                                                        const isExpanded =
-                                                            expandedMonths[
-                                                                month
-                                                            ];
-                                                        return (
+                                                Object.entries(groupedByMonth).map(([month, monthBooks]: any) => {
+                                                    const isExpanded = expandedMonths[month];
+                                                    return (
+                                                        <div
+                                                            key={month}
+                                                            style={{
+                                                                background: "rgba(139,99,56,0.02)",
+                                                                borderRadius: 12,
+                                                                border: "1px solid rgba(139,99,56,0.1)",
+                                                                overflow: "hidden",
+                                                                transition: "all 0.2s ease"
+                                                            }}
+                                                        >
+                                                            {/* Header Row */}
                                                             <div
-                                                                key={month}
+                                                                onClick={() => toggleMonth(month)}
                                                                 style={{
-                                                                    position:
-                                                                        "relative",
-                                                                    marginBottom: 24,
+                                                                    padding: "16px 20px",
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                    justifyContent: "space-between",
+                                                                    cursor: "pointer",
+                                                                    userSelect: "none"
                                                                 }}
                                                             >
-                                                                {/* Month Header with line */}
-                                                                <div
-                                                                    style={{
-                                                                        display:
-                                                                            "flex",
-                                                                        alignItems:
-                                                                            "center",
-                                                                        gap: 12,
-                                                                        marginLeft:
-                                                                            -44,
-                                                                        marginBottom: 16,
-                                                                    }}
-                                                                >
-                                                                    <span
-                                                                        style={{
-                                                                            fontSize: 11,
-                                                                            fontWeight: 700,
-                                                                            color: BRAND.darkBrown,
-                                                                            background:
-                                                                                "white",
-                                                                            padding:
-                                                                                "4px 8px",
-                                                                            minWidth: 70,
-                                                                        }}
-                                                                    >
-                                                                        {month}{" "}
-                                                                        {
-                                                                            selectedYear
-                                                                        }
+                                                                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                                                    <div style={{ 
+                                                                        width: 32, height: 32, borderRadius: "50%", 
+                                                                        background: "rgba(139,99,56,0.08)", display: "flex", alignItems: "center", justifyContent: "center",
+                                                                        color: BRAND.walnut
+                                                                    }}>
+                                                                        <BookOpen size={16} />
+                                                                    </div>
+                                                                    <span style={{ fontSize: 15, fontWeight: 700, color: BRAND.darkBrown }}>
+                                                                        {month} {selectedYear}
                                                                     </span>
-                                                                    <div
-                                                                        style={{
-                                                                            flex: 1,
-                                                                            height: 1,
-                                                                            background:
-                                                                                "rgba(139,99,56,0.1)",
-                                                                        }}
-                                                                    ></div>
+                                                                    <span style={{ 
+                                                                        padding: "2px 8px", background: "rgba(139,99,56,0.1)", 
+                                                                        color: BRAND.walnut, fontSize: 11, borderRadius: 12, fontWeight: 600 
+                                                                    }}>
+                                                                        {monthBooks.length} activities
+                                                                    </span>
                                                                 </div>
-
-                                                                {/* Event block */}
-                                                                <div
-                                                                    style={{
-                                                                        position:
-                                                                            "relative",
-                                                                    }}
-                                                                >
-                                                                    {/* Timeline Icon */}
-                                                                    <div
-                                                                        style={{
-                                                                            position:
-                                                                                "absolute",
-                                                                            left: -53,
-                                                                            top: 0,
-                                                                            width: 32,
-                                                                            height: 32,
-                                                                            borderRadius:
-                                                                                "50%",
-                                                                            background:
-                                                                                "white",
-                                                                            display:
-                                                                                "flex",
-                                                                            alignItems:
-                                                                                "center",
-                                                                            justifyContent:
-                                                                                "center",
-                                                                            zIndex: 2,
-                                                                        }}
-                                                                    >
-                                                                        <div
-                                                                            style={{
-                                                                                width: 28,
-                                                                                height: 28,
-                                                                                borderRadius:
-                                                                                    "50%",
-                                                                                background:
-                                                                                    "rgba(139,99,56,0.08)",
-                                                                                border: "1px solid rgba(139,99,56,0.15)",
-                                                                                display:
-                                                                                    "flex",
-                                                                                alignItems:
-                                                                                    "center",
-                                                                                justifyContent:
-                                                                                    "center",
-                                                                            }}
-                                                                        >
-                                                                            <BookOpen
-                                                                                size={
-                                                                                    12
-                                                                                }
-                                                                                color={
-                                                                                    BRAND.walnut
-                                                                                }
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                    <div
-                                                                        style={{
-                                                                            flex: 1,
-                                                                            paddingTop: 4,
-                                                                        }}
-                                                                    >
-                                                                        <div
-                                                                            onClick={() =>
-                                                                                toggleMonth(
-                                                                                    month,
-                                                                                )
-                                                                            }
-                                                                            style={{
-                                                                                fontSize: 13,
-                                                                                fontWeight: 700,
-                                                                                color: BRAND.darkBrown,
-                                                                                cursor: "pointer",
-                                                                                display:
-                                                                                    "flex",
-                                                                                alignItems:
-                                                                                    "center",
-                                                                                justifyContent:
-                                                                                    "space-between",
-                                                                                userSelect:
-                                                                                    "none",
-                                                                            }}
-                                                                        >
-                                                                            <span>
-                                                                                {t(
-                                                                                    "dashboard.activity.book_activities",
-                                                                                    {
-                                                                                        count: monthBooks.length,
-                                                                                    },
-                                                                                )}
-                                                                            </span>
-                                                                            <span
-                                                                                style={{
-                                                                                    color: "rgba(139,99,56,0.6)",
-                                                                                    transition:
-                                                                                        "transform 0.2s",
-                                                                                    transform:
-                                                                                        isExpanded
-                                                                                            ? "rotate(180deg)"
-                                                                                            : "rotate(0deg)",
-                                                                                }}
-                                                                            >
-                                                                                ▼
-                                                                            </span>
-                                                                        </div>
-
-                                                                        <AnimatePresence>
-                                                                            {isExpanded && (
-                                                                                <motion.div
-                                                                                    initial={{
-                                                                                        height: 0,
-                                                                                        opacity: 0,
-                                                                                    }}
-                                                                                    animate={{
-                                                                                        height: "auto",
-                                                                                        opacity: 1,
-                                                                                    }}
-                                                                                    exit={{
-                                                                                        height: 0,
-                                                                                        opacity: 0,
-                                                                                    }}
-                                                                                    style={{
-                                                                                        overflow:
-                                                                                            "hidden",
-                                                                                    }}
-                                                                                >
-                                                                                    <div
-                                                                                        style={{
-                                                                                            border: "1px solid rgba(139,99,56,0.15)",
-                                                                                            borderRadius: 8,
-                                                                                            overflow:
-                                                                                                "hidden",
-                                                                                            background:
-                                                                                                "white",
-                                                                                            marginTop: 16,
-                                                                                        }}
-                                                                                    >
-                                                                                        {monthBooks.map(
-                                                                                            (
-                                                                                                b: any,
-                                                                                                i: number,
-                                                                                            ) => {
-                                                                                                    const dates = getBookDates(b);
-                                                                                                    const hasFinishedInSelectedYear = dates.some(d => d.getFullYear() === selectedYear);
-                                                                                                    const isFinished = b.status === "finished" && hasFinishedInSelectedYear;
-                                                                                                return (
-                                                                                                    <div
-                                                                                                        key={
-                                                                                                            b.id ||
-                                                                                                            i
-                                                                                                        }
-                                                                                                        style={{
-                                                                                                            display:
-                                                                                                                "flex",
-                                                                                                            alignItems:
-                                                                                                                "center",
-                                                                                                            gap: 12,
-                                                                                                            padding:
-                                                                                                                "10px 16px",
-                                                                                                            borderTop:
-                                                                                                                i >
-                                                                                                                0
-                                                                                                                    ? "1px solid rgba(139,99,56,0.06)"
-                                                                                                                    : "none",
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        <div
-                                                                                                            style={{
-                                                                                                                width: 8,
-                                                                                                                height: 32,
-                                                                                                                background:
-                                                                                                                    b
-                                                                                                                        .spineColors?.[0] ??
-                                                                                                                    BRAND.walnut,
-                                                                                                                borderRadius:
-                                                                                                                    "1px",
-                                                                                                            }}
-                                                                                                        />
-                                                                                                        <div
-                                                                                                            style={{
-                                                                                                                flex: 1,
-                                                                                                                display:
-                                                                                                                    "flex",
-                                                                                                                alignItems:
-                                                                                                                    "center",
-                                                                                                                justifyContent:
-                                                                                                                    "space-between",
-                                                                                                                minWidth: 0,
-                                                                                                            }}
-                                                                                                        >
-                                                                                                            <div
-                                                                                                                style={{
-                                                                                                                    display:
-                                                                                                                        "flex",
-                                                                                                                    flexDirection:
-                                                                                                                        "column",
-                                                                                                                    overflow:
-                                                                                                                        "hidden",
-                                                                                                                }}
-                                                                                                            >
-                                                                                                                <span
-                                                                                                                    style={{
-                                                                                                                        fontSize: 12,
-                                                                                                                        fontWeight: 600,
-                                                                                                                        color: "#1e40af",
-                                                                                                                        whiteSpace:
-                                                                                                                            "nowrap",
-                                                                                                                        overflow:
-                                                                                                                            "hidden",
-                                                                                                                        textOverflow:
-                                                                                                                            "ellipsis",
-                                                                                                                    }}
-                                                                                                                >
-                                                                                                                    {
-                                                                                                                        b.title
-                                                                                                                    }
-                                                                                                                </span>
-                                                                                                                <span
-                                                                                                                    style={{
-                                                                                                                        fontSize: 10,
-                                                                                                                        color: "rgba(122,92,66,0.6)",
-                                                                                                                    }}
-                                                                                                                >
-                                                                                                                    {
-                                                                                                                        b.author
-                                                                                                                    }
-                                                                                                                </span>
-                                                                                                            </div>
-                                                                                                            <span
-                                                                                                                style={{
-                                                                                                                    fontSize: 10,
-                                                                                                                    fontWeight: 600,
-                                                                                                                    color: isFinished
-                                                                                                                        ? "#10b981"
-                                                                                                                        : "#6b7280",
-                                                                                                                    flexShrink: 0,
-                                                                                                                    paddingLeft: 12,
-                                                                                                                }}
-                                                                                                            >
-                                                                                                                {isFinished
-                                                                                                                    ? t(
-                                                                                                                          "dashboard.activity.finished",
-                                                                                                                      )
-                                                                                                                    : t(
-                                                                                                                          "dashboard.activity.added",
-                                                                                                                      )}
-                                                                                                            </span>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                );
-                                                                                            },
-                                                                                        )}
-                                                                                    </div>
-                                                                                </motion.div>
+                                                                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                                                                    {/* Mini Covers Preview */}
+                                                                    {!isExpanded && (
+                                                                        <div style={{ display: "flex", alignItems: "center" }}>
+                                                                            {monthBooks.slice(0, 4).map((b: any, i: number) => (
+                                                                                <div key={b.id || i} style={{ 
+                                                                                    width: 20, height: 28, borderRadius: 2, 
+                                                                                    marginLeft: i > 0 ? -10 : 0, 
+                                                                                    boxShadow: "-2px 0 5px rgba(0,0,0,0.15)", 
+                                                                                    background: b.coverImage ? `url(${b.coverImage}) center/cover` : b.spineColors?.[0] || BRAND.walnut, 
+                                                                                    zIndex: 10 - i, border: "1px solid rgba(255,255,255,0.8)" 
+                                                                                }} />
+                                                                            ))}
+                                                                            {monthBooks.length > 4 && (
+                                                                                <div style={{ 
+                                                                                    width: 20, height: 28, borderRadius: 2, marginLeft: -10, 
+                                                                                    background: "rgba(139,99,56,0.15)", border: "1px solid rgba(255,255,255,0.8)", 
+                                                                                    zIndex: 5, display: "flex", alignItems: "center", justifyContent: "center", 
+                                                                                    fontSize: 9, fontWeight: 700, color: BRAND.walnut, backdropFilter: "blur(2px)" 
+                                                                                }}>
+                                                                                    +{monthBooks.length - 4}
+                                                                                </div>
                                                                             )}
-                                                                        </AnimatePresence>
-                                                                    </div>
+                                                                        </div>
+                                                                    )}
+                                                                    <span style={{ color: "rgba(139,99,56,0.5)", transition: "transform 0.3s ease", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+                                                                        ▼
+                                                                    </span>
                                                                 </div>
                                                             </div>
-                                                        );
-                                                    },
-                                                )
+
+                                                            {/* Expanded View */}
+                                                            <AnimatePresence>
+                                                                {isExpanded && (
+                                                                    <motion.div
+                                                                        initial={{ height: 0, opacity: 0 }}
+                                                                        animate={{ height: "auto", opacity: 1 }}
+                                                                        exit={{ height: 0, opacity: 0 }}
+                                                                        style={{ overflow: "hidden" }}
+                                                                    >
+                                                                        <div style={{ padding: "0 20px 20px 20px" }}>
+                                                                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
+                                                                                {monthBooks.map((b: any, i: number) => {
+                                                                                    const dates = getBookDates(b);
+                                                                                    const hasFinishedInSelectedYear = dates.some(d => d.getFullYear() === selectedYear);
+                                                                                    const isFinished = b.status === "finished" && hasFinishedInSelectedYear;
+                                                                                    return (
+                                                                                        <div key={b.id || i} style={{ 
+                                                                                            display: "flex", alignItems: "center", gap: 12, 
+                                                                                            background: "white", padding: "10px 12px", 
+                                                                                            borderRadius: 8, border: "1px solid rgba(139,99,56,0.1)" 
+                                                                                        }}>
+                                                                                            {b.coverImage ? (
+                                                                                                <div style={{ width: 32, height: 48, borderRadius: 4, background: `url(${b.coverImage}) center/cover`, boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} />
+                                                                                            ) : (
+                                                                                                <div style={{ width: 32, height: 48, borderRadius: 4, background: b.spineColors?.[0] || BRAND.walnut, boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }} />
+                                                                                            )}
+                                                                                            <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+                                                                                                <span style={{ fontSize: 13, fontWeight: 600, color: BRAND.darkBrown, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.title}</span>
+                                                                                                <span style={{ fontSize: 11, color: "rgba(139,99,56,0.6)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{b.author}</span>
+                                                                                            </div>
+                                                                                            <div style={{ flexShrink: 0, paddingLeft: 8 }}>
+                                                                                                {isFinished ? (
+                                                                                                    <span style={{ fontSize: 10, fontWeight: 700, color: "#10b981", background: "rgba(16,185,129,0.1)", padding: "2px 6px", borderRadius: 4 }}>
+                                                                                                        {t("dashboard.activity.finished")}
+                                                                                                    </span>
+                                                                                                ) : (
+                                                                                                    <span style={{ fontSize: 10, fontWeight: 700, color: BRAND.walnut, background: "rgba(139,99,56,0.1)", padding: "2px 6px", borderRadius: 4 }}>
+                                                                                                        {t("dashboard.activity.added")}
+                                                                                                    </span>
+                                                                                                )}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
+                                                                        </div>
+                                                                    </motion.div>
+                                                                )}
+                                                            </AnimatePresence>
+                                                        </div>
+                                                    );
+                                                })
                                             )}
                                         </div>
                                     </motion.div>
