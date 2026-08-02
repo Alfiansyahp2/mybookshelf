@@ -704,18 +704,17 @@ export function ContributionGraph({
     }, [data, selectedYear]);
 
     return (
-        <div style={{ display: "flex", gap: 20 }}>
+        <div
+            style={{
+                fontFamily: "'Inter', sans-serif",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+            }}
+        >
             <TooltipPortal />
-            {/* Left section: Heatmap */}
-            <div
-                style={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                    minWidth: 0,
-                }}
-            >
+            <div style={{ padding: "0 4px", maxWidth: "100%", width: "fit-content" }}>
                 <div style={{ display: "flex", gap: 8 }}>
                     {/* Left fixed column (Day labels) */}
                     <div
@@ -766,7 +765,6 @@ export function ContributionGraph({
                     <div
                         ref={scrollRef}
                         style={{
-                            flex: 1,
                             overflowX: "auto",
                             display: "flex",
                             flexDirection: "column",
