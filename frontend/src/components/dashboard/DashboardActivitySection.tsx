@@ -122,55 +122,21 @@ export default function DashboardActivitySection({
     const [isTimelineVisible, setIsTimelineVisible] = useState(false);
 
     return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 1fr) 60px",
-                gap: 30,
-                paddingBottom: 40,
-            }}
-        >
+        <div className="grid grid-cols-[minmax(0,1fr)_60px] gap-[30px] pb-[40px]">
             {/* Left Column: Graph + Timeline */}
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 32,
-                    minWidth: 0,
-                }}
-            >
+            <div className="flex flex-col gap-8 min-w-0">
                 {/* Heatmap Card */}
                 <motion.div {...fadeUp(0.6)}>
-                    <div
-                        style={{
-                            fontSize: 14,
-                            color: BRAND.darkBrown,
-                            marginBottom: 12,
-                            paddingLeft: 4,
-                            fontWeight: 500,
-                        }}
-                    >
+                    <div className="text-[14px] text-darkBrown mb-3 pl-1 font-medium">
                         {t("dashboard.activity.pages_read", {
                             count: totalPagesInYear,
                             year: selectedYear,
                         })}
                     </div>
-                    <Card
-                        style={{
-                            padding: "16px 20px",
-                            border: "1px solid rgba(139,99,56,0.15)",
-                        }}
-                    >
-                        <div style={{ paddingBottom: 20 }}>
+                    <Card className="px-5 py-4">
+                        <div className="pb-5">
                             {augmentedDailyActivity.length === 0 ? (
-                                <div
-                                    style={{
-                                        textAlign: "center",
-                                        padding: "24px 0",
-                                        color: "rgba(122,92,66,0.4)",
-                                        fontSize: 12,
-                                    }}
-                                >
+                                <div className="text-center py-6 text-[rgba(122,92,66,0.4)] text-[12px]">
                                     {t("dashboard.activity.no_activity")}
                                 </div>
                             ) : (
@@ -183,43 +149,17 @@ export default function DashboardActivitySection({
                             )}
                         </div>
 
-                        <div
-                            style={{
-                                borderTop: "1px solid rgba(139,99,56,0.1)",
-                                paddingTop: 16,
-                            }}
-                        >
+                        <div className="border-t border-[rgba(139,99,56,0.1)] pt-4">
                             <div
                                 onClick={() =>
                                     setIsTimelineVisible(!isTimelineVisible)
                                 }
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 8,
-                                    fontSize: 14,
-                                    color: BRAND.darkBrown,
-                                    marginBottom: isTimelineVisible ? 24 : 0,
-                                    paddingLeft: 4,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                    userSelect: "none",
-                                    width: "fit-content",
-                                }}
+                                className={`flex items-center gap-2 text-[14px] text-darkBrown pl-1 font-semibold cursor-pointer select-none w-fit ${isTimelineVisible ? "mb-6" : "mb-0"}`}
                             >
                                 <span>
                                     {t("dashboard.activity.read_activity")}
                                 </span>
-                                <span
-                                    style={{
-                                        fontSize: 14,
-                                        color: "rgba(139,99,56,0.6)",
-                                        transition: "transform 0.2s",
-                                        transform: isTimelineVisible
-                                            ? "rotate(180deg)"
-                                            : "rotate(0deg)",
-                                    }}
-                                >
+                                <span className={`text-[14px] text-[rgba(139,99,56,0.6)] transition-transform duration-200 ${isTimelineVisible ? "rotate-180" : "rotate-0"}`}>
                                     ▼
                                 </span>
                             </div>
@@ -230,15 +170,9 @@ export default function DashboardActivitySection({
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: "auto", opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        style={{ overflow: "hidden" }}
+                                        className="overflow-hidden"
                                     >
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                gap: 16,
-                                            }}
-                                        >
+                                        <div className="flex flex-col gap-4">
                                             {Object.keys(groupedByMonth).length === 0 ? (
                                                 <div style={{ fontSize: 13, color: "rgba(139,99,56,0.6)", padding: "20px 0", textAlign: "center" }}>
                                                     {t("dashboard.activity.no_books")}
