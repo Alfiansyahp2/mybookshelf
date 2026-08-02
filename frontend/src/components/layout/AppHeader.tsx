@@ -15,12 +15,14 @@ interface NavItem {
 
 interface AppHeaderProps {
     isHeaderVisible: boolean;
+    isScrolled?: boolean;
     navItems: NavItem[];
     onAddShelfClick: () => void;
 }
 
 export default function AppHeader({
     isHeaderVisible,
+    isScrolled = false,
     navItems,
     onAddShelfClick,
 }: AppHeaderProps) {
@@ -63,16 +65,26 @@ export default function AppHeader({
 
     return (
         <header
-            className={`bg-cream/95 backdrop-blur-sm border-b border-walnut/10 sticky top-0 z-10 transition-transform duration-300 ease-in-out ${
+            className={`sticky top-0 z-50 transition-all duration-500 ease-in-out pt-2 pb-2 ${
                 isHeaderVisible ? "translate-y-0" : "-translate-y-full"
+            } ${
+                isScrolled 
+                    ? "px-4 md:px-8 mt-2" 
+                    : "px-0 mt-0"
             }`}
         >
-            <div className="px-4 md:px-8 py-3 md:py-4">
+            <div 
+                className={`transition-all duration-500 ease-in-out mx-auto ${
+                    isScrolled 
+                        ? "bg-white/90 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-walnut/10 py-2 px-6 max-w-6xl" 
+                        : "bg-cream/95 backdrop-blur-sm border-b border-walnut/10 py-3 md:py-4 px-4 md:px-8 w-full max-w-none"
+                }`}
+            >
                 <div className="flex items-center gap-4 md:gap-8">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-2 md:gap-3">
                         <motion.div
-                            className="w-8 h-8 md:w-10 md:h-10 bg-walnut rounded-lg flex items-center justify-center"
+                            className="w-8 h-8 md:w-10 md:h-10 bg-walnut rounded-lg flex items-center justify-center transition-colors duration-300"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}
@@ -87,13 +99,13 @@ export default function AppHeader({
                                 <BookOpen className="w-4 h-4 md:w-6 md:h-6 text-white" />
                             </motion.div>
                         </motion.div>
-                        <h1 className="text-base md:text-xl font-serif font-semibold text-darkBrown hidden sm:block">
+                        <h1 className="text-base md:text-xl font-serif font-semibold text-darkBrown hidden sm:block transition-colors duration-300">
                             MyBookshelf
                         </h1>
                     </Link>
 
                     {/* Icon Navigation - Hide on smallest screens, show icons on larger */}
-                    <nav className="hidden md:flex items-center gap-2">
+                    <nav className="hidden md:flex items-center gap-1 md:gap-2">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = location.pathname === item.path;
@@ -101,18 +113,22 @@ export default function AppHeader({
                             return (
                                 <motion.div
                                     key={item.path}
-                                    whileHover={{ scale: 1.15 }}
-                                    whileTap={{ scale: 0.9 }}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
                                 >
                                     <Link
                                         to={item.path}
                                         className={`
-                      w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-200
+                      w-10 h-10 flex items-center justify-center transition-all duration-300
                       ${
-                          isActive
-                              ? "bg-walnut text-white shadow-lg"
-                              : "text-walnut/70 hover:bg-walnut/10 hover:text-walnut"
+                          isScrolled
+                            ? isActive 
+                                ? "bg-walnut text-white shadow-md rounded-full" 
+                                : "text-walnut/70 hover:text-walnut hover:bg-walnut/10 rounded-full"
+                            : isActive
+                                ? "bg-walnut text-white shadow-md rounded-xl"
+                                : "text-walnut/70 hover:bg-walnut/10 hover:text-walnut rounded-xl"
                       }
                     `}
                                         title={t(item.labelKey as any)}
@@ -138,7 +154,7 @@ export default function AppHeader({
                     {/* Right Actions */}
                     <div className="flex items-center gap-2 md:gap-4">
                         {/* SearchBar */}
-                        <SearchBar />
+                        <SearchBar isScrolled={isScrolled} />
 
                         {/* Language Switcher */}
                         <motion.button
@@ -149,7 +165,11 @@ export default function AppHeader({
                                         : "en",
                                 )
                             }
-                            className="w-8 h-8 md:w-10 md:h-10 bg-walnut/10 hover:bg-walnut/20 rounded-lg md:rounded-xl flex items-center justify-center text-walnut font-bold text-xs md:text-sm transition-colors border border-transparent hover:border-walnut/20 shadow-sm mr-1"
+                            className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center font-bold text-xs md:text-sm transition-colors border shadow-sm mr-1 ${
+                                isScrolled 
+                                    ? "bg-cream hover:bg-walnut/10 text-walnut border-walnut/10 hover:border-walnut/20 rounded-full" 
+                                    : "bg-walnut/10 hover:bg-walnut/20 text-walnut border-transparent hover:border-walnut/20"
+                            }`}
                             whileHover={{ scale: 1.15 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}
@@ -173,7 +193,9 @@ export default function AppHeader({
                         {/* Add Bookshelf Button - Icon Only */}
                         <motion.button
                             onClick={onAddShelfClick}
-                            className="w-8 h-8 md:w-10 md:h-10 bg-walnut/80 backdrop-blur-md rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg border border-walnut/20"
+                            className={`w-8 h-8 md:w-10 md:h-10 backdrop-blur-md flex items-center justify-center text-white shadow-lg border transition-all duration-300 ${
+                                isScrolled ? "bg-walnut hover:bg-darkBrown rounded-full border-walnut/20" : "bg-walnut/80 border-walnut/20 hover:bg-walnut rounded-lg md:rounded-xl"
+                            }`}
                             whileHover={{ scale: 1.15 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}
@@ -202,7 +224,9 @@ export default function AppHeader({
                                         !isProfileDropdownOpen,
                                     )
                                 }
-                                className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-walnut to-darkBrown rounded-lg md:rounded-xl flex items-center justify-center text-white font-semibold text-xs md:text-sm relative shadow-lg"
+                                className={`w-8 h-8 md:w-10 md:h-10 flex items-center justify-center text-white font-semibold text-xs md:text-sm relative shadow-lg transition-all duration-300 bg-gradient-to-br from-walnut to-darkBrown ${
+                                    isScrolled ? "rounded-full border border-walnut/20 hover:shadow-xl" : "rounded-lg md:rounded-xl"
+                                }`}
                                 whileHover={{ scale: 1.15 }}
                                 whileTap={{ scale: 0.95 }}
                                 animate={{

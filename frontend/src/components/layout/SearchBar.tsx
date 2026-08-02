@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 import { useBooks } from "../../hooks/useBooks";
 import { useBookstore } from "../../store/useBookstore";
 
-export default function SearchBar() {
+export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
@@ -61,14 +61,19 @@ export default function SearchBar() {
           ${isMobileSearchOpen ? "block" : "hidden"} sm:block
         `}
             >
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut/50 pointer-events-none z-10" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut/50 pointer-events-none z-10 transition-colors" />
                 <input
                     ref={searchInputRef}
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsSearchFocused(true)}
-                    className="w-full sm:w-48 md:w-64 pl-10 pr-7 py-2.5 bg-white border border-walnut/20 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 shadow-lg sm:shadow-none transition-all"
+                    className={`w-full sm:w-48 md:w-64 pl-10 pr-7 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 shadow-lg sm:shadow-none transition-all ${
+                        isScrolled 
+                            ? 'bg-white border-walnut/10 text-darkBrown focus:ring-walnut/30 focus:border-walnut/50 shadow-inner' 
+                            : 'bg-white border-walnut/20 text-darkBrown focus:ring-walnut/30 focus:border-walnut/50'
+                    }`}
+                    placeholder={t("search.placeholder")}
                 />
                 {searchQuery && (
                     <button

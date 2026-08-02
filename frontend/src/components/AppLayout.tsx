@@ -68,6 +68,7 @@ export default function AppLayout() {
 
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const [isScrolled, setIsScrolled] = useState(false);
     const [isAddShelfModalOpen, setIsAddShelfModalOpen] = useState(false);
 
     // Handlers
@@ -83,24 +84,20 @@ export default function AppLayout() {
         });
     };
 
-    // Handle scroll behavior
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
+    // Handle scroll behavior on the scroll container
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const currentScrollY = e.currentTarget.scrollTop;
 
-            // Hide header when scrolling down, show when scrolling up
-            if (currentScrollY > lastScrollY && currentScrollY > 80) {
-                setIsHeaderVisible(false);
-            } else {
-                setIsHeaderVisible(true);
-            }
+        // Hide header when scrolling down, show when scrolling up
+        if (currentScrollY > lastScrollY && currentScrollY > 80) {
+            setIsHeaderVisible(false);
+        } else {
+            setIsHeaderVisible(true);
+        }
 
-            setLastScrollY(currentScrollY);
-        };
-
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [lastScrollY]);
+        setIsScrolled(currentScrollY > 20);
+        setLastScrollY(currentScrollY);
+    };
 
     const handleAddShelf = (shelf: any) => {
         console.log("New shelf added:", shelf);
@@ -143,6 +140,7 @@ export default function AppLayout() {
             {/* Top Navigation */}
             <AppHeader
                 isHeaderVisible={isHeaderVisible}
+                isScrolled={isScrolled}
                 navItems={navItems}
                 onAddShelfClick={() => setIsAddShelfModalOpen(true)}
             />
@@ -160,6 +158,7 @@ export default function AppLayout() {
                         exit={{ rotateY: 90, filter: "brightness(0.2)" }}
                         transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
                         id="main-scroll-container"
+                        onScroll={handleScroll}
                         className="w-full h-full absolute inset-0 overflow-auto bg-cream"
                         style={{
                             transformOrigin: "50% 50% 50vw",
