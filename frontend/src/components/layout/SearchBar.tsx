@@ -11,7 +11,7 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
-    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,57 +35,94 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
                 !searchRef.current.contains(e.target as Node)
             ) {
                 setIsSearchFocused(false);
-                // Also close mobile search if they click outside
-                setIsMobileSearchOpen(false);
+                if (searchQuery.trim() === "") {
+                    setIsExpanded(false);
+                }
             }
         };
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
-    }, []);
+    }, [searchQuery]);
+
+    const expandedWidth = window.innerWidth < 640 ? "180px" : "256px";
 
     return (
-        <>
-            {/* Mobile Search Toggle */}
-            <button
-                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="sm:hidden w-8 h-8 flex items-center justify-center rounded-lg text-walnut/70 hover:bg-walnut/10 hover:text-walnut transition-all"
+        <div ref={searchRef} className="relative flex items-center justify-end z-[70]">
+            <motion.div
+                initial={false}
+                animate={{ width: isExpanded ? expandedWidth : "40px" }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative h-10 flex items-center"
             >
-                <Search className="w-4 h-4" />
-            </button>
-
-            {/* Search - Live with dropdown */}
-            <div
-                ref={searchRef}
-                className={`
-          absolute sm:relative inset-x-4 top-14 sm:inset-auto sm:top-auto z-[70] sm:z-auto
-          ${isMobileSearchOpen ? "block" : "hidden"} sm:block
-        `}
-            >
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-walnut/50 pointer-events-none z-10 transition-colors" />
-                <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onFocus={() => setIsSearchFocused(true)}
-                    className={`w-full sm:w-48 md:w-64 pl-10 pr-7 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 shadow-lg sm:shadow-none transition-all ${
-                        isScrolled 
-                            ? 'bg-white border-walnut/10 text-darkBrown focus:ring-walnut/30 focus:border-walnut/50 shadow-inner' 
-                            : 'bg-white border-walnut/20 text-darkBrown focus:ring-walnut/30 focus:border-walnut/50'
+                <motion.div 
+                    whileHover={!isExpanded ? "hover" : ""}
+                    whileTap={!isExpanded ? "tap" : ""}
+                    variants={{
+                        hover: { scale: 1.05 },
+                        tap: { scale: 0.95 }
+                    }}
+                    className={`absolute inset-0 flex items-center rounded-full transition-all duration-300 ${
+                        !isExpanded 
+                            ? isScrolled 
+                                ? "bg-cream hover:bg-walnut/10 border border-walnut/10 hover:border-walnut/20 cursor-pointer shadow-sm" 
+                                : "bg-walnut/10 hover:bg-walnut/20 border border-transparent hover:border-walnut/20 cursor-pointer shadow-sm"
+                            : isScrolled
+                                ? "bg-white border border-walnut/10 shadow-inner"
+                                : "bg-white border border-walnut/20 shadow-inner"
                     }`}
-                    placeholder={t("search.placeholder")}
-                />
-                {searchQuery && (
-                    <button
-                        onClick={() => {
-                            setSearchQuery("");
-                            searchInputRef.current?.focus();
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-walnut/40 hover:text-walnut/70 transition-colors leading-none"
+                    onClick={() => {
+                        if (!isExpanded) {
+                            setIsExpanded(true);
+                            setTimeout(() => searchInputRef.current?.focus(), 100);
+                        }
+                    }}
+                >
+                    <div 
+                        className={`absolute pointer-events-none transition-all duration-300 ${
+                            isExpanded ? "left-3 top-1/2 -translate-y-1/2" : "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                        }`}
                     >
-                        ✕
-                    </button>
-                )}
+                        <motion.div
+                            variants={{
+                                hover: { rotate: 360, transition: { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] } }
+                            }}
+                        >
+                            <Search className={`transition-colors duration-300 ${
+                                isExpanded ? "w-4 h-4 text-walnut/50" : "w-5 h-5 text-walnut"
+                            }`} />
+                        </motion.div>
+                    </div>
+                    
+                    <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => setIsSearchFocused(true)}
+                        className={`w-full h-full pl-10 pr-8 bg-transparent text-sm text-darkBrown focus:outline-none rounded-full transition-opacity duration-300 ${
+                            isExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
+                        }`}
+                        placeholder=""
+                    />
+
+                    <AnimatePresence>
+                        {isExpanded && searchQuery && (
+                            <motion.button
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSearchQuery("");
+                                    searchInputRef.current?.focus();
+                                }}
+                                className="absolute right-3 text-walnut/40 hover:text-walnut/70 transition-colors leading-none"
+                            >
+                                ✕
+                            </motion.button>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
 
                 <AnimatePresence>
                     {isSearchFocused && searchQuery.trim().length >= 2 && (
@@ -94,7 +131,7 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -6, scale: 0.97 }}
                             transition={{ duration: 0.15 }}
-                            className="absolute top-full mt-2 left-0 right-0 sm:right-auto sm:w-80 bg-white rounded-2xl shadow-2xl border border-walnut/10 overflow-hidden z-[80]"
+                            className="absolute top-full mt-2 right-0 w-[85vw] sm:w-80 bg-white rounded-2xl shadow-2xl border border-walnut/10 overflow-hidden z-[80]"
                         >
                             {searchBooks.length === 0 ? (
                                 <div className="p-5 text-center text-sm text-walnut/50">
@@ -162,7 +199,7 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
                                                             false,
                                                         );
                                                         setSearchQuery("");
-                                                        setIsMobileSearchOpen(
+                                                        setIsExpanded(
                                                             false,
                                                         );
                                                         navigate("/library");
@@ -219,7 +256,7 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
                                                 );
                                                 setIsSearchFocused(false);
                                                 setSearchQuery("");
-                                                setIsMobileSearchOpen(false);
+                                                setIsExpanded(false);
                                             }}
                                             className="w-full text-center text-xs text-walnut/60 hover:text-walnut py-1 transition-colors"
                                         >
@@ -231,7 +268,7 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
-        </>
+            </motion.div>
+        </div>
     );
 }
