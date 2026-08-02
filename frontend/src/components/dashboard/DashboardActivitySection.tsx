@@ -29,29 +29,33 @@ export default function DashboardActivitySection({
         setExpandedMonths((prev) => ({ ...prev, [month]: !prev[month] }));
     };
 
-    const getBookDate = (b: any) => {
+    const getBookDates = (b: any) => {
+        const dates: Date[] = [];
         if (b.status === "finished") {
-            if (b.finishedDate) return new Date(b.finishedDate);
-            if (
-                b.readDates &&
-                Array.isArray(b.readDates) &&
-                b.readDates.length > 0
-            ) {
-                const sorted = [...b.readDates]
-                    .map((rd: any) => new Date(rd).getTime())
-                    .sort();
-                return new Date(sorted[sorted.length - 1]);
+            if (b.finishedDate) dates.push(new Date(b.finishedDate));
+            if (b.readDates && Array.isArray(b.readDates)) {
+                b.readDates.forEach((rd: any) => dates.push(new Date(rd)));
             }
+        } else if (b.created_at) {
+            dates.push(new Date(b.created_at));
+        } else {
+            dates.push(new Date());
         }
-        return b.created_at ? new Date(b.created_at) : new Date();
+        return dates.sort((a, b) => a.getTime() - b.getTime());
+    };
+
+    const getLatestBookDate = (b: any) => {
+        const dates = getBookDates(b);
+        return dates[dates.length - 1];
     };
 
     const booksInYear = books
         .filter((b) => {
-            return getBookDate(b).getFullYear() === selectedYear;
+            const dates = getBookDates(b);
+            return dates.some(d => d.getFullYear() === selectedYear);
         })
         .sort((a, b) => {
-            return getBookDate(b).getTime() - getBookDate(a).getTime();
+            return getLatestBookDate(b).getTime() - getLatestBookDate(a).getTime();
         });
 
     // Augment dailyActivity with fallback pages for finished books that have no tracking on their finish date
@@ -62,23 +66,19 @@ export default function DashboardActivitySection({
 
     books.forEach((b) => {
         if (b.status === "finished") {
-            let finalDateStr = null;
+            const finalDateStrs = new Set<string>();
             if (b.finishedDate) {
                 const d = new Date(b.finishedDate);
-                finalDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-            } else if (
-                b.readDates &&
-                Array.isArray(b.readDates) &&
-                b.readDates.length > 0
-            ) {
-                const sorted = [...b.readDates]
-                    .map((rd) => new Date(rd).getTime())
-                    .sort();
-                const d = new Date(sorted[sorted.length - 1]);
-                finalDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+            }
+            if (b.readDates && Array.isArray(b.readDates)) {
+                b.readDates.forEach((rd: any) => {
+                    const d = new Date(rd);
+                    finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+                });
             }
 
-            if (finalDateStr) {
+            finalDateStrs.forEach(finalDateStr => {
                 const existing = activityMap.get(finalDateStr) || {
                     date: finalDateStr,
                     pages: 0,
@@ -89,7 +89,7 @@ export default function DashboardActivitySection({
                     existing.fallbackPages += b.totalPages || b.pages || 0;
                 }
                 activityMap.set(finalDateStr, existing);
-            }
+            });
         }
     });
 
@@ -105,10 +105,17 @@ export default function DashboardActivitySection({
         .reduce((sum, d) => sum + (d.pages || 0), 0);
 
     const groupedByMonth = booksInYear.reduce((acc: any, book: any) => {
-        const d = getBookDate(book);
-        const month = d.toLocaleString(locale, { month: "long" });
-        if (!acc[month]) acc[month] = [];
-        acc[month].push(book);
+        // Group the book in EVERY month it was read/finished during the selected year
+        const dates = getBookDates(book).filter(d => d.getFullYear() === selectedYear);
+        const monthsAdded = new Set<string>();
+        dates.forEach(d => {
+            const month = d.toLocaleString(locale, { month: "long" });
+            if (!monthsAdded.has(month)) {
+                monthsAdded.add(month);
+                if (!acc[month]) acc[month] = [];
+                acc[month].push(book);
+            }
+        });
         return acc;
     }, {});
 
@@ -455,13 +462,9 @@ export default function DashboardActivitySection({
                                                                                                 b: any,
                                                                                                 i: number,
                                                                                             ) => {
-                                                                                                const isFinished =
-                                                                                                    b.status ===
-                                                                                                        "finished" &&
-                                                                                                    getBookDate(
-                                                                                                        b,
-                                                                                                    ).getFullYear() ===
-                                                                                                        selectedYear;
+                                                                                                    const dates = getBookDates(b);
+                                                                                                    const hasFinishedInSelectedYear = dates.some(d => d.getFullYear() === selectedYear);
+                                                                                                    const isFinished = b.status === "finished" && hasFinishedInSelectedYear;
                                                                                                 return (
                                                                                                     <div
                                                                                                         key={

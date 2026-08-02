@@ -255,23 +255,19 @@ export function ContributionGraph({
     if (books) {
         books.forEach((b) => {
             if (b.status === "finished") {
-                let finalDateStr = null;
+                const finalDateStrs = new Set<string>();
                 if (b.finishedDate) {
                     const d = new Date(b.finishedDate);
-                    finalDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-                } else if (
-                    b.readDates &&
-                    Array.isArray(b.readDates) &&
-                    b.readDates.length > 0
-                ) {
-                    const sorted = [...b.readDates]
-                        .map((rd) => new Date(rd).getTime())
-                        .sort();
-                    const d = new Date(sorted[sorted.length - 1]);
-                    finalDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                    finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+                }
+                if (b.readDates && Array.isArray(b.readDates)) {
+                    b.readDates.forEach((rd: any) => {
+                        const d = new Date(rd);
+                        finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+                    });
                 }
 
-                if (finalDateStr) {
+                finalDateStrs.forEach(finalDateStr => {
                     const existing = activityMap.get(finalDateStr) || {
                         pages: 0,
                         finished: 0,
@@ -281,7 +277,7 @@ export function ContributionGraph({
                     if (!existing.finishedBooks) existing.finishedBooks = [];
                     existing.finishedBooks.push(b);
                     activityMap.set(finalDateStr, existing);
-                }
+                });
             }
         });
     }
