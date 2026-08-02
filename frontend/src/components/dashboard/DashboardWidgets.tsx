@@ -93,36 +93,16 @@ export const fadeUp = (delay: number) => ({
 export const ChartTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload?.length) return null;
     return (
-        <div
-            style={{
-                background: "rgba(255,251,245,0.97)",
-                border: "1px solid rgba(139,99,56,0.15)",
-                borderRadius: 10,
-                padding: "8px 12px",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-                fontSize: 12,
-            }}
-        >
+        <div className="bg-[rgba(255,251,245,0.97)] border border-[rgba(139,99,56,0.15)] rounded-[10px] px-3 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[12px]">
             {label && (
-                <p
-                    style={{
-                        color: BRAND.walnut,
-                        fontWeight: 600,
-                        marginBottom: 4,
-                    }}
-                >
+                <p className="text-walnut font-semibold mb-1">
                     {label}
                 </p>
             )}
             {payload.map((p: any, i: number) => (
-                <p
-                    key={i}
-                    style={{
-                        color: p.color ?? BRAND.darkBrown,
-                        margin: "1px 0",
-                    }}
+                    style={{ color: p.color ?? BRAND.darkBrown }}
                 >
-                    <span style={{ fontWeight: 600 }}>{p.name}: </span>
+                    <span className="font-semibold">{p.name}: </span>
                     {p.value}
                 </p>
             ))}
@@ -142,15 +122,8 @@ export function Card({
 }) {
     return (
         <div
-            className={className}
-            style={{
-                background: "white",
-                borderRadius: 16,
-                border: "1px solid rgba(139,99,56,0.1)",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-                overflow: "hidden",
-                ...style,
-            }}
+            className={`bg-white rounded-2xl border border-[rgba(139,99,56,0.1)] shadow-[0_1px_4px_rgba(0,0,0,0.05)] overflow-hidden ${className}`}
+            style={style}
         >
             {children}
         </div>
@@ -202,29 +175,18 @@ export function ProgressRing({
 /* ── mini book spine stack (decorative) ─────── */
 export function MiniSpines({ colors }: { colors: string[] }) {
     return (
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 2 }}>
+        <div className="flex items-end gap-[2px]">
             {colors.slice(0, 5).map((c, i) => (
                 <div
                     key={i}
+                    className="rounded-[1px_2px_2px_1px] shadow-[1px_0_3px_rgba(0,0,0,0.2)] relative overflow-hidden"
                     style={{
                         width: 10 + (i % 3) * 4,
                         height: 38 + (i % 4) * 8,
                         background: `linear-gradient(to right,${c}cc,${c},${c}99)`,
-                        borderRadius: "1px 2px 2px 1px",
-                        boxShadow: "1px 0 3px rgba(0,0,0,0.2)",
-                        position: "relative",
-                        overflow: "hidden",
                     }}
                 >
-                    <div
-                        style={{
-                            position: "absolute",
-                            inset: 0,
-                            opacity: 0.1,
-                            backgroundImage:
-                                "repeating-linear-gradient(0deg,transparent,transparent 1px,rgba(0,0,0,0.5) 1px,rgba(0,0,0,0.5) 2px)",
-                        }}
-                    />
+                    <div className="absolute inset-0 opacity-10 bg-[repeating-linear-gradient(0deg,transparent,transparent_1px,rgba(0,0,0,0.5)_1px,rgba(0,0,0,0.5)_2px)]" />
                 </div>
             ))}
         </div>
@@ -550,54 +512,15 @@ export function ContributionGraph({
                                                 </span>
                                             </div>
                                         )}
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "space-between",
-                                                marginTop: 8,
-                                                borderTop:
-                                                    "1px solid rgba(139,99,56,0.08)",
-                                                paddingTop: 8,
-                                            }}
-                                        >
-                                            <span
-                                                style={{
-                                                    fontSize: 9.5,
-                                                    padding: "3px 8px",
-                                                    borderRadius: 12,
-                                                    background: "#dbeafe",
-                                                    color: "#1e40af",
-                                                    fontWeight: 600,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 5,
-                                                }}
-                                            >
-                                                <div
-                                                    style={{
-                                                        width: 5,
-                                                        height: 5,
-                                                        borderRadius: "50%",
-                                                        background: "#3b82f6",
-                                                    }}
-                                                />{" "}
+                                        <div className="flex items-center justify-between mt-2 border-t border-[rgba(139,99,56,0.08)] pt-2">
+                                            <span className="text-[9.5px] px-2 py-[3px] rounded-xl bg-blue-100 text-blue-800 font-semibold flex items-center gap-[5px]">
+                                                <div className="w-[5px] h-[5px] rounded-full bg-blue-500" />{" "}
                                                 Selesai
                                             </span>
                                             {book.personalRating &&
                                                 Number(book.personalRating) >
                                                     0 && (
-                                                    <span
-                                                        style={{
-                                                            fontSize: 11,
-                                                            fontWeight: 700,
-                                                            color: "#92400e",
-                                                            display: "flex",
-                                                            alignItems:
-                                                                "center",
-                                                            gap: 3,
-                                                        }}
-                                                    >
+                                                    <span className="text-[11px] font-bold text-amber-800 flex items-center gap-[3px]">
                                                         <Star
                                                             size={11}
                                                             fill="#f59e0b"
@@ -614,26 +537,10 @@ export function ContributionGraph({
                             })}
 
                             {day.booksRead && day.booksRead.length > 0 && (
-                                <div
-                                    style={{
-                                        marginBottom: 6,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        gap: 2,
-                                    }}
-                                >
+                                <div className="mb-1.5 flex flex-col gap-0.5">
                                     {day.booksRead.map(
                                         (title: string, i: number) => (
-                                            <div
-                                                key={i}
-                                                style={{
-                                                    fontSize: 11,
-                                                    color: "#655038",
-                                                    display: "flex",
-                                                    gap: 6,
-                                                    alignItems: "flex-start",
-                                                }}
-                                            >
+                                            <div key={i} className="text-[11px] text-[#655038] flex gap-1.5 items-start">
                                                 <span
                                                     style={{
                                                         color: "#c29b71",
