@@ -38,7 +38,12 @@
       "no_books": "Tidak ada riwayat buku pada tahun ini.",
       "book_activities": "Terdapat {{count}} aktivitas buku",
       "finished": "Selesai dibaca",
-      "added": "Ditambahkan"
+      "added": "Ditambahkan",
+      "less": "Sedikit",
+      "more": "Banyak",
+      "mon": "Sen",
+      "wed": "Rab",
+      "fri": "Jum"
     },
     "empty": {
       "title": "Belum ada buku",

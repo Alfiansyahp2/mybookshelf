@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import DashboardAccountingSection from "../../components/accounting/DashboardAccountingSection";
 import ReadingCalendarModal from "../../components/modals/ReadingCalendarModal";
+import { useTranslation } from "react-i18next";
 import {
     PieChart,
     Pie,
@@ -242,6 +243,7 @@ export function ContributionGraph({
     selectedYear: number;
     onClick?: () => void;
 }) {
+    const { t } = useTranslation();
     const activityMap = new Map();
     data.forEach((d) => {
         activityMap.set(d.date, {
@@ -736,7 +738,7 @@ export function ContributionGraph({
                                 alignItems: "center",
                             }}
                         >
-                            Sen
+                            {t("dashboard.activity.mon")}
                         </div>
                         <div style={{ height: 12 }}></div>
                         <div
@@ -746,7 +748,7 @@ export function ContributionGraph({
                                 alignItems: "center",
                             }}
                         >
-                            Rab
+                            {t("dashboard.activity.wed")}
                         </div>
                         <div style={{ height: 12 }}></div>
                         <div
@@ -756,7 +758,7 @@ export function ContributionGraph({
                                 alignItems: "center",
                             }}
                         >
-                            Jum
+                            {t("dashboard.activity.fri")}
                         </div>
                         <div style={{ height: 12 }}></div>
                     </div>
@@ -864,7 +866,7 @@ export function ContributionGraph({
                         paddingRight: 8,
                     }}
                 >
-                    <span>Sedikit</span>
+                    <span>{t("dashboard.activity.less")}</span>
                     <div
                         style={{
                             width: 12,
@@ -905,7 +907,7 @@ export function ContributionGraph({
                             background: "#8b5a2b",
                         }}
                     />
-                    <span>Banyak</span>
+                    <span>{t("dashboard.activity.more")}</span>
                 </div>
             </div>
         </div>

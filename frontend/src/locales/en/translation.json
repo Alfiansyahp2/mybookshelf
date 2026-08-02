@@ -38,7 +38,12 @@
       "no_books": "No book history this year.",
       "book_activities": "There are {{count}} book activities",
       "finished": "Finished reading",
-      "added": "Added"
+      "added": "Added",
+      "less": "Less",
+      "more": "More",
+      "mon": "Mon",
+      "wed": "Wed",
+      "fri": "Fri"
     },
     "empty": {
       "title": "No books yet",
