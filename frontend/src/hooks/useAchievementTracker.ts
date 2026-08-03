@@ -146,10 +146,16 @@ export function useAchievementTracker() {
 
         // 7. Kritikus (Review/Rate 5 books)
         checkAchievement(
-            "kritikus",
-            "Kritikus Sastra",
-            "Memberikan rating pada 5 buku.",
-            ratedBooks.length >= 5,
+            "kritikus-pemula",
+            "Kritikus Pemula",
+            "Memberikan rating pada buku pertamamu.",
+            ratedBooks.length >= 1,
+        );
+        checkAchievement(
+            "kritikus-buku",
+            "Kritikus Buku",
+            "Memberikan rating pada 10 buku yang berbeda.",
+            ratedBooks.length >= 10,
         );
 
         // 8. Marathon (Read 1000 pages)

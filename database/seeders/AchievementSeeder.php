@@ -148,6 +148,15 @@ class AchievementSeeder extends Seeder
                 'requirement' => 10,
                 'category' => 'special',
                 'rarity' => 'epic',
+            ],
+            [
+                'id' => 'ffa4b1a4-9226-44ea-8422-5a46ae9000fb',
+                'title' => 'Kritikus Pemula',
+                'description' => 'Memberikan rating pada buku pertamamu.',
+                'icon' => 'Star',
+                'requirement' => 1,
+                'category' => 'special',
+                'rarity' => 'common',
             ]
         ];
 

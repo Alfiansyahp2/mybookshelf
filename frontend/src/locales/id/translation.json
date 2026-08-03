@@ -495,7 +495,13 @@
       "Kritikus Buku": {
         "title": "Kritikus Buku",
         "description": "Memberikan rating pada 10 buku yang berbeda."
-      }
+      },
+      "Memberikan rating pada 10 buku yang berbeda_": "Memberikan rating pada 10 buku yang berbeda.",
+      "Kritikus Pemula": {
+        "title": "Kritikus Pemula",
+        "description": "Memberikan rating pada buku pertamamu."
+      },
+      "Memberikan rating pada buku pertamamu_": "Memberikan rating pada buku pertamamu."
     }
   },
   "borrow": {
