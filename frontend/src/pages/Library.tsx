@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
@@ -31,6 +32,20 @@ export default function Library() {
         setSelectedBookId,
     } = useBookstore();
     const { mutate: updateLayout } = useUpdateShelfLayout();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    useEffect(() => {
+        const bookId = searchParams.get("book_id");
+        if (bookId) {
+            setSelectedBookId(bookId);
+            if (!useBookstore.getState().isBookDetailOpen) {
+                toggleBookDetail(bookId);
+            }
+            // Clear the param after handling to avoid re-opening on reload
+            searchParams.delete("book_id");
+            setSearchParams(searchParams);
+        }
+    }, [searchParams]);
 
     const [activeFilter, setActiveFilter] = useState<string>("all");
     const [isEditMode, setIsEditMode] = useState(false);

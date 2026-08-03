@@ -1,7 +1,18 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, Search, Receipt, Edit, Trash2 } from "lucide-react";
+import {
+    Edit,
+    Trash2,
+    Plus,
+    Filter,
+    ArrowDownAZ,
+    ArrowUpZA,
+    Receipt,
+    BookOpen,
+    Search,
+} from "lucide-react";
 import {
     useExpenses,
     useDeleteExpense,
@@ -41,6 +52,7 @@ export default function ExpenseList({
     onEditExpense,
 }: ExpenseListProps) {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [filters, setFilters] = useState<ExpenseFilters>({
         per_page: 20,
         sort_by: "expense_date",
@@ -62,7 +74,7 @@ export default function ExpenseList({
           : [];
 
     const handleFilterChange = (key: keyof ExpenseFilters, value: any) => {
-        setFilters({ ...filters, [key]: value });
+        setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
     };
 
     const handleDelete = (expenseId: string) => {
@@ -80,6 +92,11 @@ export default function ExpenseList({
         } finally {
             setExpenseToDelete(null);
         }
+    };
+
+    const handleViewBook = (bookId: string) => {
+        // Logic to navigate and open book detail
+        navigate(`/library?book_id=${bookId}`);
     };
 
     return (
@@ -285,6 +302,7 @@ export default function ExpenseList({
                             onClick={() => onExpenseClick?.(expense)}
                             onEdit={() => onEditExpense?.(expense)}
                             onDelete={() => handleDelete(expense.id)}
+                            onViewBook={expense.book_id ? () => handleViewBook(expense.book_id!) : undefined}
                         />
                     ))
                 )}
@@ -371,9 +389,10 @@ interface ExpenseRowProps {
     onClick: () => void;
     onEdit: () => void;
     onDelete: () => void;
+    onViewBook?: () => void;
 }
 
-function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
+function ExpenseRow({ expense, onClick, onEdit, onDelete, onViewBook }: ExpenseRowProps) {
     const { t } = useTranslation();
     return (
         <motion.div
@@ -475,6 +494,23 @@ function ExpenseRow({ expense, onClick, onEdit, onDelete }: ExpenseRowProps) {
                         <p className="text-sm text-walnut/80 mt-2 line-clamp-1">
                             {expense.description}
                         </p>
+                    )}
+
+                    {onViewBook && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onViewBook();
+                            }}
+                            className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-walnut/10 hover:bg-walnut/20 rounded-lg transition-colors group"
+                        >
+                            <BookOpen className="w-4 h-4 text-walnut group-hover:scale-110 transition-transform" />
+                            <span className="text-xs font-medium text-walnut">
+                                {(expense as any).book?.title 
+                                    ? t("accounting.expense_list.view_book_title", "Lihat Buku: {{title}}", { title: (expense as any).book.title })
+                                    : t("accounting.expense_list.view_book", "Lihat Buku")}
+                            </span>
+                        </button>
                     )}
                 </div>
 
