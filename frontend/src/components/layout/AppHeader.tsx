@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Layers, Award, Settings, LogOut } from "lucide-react";
+import { BookOpen, Layers, Award, Settings, LogOut, Moon, Sun } from "lucide-react";
 import SearchBar from "./SearchBar";
 import NotificationCenter from "../NotificationCenter";
 import { useLogout, useAuthUser } from "../../hooks/useAuth";
@@ -15,16 +15,20 @@ interface NavItem {
 
 interface AppHeaderProps {
     isHeaderVisible: boolean;
-    isScrolled?: boolean;
+    isScrolled: boolean;
     navItems: NavItem[];
     onAddShelfClick: () => void;
+    isDarkMode?: boolean;
+    toggleDarkMode?: () => void;
 }
 
 export default function AppHeader({
     isHeaderVisible,
-    isScrolled = false,
+    isScrolled,
     navItems,
     onAddShelfClick,
+    isDarkMode = false,
+    toggleDarkMode = () => {},
 }: AppHeaderProps) {
     const { t, i18n } = useTranslation();
     const location = useLocation();
@@ -39,6 +43,8 @@ export default function AppHeader({
 
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
+    
+    console.log("[DarkMode] AppHeader rendered. Current isDarkMode prop:", isDarkMode);
 
     // Close profile dropdown when clicking outside
     useEffect(() => {
@@ -199,6 +205,7 @@ export default function AppHeader({
                             whileHover={{ scale: 1.15 }}
                             whileTap={{ scale: 0.95 }}
                             transition={{ duration: 0.2 }}
+                            title="Add Shelf"
                         >
                             <motion.div
                                 whileHover={{ rotate: 360 }}
@@ -208,6 +215,34 @@ export default function AppHeader({
                                 }}
                             >
                                 <Layers className="w-4 h-4 md:w-5 md:h-5" />
+                            </motion.div>
+                        </motion.button>
+
+                        {/* Dark Mode Toggle */}
+                        <motion.button
+                            onClick={() => {
+                                console.log("[DarkMode] Toggle clicked! Triggering toggleDarkMode()...");
+                                toggleDarkMode();
+                            }}
+                            className={`header-icon-btn w-8 h-8 md:w-10 md:h-10 backdrop-blur-md flex items-center justify-center shadow-sm border transition-all duration-300 ${
+                                isScrolled 
+                                    ? "bg-cream hover:bg-walnut/10 text-walnut border-walnut/10 hover:border-walnut/20 rounded-full" 
+                                    : "bg-walnut/10 hover:bg-walnut/20 text-walnut border-transparent hover:border-walnut/20 rounded-lg md:rounded-xl"
+                            }`}
+                            whileHover={{ scale: 1.15 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            title={isDarkMode ? "Switch to Light Mode" : "Switch to Night Mode"}
+                        >
+                            <motion.div
+                                animate={{ rotate: isDarkMode ? 360 : 0 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                {isDarkMode ? (
+                                    <Sun className="w-4 h-4 md:w-5 md:h-5 text-gold" />
+                                ) : (
+                                    <Moon className="w-4 h-4 md:w-5 md:h-5" />
+                                )}
                             </motion.div>
                         </motion.button>
 

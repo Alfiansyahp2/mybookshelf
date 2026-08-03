@@ -675,6 +675,9 @@ export default function LibraryRoom({ children }: LibraryRoomProps) {
                 }}
             />
 
+            {/* Cozy Night Mode Overlay (Z-index tinggi agar menutupi seluruh rak dan buku) */}
+            <div className="night-overlay absolute inset-0 z-[20] pointer-events-none opacity-0 transition-opacity duration-1000 bg-gradient-to-b from-black/80 to-black/95 mix-blend-multiply" />
+
             {/* Dust particles */}
             <div
                 style={{
@@ -829,6 +832,9 @@ export default function LibraryRoom({ children }: LibraryRoomProps) {
                         background: "rgba(255,255,255,0.06)",
                     }}
                 />
+                
+                {/* Cozy Night Mode Floor Shadow */}
+                <div className="night-overlay absolute inset-0 bg-black/60 opacity-0 transition-opacity duration-1000 pointer-events-none" />
             </div>
         </div>
     );

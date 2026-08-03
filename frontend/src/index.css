@@ -58,6 +58,40 @@ body {
     border: 2px solid transparent;
     background-clip: padding-box;
 }
+
+/* ==========================================================================
+   DARK MODE FALLBACKS (Murni CSS)
+   ========================================================================== */
+.app-layout-bg {
+    background-color: var(--color-cream);
+}
+
+html.dark .app-layout-bg {
+    background-color: transparent !important;
+}
+
+html.dark body {
+    background-color: #1a100b !important;
+    color: #f2e8d9 !important;
+}
+
+html.dark .night-overlay {
+    opacity: 1 !important;
+}
+
+html.dark .app-header-bg {
+    background-color: rgba(42, 26, 16, 0.9) !important;
+    border-color: rgba(61, 37, 22, 0.5) !important;
+}
+
+html.dark .header-icon-btn {
+    background-color: rgba(61, 37, 22, 0.5) !important;
+    color: #f2e8d9 !important;
+}
+
+html.dark .header-icon-btn:hover {
+    background-color: rgba(61, 37, 22, 0.8) !important;
+}
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: var(--color-dark-brown);
     border: 2px solid transparent;

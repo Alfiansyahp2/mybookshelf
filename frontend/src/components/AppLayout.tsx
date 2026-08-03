@@ -53,9 +53,44 @@ export default function AppLayout() {
     const deleteShelf = useDeleteShelf();
 
     // Get shelves data for edit functionality
-    const { data: shelves } = useShelves();
+    const { shelves } = useShelves();
+    
+    // Global Dark Mode State
+    const [isDarkMode, setIsDarkMode] = useState(() => {
+        try {
+            return localStorage.getItem("theme") === "dark";
+        } catch (e) {
+            return false;
+        }
+    });
 
-    // Get selected book details for animation
+    const toggleDarkMode = () => {
+        setIsDarkMode((prev: boolean) => {
+            const next = !prev;
+            try { localStorage.setItem("theme", next ? "dark" : "light"); } catch (e) {}
+            
+            // For CSS fallbacks
+            if (next) {
+                document.documentElement.classList.add("dark");
+                document.body.classList.add("dark");
+            } else {
+                document.documentElement.classList.remove("dark");
+                document.body.classList.remove("dark");
+            }
+            
+            return next;
+        });
+    };
+
+    // Ensure body gets class on mount
+    useEffect(() => {
+        if (isDarkMode) {
+            document.documentElement.classList.add("dark");
+            document.body.classList.add("dark");
+        }
+    }, []);
+
+    // Handle scroll physics
     const { data: selectedBook } = useBook(selectedBookId || "");
 
     // Initialize background achievement tracking
@@ -136,18 +171,20 @@ export default function AppLayout() {
     }, [handleEditShelf, handleDeleteShelf]);
 
     return (
-        <div className="min-h-screen bg-cream flex flex-col">
+        <div className="app-layout-bg min-h-screen transition-colors duration-500 flex flex-col">
             {/* Top Navigation */}
             <AppHeader
                 isHeaderVisible={isHeaderVisible}
                 isScrolled={isScrolled}
                 navItems={navItems}
                 onAddShelfClick={() => setIsAddShelfModalOpen(true)}
+                isDarkMode={isDarkMode}
+                toggleDarkMode={toggleDarkMode}
             />
 
             {/* Page Content */}
             <main
-                className="flex-1 relative overflow-hidden bg-black"
+                className="flex-1 relative overflow-hidden transition-colors duration-500"
                 style={{ perspective: "1200px" }}
             >
                 <AnimatePresence initial={false}>
