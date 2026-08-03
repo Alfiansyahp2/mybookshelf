@@ -100,6 +100,8 @@ export const ChartTooltip = ({ active, payload, label }: any) => {
                 </p>
             )}
             {payload.map((p: any, i: number) => (
+                <p
+                    key={i}
                     style={{ color: p.color ?? BRAND.darkBrown }}
                 >
                     <span className="font-semibold">{p.name}: </span>
