@@ -176,6 +176,38 @@
     }
   },
   "settings": {
+    "title": "Pengaturan",
+    "subtitle": "Kelola akun dan preferensi aplikasi Anda",
+    "sections": {
+      "account": "Akun",
+      "preferences": "Preferensi",
+      "data": "Data",
+      "about": "Tentang"
+    },
+    "logging_out": "Keluar...",
+    "confirm_clear": "Apakah Anda yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan.",
+    "member_since": "Anggota sejak {{year}}",
+    "sign_out": "Keluar",
+    "theme": {
+      "title": "Tema",
+      "desc": "Pilih tampilan yang Anda inginkan"
+    },
+    "notifications": {
+      "title": "Notifikasi",
+      "desc": "Aktifkan notifikasi push"
+    },
+    "email": {
+      "title": "Pembaruan Email",
+      "desc": "Terima ringkasan membaca mingguan"
+    },
+    "autosave": {
+      "title": "Simpan Otomatis",
+      "desc": "Simpan perubahan secara otomatis"
+    },
+    "reminders": {
+      "title": "Pengingat Membaca",
+      "desc": "Dapatkan pengingat untuk membaca setiap hari"
+    },
     "account": {
       "profile_success": "Profil berhasil diperbarui!",
       "profile_error": "Gagal memperbarui profil.",

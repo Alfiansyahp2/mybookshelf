@@ -176,6 +176,38 @@
     }
   },
   "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and application preferences",
+    "sections": {
+      "account": "Account",
+      "preferences": "Preferences",
+      "data": "Data",
+      "about": "About"
+    },
+    "logging_out": "Logging out...",
+    "confirm_clear": "Are you sure you want to clear all data? This action cannot be undone.",
+    "member_since": "Member since {{year}}",
+    "sign_out": "Sign Out",
+    "theme": {
+      "title": "Theme",
+      "desc": "Choose your preferred appearance"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "desc": "Enable push notifications"
+    },
+    "email": {
+      "title": "Email Updates",
+      "desc": "Receive weekly reading summaries"
+    },
+    "autosave": {
+      "title": "AutoSave",
+      "desc": "Automatically save changes"
+    },
+    "reminders": {
+      "title": "Reading Reminders",
+      "desc": "Get reminded to read daily"
+    },
     "account": {
       "profile_success": "Profile updated successfully!",
       "profile_error": "Failed to update profile.",
