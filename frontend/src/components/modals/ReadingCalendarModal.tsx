@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ChevronDown, BookOpen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Book } from "../../types";
 
@@ -38,6 +38,7 @@ export default function ReadingCalendarModal({
         book: Book;
         rect: DOMRect;
     } | null>(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const { daysInMonth, startDayOfWeek, previousMonthDays } = useMemo(() => {
         const year = currentDate.getFullYear();
@@ -204,16 +205,71 @@ export default function ReadingCalendarModal({
                                 >
                                     <ChevronRight size={20} />
                                 </button>
-                                <h2 className="text-lg md:text-[22px] text-[#2a1a08] w-40 md:w-48 font-serif font-bold text-right md:text-left">
-                                    {new Date(
-                                        currentDate.getFullYear(),
-                                        currentDate.getMonth(),
-                                        1,
-                                    ).toLocaleDateString(t("locale", "id-ID"), {
-                                        month: "long",
-                                        year: "numeric",
-                                    })}
-                                </h2>
+                                <div className="relative">
+                                    <h2 
+                                        onClick={() => setShowDatePicker(!showDatePicker)}
+                                        className="cursor-pointer hover:text-[#5e4b37] transition-colors text-lg md:text-[22px] text-[#2a1a08] w-40 md:w-48 font-serif font-bold text-right md:text-left flex items-center justify-end md:justify-start gap-1 select-none"
+                                    >
+                                        {new Date(
+                                            currentDate.getFullYear(),
+                                            currentDate.getMonth(),
+                                            1,
+                                        ).toLocaleDateString(t("locale", "id-ID"), {
+                                            month: "long",
+                                            year: "numeric",
+                                        })}
+                                        <ChevronDown size={18} className={`transition-transform ${showDatePicker ? "rotate-180" : ""}`} />
+                                    </h2>
+
+                                    <AnimatePresence>
+                                        {showDatePicker && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                                transition={{ duration: 0.15 }}
+                                                className="absolute top-full mt-2 right-0 bg-[#faf9f6] shadow-xl rounded-2xl border border-[#8B7355]/30 p-4 z-50 min-w-[280px]"
+                                            >
+                                                {/* Year Selector Header */}
+                                                <div className="flex items-center justify-between mb-4 border-b border-[#8B7355]/10 pb-3">
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); setCurrentDate(new Date(currentDate.getFullYear() - 1, currentDate.getMonth(), 1)); }}
+                                                        className="p-1 hover:bg-[#8B7355]/10 rounded-full text-[#8B7355] transition-colors"
+                                                    >
+                                                        <ChevronLeft size={18} />
+                                                    </button>
+                                                    <span className="font-serif font-bold text-lg text-[#2a1a08]">{currentDate.getFullYear()}</span>
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); setCurrentDate(new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), 1)); }}
+                                                        className="p-1 hover:bg-[#8B7355]/10 rounded-full text-[#8B7355] transition-colors"
+                                                    >
+                                                        <ChevronRight size={18} />
+                                                    </button>
+                                                </div>
+                                                
+                                                {/* Month Grid */}
+                                                <div className="grid grid-cols-3 gap-2">
+                                                    {MONTHS.map((m, i) => {
+                                                        const isSelected = currentDate.getMonth() === i;
+                                                        return (
+                                                            <button
+                                                                key={m}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setCurrentDate(new Date(currentDate.getFullYear(), i, 1));
+                                                                    setShowDatePicker(false);
+                                                                }}
+                                                                className={`py-2 px-1 text-sm rounded-lg font-medium transition-colors ${isSelected ? "bg-[#8B7355] text-white shadow-sm" : "text-[#2a1a08] hover:bg-[#8B7355]/10"}`}
+                                                            >
+                                                                {new Date(2000, i, 1).toLocaleDateString(t("locale", "id-ID"), { month: "short" })}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </div>
                         </div>
                     </div>
