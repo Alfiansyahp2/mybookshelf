@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Shelf from "../components/Shelf";
+import Shelf from "../components/shelf/Shelf";
 import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
 import { useState, useEffect } from "react";

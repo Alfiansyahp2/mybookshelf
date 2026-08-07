@@ -5,7 +5,7 @@ import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
 import { useBookstore } from "../store/useBookstore";
 import type { Book } from "../types";
-import Bookshelf from "../components/Bookshelf";
+import Bookshelf from "../components/shelf/Bookshelf";
 import AddBookModal from "../components/AddBookModal";
 import { LayoutGrid, Save, Filter, X } from "lucide-react";
 import { useUpdateShelfLayout } from "../hooks/useShelves";

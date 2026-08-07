@@ -25,8 +25,8 @@ import {
 } from "lucide-react";
 import BookDetailModal from "./modals/BookDetailModal";
 import EditBookModal from "./modals/EditBookModal";
-import EditShelfModal from "./modals/EditShelfModal";
-import AddShelfModal from "./modals/AddShelfModal";
+import EditShelfModal from "./shelf/EditShelfModal";
+import AddShelfModal from "./shelf/AddShelfModal";
 import { useBookstore } from "../store/useBookstore";
 import { useBook, useDeleteBook, useBooks } from "../hooks/useBooks";
 import { useDeleteShelf, useShelves } from "../hooks/useShelves";

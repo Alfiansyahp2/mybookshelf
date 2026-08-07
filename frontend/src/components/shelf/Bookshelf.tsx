@@ -17,8 +17,8 @@ import {
     rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { SortableShelf } from "./SortableShelf";
-import { useLighting, TEMP_COLORS } from "../hooks/useLighting";
-import type { Book, Shelf as ShelfType } from "../types";
+import { useLighting, TEMP_COLORS } from "../../hooks/useLighting";
+import type { Book, Shelf as ShelfType } from "../../types";
 
 interface BookshelfProps {
     books: Book[];

@@ -3,7 +3,7 @@ import { useShelves } from "../hooks/useShelves";
 import { useStartReading } from "../hooks/useBooks";
 import { useNavigate } from "react-router-dom";
 import { useBookstore } from "../store/useBookstore";
-import Bookshelf from "../components/Bookshelf";
+import Bookshelf from "../components/shelf/Bookshelf";
 import AddWishlistBookModal from "../components/AddWishlistBookModal";
 import WishlistCard from "../components/assets/WishlistCard";
 import { useState } from "react";

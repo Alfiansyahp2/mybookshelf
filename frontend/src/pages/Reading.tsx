@@ -3,7 +3,7 @@ import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
 import { useNavigate } from "react-router-dom";
 import { useBookstore } from "../store/useBookstore";
-import Bookshelf from "../components/Bookshelf";
+import Bookshelf from "../components/shelf/Bookshelf";
 import YearlyTargetCards from "../components/reading/YearlyTargetCards";
 import { useYearlyStats, getBookYears } from "../hooks/useYearlyStats";
 import type { Book } from "../types";

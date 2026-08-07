@@ -3,7 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripHorizontal } from "lucide-react";
 import LibraryShelf from "./Shelf";
-import type { Shelf as ShelfType, Book } from "../types";
+import type { Shelf as ShelfType, Book } from "../../types";
 
 interface SortableShelfProps {
     shelf: ShelfType;

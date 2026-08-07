@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Trash2, Sparkles } from "lucide-react";
-import RealisticBook from "./Book";
-import DecorationPicker from "./decorations/DecorationPicker";
+import RealisticBook from "../Book";
+import DecorationPicker from "../decorations/DecorationPicker";
 import {
     renderDecoration,
     addDecoration,
     removeDecoration,
     type DecorationKind,
     type ShelfDecoration,
-} from "./decorations/DecorationSystem";
-import { useUpdateShelf } from "../hooks/useShelves";
-import { useLighting, TEMP_COLORS } from "../hooks/useLighting";
-import type { Shelf, Book as BookType } from "../types";
+} from "../decorations/DecorationSystem";
+import { useUpdateShelf } from "../../hooks/useShelves";
+import { useLighting, TEMP_COLORS } from "../../hooks/useLighting";
+import type { Shelf, Book as BookType } from "../../types";
 import { useTranslation } from "react-i18next";
 
 interface ShelfProps {
