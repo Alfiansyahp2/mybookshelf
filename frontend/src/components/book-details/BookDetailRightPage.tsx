@@ -10,9 +10,9 @@ import {
     ChevronRight,
 } from "lucide-react";
 import type { Book } from "../../types";
-import ReadingProgressSection from "./ReadingProgressSection";
-import ReadingSessionTimer from "./ReadingSessionTimer";
-import BookNotesSection from "./BookNotesSection";
+import ReadingProgressSection from "./right/ReadingProgressSection";
+import ReadingSessionTimer from "./right/ReadingSessionTimer";
+import BookNotesSection from "./right/BookNotesSection";
 import { useTranslation } from "react-i18next";
 
 interface BookDetailRightPageProps {

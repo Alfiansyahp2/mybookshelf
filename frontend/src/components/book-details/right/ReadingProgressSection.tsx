@@ -1,6 +1,6 @@
 import { BookOpen, Clock, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { Book } from "../../types";
+import type { Book } from "../../../types";
 
 interface ReadingProgressSectionProps {
     book: Book;

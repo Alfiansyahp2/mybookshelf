@@ -15,14 +15,14 @@ import {
     Activity,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Book } from "../../types";
+import type { Book } from "../../../types";
 import {
     useStartReadingSession,
     useEndReadingSession,
     useBookReadingSessions,
     usePauseReadingSession,
-} from "../../hooks/useReadingSessions";
-import type { ReadingSession } from "../../lib/api/readingSessions";
+} from "../../../hooks/useReadingSessions";
+import type { ReadingSession } from "../../../lib/api/readingSessions";
 import { useTranslation } from "react-i18next";
 
 interface ReadingSessionTimerProps {

@@ -12,7 +12,7 @@ import {
 import type {
     BookReadingSessionsResponse,
     ReadingSession,
-} from "../../lib/api/readingSessions";
+} from "../../../lib/api/readingSessions";
 
 interface ReadingSessionsModalProps {
     isOpen: boolean;
