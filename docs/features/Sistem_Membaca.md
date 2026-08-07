@@ -114,52 +114,43 @@ Sistem reading session yang lengkap telah berhasil diimplementasikan dengan fitu
 ## 🔄 Complete Data Flow
 
 ### 1. Start Reading Session Flow
-```
-Frontend                    Backend                    Database
-   |                           |                          |
-   |---(POST)---------------->|                          |
-   |  /start                   |                          |
-   |                          |---(create)------------>|
-   |                          |  session                   |
-   |                           |                          |
-   |<--(session data)---------|                          |
-   |  (id, start_time)        |                          |
-   |                           |                          |
-   |---(start timer)---------->|                          |
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant Backend
+    participant Database
+
+    Frontend->>Backend: POST /start
+    Backend->>Database: create session
+    Backend-->>Frontend: session data (id, start_time)
+    Frontend->>Frontend: start timer
 ```
 
 ### 2. Stop Reading Session Flow
-```
-Frontend                    Backend                    Database
-   |                           |                          |
-   |---(PUT)------------------->|                          |
-   |  /end + page data        |                          |
-   |                           |                          |
-   |                          |---(update session)------|
-   |                          |  calculate duration          |
-   |                           |                          |
-   |                          |---(syncBookProgress)------>|
-   |                          |  update book.progress         |
-   |                          |  update book.current_page     |
-   |                          |  check if 100% -> finished      |
-   |                           |                          |
-   |<--(updated book)---------|                          |
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant Backend
+    participant Database
+
+    Frontend->>Backend: PUT /end + page data
+    Backend->>Database: update session (calculate duration)
+    Backend->>Database: syncBookProgress (update progress & page)
+    Note right of Backend: check if 100% -> finished
+    Backend-->>Frontend: updated book
 ```
 
 ### 3. Read Again Flow
-```
-Frontend                    Backend                    Database
-   |                           |                          |
-   |---(POST)------------------->|                          |
-   |  /read-again              |                          |
-   |                           |                          |
-   |                          |---(update book)----------->|
-   |  status: reading         |  finished_date: null       |
-   |                           |                          |
-   |                          |---(create timeline)------>|
-   |  type: 'restarted'        |                          |
-   |                           |                          |
-   |<--(updated book)---------|                          |
+```mermaid
+sequenceDiagram
+    participant Frontend
+    participant Backend
+    participant Database
+
+    Frontend->>Backend: POST /read-again
+    Backend->>Database: update book (status: reading, finished_date: null)
+    Backend->>Database: create timeline (type: 'restarted')
+    Backend-->>Frontend: updated book
 ```
 
 ---
