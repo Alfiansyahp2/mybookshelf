@@ -1,4 +1,4 @@
-import { DecorationKind } from "../types/decorations";
+import type { DecorationKind } from "../types/decorations";
 
 // ── Decoration catalogue (label + emoji) ─────────────────
 export const DECORATION_CATALOGUE: {

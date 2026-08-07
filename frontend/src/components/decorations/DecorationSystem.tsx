@@ -1,4 +1,4 @@
-import { ShelfDecoration } from "../../types/decorations";
+import type { ShelfDecoration } from "../../types/decorations";
 export type { DecorationKind, ShelfDecoration } from "../../types/decorations";
 export { addDecoration, removeDecoration } from "../../types/decorations";
 export { DECORATION_CATALOGUE } from "../../constants/decorations";
