@@ -6,16 +6,17 @@ A modern personal library management application with a beautiful 3D bookshelf v
 
 ## 🌟 Features
 
-- **3D Bookshelf Rendering**: Interactive book spines with realistic perspective and lighting.
-- **Library Management**: Organize books into shelves, track reading progress, and manage borrowed books.
-- **Personalization**: Decorate your shelves with plants, candles, and pixel art cats.
-- **Analytics**: Visualize your reading habits with charts and statistics.
-- **Drag & Drop**: Easily reorder and organize your shelves.
+- **3D Bookshelf Rendering**: Interactive book spines with realistic perspective, lighting control, and drag-and-drop customization.
+- **Library & Reading Management**: Organize books into custom shelves, manage a wishlist, and track active reading sessions with a built-in timer.
+- **Financial Tracking**: Integrated accounting system to log book expenses and manage your reading budget.
+- **Gamification & Analytics**: Earn achievements, visualize reading habits with charts, and explore your timeline of activities.
+- **Personalization**: Decorate your shelves with plants, candles, pixel art cats, and bookends.
 
 ## 🔧 Tech Stack
 
 - **Backend**: Laravel 12, PHP 8.2+, PostgreSQL
 - **Frontend**: React 19, TypeScript, Tailwind CSS, Zustand, TanStack Query, Framer Motion
+
 
 ## 🚀 Quick Start
 
@@ -52,4 +53,6 @@ This project is open-sourced software licensed under the MIT license.
 
 ## 📖 Documentation
 
-For detailed technical documentation, API summaries, and system architecture, please refer to the [Developer Guide](DEVELOPER_GUIDE.md).
+MyBookshelf features a comprehensive documentation directory covering user features, technical guidelines, and the project's refactoring history. 
+
+Please refer to the [Documentation Index](docs/INDEX.md) to explore the available guides.
