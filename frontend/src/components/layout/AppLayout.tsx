@@ -23,17 +23,18 @@ import {
     Menu,
     X,
 } from "lucide-react";
-import BookDetailModal from "./modals/BookDetailModal";
-import EditBookModal from "./modals/EditBookModal";
-import EditShelfModal from "./shelf/EditShelfModal";
-import AddShelfModal from "./shelf/AddShelfModal";
-import { useBookstore } from "../store/useBookstore";
-import { useBook, useDeleteBook, useBooks } from "../hooks/useBooks";
-import { useDeleteShelf, useShelves } from "../hooks/useShelves";
-import BookmarkHeart from "./icons/BookmarkHeart";
-import MobileMenu from "./layout/MobileMenu";
-import AppHeader from "./layout/AppHeader";
-import { useAchievementTracker } from "../hooks/useAchievementTracker";
+import BookDetailModal from "../modals/BookDetailModal";
+import EditBookModal from "../modals/EditBookModal";
+import EditShelfModal from "../shelf/EditShelfModal";
+import AddShelfModal from "../shelf/AddShelfModal";
+import { useBookstore } from "../../store/useBookstore";
+import { useBook, useDeleteBook, useBooks } from "../../hooks/useBooks";
+import { useDeleteShelf, useShelves } from "../../hooks/useShelves";
+import BookmarkHeart from "../icons/BookmarkHeart";
+import { Toaster } from "react-hot-toast";
+import MobileMenu from "./MobileMenu";
+import AppHeader from "./AppHeader";
+import { useAchievementTracker } from "../../hooks/useAchievementTracker";
 
 const navItems = [
     { path: "/library", icon: Library, labelKey: "nav.library" },

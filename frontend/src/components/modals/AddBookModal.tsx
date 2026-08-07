@@ -2,12 +2,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useCreateBook } from "../hooks/useBooks";
-import BookBasicInfoInput from "./book-form/BookBasicInfoInput";
-import BookAppearanceInput from "./book-form/BookAppearanceInput";
-import BookPurchaseInput from "./book-form/BookPurchaseInput";
-import BookStatusInput from "./book-form/BookStatusInput";
+import { useCreateBook } from "../../hooks/useBooks";
+import BookBasicInfoInput from "../book-form/BookBasicInfoInput";
+import BookAppearanceInput from "../book-form/BookAppearanceInput";
+import BookPurchaseInput from "../book-form/BookPurchaseInput";
+import BookStatusInput from "../book-form/BookStatusInput";
 import { useTranslation } from "react-i18next";
+import type { Book } from "../../types";
 
 interface AddBookModalProps {
     isOpen: boolean;

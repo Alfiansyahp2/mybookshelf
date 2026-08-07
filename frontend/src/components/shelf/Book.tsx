@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Heart, BookOpen } from "lucide-react";
-import type { Book } from "../types";
+import type { Book } from "../../types";
 
 interface BookProps {
     book: Book;

@@ -2,8 +2,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useCreateBook } from "../hooks/useBooks";
-import BookBasicInfoInput from "./book-form/BookBasicInfoInput";
+import { useCreateBook } from "../../hooks/useBooks";
+import BookBasicInfoInput from "../book-form/BookBasicInfoInput";
 import { useTranslation } from "react-i18next";
 
 interface AddWishlistBookModalProps {

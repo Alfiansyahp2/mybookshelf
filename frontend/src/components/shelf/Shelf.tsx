@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Trash2, Sparkles } from "lucide-react";
-import RealisticBook from "../Book";
+import RealisticBook from "./Book";
 import DecorationPicker from "../decorations/DecorationPicker";
 import {
     renderDecoration,

@@ -14,7 +14,7 @@ import {
 import {
     useNotifications,
     type NotificationType,
-} from "../hooks/useNotifications";
+} from "../../hooks/useNotifications";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 

@@ -10,7 +10,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lightbulb, LightbulbOff, X, Sun, Moon } from "lucide-react";
-import { useLighting, TEMP_COLORS, type ColorTemp } from "../hooks/useLighting";
+import { useLighting, TEMP_COLORS, type ColorTemp } from "../../hooks/useLighting";
 import { useTranslation } from "react-i18next";
 
 const TEMPS: ColorTemp[] = ["warm", "neutral", "cool", "rose", "mint"];

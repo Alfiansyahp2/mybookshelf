@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ReactQueryProvider } from "./lib/ReactQueryProvider";
-import AppLayout from "./components/AppLayout";
-import ProtectedRoute from "./components/ProtectedRoute";
-import CatchAll from "./components/CatchAll";
+import AppLayout from "./components/layout/AppLayout";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import CatchAll from "./components/layout/CatchAll";
 import ToastContainer from "./components/ui/ToastContainer";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";

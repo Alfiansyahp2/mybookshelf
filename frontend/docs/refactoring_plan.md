@@ -38,7 +38,7 @@ src/components/book-details/
 3. Memodifikasi `BookDetailRightPage.tsx` untuk memanggil komponen-komponen kecil dari folder `right/`.
 4. Menghapus sisa *dead code* berupa modal/tampilan usang (`LibraryRoom.tsx`, `BookDetailDrawer.tsx`, dll).
 
-## Fase 3: Modularisasi Pengaturan Rak / Shelf (ONGOING 🚧)
+## Fase 3: Modularisasi Pengaturan Rak / Shelf (SELESAI ✅)
 **Tujuan:** Mengelompokkan komponen yang berhubungan dengan rak buku (*shelf*) dan pengaturannya ke dalam satu direktori terpusat, memisahkan fungsionalitas UI terkait manajemen rak dari akar folder `components/`.
 
 **Target Perubahan Struktur (Folder Baru):**
@@ -57,7 +57,27 @@ src/components/shelf/
 3. Memperbarui jalur *import* pada komponen lain yang bergantung pada mereka.
 4. Menghapus *dead code* `src/components/AddShelfModal.tsx` yang usang.
 
-## Fase 4: Optimasi State & Performa (Direncanakan)
+## Fase 4: Pembersihan Sisa Komponen Akar (ONGOING 🚧)
+**Tujuan:** Menyapu bersih sisa-sisa *file* yang tercecer di direktori *root* komponen (`src/components/`) agar proyek menjadi sepenuhnya modular dan tertata.
+
+**Target Pemindahan:**
+1. `AddBookModal.tsx` -> `modals/`
+2. `AddWishlistBookModal.tsx` -> `modals/`
+3. `AppLayout.tsx` -> `layout/`
+4. `Book.tsx` -> `shelf/`
+5. `CatchAll.tsx` -> `layout/`
+6. `LightingControl.tsx` -> `shelf/`
+7. `NotificationCenter.tsx` -> `layout/`
+8. `ProtectedRoute.tsx` -> `auth/`
+9. `Timeline.tsx` -> **DIHAPUS** (Dead code)
+
+**Langkah Eksekusi Fase 4:**
+1. Pindahkan seluruh file di atas ke sub-direktori masing-masing.
+2. Hapus `Timeline.tsx` yang usang.
+3. Perbaiki *import path* global pada file seperti `App.tsx`, halaman `Explore`, `Library`, dsb.
+4. Validasi kompilasi akhir untuk memastikan tidak ada kesalahan `import`.
+
+## Fase 5: Optimasi State & Performa (Direncanakan)
 **Tujuan:** Mengurangi *re-render* yang tidak perlu pada saat Timer Membaca (`ReadingSessionTimer`) berjalan.
 - Mengubah arsitektur *state management* agar detak pewaktu (*timer tick*) tidak memaksa seluruh halaman buku ikut me-*render* ulang.
 - *Lazy loading* komponen yang berat.

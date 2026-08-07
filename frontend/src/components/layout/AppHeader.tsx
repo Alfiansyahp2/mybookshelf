@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Layers, Award, Settings, LogOut, Moon, Sun } from "lucide-react";
 import SearchBar from "./SearchBar";
-import NotificationCenter from "../NotificationCenter";
+import NotificationCenter from "./NotificationCenter";
 import { useLogout, useAuthUser } from "../../hooks/useAuth";
 
 interface NavItem {

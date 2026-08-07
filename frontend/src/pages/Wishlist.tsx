@@ -4,7 +4,7 @@ import { useStartReading } from "../hooks/useBooks";
 import { useNavigate } from "react-router-dom";
 import { useBookstore } from "../store/useBookstore";
 import Bookshelf from "../components/shelf/Bookshelf";
-import AddWishlistBookModal from "../components/AddWishlistBookModal";
+import AddWishlistBookModal from "../components/modals/AddWishlistBookModal";
 import WishlistCard from "../components/assets/WishlistCard";
 import { useState } from "react";
 import type { Book } from "../types";
