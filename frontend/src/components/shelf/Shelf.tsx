@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, Sparkles, MoreHorizontal } from "lucide-react";
 import RealisticBook from "./Book";
 import DecorationPicker from "../decorations/DecorationPicker";
 import {
@@ -60,7 +60,25 @@ export default function LibraryShelf({
     const { t } = useTranslation();
     const [pickerSlot, setPickerSlot] = useState<"left" | "right" | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
     const updateShelf = useUpdateShelf();
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        };
+        if (isMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener("touchstart", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("touchstart", handleClickOutside);
+        };
+    }, [isMenuOpen]);
 
     /* ── Lighting state ──────────────────────────── */
     const { on: lightOn, brightness, colorTemp } = useLighting();
@@ -445,14 +463,18 @@ export default function LibraryShelf({
                             className="hide-scrollbar"
                             style={{
                                 flex: 1,
+                                height: "calc(100% + 30px)",
+                                marginTop: -30,
+                                paddingTop: 30,
                                 display: "flex",
                                 alignItems: "flex-end",
                                 gap: 1,
-                                overflowX: "visible",
-                                overflowY: "visible",
+                                overflowX: "auto",
+                                overflowY: "hidden",
                                 perspective: "500px",
                                 perspectiveOrigin: "50% 100%",
                                 paddingBottom: 2,
+                                WebkitOverflowScrolling: "touch",
                             }}
                         >
                             {books.map((book) => {
@@ -634,7 +656,7 @@ export default function LibraryShelf({
                         paddingLeft: 24,
                         paddingRight: 10,
                         gap: 10,
-                        overflow: "hidden",
+                        overflow: "visible",
                     }}
                 >
                     {/* Shelf name */}
@@ -713,30 +735,75 @@ export default function LibraryShelf({
 
                     {/* Action buttons */}
                     <div
+                        ref={menuRef}
                         style={{
+                            position: "relative",
                             display: "flex",
                             alignItems: "center",
                             gap: 4,
                             flexShrink: 0,
                         }}
                     >
+                        <AnimatePresence>
+                            {isMenuOpen && (
+                                <motion.div
+                                    key="shelf-menu"
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    transition={{ duration: 0.15 }}
+                                    style={{
+                                        position: "absolute",
+                                        bottom: "100%",
+                                        right: 0,
+                                        marginBottom: 8,
+                                        background: "rgba(30, 20, 10, 0.95)",
+                                        backdropFilter: "blur(8px)",
+                                        border: "1px solid rgba(255,255,255,0.1)",
+                                        borderRadius: 8,
+                                        padding: 6,
+                                        display: "flex",
+                                        gap: 6,
+                                        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                                        zIndex: 50,
+                                    }}
+                                >
+                                    <ActionBtn
+                                        icon={<Plus size={14} />}
+                                        title={t("shelf.add_book")}
+                                        onClick={() => {
+                                            setIsMenuOpen(false);
+                                            onAddBook?.(shelf.id);
+                                        }}
+                                        color="#ffffff"
+                                    />
+                                    <ActionBtn
+                                        icon={<Pencil size={13} />}
+                                        title={t("shelf.edit_shelf")}
+                                        onClick={() => {
+                                            setIsMenuOpen(false);
+                                            onEditShelf?.(shelf.id);
+                                        }}
+                                        color="#60a5fa"
+                                    />
+                                    <ActionBtn
+                                        icon={<Trash2 size={13} />}
+                                        title={t("shelf.delete_shelf")}
+                                        onClick={() => {
+                                            setIsMenuOpen(false);
+                                            setIsDeleting(true);
+                                        }}
+                                        color="#f87171"
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                        
                         <ActionBtn
-                            icon={<Plus size={12} />}
-                            title={t("shelf.add_book")}
-                            onClick={() => onAddBook?.(shelf.id)}
+                            icon={<MoreHorizontal size={14} />}
+                            title={t("shelf.options", "Opsi Rak")}
+                            onClick={() => setIsMenuOpen((prev) => !prev)}
                             color="#ffffff"
-                        />
-                        <ActionBtn
-                            icon={<Pencil size={11} />}
-                            title={t("shelf.edit_shelf")}
-                            onClick={() => onEditShelf?.(shelf.id)}
-                            color="#60a5fa"
-                        />
-                        <ActionBtn
-                            icon={<Trash2 size={11} />}
-                            title={t("shelf.delete_shelf")}
-                            onClick={() => setIsDeleting(true)}
-                            color="#f87171"
                         />
                     </div>
                 </div>

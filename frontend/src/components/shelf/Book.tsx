@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Heart, BookOpen } from "lucide-react";
 import type { Book } from "../../types";
@@ -68,6 +68,9 @@ export default function RealisticBook({
 }: BookProps) {
     const [hovered, setHovered] = useState(false);
     const [clicked, setClicked] = useState(false);
+    const touchTimer = useRef<NodeJS.Timeout | null>(null);
+    const hasLongPressed = useRef(false);
+    const bookRef = useRef<HTMLDivElement>(null);
 
     const c0 = book.spineColors?.[0] || "#8B7355";
     const c1 = book.spineColors?.[1] || "#6B5344";
@@ -87,8 +90,49 @@ export default function RealisticBook({
         }
     }, [isDrawerOpen]);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+            if (bookRef.current && !bookRef.current.contains(event.target as Node)) {
+                setHovered(false);
+            }
+        };
+        if (hovered) {
+            document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener("touchstart", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("touchstart", handleClickOutside);
+        };
+    }, [hovered]);
+
+    const handleTouchStart = () => {
+        hasLongPressed.current = false;
+        touchTimer.current = setTimeout(() => {
+            setHovered(true);
+            hasLongPressed.current = true;
+        }, 400);
+    };
+
+    const handleTouchEnd = () => {
+        if (touchTimer.current) clearTimeout(touchTimer.current);
+    };
+
+    const handleTouchMove = () => {
+        if (touchTimer.current) clearTimeout(touchTimer.current);
+    };
+
+    const handleBookClick = (e: React.MouseEvent) => {
+        if (hasLongPressed.current) {
+            hasLongPressed.current = false;
+            return;
+        }
+        onClick();
+    };
+
     return (
         <div
+            ref={bookRef}
             style={{
                 position: "relative",
                 flexShrink: 0,
@@ -99,10 +143,13 @@ export default function RealisticBook({
             }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchMove={handleTouchMove}
         >
             {/* ── Book body ──────────────────────────── */}
             <motion.div
-                onClick={onClick}
+                onClick={handleBookClick}
                 style={{
                     width: "100%",
                     height: bookH,
