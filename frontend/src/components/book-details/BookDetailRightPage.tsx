@@ -364,6 +364,7 @@ export default function BookDetailRightPage({
                             className="h-full flex flex-col"
                         >
                             <BookNotesSection
+                                book={book}
                                 userNotes={userNotes}
                                 tempNotes={tempNotes}
                                 isEditingNotes={isEditingNotes}

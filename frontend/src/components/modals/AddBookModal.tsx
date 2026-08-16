@@ -118,15 +118,12 @@ export default function AddBookModal({
             purchaseLocation:
                 formData.acquisitionType === "purchased"
                     ? formData.purchaseLocation
-                    : undefined,
+                    : formData.acquisitionType === "gift" && formData.giftFrom
+                        ? `Gift from: ${formData.giftFrom}`
+                        : formData.acquisitionType === "borrowed" && formData.borrowedFrom
+                            ? `Borrowed from: ${formData.borrowedFrom}`
+                            : undefined,
             isGift: formData.acquisitionType === "gift",
-            personalNotes:
-                formData.acquisitionType === "gift" && formData.giftFrom
-                    ? `Gift from: ${formData.giftFrom}`
-                    : formData.acquisitionType === "borrowed" &&
-                        formData.borrowedFrom
-                      ? `Borrowed from: ${formData.borrowedFrom}`
-                      : "",
             borrowedBy:
                 formData.status === "borrowed" ? formData.borrowedBy : "",
             borrowedDate:

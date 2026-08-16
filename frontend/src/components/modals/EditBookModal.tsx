@@ -105,25 +105,34 @@ export default function EditBookModal({
                     new Date().toISOString().split("T")[0],
                 purchasePrice: book.purchasePrice?.toString() || "",
                 purchaseCurrency: book.purchaseCurrency || "IDR",
-                acquisitionType: book.personalNotes?.startsWith(
-                    "Borrowed from: ",
-                )
-                    ? "borrowed"
-                    : book.isGift
-                      ? "gift"
-                      : "purchased",
-                giftFrom: book.personalNotes?.startsWith("Gift from: ")
-                    ? book.personalNotes.replace("Gift from: ", "")
-                    : "",
-                borrowedFrom: book.personalNotes?.startsWith("Borrowed from: ")
-                    ? book.personalNotes.replace("Borrowed from: ", "")
-                    : "",
+                acquisitionType:
+                    book.purchaseLocation?.startsWith("Borrowed from: ") ||
+                    book.personalNotes?.startsWith("Borrowed from: ")
+                        ? "borrowed"
+                        : book.isGift ||
+                          book.purchaseLocation?.startsWith("Gift from: ") ||
+                          book.personalNotes?.startsWith("Gift from: ")
+                          ? "gift"
+                          : "purchased",
+                giftFrom: book.purchaseLocation?.startsWith("Gift from: ")
+                    ? book.purchaseLocation.replace("Gift from: ", "")
+                    : book.personalNotes?.startsWith("Gift from: ")
+                      ? book.personalNotes.replace("Gift from: ", "").split('\n')[0]
+                      : "",
+                borrowedFrom: book.purchaseLocation?.startsWith("Borrowed from: ")
+                    ? book.purchaseLocation.replace("Borrowed from: ", "")
+                    : book.personalNotes?.startsWith("Borrowed from: ")
+                      ? book.personalNotes.replace("Borrowed from: ", "").split('\n')[0]
+                      : "",
                 borrowedBy: book.borrowedBy || "",
                 borrowedDate:
                     book.borrowedDate?.split("T")[0] ||
                     new Date().toISOString().split("T")[0],
                 dueDate: book.dueDate?.split("T")[0] || "",
-                purchaseLocation: book.purchaseLocation || "",
+                purchaseLocation: 
+                    book.purchaseLocation && !book.purchaseLocation.startsWith("Gift from: ") && !book.purchaseLocation.startsWith("Borrowed from: ")
+                        ? book.purchaseLocation 
+                        : "",
             });
         }
     }, [book]);
@@ -212,16 +221,14 @@ export default function EditBookModal({
                     purchaseLocation:
                         formData.acquisitionType === "purchased"
                             ? formData.purchaseLocation
-                            : undefined,
+                            : formData.acquisitionType === "gift" && formData.giftFrom
+                              ? `Gift from: ${formData.giftFrom}`
+                              : formData.acquisitionType === "borrowed" && formData.borrowedFrom
+                                ? `Borrowed from: ${formData.borrowedFrom}`
+                                : undefined,
                     isGift: formData.acquisitionType === "gift",
                     status: formData.status,
-                    personalNotes:
-                        formData.acquisitionType === "gift" && formData.giftFrom
-                            ? `Gift from: ${formData.giftFrom}`
-                            : formData.acquisitionType === "borrowed" &&
-                                formData.borrowedFrom
-                              ? `Borrowed from: ${formData.borrowedFrom}`
-                              : "",
+                    personalNotes: book.personalNotes, // Keep original personalNotes intact
                     borrowedBy:
                         formData.status === "borrowed"
                             ? formData.borrowedBy
