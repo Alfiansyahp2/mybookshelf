@@ -30,6 +30,8 @@ interface ReadingSessionTimerProps {
     updateProgress: {
         mutate: (params: { id: string; currentPage: number }) => void;
     };
+    selectedReadDate?: string | null;
+    onClearSelectedReadDate?: () => void;
 }
 
 // ── helpers ────────────────────────────────────────────────
@@ -279,6 +281,8 @@ function SessionCard({
 export default function ReadingSessionTimer({
     book,
     updateProgress,
+    selectedReadDate,
+    onClearSelectedReadDate,
 }: ReadingSessionTimerProps) {
     const { t } = useTranslation();
     const [isReadingSession, setIsReadingSession] = useState(false);
@@ -298,8 +302,53 @@ export default function ReadingSessionTimer({
     const pauseSessionMutation = usePauseReadingSession();
     const { data: sessionData } = useBookReadingSessions(book.id);
 
-    const sessions = sessionData?.sessions ?? [];
-    const stats = sessionData?.statistics;
+    // If selectedReadDate is present, we filter the sessions up to that date,
+    // bounded by the previous readDate.
+    let sessions = sessionData?.sessions ?? [];
+    
+    if (selectedReadDate && book.readDates) {
+        const sortedDates = [...book.readDates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+        const dateIdx = sortedDates.indexOf(selectedReadDate);
+        if (dateIdx !== -1) {
+            const endDate = new Date(selectedReadDate);
+            endDate.setHours(23, 59, 59, 999);
+            const endMs = endDate.getTime();
+            
+            let startMs = 0;
+            if (dateIdx > 0) {
+                const prevDate = new Date(sortedDates[dateIdx - 1]);
+                prevDate.setHours(23, 59, 59, 999);
+                startMs = prevDate.getTime();
+            }
+
+            sessions = sessions.filter(s => {
+                const sessionTime = new Date(s.start_time).getTime();
+                return sessionTime > startMs && sessionTime <= endMs;
+            });
+        }
+    }
+
+    // Recalculate stats based on filtered sessions
+    const stats = {
+        total_sessions: sessions.length,
+        total_duration_seconds: sessions.reduce((acc, s) => acc + (s.duration || 0), 0),
+        total_pages_read: sessions.reduce((acc, s) => {
+            const pages = s.end_page != null ? s.end_page - s.start_page : 0;
+            return acc + Math.max(0, pages);
+        }, 0),
+        average_duration: 0,
+        average_pages_per_session: 0,
+        average_reading_speed_pages_per_hour: 0,
+        total_duration_formatted: "",
+    };
+    if (stats.total_sessions > 0) {
+        stats.average_duration = stats.total_duration_seconds / stats.total_sessions;
+        stats.average_pages_per_session = stats.total_pages_read / stats.total_sessions;
+        if (stats.total_duration_seconds > 0) {
+            stats.average_reading_speed_pages_per_hour = (stats.total_pages_read / (stats.total_duration_seconds / 3600));
+        }
+    }
+
     const completedSessions = sessions.filter((s) => s.end_time !== null);
     const activeSession = sessions.find((s) => s.end_time === null);
 
@@ -429,7 +478,22 @@ export default function ReadingSessionTimer({
 
     return (
         <div className="space-y-2">
-            {/* ── Timer Card ──────────────────────────────── */}
+            {selectedReadDate ? (
+                <div className="rounded-xl border p-3 flex justify-between items-center" style={{ background: "rgba(255,255,255,0.85)", borderColor: "rgba(139,115,85,0.12)", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
+                    <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" style={{ color: "#8B7355" }} />
+                        <span className="text-sm font-semibold" style={{ color: "#2a1a08" }}>
+                            {t("bookDetail.session.journey_for", "Riwayat Perjalanan:")} {new Date(selectedReadDate).toLocaleDateString(t("locale", "id-ID"), { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </span>
+                    </div>
+                    {onClearSelectedReadDate && (
+                        <button onClick={onClearSelectedReadDate} className="text-xs px-3 py-1 rounded transition-colors hover:bg-black/5" style={{ color: "#2a1a08" }}>
+                            {t("bookDetail.session.back_to_current", "Kembali")}
+                        </button>
+                    )}
+                </div>
+            ) : book.status === "finished" ? null : (
+            /* ── Timer Card ──────────────────────────────── */
             <div
                 className="rounded-xl border p-3"
                 style={{
@@ -765,10 +829,11 @@ export default function ReadingSessionTimer({
                     </div>
                 )}
             </div>
+            )}
 
             {/* ── Riwayat — inline expand below the timer card ── */}
             <AnimatePresence>
-                {showHistory && (
+                {(showHistory || selectedReadDate || book.status === "finished") && (
                     <motion.div
                         key="history"
                         initial={{ opacity: 0, height: 0 }}

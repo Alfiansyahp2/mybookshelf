@@ -14,6 +14,7 @@ import ReadingProgressSection from "./right/ReadingProgressSection";
 import ReadingSessionTimer from "./right/ReadingSessionTimer";
 import BookNotesSection from "./right/BookNotesSection";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 interface BookDetailRightPageProps {
     book: Book;
@@ -35,6 +36,7 @@ interface BookDetailRightPageProps {
     handleMarkAsReadNow: () => void;
     handleProgress: (p: number) => void;
     handleAddReadDate: (d: string) => void;
+    handleRemoveReadDate: (d: string) => void;
     userNotes: string;
     tempNotes: string;
     isEditingNotes: boolean;
@@ -71,6 +73,7 @@ export default function BookDetailRightPage({
     handleMarkAsReadNow,
     handleProgress,
     handleAddReadDate,
+    handleRemoveReadDate,
     userNotes,
     tempNotes,
     isEditingNotes,
@@ -83,6 +86,8 @@ export default function BookDetailRightPage({
     updateProgress,
 }: BookDetailRightPageProps) {
     const { t } = useTranslation();
+    const [selectedReadDate, setSelectedReadDate] = useState<string | null>(null);
+
     return (
         <motion.div
             key="right"
@@ -120,7 +125,10 @@ export default function BookDetailRightPage({
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => {
+                            if (tab.id !== "session") setSelectedReadDate(null);
+                            setActiveTab(tab.id);
+                        }}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-t-lg transition-all border-b-2"
                         style={
                             activeTab === tab.id
@@ -208,6 +216,11 @@ export default function BookDetailRightPage({
                                     book={book}
                                     onProgressChange={handleProgress}
                                     onAddReadDate={handleAddReadDate}
+                                    onRemoveReadDate={handleRemoveReadDate}
+                                    onSelectReadDate={(date) => {
+                                        setSelectedReadDate(date);
+                                        setActiveTab("session");
+                                    }}
                                 />
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-14 text-center">
@@ -350,6 +363,8 @@ export default function BookDetailRightPage({
                             <ReadingSessionTimer
                                 book={book}
                                 updateProgress={updateProgress}
+                                selectedReadDate={selectedReadDate}
+                                onClearSelectedReadDate={() => setSelectedReadDate(null)}
                             />
                         </motion.div>
                     )}

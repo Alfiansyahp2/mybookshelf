@@ -1,19 +1,26 @@
-import { BookOpen, Clock, Plus } from "lucide-react";
+import { BookOpen, Clock, Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import type { Book } from "../../../types";
+import ConfirmModal from "../../ui/ConfirmModal";
 
 interface ReadingProgressSectionProps {
     book: Book;
     onProgressChange: (currentPage: number) => void;
     onAddReadDate?: (date: string) => void;
+    onSelectReadDate?: (date: string) => void;
+    onRemoveReadDate?: (date: string) => void;
 }
 
 export default function ReadingProgressSection({
     book,
     onProgressChange,
     onAddReadDate,
+    onSelectReadDate,
+    onRemoveReadDate,
 }: ReadingProgressSectionProps) {
     const { t } = useTranslation();
+    const [dateToDelete, setDateToDelete] = useState<string | null>(null);
     const progress =
         book.pages && book.pages > 0
             ? Math.round(((book.currentPage || 0) / book.pages) * 100)
@@ -116,8 +123,11 @@ export default function ReadingProgressSection({
                                     }
                                 }}
                             />
-                            <button className="text-xs px-2 py-1 bg-walnut/10 hover:bg-walnut/20 text-darkBrown font-medium rounded transition-colors flex items-center gap-1 pointer-events-none">
+                            <button className="text-xs px-2 py-1 bg-walnut/10 hover:bg-walnut/20 text-darkBrown font-medium rounded transition-colors flex items-center gap-1">
                                 <Plus className="w-3 h-3" />
+                                <span className="hidden sm:inline">
+                                    {t("bookDetail.progress.add", "Tambah")}
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -125,25 +135,55 @@ export default function ReadingProgressSection({
                     {book.readDates && book.readDates.length > 0 && (
                         <ul className="space-y-2">
                             {book.readDates.map((date, idx) => (
-                                <li
-                                    key={idx}
-                                    className="flex items-center gap-2 text-xs text-walnut/80 bg-walnut/5 p-2 rounded border border-walnut/10"
-                                >
-                                    <span className="w-1.5 h-1.5 rounded-full bg-walnut/40" />
-                                    {new Date(date).toLocaleDateString(
-                                        t("locale", "id-ID"),
-                                        {
-                                            year: "numeric",
-                                            month: "long",
-                                            day: "numeric",
-                                        },
-                                    )}
+                                <li key={idx} className="relative group">
+                                    <button
+                                        onClick={() => onSelectReadDate && onSelectReadDate(date)}
+                                        className="w-full text-left flex items-center gap-2 text-xs text-walnut/80 bg-walnut/5 p-2 rounded border border-walnut/10 hover:bg-walnut/10 transition-colors"
+                                    >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-walnut/40" />
+                                        {new Date(date).toLocaleDateString(
+                                            t("locale", "id-ID"),
+                                            {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            },
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setDateToDelete(date);
+                                        }}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-walnut/40 hover:text-red-500 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-all"
+                                        title={t("bookDetail.remove_read_date", "Hapus riwayat")}
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
                                 </li>
                             ))}
                         </ul>
                     )}
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={dateToDelete !== null}
+                onClose={() => setDateToDelete(null)}
+                onConfirm={() => {
+                    if (dateToDelete && onRemoveReadDate) {
+                        onRemoveReadDate(dateToDelete);
+                        setDateToDelete(null);
+                    }
+                }}
+                title={t("bookDetail.confirm_delete_history", "Hapus riwayat ini?")}
+                message={t(
+                    "bookDetail.confirm_delete_history_msg",
+                    "Apakah kamu yakin ingin menghapus tanggal penyelesaian membaca ini dari riwayat perjalananmu?"
+                )}
+                confirmText={t("common.delete", "Hapus")}
+                isDanger={true}
+            />
         </div>
     );
 }

@@ -173,9 +173,19 @@ class ReadingSessionService
 
         // Auto-finish book if progress reaches 100%
         if ($progress >= 100 && $book->status !== 'finished') {
+            $readDates = $book->read_dates ?? [];
+            $today = now()->toDateString();
+            if (!in_array($today, $readDates)) {
+                $readDates[] = $today;
+                usort($readDates, function($a, $b) {
+                    return strtotime($b) - strtotime($a);
+                });
+            }
+
             $book->update([
                 'status' => 'finished',
                 'finished_date' => now(),
+                'read_dates' => $readDates,
             ]);
 
             // Create timeline event for finishing

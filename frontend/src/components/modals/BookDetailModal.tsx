@@ -93,17 +93,28 @@ export default function BookDetailModal({
         new Date().toISOString().split("T")[0],
     );
 
+    // Sync data that might update from background, but don't interrupt typing
     useEffect(() => {
         if (book) {
             setUserRating(book.personalRating || 0);
             setUserNotes(book.personalNotes || "");
-            setTempNotes(book.personalNotes || "");
-            setIsEditingNotes(false);
-            if (book.status === "reading") setActiveTab("progress");
-            else if (book.status === "finished") setActiveTab("notes");
-            else setActiveTab("info");
+            if (!isEditingNotes) {
+                setTempNotes(book.personalNotes || "");
+            }
         }
-    }, [book]);
+    }, [book, isEditingNotes]);
+
+    // Set initial tab ONLY when modal opens for a specific book
+    useEffect(() => {
+        if (isOpen && book) {
+            setIsEditingNotes(false);
+            if (book.status === "reading" || book.status === "finished") {
+                setActiveTab("progress");
+            } else {
+                setActiveTab("info");
+            }
+        }
+    }, [isOpen, book?.id]);
 
     if (!book) return null;
 
@@ -196,6 +207,17 @@ export default function BookDetailModal({
                 },
             });
         }
+    };
+
+    const handleRemoveReadDate = (date: string) => {
+        if (!book.readDates) return;
+        const dates = book.readDates.filter((d) => d !== date);
+        updateBook.mutate({
+            id: book.id,
+            updates: {
+                readDates: dates,
+            },
+        });
     };
 
     const handleMarkAsReadNow = () => {
@@ -316,6 +338,7 @@ export default function BookDetailModal({
                                     handleMarkAsReadNow={handleMarkAsReadNow}
                                     handleProgress={handleProgress}
                                     handleAddReadDate={handleAddReadDate}
+                                    handleRemoveReadDate={handleRemoveReadDate}
                                     userNotes={userNotes}
                                     tempNotes={tempNotes}
                                     isEditingNotes={isEditingNotes}
