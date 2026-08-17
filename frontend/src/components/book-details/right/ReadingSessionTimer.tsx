@@ -939,7 +939,7 @@ export default function ReadingSessionTimer({
                                     <SessionCard
                                         key={activeSession.id}
                                         session={activeSession}
-                                        index={0}
+                                        index={sessions.length - 1}
                                     />
                                 )}
                                 {[...completedSessions]
@@ -952,7 +952,7 @@ export default function ReadingSessionTimer({
                                         <SessionCard
                                             key={s.id}
                                             session={s}
-                                            index={activeSession ? i + 1 : i}
+                                            index={completedSessions.length - 1 - i}
                                         />
                                     ))}
                             </div>
