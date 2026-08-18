@@ -44,7 +44,7 @@ export default function BookAppearanceInput({
                         onChange={(e) =>
                             setFormData({ ...formData, height: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                     >
                         <option value="short">
                             {t("book_form.appearance.height_short")}
@@ -71,7 +71,7 @@ export default function BookAppearanceInput({
                                 thickness: e.target.value,
                             })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                     >
                         <option value="thin">
                             {t("book_form.appearance.thickness_thin")}

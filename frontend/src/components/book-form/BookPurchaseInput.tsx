@@ -90,7 +90,7 @@ export default function BookPurchaseInput({
                                 purchaseDate: e.target.value,
                             })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                     />
                 </div>
 
@@ -157,7 +157,7 @@ export default function BookPurchaseInput({
                                     purchaseLocation: e.target.value,
                                 })
                             }
-                            className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                            className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                             placeholder={t(
                                 "book_form.purchase.location_placeholder",
                             )}
@@ -180,7 +180,7 @@ export default function BookPurchaseInput({
                                     giftFrom: e.target.value,
                                 })
                             }
-                            className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                            className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                             placeholder={t(
                                 "book_form.purchase.gift_placeholder",
                             )}
@@ -203,7 +203,7 @@ export default function BookPurchaseInput({
                                     borrowedFrom: e.target.value,
                                 })
                             }
-                            className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                            className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                             placeholder={t(
                                 "book_form.purchase.borrowed_placeholder",
                             )}

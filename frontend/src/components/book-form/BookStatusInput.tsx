@@ -27,7 +27,7 @@ export default function BookStatusInput({
                         onChange={(e) =>
                             setFormData({ ...formData, status: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                     >
                         <option value="unread">Belum Dibaca (Unread)</option>
                         <option value="reading">Sedang Dibaca (Reading)</option>
@@ -63,7 +63,7 @@ export default function BookStatusInput({
                                             borrowedBy: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                                    className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                                     placeholder="Nama Peminjam"
                                 />
                             </div>
@@ -80,7 +80,7 @@ export default function BookStatusInput({
                                             borrowedDate: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                                    className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                                 />
                             </div>
                             <div>
@@ -96,7 +96,7 @@ export default function BookStatusInput({
                                             dueDate: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                                    className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                                 />
                             </div>
                         </div>

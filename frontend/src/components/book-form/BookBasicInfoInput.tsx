@@ -39,7 +39,7 @@ export default function BookBasicInfoInput({
                         onChange={(e) =>
                             setFormData({ ...formData, title: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                         placeholder={t("book_form.basic.title_placeholder")}
                     />
                 </div>
@@ -57,7 +57,7 @@ export default function BookBasicInfoInput({
                         onChange={(e) =>
                             setFormData({ ...formData, author: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                         placeholder={t("book_form.basic.author_placeholder")}
                     />
                 </div>
@@ -74,7 +74,7 @@ export default function BookBasicInfoInput({
                         onChange={(e) =>
                             setFormData({ ...formData, isbn: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                         placeholder="978-0-123456-78-9"
                     />
                 </div>
@@ -169,7 +169,7 @@ export default function BookBasicInfoInput({
                                 publisher: e.target.value,
                             })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                         placeholder={t("book_form.basic.publisher_placeholder")}
                     />
                 </div>
@@ -187,7 +187,7 @@ export default function BookBasicInfoInput({
                                 language: e.target.value,
                             })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                     >
                         <option value="Indonesian">Indonesia</option>
                         <option value="English">Inggris</option>
@@ -221,7 +221,7 @@ export default function BookBasicInfoInput({
                                 publishYear: e.target.value,
                             })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                     />
                 </div>
 
@@ -238,7 +238,7 @@ export default function BookBasicInfoInput({
                         onChange={(e) =>
                             setFormData({ ...formData, pages: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                         placeholder={t("book_form.basic.pages_placeholder")}
                     />
                 </div>
@@ -254,7 +254,7 @@ export default function BookBasicInfoInput({
                         onChange={(e) =>
                             setFormData({ ...formData, format: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                        className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                     >
                         <option value="hardcover">Hardcover</option>
                         <option value="paperback">Paperback</option>
