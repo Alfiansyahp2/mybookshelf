@@ -71,11 +71,48 @@ export default function BookBasicInfoInput({
                     <input
                         type="text"
                         value={formData.isbn}
-                        onChange={(e) =>
-                            setFormData({ ...formData, isbn: e.target.value })
-                        }
+                        onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9X]/gi, '').toUpperCase();
+                            let formatted = val;
+
+                            if (val.length > 3) {
+                                const prefix = val.substring(0, 3);
+                                const rest = val.substring(3);
+                                
+                                if (prefix === '978' || prefix === '979') {
+                                    const group = rest.substring(0, 3);
+                                    if (group.startsWith('623') || group.startsWith('602')) {
+                                        // 3-3-4-2-1 format (Indonesia)
+                                        formatted = prefix;
+                                        if (rest.length > 0) formatted += '-' + rest.substring(0, 3);
+                                        if (rest.length > 3) formatted += '-' + rest.substring(3, 7);
+                                        if (rest.length > 7) formatted += '-' + rest.substring(7, 9);
+                                        if (rest.length > 9) formatted += '-' + rest.substring(9, 10);
+                                    } else {
+                                        const first = rest.charAt(0);
+                                        if (['0', '1', '2', '3', '4', '7'].includes(first)) {
+                                            // 3-1-4-4-1 format (International)
+                                            formatted = prefix;
+                                            if (rest.length > 0) formatted += '-' + rest.substring(0, 1);
+                                            if (rest.length > 1) formatted += '-' + rest.substring(1, 5);
+                                            if (rest.length > 5) formatted += '-' + rest.substring(5, 9);
+                                            if (rest.length > 9) formatted += '-' + rest.substring(9, 10);
+                                        } else {
+                                            // generic fallback 3-2-4-3-1
+                                            formatted = prefix;
+                                            if (rest.length > 0) formatted += '-' + rest.substring(0, 2);
+                                            if (rest.length > 2) formatted += '-' + rest.substring(2, 6);
+                                            if (rest.length > 6) formatted += '-' + rest.substring(6, 9);
+                                            if (rest.length > 9) formatted += '-' + rest.substring(9, 10);
+                                        }
+                                    }
+                                }
+                            }
+                            setFormData({ ...formData, isbn: formatted });
+                        }}
                         className="w-full px-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
-                        placeholder="978-0-123456-78-9"
+                        placeholder="978-623-XXXX-XX-X"
+                        maxLength={17}
                     />
                 </div>
 
