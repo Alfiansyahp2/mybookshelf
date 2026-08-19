@@ -119,21 +119,33 @@ export default function BookPurchaseInput({
                                 <option value="JPY">¥</option>
                             </select>
                             <input
-                                type="number"
-                                step={
-                                    formData.purchaseCurrency === "IDR" ||
-                                    formData.purchaseCurrency === "JPY"
-                                        ? "1"
-                                        : "0.01"
+                                type="text"
+                                value={
+                                    formData.purchasePrice
+                                        ? (formData.purchaseCurrency === "IDR" || formData.purchaseCurrency === "JPY")
+                                            ? (() => {
+                                                  const parsed = parseInt(formData.purchasePrice.toString().replace(/[^\d]/g, ''), 10);
+                                                  return isNaN(parsed) ? "" : parsed.toLocaleString('id-ID');
+                                              })()
+                                            : formData.purchasePrice
+                                        : ""
                                 }
-                                min="0"
-                                value={formData.purchasePrice || ""}
-                                onChange={(e) =>
+                                onChange={(e) => {
+                                    let rawValue = e.target.value;
+                                    if (formData.purchaseCurrency === "IDR" || formData.purchaseCurrency === "JPY") {
+                                        rawValue = rawValue.replace(/[^\d]/g, '');
+                                    } else {
+                                        rawValue = rawValue.replace(/[^\d.]/g, '');
+                                        const parts = rawValue.split('.');
+                                        if (parts.length > 2) {
+                                            rawValue = parts[0] + '.' + parts.slice(1).join('');
+                                        }
+                                    }
                                     setFormData({
                                         ...formData,
-                                        purchasePrice: e.target.value,
+                                        purchasePrice: rawValue,
                                     })
-                                }
+                                }}
                                 className="w-full pl-16 pr-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
                                 placeholder="0"
                             />
