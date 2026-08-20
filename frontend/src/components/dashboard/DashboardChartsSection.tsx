@@ -20,12 +20,14 @@ interface DashboardChartsSectionProps {
     stats: any;
     genreFilter: string;
     setGenreFilter: (genre: string) => void;
+    topReadBooks?: any[];
 }
 
 export default function DashboardChartsSection({
     stats,
     genreFilter,
     setGenreFilter,
+    topReadBooks = [],
 }: DashboardChartsSectionProps) {
     const { t } = useTranslation();
 

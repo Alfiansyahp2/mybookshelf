@@ -175,6 +175,28 @@ export function useDashboardStats(books: any[]) {
                     color: v.color,
                 }))
                 .filter((d) => d.value > 0),
+            topReadBooks: books
+                .map((b: any) => {
+                    const count =
+                        b.readDates && Array.isArray(b.readDates)
+                            ? b.readDates.length
+                            : b.status === "finished"
+                            ? 1
+                            : 0;
+                    return {
+                        id: b.id,
+                        name: b.title || "Unknown Book",
+                        author: b.author || "Unknown Author",
+                        coverUrl: b.coverUrl,
+                        personalRating: b.personalRating,
+                        genre: b.genre,
+                        value: count,
+                        color: b.spineColors?.[0] || BRAND.walnut,
+                    };
+                })
+                .filter((b: any) => b.value > 0)
+                .sort((a: any, b: any) => b.value - a.value)
+                .slice(0, 5),
             bookColors: books
                 .slice(0, 12)
                 .map((b: any) => b.spineColors?.[0] || "#8B7355"),

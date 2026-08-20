@@ -139,6 +139,23 @@ class StatisticsController extends Controller
                         ->sum('amount_base_currency') ?: 0,
                 ],
             ],
+            'top_read_books' => ReadingSession::where('user_id', $user->id)
+                ->whereNotNull('end_time')
+                ->select('book_id', \Illuminate\Support\Facades\DB::raw('count(*) as session_count'), \Illuminate\Support\Facades\DB::raw('sum(duration) as total_duration'))
+                ->groupBy('book_id')
+                ->orderByDesc('session_count')
+                ->take(5)
+                ->with('book:id,title,spine_color_light')
+                ->get()
+                ->map(function ($session) {
+                    return [
+                        'id' => $session->book_id,
+                        'name' => $session->book ? $session->book->title : 'Unknown Book',
+                        'value' => $session->session_count, // for the pie chart or bar chart
+                        'duration' => $session->total_duration,
+                        'color' => $session->book && $session->book->spine_color_light ? $session->book->spine_color_light : '#8B7355'
+                    ];
+                }),
             'generated_at' => now()->toIso8601String(),
         ];
 

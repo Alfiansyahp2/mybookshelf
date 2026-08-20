@@ -78,6 +78,7 @@
     "charts": {
       "status_title": "Distribusi Status",
       "genre_title": "Genre Terbanyak",
+      "top_read_books": "Buku Sering Dibaca",
       "all": "Semua",
       "no_genre": "Belum ada data genre",
       "books": "Buku"

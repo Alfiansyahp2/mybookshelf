@@ -84,6 +84,7 @@ export default function Dashboard() {
                 >
                     <DashboardReadingSection
                         currentlyReading={stats.currentlyReading}
+                        topReadBooks={stats.topReadBooks || []}
                     />
 
                     <DashboardChartsSection

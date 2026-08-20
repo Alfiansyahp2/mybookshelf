@@ -78,6 +78,7 @@
     "charts": {
       "status_title": "Status Distribution",
       "genre_title": "Top Genres",
+      "top_read_books": "Most Read Books",
       "all": "All",
       "no_genre": "No genre data yet",
       "books": "Books"
