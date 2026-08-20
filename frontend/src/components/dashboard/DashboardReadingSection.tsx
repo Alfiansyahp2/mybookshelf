@@ -407,16 +407,16 @@ export default function DashboardReadingSection({
                                                 borderRadius: 6,
                                                 overflow: "hidden",
                                                 boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                                                background: b.coverUrl ? "#fff" : `linear-gradient(135deg, ${b.color}aa, ${b.color})`,
+                                                background: b.coverImage ? "#fff" : `linear-gradient(135deg, ${b.color}aa, ${b.color})`,
                                                 position: "relative",
                                                 display: "flex",
                                                 alignItems: "center",
                                                 justifyContent: "center",
                                             }}
                                         >
-                                            {b.coverUrl ? (
+                                            {b.coverImage ? (
                                                 <img
-                                                    src={b.coverUrl}
+                                                    src={b.coverImage}
                                                     alt={b.name}
                                                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                                 />

@@ -187,7 +187,7 @@ export function useDashboardStats(books: any[]) {
                         id: b.id,
                         name: b.title || "Unknown Book",
                         author: b.author || "Unknown Author",
-                        coverUrl: b.coverUrl,
+                        coverImage: b.coverImage,
                         personalRating: b.personalRating,
                         genre: b.genre,
                         value: count,
