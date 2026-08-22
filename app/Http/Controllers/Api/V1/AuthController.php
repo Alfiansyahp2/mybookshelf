@@ -32,11 +32,13 @@ class AuthController extends Controller
         // Regenerate session to prevent session fixation
         $request->session()->regenerate();
 
+        $user = Auth::guard('web')->user();
+
         return response()->success([
             'user' => [
-                'id' => auth()->id(),
-                'name' => auth()->user()->name,
-                'email' => auth()->user()->email,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
             ],
         ], 'Login successful');
     }
@@ -76,12 +78,14 @@ class AuthController extends Controller
      */
     public function me(Request $request)
     {
+        $user = $request->user();
+
         return response()->success([
             'user' => [
-                'id' => auth()->id(),
-                'name' => auth()->user()->name,
-                'email' => auth()->user()->email,
-                'created_at' => auth()->user()->created_at->toIso8601String(),
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'created_at' => $user->created_at->toIso8601String(),
             ],
         ]);
     }
@@ -102,7 +106,7 @@ class AuthController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -134,7 +138,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = auth()->user();
+        $user = $request->user();
 
         if (!Hash::check($request->current_password, $user->password)) {
             throw ValidationException::withMessages([

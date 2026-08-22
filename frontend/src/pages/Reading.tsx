@@ -10,6 +10,7 @@ import type { Book } from "../types";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { BookOpen, TrendingUp, Clock, Target, Plus } from "lucide-react";
+import SEO from "../components/SEO";
 
 export default function Reading() {
     const { t } = useTranslation();
@@ -70,6 +71,7 @@ export default function Reading() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-16">
+            <SEO title={t("navigation.reading", "Reading")} />
                 <div className="text-walnut">
                     {t("reading.loading", "Loading reading progress...")}
                 </div>
@@ -85,6 +87,7 @@ export default function Reading() {
                     "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
             }}
         >
+            <SEO title={t("navigation.reading", "Reading")} description={t("reading.seo_description", "Track your current reading progress and goals.")} />
             {/* Plaster / linen wall texture */}
             <div
                 style={{

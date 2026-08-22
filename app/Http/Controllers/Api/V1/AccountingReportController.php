@@ -101,15 +101,15 @@ class AccountingReportController extends Controller
             // Get this month's expenses vs last month
             $thisMonthExpenses = \App\Models\Expense::forUser($userId)
                 ->completed()
-                ->whereBetween('expense_date', [now()->startOfMonth(), now()->endOfMonth()])
+                ->inPeriod(now()->startOfMonth(), now()->endOfMonth())
                 ->sum('amount_base_currency');
 
             $lastMonthExpenses = \App\Models\Expense::forUser($userId)
                 ->completed()
-                ->whereBetween('expense_date', [
+                ->inPeriod(
                     now()->subMonth()->startOfMonth(),
                     now()->subMonth()->endOfMonth()
-                ])
+                )
                 ->sum('amount_base_currency');
 
             $overview = [

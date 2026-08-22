@@ -418,7 +418,7 @@ class BookController extends Controller
     {
         $book = $this->bookService->getBook($id, $request->user()->id);
 
-        $session = ReadingSession::where('user_id', $request->user()->id)
+        $session = ReadingSession::query()->where('user_id', $request->user()->id)
             ->where('book_id', $book->id)
             ->findOrFail($sessionId);
 
@@ -446,7 +446,7 @@ class BookController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $session = ReadingSession::where('user_id', $request->user()->id)
+        $session = ReadingSession::query()->where('user_id', $request->user()->id)
             ->where('book_id', $book->id)
             ->findOrFail($sessionId);
 
@@ -552,7 +552,7 @@ class BookController extends Controller
             $userId = $request->user()->id;
 
             // Get books with purchase data, ordered by date
-            $books = \App\Models\Book::where('user_id', $userId)
+            $books = \App\Models\Book::query()->where('user_id', $userId)
                 ->whereNotNull('purchase_date')
                 ->whereNotNull('purchase_price')
                 ->orderBy('purchase_date', 'desc')

@@ -1,4 +1,5 @@
 import { useMemo, useEffect } from "react";
+import SEO from "../components/SEO";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useBooks } from "../hooks/useBooks";
@@ -163,6 +164,7 @@ export default function Achievements() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-24">
+            <SEO title={t("navigation.achievements", "Achievements")} />
                 <p style={{ color: BRAND.walnut, fontSize: 13 }}>
                     {t("achievements.loading", "Memuat pencapaian…")}
                 </p>

@@ -16,6 +16,7 @@ import AccountSettings from "../components/settings/AccountSettings";
 import AppPreferences from "../components/settings/AppPreferences";
 import DataManagement from "../components/settings/DataManagement";
 import AboutSettings from "../components/settings/AboutSettings";
+import SEO from "../components/SEO";
 
 export default function Settings() {
     const { t } = useTranslation();
@@ -106,6 +107,7 @@ export default function Settings() {
 
     return (
         <div className="p-4 md:p-8 pt-[88px] md:pt-[100px] max-w-7xl mx-auto">
+            <SEO title={t("navigation.settings", "Settings")} />
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">

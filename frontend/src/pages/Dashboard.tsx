@@ -16,6 +16,7 @@ import DashboardActivitySection from "../components/dashboard/DashboardActivityS
 import DashboardEmptyState from "../components/dashboard/DashboardEmptyState";
 import ReadingCalendarModal from "../components/modals/ReadingCalendarModal";
 import { fadeUp, BRAND } from "../components/dashboard/DashboardWidgets";
+import SEO from "../components/SEO";
 
 /* ══════════════════════════════════════════════
     MAIN DASHBOARD
@@ -66,6 +67,7 @@ export default function Dashboard() {
 
     return (
         <div className="px-4 md:px-5 pt-[88px] md:pt-[100px] pb-10 max-w-[1200px] mx-auto">
+            <SEO title={t("navigation.dashboard", "Dashboard")} />
             {/* ─── Hero header ──────────────────────────── */}
             <DashboardHeroSection bookColors={stats.bookColors} />
 

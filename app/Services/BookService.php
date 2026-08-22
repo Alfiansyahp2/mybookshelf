@@ -449,7 +449,7 @@ class BookService
      */
     public function syncProgressFromSessions($bookId, $userId)
     {
-        $book = Book::where('user_id', $userId)->findOrFail($bookId);
+        $book = Book::query()->where('user_id', $userId)->findOrFail($bookId);
 
         $readingSessionService = app(ReadingSessionService::class);
 

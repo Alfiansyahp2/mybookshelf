@@ -6,6 +6,7 @@ import { useShelves } from "../hooks/useShelves";
 import { useState, useEffect } from "react";
 import type { Book } from "../types";
 import { useTranslation } from "react-i18next";
+import SEO from "../components/SEO";
 
 export default function ExploreLibrary() {
     const { t } = useTranslation();
@@ -64,6 +65,7 @@ export default function ExploreLibrary() {
     if (isLoading) {
         return (
             <div className="p-8">
+            <SEO title={t("navigation.explorelibrary", "ExploreLibrary")} />
                 {t("explore.loading_shelves", "Memuat rak...")}
             </div>
         );

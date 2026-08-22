@@ -8,6 +8,7 @@ import LoginForm from "../components/auth/LoginForm";
 import RegisterForm from "../components/auth/RegisterForm";
 import AuthDecoration from "../components/auth/AuthDecoration";
 import AuthLeftPage from "../components/auth/AuthLeftPage";
+import SEO from "../components/SEO";
 
 export default function Login() {
     const { t } = useTranslation();
@@ -82,6 +83,7 @@ export default function Login() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex flex-col items-center justify-center p-4">
+            <SEO title={t("navigation.login", "Login")} />
             {/* Extracted Decoration & Background */}
             <AuthDecoration isLogin={isLogin} />
 

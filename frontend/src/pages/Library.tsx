@@ -14,6 +14,7 @@ import LightingControl from "../components/shelf/LightingControl";
 import BigDigitalClock from "../components/ui/BigDigitalClock";
 import FlipCalendar from "../components/ui/FlipCalendar";
 import { useTranslation } from "react-i18next";
+import SEO from "../components/SEO";
 
 const FILTER_TABS = [
     { key: "all", labelKey: "library.filters.all" },
@@ -67,6 +68,7 @@ export default function Library() {
     if (isLoading || shelvesLoading) {
         return (
             <div className="flex items-center justify-center py-20">
+            <SEO title={t("navigation.library", "Library")} />
                 <div className="flex flex-col items-center gap-3">
                     <div className="w-8 h-8 border-3 border-walnut/30 border-t-walnut rounded-full animate-spin" />
                     <p className="text-sm text-walnut/60">
@@ -119,6 +121,7 @@ export default function Library() {
                     "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
             }}
         >
+            <SEO title={t("navigation.library", "Library")} description={t("library.seo_description", "Browse and manage your personal book library.")} />
             {/* Plaster / linen wall texture */}
             <div
                 style={{

@@ -19,6 +19,7 @@ import {
     Plus,
 } from "lucide-react";
 import BookmarkHeart from "../components/icons/BookmarkHeart";
+import SEO from "../components/SEO";
 
 export default function Wishlist() {
     const { t } = useTranslation();
@@ -92,6 +93,7 @@ export default function Wishlist() {
     if (isLoading || shelvesLoading) {
         return (
             <div className="flex items-center justify-center py-16">
+            <SEO title={t("navigation.wishlist", "Wishlist")} />
                 <div className="text-walnut">
                     {t("wishlist.loading", "Loading wishlist...")}
                 </div>
@@ -107,6 +109,7 @@ export default function Wishlist() {
                     "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
             }}
         >
+            <SEO title={t("navigation.wishlist", "Wishlist")} description={t("wishlist.seo_description", "Manage your book wishlist and track what you want to read next.")} />
             {/* Plaster / linen wall texture */}
             <div
                 style={{

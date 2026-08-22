@@ -19,6 +19,7 @@ import ExpenseList from "../components/accounting/ExpenseList";
 import ExpenseModal from "../components/accounting/ExpenseModal";
 import BudgetTracker from "../components/accounting/BudgetTracker";
 import CategoryManager from "../components/accounting/CategoryManager";
+import SEO from "../components/SEO";
 
 export default function Accounting() {
     const { t } = useTranslation();
@@ -66,6 +67,7 @@ export default function Accounting() {
                 margin: "0 auto",
             }}
         >
+            <SEO title={t("navigation.accounting", "Accounting")} />
             {/* Header */}
             <div
                 style={{
