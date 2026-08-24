@@ -26,6 +26,7 @@ export default function AccountingDashboard({
 }: AccountingDashboardProps) {
     const { t } = useTranslation();
     const { data: overview, isLoading } = useAccountingOverview({ period });
+    const { data: monthOverview } = useAccountingOverview({ period: "month" });
 
     if (isLoading) {
         return (
@@ -50,7 +51,7 @@ export default function AccountingDashboard({
     const summary = overview?.data?.summary;
     const budgetData = overview?.data?.budget;
     const categoriesData = overview?.data?.expenses_by_category || [];
-    const recentExpenses = overview?.data?.recent_expenses || [];
+    const recentExpenses = monthOverview?.data?.recent_expenses || overview?.data?.recent_expenses || [];
 
     return (
         <div className="space-y-6">
@@ -140,6 +141,7 @@ export default function AccountingDashboard({
                             color: "#4A3B2F",
                             lineHeight: 1,
                             marginBottom: 3,
+                            wordBreak: "break-all",
                         }}
                     >
                         {summary?.formatted_total || "Rp 0"}
@@ -206,6 +208,7 @@ export default function AccountingDashboard({
                             color: "#4A3B2F",
                             lineHeight: 1,
                             marginBottom: 3,
+                            wordBreak: "break-all",
                         }}
                     >
                         {summary?.pending_expenses || 0}
@@ -286,6 +289,7 @@ export default function AccountingDashboard({
                                     : "#ef4444",
                             lineHeight: 1,
                             marginBottom: 3,
+                            wordBreak: "break-all",
                         }}
                     >
                         {(summary?.month_over_month_change || 0) >= 0
@@ -353,6 +357,7 @@ export default function AccountingDashboard({
                             color: "#4A3B2F",
                             lineHeight: 1,
                             marginBottom: 3,
+                            wordBreak: "break-all",
                         }}
                     >
                         {budgetData?.healthy_count || 0}/

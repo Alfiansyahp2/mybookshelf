@@ -162,7 +162,7 @@ export default function Accounting() {
                 </div>
 
                 <div className="p-6">
-                    {activeTab === "overview" && <AccountingDashboard />}
+                    {activeTab === "overview" && <AccountingDashboard period="all" />}
                     {activeTab === "expenses" && (
                         <ExpenseList 
                             onEditExpense={(expense) => {

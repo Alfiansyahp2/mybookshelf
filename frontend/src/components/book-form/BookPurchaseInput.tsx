@@ -146,7 +146,7 @@ export default function BookPurchaseInput({
                                         purchasePrice: rawValue,
                                     })
                                 }}
-                                className="w-full pl-16 pr-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm"
+                                className="w-full pl-16 pr-4 py-2.5 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50 text-sm text-walnut"
                                 placeholder="0"
                             />
                         </div>
