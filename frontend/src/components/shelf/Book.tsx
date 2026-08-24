@@ -140,6 +140,7 @@ export default function RealisticBook({
                 height: bookAreaHeight,
                 display: "flex",
                 alignItems: "flex-end",
+                zIndex: hovered || clicked ? 100 : 1,
             }}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
