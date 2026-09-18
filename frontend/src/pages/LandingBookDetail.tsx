@@ -359,7 +359,7 @@ export default function LandingBookDetail() {
                                         initial={{ opacity: 0, y: 12 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.15, duration: 0.3 }}
-                                        className="mt-2 sm:mt-5 text-xs sm:text-base text-[#4a3b2f]/90 leading-snug sm:leading-relaxed font-sans max-w-2xl line-clamp-3 sm:line-clamp-none"
+                                        className="mt-2 sm:mt-5 text-xs sm:text-base text-[#4a3b2f]/90 leading-relaxed font-sans max-w-2xl"
                                     >
                                         <p>{currentBook.synopsis}</p>
                                     </motion.div>
