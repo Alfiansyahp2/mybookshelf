@@ -114,10 +114,12 @@ export function usePauseReadingSession() {
  * Hook to get reading sessions for a book
  */
 export function useBookReadingSessions(bookId: string) {
+    const isDemoBook = !bookId || bookId.startsWith("b");
+    const isAuthenticated = !!localStorage.getItem("user");
     return useQuery({
         queryKey: ["reading-sessions", bookId],
         queryFn: () => readingSessionsApi.getBookSessions(bookId),
-        enabled: !!bookId,
+        enabled: !!bookId && !isDemoBook && isAuthenticated,
     });
 }
 

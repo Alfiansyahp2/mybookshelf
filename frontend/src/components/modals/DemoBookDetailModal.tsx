@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Edit, Clock, Hash } from "lucide-react";
+import { BookOpen, Edit, Clock, Hash, X } from "lucide-react";
 import type { Book } from "../../types";
 import BookDetailLeftPage from "../book-details/BookDetailLeftPage";
 import BookDetailRightPage from "../book-details/BookDetailRightPage";
@@ -74,6 +74,7 @@ export default function DemoBookDetailModal({
     const [markAsReadDate, setMarkAsReadDate] = useState(
         new Date().toISOString().split("T")[0]
     );
+    const [mobilePage, setMobilePage] = useState<"left" | "right">("left");
 
     useEffect(() => {
         if (initialBook) {
@@ -128,10 +129,10 @@ export default function DemoBookDetailModal({
         setBook((prev) =>
             prev
                 ? {
-                      ...prev,
-                      currentPage: p,
-                      progress: Math.round((p / (prev.pages || 1)) * 100),
-                  }
+                    ...prev,
+                    currentPage: p,
+                    progress: Math.round((p / (prev.pages || 1)) * 100),
+                }
                 : null
         );
     };
@@ -146,10 +147,10 @@ export default function DemoBookDetailModal({
         setBook((prev) =>
             prev
                 ? {
-                      ...prev,
-                      status: "reading",
-                      startedDate: new Date().toISOString().split("T")[0],
-                  }
+                    ...prev,
+                    status: "reading",
+                    startedDate: new Date().toISOString().split("T")[0],
+                }
                 : null
         );
     };
@@ -158,12 +159,12 @@ export default function DemoBookDetailModal({
         setBook((prev) =>
             prev
                 ? {
-                      ...prev,
-                      status: "finished",
-                      progress: 100,
-                      currentPage: prev.pages,
-                      finishedDate: new Date().toISOString().split("T")[0],
-                  }
+                    ...prev,
+                    status: "finished",
+                    progress: 100,
+                    currentPage: prev.pages,
+                    finishedDate: new Date().toISOString().split("T")[0],
+                }
                 : null
         );
     };
@@ -195,9 +196,15 @@ export default function DemoBookDetailModal({
         });
     };
 
+    // Automatically switch to right page if user selects a right-page tab
+    const handleMobileSetActiveTab = (tab: RightTab) => {
+        setActiveTab(tab);
+        setMobilePage("right");
+    };
+
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 lg:p-8">
                 {/* Backdrop */}
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -209,64 +216,178 @@ export default function DemoBookDetailModal({
 
                 {/* 2-Page Open Book Reader Modal Container */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.94, y: 12 }}
+                    initial={{ opacity: 0, scale: 0.92, y: 12 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.94, y: 12 }}
+                    exit={{ opacity: 0, scale: 0.92, y: 12 }}
                     transition={{ type: "spring", damping: 25, stiffness: 280 }}
-                    className="relative w-full max-w-5xl h-[90vh] max-h-[640px] bg-[#f5ecd7] rounded-2xl shadow-2xl z-10 overflow-hidden flex flex-col md:flex-row border border-[#8b643c]/20"
+                    className="relative w-full max-w-[94vw] sm:max-w-xl md:max-w-5xl h-[88vh] sm:h-[88vh] md:h-[90vh] max-h-[600px] sm:max-h-[620px] md:max-h-[640px] bg-[#f5ecd7] rounded-2xl shadow-2xl z-10 overflow-hidden flex flex-col border-2 border-[#8b643c]/30"
                     style={{ perspective: 1200 }}
                 >
-                    <BookDetailLeftPage
-                        book={book}
-                        c0={c0}
-                        c1={c1}
-                        c2={c2}
-                        cfg={cfg}
-                        progress={progress}
-                        userRating={userRating}
-                        handleRating={handleRating}
-                        handleFav={handleFav}
-                        handleStart={handleStart}
-                        handleFinish={handleFinish}
-                        toggleFavoritePending={false}
-                        startReadingPending={false}
-                        finishReadingPending={false}
-                        updateBookPending={false}
-                        setActiveTab={setActiveTab}
-                        setShowMarkAsReadDatePicker={setShowMarkAsReadDatePicker}
-                        updateBookMutate={() => {}}
-                    />
+                    {/* Mobile 2-Page Switcher Bar */}
+                    <div className="md:hidden flex items-center justify-between px-3 py-2 bg-[#4a3b2f] text-[#f8f5f0] border-b border-[#7a5c42]/30 shrink-0 z-40">
+                        <div className="flex items-center gap-1.5">
+                            <button
+                                onClick={() => setMobilePage("left")}
+                                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${mobilePage === "left"
+                                    ? "bg-[#d4a574] text-[#2c1a0e] shadow-sm"
+                                    : "text-[#f8f5f0]/70 hover:text-white"
+                                    }`}
+                            >
+                                <span>Cover</span>
+                            </button>
+                            <button
+                                onClick={() => setMobilePage("right")}
+                                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${mobilePage === "right"
+                                    ? "bg-[#d4a574] text-[#2c1a0e] shadow-sm"
+                                    : "text-[#f8f5f0]/70 hover:text-white"
+                                    }`}
+                            >
+                                <span>Progress</span>
+                            </button>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-1 rounded-full hover:bg-white/10 text-white"
+                            aria-label="Tutup"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
 
-                    <BookDetailRightPage
-                        book={book}
-                        c0={c0}
-                        c1={c1}
-                        c2={c2}
-                        tabs={tabs}
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                        tabIdx={tabIdx}
-                        onClose={onClose}
-                        showMarkAsReadDatePicker={showMarkAsReadDatePicker}
-                        setShowMarkAsReadDatePicker={setShowMarkAsReadDatePicker}
-                        markAsReadDate={markAsReadDate}
-                        setMarkAsReadDate={setMarkAsReadDate}
-                        handleStart={handleStart}
-                        handleMarkAsReadNow={handleMarkAsReadNow}
-                        handleProgress={handleProgress}
-                        handleAddReadDate={handleAddReadDate}
-                        handleRemoveReadDate={handleRemoveReadDate}
-                        userNotes={userNotes}
-                        tempNotes={tempNotes}
-                        isEditingNotes={isEditingNotes}
-                        setTempNotes={setTempNotes}
-                        setIsEditingNotes={setIsEditingNotes}
-                        handleNotes={handleNotes}
-                        startReadingPending={false}
-                        updateBookPending={false}
-                        updateNotes={{ isPending: false }}
-                        updateProgress={{ isPending: false }}
-                    />
+                    {/* Book Spine / Center Fold Shadow (Desktop & Mobile) */}
+                    <div className="hidden md:block absolute top-0 bottom-0 left-[42%] -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-30" />
+
+                    {/* Desktop Side-by-Side 2-Page Spread */}
+                    <div className="hidden md:flex w-full h-full flex-row overflow-hidden">
+                        <BookDetailLeftPage
+                            book={book}
+                            c0={c0}
+                            c1={c1}
+                            c2={c2}
+                            cfg={cfg}
+                            progress={progress}
+                            userRating={userRating}
+                            handleRating={handleRating}
+                            handleFav={handleFav}
+                            handleStart={handleStart}
+                            handleFinish={handleFinish}
+                            toggleFavoritePending={false}
+                            startReadingPending={false}
+                            finishReadingPending={false}
+                            updateBookPending={false}
+                            setActiveTab={handleMobileSetActiveTab}
+                            setShowMarkAsReadDatePicker={setShowMarkAsReadDatePicker}
+                            updateBookMutate={() => { }}
+                        />
+
+                        <BookDetailRightPage
+                            book={book}
+                            c0={c0}
+                            c1={c1}
+                            c2={c2}
+                            tabs={tabs}
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            tabIdx={tabIdx}
+                            onClose={onClose}
+                            showMarkAsReadDatePicker={showMarkAsReadDatePicker}
+                            setShowMarkAsReadDatePicker={setShowMarkAsReadDatePicker}
+                            markAsReadDate={markAsReadDate}
+                            setMarkAsReadDate={setMarkAsReadDate}
+                            handleStart={handleStart}
+                            handleMarkAsReadNow={handleMarkAsReadNow}
+                            handleProgress={handleProgress}
+                            handleAddReadDate={handleAddReadDate}
+                            handleRemoveReadDate={handleRemoveReadDate}
+                            userNotes={userNotes}
+                            tempNotes={tempNotes}
+                            isEditingNotes={isEditingNotes}
+                            setTempNotes={setTempNotes}
+                            setIsEditingNotes={setIsEditingNotes}
+                            handleNotes={handleNotes}
+                            startReadingPending={false}
+                            updateBookPending={false}
+                            updateNotes={{ isPending: false }}
+                            updateProgress={{ isPending: false }}
+                        />
+                    </div>
+
+                    {/* Mobile Page View (Flippable Page 1 vs Page 2) */}
+                    <div className="flex md:hidden w-full h-full flex-col overflow-hidden relative">
+                        <AnimatePresence mode="wait">
+                            {mobilePage === "left" ? (
+                                <motion.div
+                                    key="mobile-left"
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="w-full h-full flex flex-col overflow-hidden"
+                                >
+                                    <BookDetailLeftPage
+                                        book={book}
+                                        c0={c0}
+                                        c1={c1}
+                                        c2={c2}
+                                        cfg={cfg}
+                                        progress={progress}
+                                        userRating={userRating}
+                                        handleRating={handleRating}
+                                        handleFav={handleFav}
+                                        handleStart={handleStart}
+                                        handleFinish={handleFinish}
+                                        toggleFavoritePending={false}
+                                        startReadingPending={false}
+                                        finishReadingPending={false}
+                                        updateBookPending={false}
+                                        setActiveTab={handleMobileSetActiveTab}
+                                        setShowMarkAsReadDatePicker={setShowMarkAsReadDatePicker}
+                                        updateBookMutate={() => { }}
+                                    />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="mobile-right"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="w-full h-full flex flex-col overflow-hidden"
+                                >
+                                    <BookDetailRightPage
+                                        book={book}
+                                        c0={c0}
+                                        c1={c1}
+                                        c2={c2}
+                                        tabs={tabs}
+                                        activeTab={activeTab}
+                                        setActiveTab={setActiveTab}
+                                        tabIdx={tabIdx}
+                                        onClose={onClose}
+                                        showMarkAsReadDatePicker={showMarkAsReadDatePicker}
+                                        setShowMarkAsReadDatePicker={setShowMarkAsReadDatePicker}
+                                        markAsReadDate={markAsReadDate}
+                                        setMarkAsReadDate={setMarkAsReadDate}
+                                        handleStart={handleStart}
+                                        handleMarkAsReadNow={handleMarkAsReadNow}
+                                        handleProgress={handleProgress}
+                                        handleAddReadDate={handleAddReadDate}
+                                        handleRemoveReadDate={handleRemoveReadDate}
+                                        userNotes={userNotes}
+                                        tempNotes={tempNotes}
+                                        isEditingNotes={isEditingNotes}
+                                        setTempNotes={setTempNotes}
+                                        setIsEditingNotes={setIsEditingNotes}
+                                        handleNotes={handleNotes}
+                                        startReadingPending={false}
+                                        updateBookPending={false}
+                                        updateNotes={{ isPending: false }}
+                                        updateProgress={{ isPending: false }}
+                                    />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </motion.div>
             </div>
         </AnimatePresence>

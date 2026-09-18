@@ -78,17 +78,17 @@ export default function BookDetailLeftPage({
 
             {/* ── scrollable content ─────────────────────── */}
             <div
-                className="flex-1 overflow-y-auto flex flex-col"
+                className="flex-1 overflow-y-auto hide-scrollbar flex flex-col"
                 style={{ fontFamily: "'Georgia', serif" }}
             >
                 {/* ── Cover + Info side-by-side ──────────────── */}
-                <div className="flex items-start gap-4 px-6 pt-6 pb-4">
+                <div className="flex items-start gap-3 sm:gap-4 px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
                     <BookCoverSection book={book} c0={c0} c1={c1} c2={c2} />
                     <BookMetadataSection book={book} c1={c1} cfg={cfg} />
                 </div>
 
                 {/* divider */}
-                <div className="flex items-center gap-2 px-6">
+                <div className="flex items-center gap-2 px-4 sm:px-6">
                     <div
                         className="flex-1 h-px"
                         style={{ background: `${c1}30` }}
@@ -101,7 +101,7 @@ export default function BookDetailLeftPage({
                 </div>
 
                 {/* stats 2×2 grid + rest of content */}
-                <div className="px-6 pb-5 flex flex-col gap-3 flex-1">
+                <div className="px-4 sm:px-6 pb-4 sm:pb-5 flex flex-col gap-2.5 sm:gap-3 flex-1">
                     <BookStatsSection book={book} c0={c0} />
                     
                     <BookProgressLeft 

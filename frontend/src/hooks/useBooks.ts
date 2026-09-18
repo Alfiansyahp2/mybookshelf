@@ -11,9 +11,11 @@ export function useBooks(filters?: {
     favorite?: boolean;
     search?: string;
 }) {
+    const isAuthenticated = !!localStorage.getItem("user");
     return useQuery({
         queryKey: ["books", filters],
         queryFn: () => booksApi.getBooks(filters),
+        enabled: isAuthenticated,
     });
 }
 
@@ -21,10 +23,12 @@ export function useBooks(filters?: {
  * Hook to fetch a single book
  */
 export function useBook(id: string) {
+    const isDemoBook = !id || id.startsWith("b");
+    const isAuthenticated = !!localStorage.getItem("user");
     return useQuery({
         queryKey: ["books", id],
         queryFn: () => booksApi.getBook(id),
-        enabled: !!id,
+        enabled: !!id && !isDemoBook && isAuthenticated,
         select: (response) => response.data, // Extract the actual book data from API response
     });
 }

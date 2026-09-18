@@ -270,6 +270,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
     const navigate = useNavigate();
     const [books] = useState<EditorialBook[]>(DEMO_EDITORIAL_BOOKS);
     const [hoveredBookId, setHoveredBookId] = useState<string | null>(null);
+    const [activeMobileIndex, setActiveMobileIndex] = useState<number>(0);
     const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
@@ -300,10 +301,61 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
         navigate(`/landing/book/${id}`);
     };
 
+    const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
+
+    const handleMobileTouchStart = (e: React.TouchEvent) => {
+        setTouchStartPos({
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        });
+    };
+
+    const handleMobileTouchEnd = (e: React.TouchEvent) => {
+        if (!touchStartPos) return;
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+
+        const diffX = touchStartPos.x - endX;
+        const diffY = touchStartPos.y - endY;
+
+        if (Math.abs(diffX) > 18 || Math.abs(diffY) > 18) {
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) {
+                    setActiveMobileIndex((prev) => (prev + 1) % books.length);
+                } else {
+                    setActiveMobileIndex((prev) => (prev - 1 + books.length) % books.length);
+                }
+            } else {
+                if (diffY > 0) {
+                    setActiveMobileIndex((prev) => (prev + 1) % books.length);
+                } else {
+                    setActiveMobileIndex((prev) => (prev - 1 + books.length) % books.length);
+                }
+            }
+        }
+        setTouchStartPos(null);
+    };
+
+    const [lastWheelTime, setLastWheelTime] = useState(0);
+
+    const handleMobileWheel = (e: React.WheelEvent) => {
+        const now = Date.now();
+        if (now - lastWheelTime < 280) return;
+
+        if (Math.abs(e.deltaY) > 10 || Math.abs(e.deltaX) > 10) {
+            setLastWheelTime(now);
+            if (e.deltaY > 0 || e.deltaX > 0) {
+                setActiveMobileIndex((prev) => (prev + 1) % books.length);
+            } else {
+                setActiveMobileIndex((prev) => (prev - 1 + books.length) % books.length);
+            }
+        }
+    };
+
     return (
         <div className="w-full text-[#4a3b2f] font-sans">
-            {/* MINIMALIST STANDING SPINES SHOWCASE WITH HOVER TOOLTIP */}
-            <div className="relative py-6 px-2 sm:px-4 flex flex-wrap items-end justify-center gap-2 sm:gap-4 min-h-[360px] max-h-[385px]">
+            {/* ── DESKTOP & TABLET STANDING SPINES SHOWCASE ── */}
+            <div className="hidden md:flex relative py-6 px-4 flex-wrap items-end justify-center gap-4 min-h-[360px] max-h-[390px]">
                 {books.map((book) => {
                     const isStatusMatch = statusFilter === "All" || book.status === statusFilter;
                     const isLangMatch = langFilter === "Semua" || book.language === langFilter;
@@ -325,7 +377,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                 whileHover={{ y: -16, scale: 1.05 }}
                                 whileTap={{ scale: 0.96 }}
                                 onClick={() => handleSelectBook(book.id)}
-                                className={`cursor-pointer group relative w-10 sm:w-12 ${book.spineBg} ${book.textColor} rounded-sm shadow-xl transition-all duration-300 flex flex-col justify-between p-2 select-none border-t border-l border-white/80 overflow-hidden ${isMatch
+                                className={`cursor-pointer group relative w-12 ${book.spineBg} ${book.textColor} rounded-sm shadow-xl transition-all duration-300 flex flex-col justify-between p-2 select-none border-t border-l border-white/80 overflow-hidden ${isMatch
                                         ? "opacity-100 hover:shadow-[#7a5c42]/30 hover:ring-2 hover:ring-[#4a3b2f]"
                                         : "opacity-25 grayscale-[60%] blur-[0.4px] scale-95 pointer-events-none"
                                     }`}
@@ -338,7 +390,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                 {/* Vertical Title Text */}
                                 <div className="my-auto py-1 px-0.5 text-center flex items-center justify-center overflow-hidden flex-1">
                                     <span
-                                        className="font-serif font-bold text-[10px] sm:text-xs tracking-wider uppercase leading-none overflow-hidden max-h-full"
+                                        className="font-serif font-bold text-xs tracking-wider uppercase leading-none overflow-hidden max-h-full"
                                         style={{
                                             writingMode: "vertical-rl",
                                             transform: "rotate(180deg)",
@@ -367,7 +419,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                 </div>
                             </motion.div>
 
-                            {/* ── EXACT TOOLTIP POPUP FROM APP (PERSIS SCREENSHOT) ── */}
+                            {/* ── HOVER TOOLTIP POPUP (DESKTOP ONLY) ── */}
                             <AnimatePresence>
                                 {isHovered && (
                                     <motion.div
@@ -375,7 +427,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 8, scale: 0.94 }}
                                         transition={{ duration: 0.16, ease: "easeOut" }}
-                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-[9999] pointer-events-none w-56 sm:w-64 shadow-2xl rounded-2xl overflow-hidden border border-[#7a5c42]/20"
+                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-[9999] pointer-events-none w-64 shadow-2xl rounded-2xl overflow-hidden border border-[#7a5c42]/20"
                                         style={{
                                             background: "rgba(253, 249, 243, 0.98)",
                                             backdropFilter: "blur(16px)",
@@ -390,7 +442,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                             }}
                                         />
 
-                                        <div className="p-3.5 sm:p-4">
+                                        <div className="p-4">
                                             {/* Mini Cover + Title & Author Header */}
                                             <div className="flex items-start gap-3 mb-3">
                                                 <div className="w-10 h-14 rounded shadow-md overflow-hidden shrink-0 border border-black/15 bg-[#e8deca] relative">
@@ -410,7 +462,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                                 </div>
 
                                                 <div className="flex-1 min-w-0 pt-0.5">
-                                                    <h5 className="font-serif font-bold text-xs sm:text-sm text-[#1c0f05] leading-snug line-clamp-2">
+                                                    <h5 className="font-serif font-bold text-sm text-[#1c0f05] leading-snug line-clamp-2">
                                                         {book.title}
                                                     </h5>
                                                     <p className="text-[11px] font-serif italic text-[#7c5a3a] mt-0.5 truncate">
@@ -461,6 +513,125 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
 
                 {/* Bottom Baseline Floor Line */}
                 <div className="absolute bottom-1 left-2 right-2 h-[2px] bg-[#7a5c42]/30 rounded-full" />
+            </div>
+
+            {/* ── MOBILE STACKED HORIZONTAL SPINES SHOWCASE (TOUCH & WHEEL SCROLLABLE) ── */}
+            <div
+                onTouchStart={handleMobileTouchStart}
+                onTouchEnd={handleMobileTouchEnd}
+                onWheel={handleMobileWheel}
+                className="flex md:hidden flex-col items-center justify-between w-full py-2 sm:py-4 min-h-[350px] select-none relative touch-pan-y"
+            >
+                {/* Horizontal Tilted Spine Stack */}
+                <div className="w-full flex flex-col items-center justify-center space-y-3 my-auto px-1 sm:px-2">
+                    {[-1, 0, 1].map((offset) => {
+                        const idx = (activeMobileIndex + offset + books.length) % books.length;
+                        const book = books[idx];
+                        const isActive = offset === 0;
+
+                        return (
+                            <motion.div
+                                key={`slot-${offset}`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (isActive) {
+                                        handleSelectBook(book.id);
+                                    } else {
+                                        setActiveMobileIndex(idx);
+                                    }
+                                }}
+                                animate={{
+                                    opacity: isActive ? 1 : 0.5,
+                                    scale: isActive ? 1 : 0.92,
+                                    filter: isActive ? "blur(0px)" : "blur(0.5px)"
+                                }}
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 240,
+                                    damping: 24,
+                                    mass: 0.8
+                                }}
+                                className={`w-full max-w-[360px] rounded-2xl transition-colors duration-300 cursor-pointer flex items-center justify-between shadow-lg relative ${
+                                    isActive
+                                        ? "p-3 sm:p-3.5 bg-gradient-to-r from-[#fdfbf7] via-[#faf4e8] to-[#f5ecd7] text-[#4a3b2f] border-l-4 border-[#7a5c42] shadow-2xl z-20 ring-1 ring-[#7a5c42]/25"
+                                        : "px-4 py-2.5 bg-[#f5ecd7]/80 text-[#7a5c42]/90 z-10 border border-[#7a5c42]/10"
+                                }`}
+                                style={{
+                                    transform: `rotate(${offset === 0 ? -1.5 : offset * 2}deg)`
+                                }}
+                            >
+                                <AnimatePresence mode="popLayout" initial={false}>
+                                    <motion.div
+                                        key={book.id}
+                                        initial={{ opacity: 0, y: offset > 0 ? 8 : -8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: offset > 0 ? -8 : 8 }}
+                                        transition={{ duration: 0.22, ease: "easeOut" }}
+                                        className="flex items-center gap-3 min-w-0 flex-1 w-full"
+                                    >
+                                        {/* Mini Cover Thumbnail */}
+                                        <div className={`${isActive ? "w-11 h-15" : "w-8 h-11"} rounded-md shadow-md overflow-hidden shrink-0 border border-black/15 bg-[#e8deca] relative transition-all duration-300`}>
+                                            {book.coverImage && !imgErrors[book.id] ? (
+                                                <img
+                                                    src={book.coverImage}
+                                                    alt={book.title}
+                                                    onError={() => setImgErrors((prev) => ({ ...prev, [book.id]: true }))}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className={`w-full h-full bg-gradient-to-tr ${book.coverGradient} p-1 flex flex-col justify-between text-white text-[7px]`}>
+                                                    <span className="font-serif font-bold line-clamp-2 leading-tight">{book.title}</span>
+                                                    <span className="text-[6px] opacity-75 truncate">{book.author}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Book Metadata */}
+                                        <div className="flex flex-col min-w-0 flex-1">
+                                            <span className="text-[9.5px] font-bold uppercase tracking-wider text-[#7a5c42]/80 truncate">
+                                                {book.author}
+                                            </span>
+                                            <h4 className={`font-serif font-bold text-[#2a1a08] leading-snug truncate ${isActive ? "text-sm sm:text-base" : "text-xs"}`}>
+                                                {book.title}
+                                            </h4>
+                                        </div>
+                                    </motion.div>
+                                </AnimatePresence>
+                            </motion.div>
+                        );
+                    })}
+                </div>
+
+                {/* Bottom Horizontal Pill Dash Scroll Indicator */}
+                <div className="flex items-center justify-center gap-[2.5px] pt-3 pb-1 z-30">
+                    {books.map((b, idx) => {
+                        const isActive = idx === activeMobileIndex;
+                        return (
+                            <button
+                                key={`dash-${b.id}`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveMobileIndex(idx);
+                                }}
+                                className="p-0 focus:outline-none flex items-center justify-center min-h-[20px] transition-transform active:scale-90 cursor-pointer"
+                                aria-label={`Scroll to item ${idx + 1}`}
+                                title={`${idx + 1}. ${b.title}`}
+                            >
+                                <motion.div
+                                    initial={false}
+                                    animate={{
+                                        height: isActive ? 16 : 10,
+                                        width: isActive ? 4 : 3,
+                                        backgroundColor: isActive ? "#7a5c42" : "rgba(122, 92, 66, 0.25)",
+                                        boxShadow: isActive ? "0px 2px 6px rgba(122, 92, 66, 0.35)" : "none"
+                                    }}
+                                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                                    className="rounded-full"
+                                />
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
