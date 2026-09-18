@@ -10,7 +10,7 @@ export default function AuthLeftPage({ isLogin }: AuthLeftPageProps) {
     const { t } = useTranslation();
     return (
         <div
-            className="w-1/2 bg-gradient-to-br from-[#fdfbf7] to-[#f4f1ea] border-r border-walnut/20 p-10 flex flex-col justify-center relative overflow-hidden"
+            className="hidden md:flex w-1/2 bg-gradient-to-br from-[#fdfbf7] to-[#f4f1ea] border-r border-walnut/20 p-10 flex-col justify-center relative overflow-hidden"
             style={{
                 boxShadow: "inset -20px 0 30px -20px rgba(0,0,0,0.15)",
             }}

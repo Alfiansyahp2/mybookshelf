@@ -63,11 +63,7 @@ export default function BookActionsSection({
                     <button
                         onClick={handleStart}
                         disabled={startReadingPending}
-                        className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                        style={{
-                            background: `linear-gradient(135deg, ${c0}, ${c2})`,
-                            color: "white",
-                        }}
+                        className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 bg-walnut text-white"
                         title={t(
                             "bookDetail.actions.start_reading",
                             "Mulai Membaca",
@@ -131,11 +127,7 @@ export default function BookActionsSection({
                         })
                     }
                     disabled={updateBookPending}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
-                    style={{
-                        background: `linear-gradient(135deg, ${c0}, ${c2})`,
-                        color: "white",
-                    }}
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 bg-walnut text-white"
                 >
                     <Play className="w-3.5 h-3.5" />
                     {t("bookDetail.actions.reread", "Baca Ulang")}

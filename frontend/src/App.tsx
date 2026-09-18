@@ -4,6 +4,8 @@ import AppLayout from "./components/layout/AppLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import CatchAll from "./components/layout/CatchAll";
 import ToastContainer from "./components/ui/ToastContainer";
+import LandingPage from "./pages/LandingPage";
+import LandingBookDetail from "./pages/LandingBookDetail";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
@@ -24,9 +26,13 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     {/* Public Routes */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/landing" element={<LandingPage />} />
+                    <Route path="/landing/book/:id" element={<LandingBookDetail />} />
+                    <Route path="/book/:id" element={<LandingBookDetail />} />
                     <Route path="/login" element={<Login />} />
 
-                    {/* Protected Routes */}
+                    {/* App / Protected Routes */}
                     <Route
                         path="/"
                         element={
@@ -35,7 +41,7 @@ function App() {
                             </ProtectedRoute>
                         }
                     >
-                        <Route index element={<Dashboard />} />
+                        <Route path="dashboard" element={<Dashboard />} />
                         <Route path="library" element={<Library />} />
                         <Route path="explore" element={<ExploreLibrary />} />
                         <Route path="reading" element={<Reading />} />

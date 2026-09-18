@@ -106,7 +106,7 @@ export default function AppHeader({
                             </motion.div>
                         </motion.div>
                         <h1 className="text-base md:text-xl font-serif font-semibold text-darkBrown hidden sm:block transition-colors duration-300">
-                            MyBookshelf
+                            A?Bookshelf
                         </h1>
                     </Link>
 

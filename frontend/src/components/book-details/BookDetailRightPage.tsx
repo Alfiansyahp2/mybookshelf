@@ -110,12 +110,7 @@ export default function BookDetailRightPage({
             }}
         >
             {/* top accent strip */}
-            <div
-                className="flex-shrink-0 h-2"
-                style={{
-                    background: `linear-gradient(to right, ${c0}, ${c2})`,
-                }}
-            />
+            <div className="flex-shrink-0 h-2 bg-walnut" />
 
             {/* ── Tab bar ─────────────────────────────────── */}
             <div
@@ -245,10 +240,7 @@ export default function BookDetailRightPage({
                                                     disabled={
                                                         startReadingPending
                                                     }
-                                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
-                                                    style={{
-                                                        background: `linear-gradient(135deg, ${c0}, ${c2})`,
-                                                    }}
+                                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 bg-walnut"
                                                 >
                                                     {t(
                                                         "bookDetail.actions.start_reading",
@@ -317,10 +309,7 @@ export default function BookDetailRightPage({
                                                         disabled={
                                                             updateBookPending
                                                         }
-                                                        className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50"
-                                                        style={{
-                                                            background: `linear-gradient(135deg, ${c0}, ${c2})`,
-                                                        }}
+                                                        className="flex-1 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 bg-walnut"
                                                     >
                                                         {t(
                                                             "bookDetail.actions.save",

@@ -48,10 +48,9 @@ export default function ReadingProgressSection({
                 </div>
                 <div className="h-2 bg-walnut/20 rounded-full overflow-hidden">
                     <div
-                        className="h-full rounded-full transition-all duration-500"
+                        className="h-full rounded-full transition-all duration-500 bg-walnut"
                         style={{
                             width: `${progress}%`,
-                            background: `linear-gradient(90deg, ${spineColor0}, ${spineColor2})`,
                         }}
                     />
                 </div>

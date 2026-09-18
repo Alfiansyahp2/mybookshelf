@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLogin, useRegister, useAuthUser } from "../hooks/useAuth";
 import { useNotifications } from "../hooks/useNotifications";
+import { BookOpen } from "lucide-react";
 import LoginForm from "../components/auth/LoginForm";
 import RegisterForm from "../components/auth/RegisterForm";
 import AuthDecoration from "../components/auth/AuthDecoration";
@@ -22,7 +23,7 @@ export default function Login() {
     useEffect(() => {
         const userData = localStorage.getItem("user");
         if (userData && user) {
-            navigate("/", { replace: true });
+            navigate("/dashboard", { replace: true });
         }
     }, [user, navigate]);
 
@@ -50,7 +51,7 @@ export default function Login() {
         authFn.mutate(credentials as any, {
             onSuccess: () => {
                 setTimeout(() => {
-                    navigate("/", { replace: true });
+                    navigate("/dashboard", { replace: true });
                 }, 100);
             },
             onError: (error: any) => {
@@ -94,12 +95,12 @@ export default function Login() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: -20 }}
                     transition={{ duration: 0.6, type: "spring", damping: 20 }}
-                    className="w-full max-w-4xl h-[600px] relative z-10 mx-auto"
+                    className="w-full max-w-sm sm:max-w-md md:max-w-4xl min-h-[500px] md:h-[600px] relative z-10 mx-auto my-auto"
                     style={{ perspective: "2000px" }}
                 >
                     {/* Hardcover Backing */}
                     <div
-                        className="absolute inset-[-12px] bg-[#5C4532] rounded-xl shadow-2xl"
+                        className="absolute inset-[-6px] sm:inset-[-12px] bg-[#5C4532] rounded-xl shadow-2xl"
                         style={{
                             boxShadow:
                                 "0 30px 60px -15px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 2px 10px rgba(0,0,0,0.5)",
@@ -110,21 +111,21 @@ export default function Login() {
 
                     {/* Pages Container */}
                     <div
-                        className="absolute inset-0 flex bg-[#fdfbf7] rounded-md shadow-inner overflow-hidden"
+                        className="relative md:absolute inset-0 flex flex-col md:flex-row bg-[#fdfbf7] rounded-md shadow-inner overflow-hidden min-h-[490px]"
                         style={{
                             boxShadow:
                                 "inset 0 0 0 1px rgba(139, 115, 85, 0.2)",
                         }}
                     >
-                        {/* Book Spine / Center Fold Shadow */}
-                        <div className="absolute top-0 bottom-0 left-1/2 -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-20" />
+                        {/* Book Spine / Center Fold Shadow (Desktop Only) */}
+                        <div className="hidden md:block absolute top-0 bottom-0 left-1/2 -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-20" />
 
-                        {/* Left Page (Welcome Art) */}
+                        {/* Left Page (Welcome Art - Hidden on Mobile) */}
                         <AuthLeftPage isLogin={isLogin} />
 
-                        {/* Right Page */}
+                        {/* Right Page (Full width on Mobile) */}
                         <div
-                            className="w-1/2 bg-gradient-to-bl from-[#fdfbf7] to-[#f4f1ea] p-10 flex flex-col justify-center relative"
+                            className="w-full md:w-1/2 bg-gradient-to-bl from-[#fdfbf7] to-[#f4f1ea] p-5 sm:p-8 md:p-10 flex flex-col justify-center relative min-h-[480px]"
                             style={{
                                 boxShadow:
                                     "inset 20px 0 30px -20px rgba(0,0,0,0.15)",
@@ -140,7 +141,17 @@ export default function Login() {
                             />
 
                             <div className="relative z-10 w-full max-w-sm mx-auto">
-                                <h2 className="text-2xl font-serif font-bold text-darkBrown mb-6 text-center">
+                                {/* Mobile Header Brand Icon */}
+                                <div className="md:hidden flex flex-col items-center text-center mb-4">
+                                    <div className="w-11 h-11 mb-2 bg-walnut text-white rounded-xl flex items-center justify-center shadow-md">
+                                        <BookOpen size={22} />
+                                    </div>
+                                    <h1 className="text-xl font-serif font-bold text-darkBrown">
+                                        A? Bookshelf
+                                    </h1>
+                                </div>
+
+                                <h2 className="text-xl sm:text-2xl font-serif font-bold text-darkBrown mb-4 sm:mb-6 text-center">
                                     {isLogin
                                         ? t("login.sign_in", "Sign In")
                                         : t("login.register", "Register")}
@@ -162,11 +173,11 @@ export default function Login() {
                                     />
                                 )}
 
-                                <div className="mt-6 text-center">
+                                <div className="mt-5 text-center">
                                     <button
                                         type="button"
                                         onClick={toggleMode}
-                                        className="text-walnut/70 hover:text-walnut text-sm font-medium transition-colors"
+                                        className="text-walnut/80 hover:text-walnut text-xs sm:text-sm font-medium transition-colors"
                                     >
                                         {isLogin
                                             ? t(

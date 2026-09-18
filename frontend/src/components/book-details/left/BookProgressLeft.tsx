@@ -53,13 +53,7 @@ export default function BookProgressLeft({
                         delay: 0.4,
                         ease: "easeOut",
                     }}
-                    className="h-full rounded-full"
-                    style={{
-                        background:
-                            book.status === "finished"
-                                ? `linear-gradient(90deg, #10b981, #059669)`
-                                : `linear-gradient(90deg, ${c0}, ${c2})`,
-                    }}
+                    className="h-full rounded-full bg-walnut"
                 />
             </div>
             <div

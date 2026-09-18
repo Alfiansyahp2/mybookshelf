@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Edit, Clock, Hash } from "lucide-react";
+import { BookOpen, Edit, Clock, Hash, X } from "lucide-react";
 import {
     useUpdateProgress,
     useToggleFavorite,
@@ -92,6 +92,7 @@ export default function BookDetailModal({
     const [markAsReadDate, setMarkAsReadDate] = useState(
         new Date().toISOString().split("T")[0],
     );
+    const [mobilePage, setMobilePage] = useState<"left" | "right">("left");
 
     // Sync data that might update from background, but don't interrupt typing
     useEffect(() => {
@@ -238,6 +239,11 @@ export default function BookDetailModal({
         setShowMarkAsReadDatePicker(false);
     };
 
+    const handleMobileSetActiveTab = (tab: RightTab) => {
+        setActiveTab(tab);
+        setMobilePage("right");
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -261,7 +267,7 @@ export default function BookDetailModal({
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 pointer-events-none">
                         {/* ── Perspective container ─────────────────────── */}
                         <div
-                            className="pointer-events-auto w-full max-w-5xl"
+                            className="pointer-events-auto w-full max-w-[94vw] sm:max-w-xl md:max-w-5xl"
                             style={{
                                 perspective: "1800px",
                                 perspectiveOrigin: "50% 50%",
@@ -273,83 +279,204 @@ export default function BookDetailModal({
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 transition={{ duration: 0.22 }}
-                                className="flex flex-col md:flex-row relative"
+                                className="flex flex-col relative rounded-2xl border-2 border-[#8b643c]/30 overflow-hidden"
                                 style={{
                                     boxShadow:
-                                        "0 48px 96px rgba(0,0,0,0.7), 0 12px 32px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(139, 115, 85, 0.2)",
-                                    borderRadius: "3px 6px 6px 3px",
-                                    minHeight: "580px",
-                                    maxHeight: "88vh",
+                                        "0 32px 72px rgba(0,0,0,0.65), 0 8px 24px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(139, 115, 85, 0.25)",
+                                    height: "88vh",
+                                    maxHeight: "600px",
                                     background: "#fdfbf7", // Hardcover inner background
-                                    overflowY: "auto",
                                 }}
                             >
-                                {/* Book Spine / Center Fold Shadow */}
+                                {/* Mobile 2-Page Switcher Bar */}
+                                <div className="md:hidden flex items-center justify-between px-3 py-2 bg-[#4a3b2f] text-[#f8f5f0] border-b border-[#7a5c42]/30 shrink-0 z-40">
+                                    <div className="flex items-center gap-1.5">
+                                        <button
+                                            onClick={() => setMobilePage("left")}
+                                            className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${mobilePage === "left"
+                                                ? "bg-[#d4a574] text-[#2c1a0e] shadow-sm"
+                                                : "text-[#f8f5f0]/70 hover:text-white"
+                                                }`}
+                                        >
+                                            <span>Cover</span>
+                                        </button>
+                                        <button
+                                            onClick={() => setMobilePage("right")}
+                                            className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${mobilePage === "right"
+                                                ? "bg-[#d4a574] text-[#2c1a0e] shadow-sm"
+                                                : "text-[#f8f5f0]/70 hover:text-white"
+                                                }`}
+                                        >
+                                            <span>Progress</span>
+                                        </button>
+                                    </div>
+                                    <button
+                                        onClick={onClose}
+                                        className="p-1 rounded-full hover:bg-white/10 text-white"
+                                        aria-label="Tutup"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+
+                                {/* Book Spine / Center Fold Shadow (Desktop) */}
                                 <div className="hidden md:block absolute top-0 bottom-0 left-[42%] -ml-8 w-16 bg-gradient-to-r from-transparent via-black/20 to-transparent pointer-events-none z-30" />
 
-                                <BookDetailLeftPage
-                                    book={book}
-                                    c0={c0}
-                                    c1={c1}
-                                    c2={c2}
-                                    cfg={cfg}
-                                    progress={progress}
-                                    userRating={userRating}
-                                    handleRating={handleRating}
-                                    handleFav={handleFav}
-                                    handleStart={handleStart}
-                                    handleFinish={handleFinish}
-                                    toggleFavoritePending={
-                                        toggleFavorite.isPending
-                                    }
-                                    startReadingPending={startReading.isPending}
-                                    finishReadingPending={
-                                        finishReading.isPending
-                                    }
-                                    updateBookPending={updateBook.isPending}
-                                    setActiveTab={setActiveTab}
-                                    setShowMarkAsReadDatePicker={
-                                        setShowMarkAsReadDatePicker
-                                    }
-                                    updateBookMutate={updateBook.mutate}
-                                />
+                                {/* Desktop 2-Page Side-by-Side Spread */}
+                                <div className="hidden md:flex w-full h-full flex-row overflow-hidden">
+                                    <BookDetailLeftPage
+                                        book={book}
+                                        c0={c0}
+                                        c1={c1}
+                                        c2={c2}
+                                        cfg={cfg}
+                                        progress={progress}
+                                        userRating={userRating}
+                                        handleRating={handleRating}
+                                        handleFav={handleFav}
+                                        handleStart={handleStart}
+                                        handleFinish={handleFinish}
+                                        toggleFavoritePending={
+                                            toggleFavorite.isPending
+                                        }
+                                        startReadingPending={startReading.isPending}
+                                        finishReadingPending={
+                                            finishReading.isPending
+                                        }
+                                        updateBookPending={updateBook.isPending}
+                                        setActiveTab={handleMobileSetActiveTab}
+                                        setShowMarkAsReadDatePicker={
+                                            setShowMarkAsReadDatePicker
+                                        }
+                                        updateBookMutate={updateBook.mutate}
+                                    />
 
-                                <BookDetailRightPage
-                                    book={book}
-                                    c0={c0}
-                                    c1={c1}
-                                    c2={c2}
-                                    tabs={tabs}
-                                    activeTab={activeTab}
-                                    setActiveTab={setActiveTab}
-                                    tabIdx={tabIdx}
-                                    onEdit={onEdit}
-                                    onDelete={onDelete}
-                                    onClose={onClose}
-                                    showMarkAsReadDatePicker={
-                                        showMarkAsReadDatePicker
-                                    }
-                                    setShowMarkAsReadDatePicker={
-                                        setShowMarkAsReadDatePicker
-                                    }
-                                    markAsReadDate={markAsReadDate}
-                                    setMarkAsReadDate={setMarkAsReadDate}
-                                    handleStart={handleStart}
-                                    handleMarkAsReadNow={handleMarkAsReadNow}
-                                    handleProgress={handleProgress}
-                                    handleAddReadDate={handleAddReadDate}
-                                    handleRemoveReadDate={handleRemoveReadDate}
-                                    userNotes={userNotes}
-                                    tempNotes={tempNotes}
-                                    isEditingNotes={isEditingNotes}
-                                    setTempNotes={setTempNotes}
-                                    setIsEditingNotes={setIsEditingNotes}
-                                    handleNotes={handleNotes}
-                                    startReadingPending={startReading.isPending}
-                                    updateBookPending={updateBook.isPending}
-                                    updateNotes={updateNotes}
-                                    updateProgress={updateProgress}
-                                />
+                                    <BookDetailRightPage
+                                        book={book}
+                                        c0={c0}
+                                        c1={c1}
+                                        c2={c2}
+                                        tabs={tabs}
+                                        activeTab={activeTab}
+                                        setActiveTab={setActiveTab}
+                                        tabIdx={tabIdx}
+                                        onEdit={onEdit}
+                                        onDelete={onDelete}
+                                        onClose={onClose}
+                                        showMarkAsReadDatePicker={
+                                            showMarkAsReadDatePicker
+                                        }
+                                        setShowMarkAsReadDatePicker={
+                                            setShowMarkAsReadDatePicker
+                                        }
+                                        markAsReadDate={markAsReadDate}
+                                        setMarkAsReadDate={setMarkAsReadDate}
+                                        handleStart={handleStart}
+                                        handleMarkAsReadNow={handleMarkAsReadNow}
+                                        handleProgress={handleProgress}
+                                        handleAddReadDate={handleAddReadDate}
+                                        handleRemoveReadDate={handleRemoveReadDate}
+                                        userNotes={userNotes}
+                                        tempNotes={tempNotes}
+                                        isEditingNotes={isEditingNotes}
+                                        setTempNotes={setTempNotes}
+                                        setIsEditingNotes={setIsEditingNotes}
+                                        handleNotes={handleNotes}
+                                        startReadingPending={startReading.isPending}
+                                        updateBookPending={updateBook.isPending}
+                                        updateNotes={updateNotes}
+                                        updateProgress={updateProgress}
+                                    />
+                                </div>
+
+                                {/* Mobile Flippable 2-Page View */}
+                                <div className="flex md:hidden w-full h-full flex-col overflow-hidden relative">
+                                    <AnimatePresence mode="wait">
+                                        {mobilePage === "left" ? (
+                                            <motion.div
+                                                key="mobile-left-app"
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="w-full h-full flex flex-col overflow-hidden"
+                                            >
+                                                <BookDetailLeftPage
+                                                    book={book}
+                                                    c0={c0}
+                                                    c1={c1}
+                                                    c2={c2}
+                                                    cfg={cfg}
+                                                    progress={progress}
+                                                    userRating={userRating}
+                                                    handleRating={handleRating}
+                                                    handleFav={handleFav}
+                                                    handleStart={handleStart}
+                                                    handleFinish={handleFinish}
+                                                    toggleFavoritePending={
+                                                        toggleFavorite.isPending
+                                                    }
+                                                    startReadingPending={startReading.isPending}
+                                                    finishReadingPending={
+                                                        finishReading.isPending
+                                                    }
+                                                    updateBookPending={updateBook.isPending}
+                                                    setActiveTab={handleMobileSetActiveTab}
+                                                    setShowMarkAsReadDatePicker={
+                                                        setShowMarkAsReadDatePicker
+                                                    }
+                                                    updateBookMutate={updateBook.mutate}
+                                                />
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div
+                                                key="mobile-right-app"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: 20 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="w-full h-full flex flex-col overflow-hidden"
+                                            >
+                                                <BookDetailRightPage
+                                                    book={book}
+                                                    c0={c0}
+                                                    c1={c1}
+                                                    c2={c2}
+                                                    tabs={tabs}
+                                                    activeTab={activeTab}
+                                                    setActiveTab={setActiveTab}
+                                                    tabIdx={tabIdx}
+                                                    onEdit={onEdit}
+                                                    onDelete={onDelete}
+                                                    onClose={onClose}
+                                                    showMarkAsReadDatePicker={
+                                                        showMarkAsReadDatePicker
+                                                    }
+                                                    setShowMarkAsReadDatePicker={
+                                                        setShowMarkAsReadDatePicker
+                                                    }
+                                                    markAsReadDate={markAsReadDate}
+                                                    setMarkAsReadDate={setMarkAsReadDate}
+                                                    handleStart={handleStart}
+                                                    handleMarkAsReadNow={handleMarkAsReadNow}
+                                                    handleProgress={handleProgress}
+                                                    handleAddReadDate={handleAddReadDate}
+                                                    handleRemoveReadDate={handleRemoveReadDate}
+                                                    userNotes={userNotes}
+                                                    tempNotes={tempNotes}
+                                                    isEditingNotes={isEditingNotes}
+                                                    setTempNotes={setTempNotes}
+                                                    setIsEditingNotes={setIsEditingNotes}
+                                                    handleNotes={handleNotes}
+                                                    startReadingPending={startReading.isPending}
+                                                    updateBookPending={updateBook.isPending}
+                                                    updateNotes={updateNotes}
+                                                    updateProgress={updateProgress}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
                             </motion.div>
                         </div>
                     </div>
