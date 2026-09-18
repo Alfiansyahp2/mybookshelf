@@ -10,12 +10,12 @@ interface SEOProps {
 
 const SEO = ({ 
     title, 
-    description = "Manage and explore your personal library with MyBookshelf.", 
+    description = "Manage and explore your personal library with A?Bookshelf.", 
     type = "website", 
     image = "/og-image.svg", 
     url 
 }: SEOProps) => {
-    const siteName = "MyBookshelf";
+    const siteName = "A?Bookshelf";
     const fullTitle = `${title} | ${siteName}`;
 
     return (

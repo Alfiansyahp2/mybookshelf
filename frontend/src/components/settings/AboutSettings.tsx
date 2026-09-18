@@ -13,14 +13,14 @@ export default function AboutSettings() {
             <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
                 <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
                     <Info className="w-5 h-5" />
-                    {t("settings.about.title", "About MyBookshelf")}
+                    {t("settings.about.title", "About A?Bookshelf")}
                 </h2>
                 <div className="space-y-4">
                     <div className="p-4 bg-cream/30 rounded-xl">
                         <p className="text-sm text-walnut/80 mb-3">
                             {t(
                                 "settings.about.description",
-                                "MyBookshelf is a beautiful and intuitive digital library management system designed for book lovers.",
+                                "A?Bookshelf is a beautiful and intuitive digital library management system designed for book lovers.",
                             )}
                         </p>
                         <div className="space-y-2">

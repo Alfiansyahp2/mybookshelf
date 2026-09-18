@@ -73,13 +73,8 @@ export default function BookDetailLeftPage({
                 borderRadius: "3px 0 0 3px",
             }}
         >
-            {/* ── colour accent strip at top (book colour) ── */}
-            <div
-                className="flex-shrink-0 h-2"
-                style={{
-                    background: `linear-gradient(to right, ${c2}, ${c0})`,
-                }}
-            />
+            {/* ── colour accent strip at top ── */}
+            <div className="flex-shrink-0 h-2 bg-walnut" />
 
             {/* ── scrollable content ─────────────────────── */}
             <div

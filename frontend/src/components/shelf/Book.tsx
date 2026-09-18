@@ -688,7 +688,7 @@ export default function RealisticBook({
                                                         height: "100%",
                                                         borderRadius: 2,
                                                         width: `${Math.round(((book.currentPage || 0) / book.pages) * 100)}%`,
-                                                        background: `linear-gradient(to right,${c0},${c2})`,
+                                                        background: "#7a5c42",
                                                     }}
                                                 />
                                             </div>
