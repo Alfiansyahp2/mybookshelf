@@ -433,37 +433,43 @@ export default function RealisticBook({
                     >
                         <div
                             style={{
-                                background: "rgba(254,249,239,0.97)",
-                                backdropFilter: "blur(14px)",
-                                borderRadius: 10,
+                                background: "rgba(253, 249, 243, 0.98)",
+                                backdropFilter: "blur(16px)",
+                                borderRadius: 16,
                                 boxShadow:
-                                    "0 10px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.12)",
+                                    "0 14px 36px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1)",
                                 border: "1px solid rgba(139,99,56,0.18)",
                                 overflow: "hidden",
+                                width: 224,
                             }}
                         >
                             <div
                                 style={{
-                                    height: 3,
-                                    background: `linear-gradient(to right,${c0},${c2})`,
+                                    height: 4,
+                                    background: `linear-gradient(to right,${c0},${c1})`,
                                 }}
                             />
-                            <div style={{ padding: "10px 12px" }}>
-                                {/* Mini cover */}
+                            <div style={{ padding: "14px" }}>
+                                {/* Mini cover & Title/Author */}
                                 <div
                                     style={{
                                         display: "flex",
-                                        gap: 8,
+                                        gap: 12,
                                         alignItems: "flex-start",
-                                        marginBottom: 8,
+                                        marginBottom: 12,
                                     }}
                                 >
                                     <div
                                         style={{
                                             position: "relative",
-                                            width: 24,
-                                            height: 36,
+                                            width: 40,
+                                            height: 56,
                                             flexShrink: 0,
+                                            borderRadius: 4,
+                                            overflow: "hidden",
+                                            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                                            border: "1px solid rgba(0,0,0,0.12)",
+                                            backgroundColor: "#e8deca",
                                         }}
                                     >
                                         {book.coverImage ? (
@@ -474,48 +480,37 @@ export default function RealisticBook({
                                                     width: "100%",
                                                     height: "100%",
                                                     objectFit: "cover",
-                                                    borderRadius: "0 2px 2px 0",
-                                                    boxShadow:
-                                                        "2px 2px 5px rgba(0,0,0,0.35)",
                                                 }}
                                             />
                                         ) : (
-                                            <>
-                                                <div
-                                                    style={{
-                                                        position: "absolute",
-                                                        inset: 0,
-                                                        borderRadius:
-                                                            "0 2px 2px 0",
-                                                        background: `linear-gradient(150deg,${c0},${c1} 50%,${c2})`,
-                                                        boxShadow:
-                                                            "2px 2px 5px rgba(0,0,0,0.35)",
-                                                    }}
-                                                />
-                                                <div
-                                                    style={{
-                                                        position: "absolute",
-                                                        left: 0,
-                                                        top: 0,
-                                                        bottom: 0,
-                                                        width: 4,
-                                                        background: `linear-gradient(to right,${c2},${c1})`,
-                                                        borderRadius:
-                                                            "1px 0 0 1px",
-                                                    }}
-                                                />
-                                            </>
+                                            <div
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    background: `linear-gradient(150deg,${c0},${c1} 50%,${c2})`,
+                                                    padding: 4,
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    justifyContent: "space-between",
+                                                    color: "#ffffff",
+                                                }}
+                                            >
+                                                <span style={{ fontSize: 7, fontWeight: 700, fontFamily: "serif", lineHeight: 1.1 }}>
+                                                    {book.title}
+                                                </span>
+                                            </div>
                                         )}
                                     </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
+
+                                    <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
                                         <p
                                             style={{
                                                 color: "#1c0f05",
-                                                fontSize: 11,
+                                                fontSize: 13,
                                                 fontWeight: 700,
-                                                fontFamily: "'Georgia',serif",
-                                                lineHeight: 1.3,
-                                                margin: "0 0 2px",
+                                                fontFamily: "'Georgia', serif",
+                                                lineHeight: 1.25,
+                                                margin: "0 0 3px",
                                                 display: "-webkit-box",
                                                 WebkitLineClamp: 2,
                                                 WebkitBoxOrient: "vertical",
@@ -527,8 +522,9 @@ export default function RealisticBook({
                                         <p
                                             style={{
                                                 color: "#7c5a3a",
-                                                fontSize: 9.5,
+                                                fontSize: 11,
                                                 margin: 0,
+                                                fontFamily: "'Georgia', serif",
                                                 fontStyle: "italic",
                                                 overflow: "hidden",
                                                 textOverflow: "ellipsis",
@@ -540,31 +536,38 @@ export default function RealisticBook({
                                     </div>
                                 </div>
 
+                                {/* Category Pill Box */}
                                 {book.genre && (
-                                    <span
+                                    <div
                                         style={{
-                                            display: "inline-block",
-                                            fontSize: 8,
-                                            fontWeight: 600,
-                                            padding: "1px 6px",
+                                            marginBottom: 10,
+                                            padding: "7px 10px",
                                             borderRadius: 10,
-                                            marginBottom: 6,
-                                            letterSpacing: "0.12em",
-                                            textTransform: "uppercase",
-                                            background: `${c0}22`,
-                                            color: c2,
-                                            border: `1px solid ${c0}33`,
+                                            background: "rgba(220, 231, 229, 0.8)",
+                                            border: "1px solid rgba(184, 207, 204, 0.7)",
                                         }}
                                     >
-                                        {book.genre}
-                                    </span>
+                                        <span
+                                            style={{
+                                                display: "block",
+                                                fontSize: 9.5,
+                                                fontWeight: 700,
+                                                letterSpacing: "0.08em",
+                                                textTransform: "uppercase",
+                                                color: "#3d6568",
+                                                lineHeight: 1.25,
+                                            }}
+                                        >
+                                            {book.genre}
+                                        </span>
+                                    </div>
                                 )}
 
                                 <div
                                     style={{
                                         height: 1,
-                                        background: `rgba(139,99,56,0.12)`,
-                                        margin: "4px 0",
+                                        background: "#e8e0d5",
+                                        margin: "10px 0 8px",
                                     }}
                                 />
 
@@ -579,19 +582,19 @@ export default function RealisticBook({
                                         style={{
                                             display: "flex",
                                             alignItems: "center",
-                                            gap: 4,
+                                            gap: 5,
                                             background: sCfg.bg,
                                             color: sCfg.text,
-                                            fontSize: 8.5,
+                                            fontSize: 10.5,
                                             fontWeight: 600,
-                                            padding: "2px 7px",
-                                            borderRadius: 10,
+                                            padding: "3px 10px",
+                                            borderRadius: 14,
                                         }}
                                     >
                                         <span
                                             style={{
-                                                width: 5,
-                                                height: 5,
+                                                width: 6,
+                                                height: 6,
                                                 borderRadius: "50%",
                                                 background: sCfg.dot,
                                                 flexShrink: 0,
@@ -605,21 +608,21 @@ export default function RealisticBook({
                                             style={{
                                                 display: "flex",
                                                 alignItems: "center",
-                                                gap: 2,
+                                                gap: 3,
                                             }}
                                         >
                                             <Star
-                                                size={10}
+                                                size={13}
                                                 style={{
-                                                    fill: "#fbbf24",
-                                                    color: "#fbbf24",
+                                                    fill: "#f59e0b",
+                                                    color: "#f59e0b",
                                                 }}
                                             />
                                             <span
                                                 style={{
-                                                    fontSize: 9,
+                                                    fontSize: 11,
                                                     fontWeight: 700,
-                                                    color: "#7c5a3a",
+                                                    color: "#4a3b2f",
                                                 }}
                                             >
                                                 {book.personalRating}
@@ -627,7 +630,7 @@ export default function RealisticBook({
                                         </div>
                                     ) : book.favorite || book.isFavorite ? (
                                         <Heart
-                                            size={10}
+                                            size={12}
                                             style={{
                                                 fill: "#f87171",
                                                 color: "#f87171",
@@ -639,25 +642,25 @@ export default function RealisticBook({
                                 {book.status === "reading" &&
                                     book.pages &&
                                     book.pages > 0 && (
-                                        <div style={{ marginTop: 7 }}>
+                                        <div style={{ marginTop: 8 }}>
                                             <div
                                                 style={{
                                                     display: "flex",
                                                     justifyContent:
                                                         "space-between",
-                                                    fontSize: 8,
+                                                    fontSize: 9,
                                                     color: "#9c7a5a",
                                                     marginBottom: 3,
                                                 }}
                                             >
                                                 <span>
                                                     <BookOpen
-                                                        size={9}
+                                                        size={10}
                                                         style={{
                                                             display: "inline",
                                                             verticalAlign:
                                                                 "middle",
-                                                            marginRight: 2,
+                                                            marginRight: 3,
                                                         }}
                                                     />
                                                     Hal. {book.currentPage || 0}
@@ -698,12 +701,12 @@ export default function RealisticBook({
                             style={{
                                 position: "absolute",
                                 left: -5,
-                                top: 14,
+                                top: 18,
                                 width: 0,
                                 height: 0,
                                 borderTop: "5px solid transparent",
                                 borderBottom: "5px solid transparent",
-                                borderRight: "5px solid rgba(254,249,239,0.97)",
+                                borderRight: "5px solid rgba(253,249,243,0.98)",
                                 filter: "drop-shadow(-1px 0 1px rgba(0,0,0,0.08))",
                             }}
                         />
