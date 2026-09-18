@@ -39,8 +39,8 @@ export const DEMO_EDITORIAL_BOOKS: EditorialBook[] = [
         pages: 160,
         year: 2020,
         status: "Finished",
-        coverGradient: "from-[#4a3b2f] via-[#7a5c42] to-[#2c1d11]",
-        coverImage: "https://covers.openlibrary.org/b/isbn/9786020638522-L.jpg",
+        coverGradient: "from-[#1b4332] via-[#2d6a4f] to-[#081c15]",
+        coverImage: "/covers/berdamai-dengan-diri-sendiri.jpg",
         synopsis: "Buku ini mengajak pembaca untuk berdamai dengan kekurangan, menghentikan kritik internal berlebihan, serta memeluk keunikan diri sendiri dengan penuh cinta dan penerimaan.",
         personalQuote: "Kedamaian terbesar dimulai saat kita menghentikan perang dengan diri sendiri.",
         rating: 5.0,
@@ -313,7 +313,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                     return (
                         <div
                             key={book.id}
-                            className="relative demo-spine-item opacity-0"
+                            className={`relative demo-spine-item opacity-0 transition-all ${isHovered ? "z-[9999]" : "z-1"}`}
                             onMouseEnter={() => setHoveredBookId(book.id)}
                             onMouseLeave={() => setHoveredBookId(null)}
                         >
@@ -375,7 +375,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 8, scale: 0.94 }}
                                         transition={{ duration: 0.16, ease: "easeOut" }}
-                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-50 pointer-events-none w-56 sm:w-64 shadow-2xl rounded-2xl overflow-hidden border border-[#7a5c42]/20"
+                                        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 z-[9999] pointer-events-none w-56 sm:w-64 shadow-2xl rounded-2xl overflow-hidden border border-[#7a5c42]/20"
                                         style={{
                                             background: "rgba(253, 249, 243, 0.98)",
                                             backdropFilter: "blur(16px)",

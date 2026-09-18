@@ -22,7 +22,7 @@ export default function Login() {
     useEffect(() => {
         const userData = localStorage.getItem("user");
         if (userData && user) {
-            navigate("/", { replace: true });
+            navigate("/dashboard", { replace: true });
         }
     }, [user, navigate]);
 
@@ -50,7 +50,7 @@ export default function Login() {
         authFn.mutate(credentials as any, {
             onSuccess: () => {
                 setTimeout(() => {
-                    navigate("/", { replace: true });
+                    navigate("/dashboard", { replace: true });
                 }, 100);
             },
             onError: (error: any) => {

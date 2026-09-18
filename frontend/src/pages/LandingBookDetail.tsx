@@ -375,7 +375,7 @@ export default function LandingBookDetail() {
             <footer className="w-full max-w-7xl mx-auto flex items-center justify-between text-[11px] text-[#7a5c42] shrink-0 border-t border-[#7a5c42]/15 pt-3 relative z-10">
                 <span>© {new Date().getFullYear()} A?Bookshelf. Editorial Showcase.</span>
                 <div className="flex items-center gap-4">
-                    <span className="hidden sm:inline text-[#7a5c42]/60">Gunakan tombol panah ◄ ► atau scroll mouse untuk berpindah</span>
+                    <span className="hidden sm:inline text-[#7a5c42]/60">Gunakan scroll mouse untuk berpindah</span>
                     <Link to="/dashboard" className="hover:text-[#4a3b2f] underline font-bold flex items-center gap-1">
                         <span>Buka App Dashboard</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />
