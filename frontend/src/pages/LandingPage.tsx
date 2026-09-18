@@ -267,6 +267,26 @@ export default function LandingPage() {
                                         </div>
                                         <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-amber-700 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
                                     </a>
+
+                                    {/* Medium */}
+                                    <a
+                                        href="https://medium.com/@putraalfiansyahp0"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2 px-3 rounded-xl bg-white/80 backdrop-blur-xs border border-[#7a5c42]/15 flex items-center justify-between hover:bg-white hover:border-[#7a5c42]/30 transition-all duration-200 group"
+                                    >
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-black to-zinc-900 text-white shadow-xs flex items-center justify-center shrink-0">
+                                                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M13.54 12a6.8 6.8 0 0 1-6.77 6.82A6.8 6.8 0 0 1 0 12a6.8 6.8 0 0 1 6.77-6.82A6.8 6.8 0 0 1 13.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42c1.87 0 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-[11px] font-bold text-[#4a3b2f] group-hover:text-black transition-colors uppercase tracking-wider">
+                                                Medium
+                                            </span>
+                                        </div>
+                                        <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
+                                    </a>
                                 </div>
 
                                 {/* Footer Note */}
