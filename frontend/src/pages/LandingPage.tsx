@@ -211,7 +211,7 @@ export default function LandingPage() {
                                     </div>
 
                                     {/* LinkedIn */}
-                                    <a
+                                    {/* <a
                                         href="https://linkedin.com/in/alfiansyahpp"
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -228,10 +228,10 @@ export default function LandingPage() {
                                             </span>
                                         </div>
                                         <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-blue-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                                    </a>
+                                    </a> */}
 
                                     {/* GitHub */}
-                                    <a
+                                    {/* <a
                                         href="https://github.com/Alfiansyahp2"
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -248,7 +248,7 @@ export default function LandingPage() {
                                             </span>
                                         </div>
                                         <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                                    </a>
+                                    </a> */}
 
                                     {/* Website / Portfolio */}
                                     {/* <a
