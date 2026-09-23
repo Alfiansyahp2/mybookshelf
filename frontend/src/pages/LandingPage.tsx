@@ -93,14 +93,40 @@ export default function LandingPage() {
                 </motion.div>
 
                 {/* MOBILE HEADLINE (RESPONSIVELY CENTERED IN THE SPACE BETWEEN HEADER AND BOOKSHELF) */}
-                <div className="flex-1 w-full flex flex-col items-center justify-center md:hidden text-center max-w-xs mx-auto px-4 py-2">
-                    <h1 className="font-serif italic font-bold text-2xl xs:text-[27px] text-[#3a2d23] tracking-tight leading-snug">
+                <motion.div
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex-1 w-full flex flex-col items-center justify-center md:hidden text-center max-w-xs mx-auto px-4 py-2"
+                >
+                    {/* Animated Title */}
+                    <motion.h1
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+                        className="font-serif italic font-bold text-2xl xs:text-[27px] text-[#3a2d23] tracking-tight leading-snug"
+                    >
                         {t("landing.mobile_title", "Abadikan Setiap Lembar Cerita")}
-                    </h1>
-                    <p className="text-xs text-[#7a5c42] mt-1.5 font-sans opacity-90 leading-relaxed">
+                    </motion.h1>
+
+                    {/* Animated Gold Underline Divider */}
+                    <motion.div
+                        initial={{ scaleX: 0, opacity: 0 }}
+                        animate={{ scaleX: 1, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.22, ease: "easeOut" }}
+                        className="h-[2px] w-14 bg-gradient-to-r from-transparent via-[#d4a574] to-transparent my-1.5 rounded-full"
+                    />
+
+                    {/* Subtitle */}
+                    <motion.p
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, delay: 0.28, ease: "easeOut" }}
+                        className="text-xs text-[#7a5c42] font-sans opacity-90 leading-relaxed"
+                    >
                         {t("landing.mobile_subtitle", "Jelajahi koleksi editorial & kelola rak buku digitalmu")}
-                    </p>
-                </div>
+                    </motion.p>
+                </motion.div>
 
                 {/* STANDING SPINES SHOWCASE */}
                 <motion.div

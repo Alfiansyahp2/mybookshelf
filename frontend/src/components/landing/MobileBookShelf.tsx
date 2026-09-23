@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
@@ -30,8 +30,17 @@ export default function MobileBookShelf({
 }: MobileBookShelfProps) {
     const { t } = useTranslation();
     const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
+    const [isInitialMounted, setIsInitialMounted] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsInitialMounted(true);
+        }, 850);
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleTouchStart = (e: React.TouchEvent) => {
+        setIsInitialMounted(true);
         setTouchStartPos({
             x: e.touches[0].clientX,
             y: e.touches[0].clientY
@@ -87,27 +96,39 @@ export default function MobileBookShelf({
                         const style = MOBILE_BOOK_STYLES[bookIdx] || { height: 280, tilt: 0 };
                         const transformOrigin =
                             style.tilt < 0 ? "left bottom" : style.tilt > 0 ? "right bottom" : "center bottom";
+                        const visibleOffset = Math.max(0, Math.min(5, slotIndex - trainIndex));
 
                         return (
                             <motion.div
                                 key={`infinite-book-slot-${slotIndex}`}
                                 onClick={() => {
+                                    setIsInitialMounted(true);
                                     if (activeMobileBookId === book.id) {
                                         setActiveMobileBookId(null);
                                     } else {
                                         setActiveMobileBookId(book.id);
                                     }
                                 }}
+                                initial={{ y: 55, opacity: 0 }}
                                 animate={{
                                     y: isActive ? -80 : 0,
                                     scale: isActive ? 1.05 : 1,
                                     rotate: isActive ? 0 : style.tilt,
+                                    opacity: 1,
                                     zIndex: isActive ? 50 : style.tilt !== 0 ? 15 : 10
                                 }}
-                                transition={{ type: "spring", stiffness: 320, damping: 25 }}
-                                className={`absolute cursor-pointer w-[54px] xs:w-14 rounded-sm shadow-xl flex flex-col justify-between p-2 select-none border-t border-l border-white/80 overflow-hidden transition-shadow duration-300 ${
+                                transition={
+                                    !isInitialMounted
+                                        ? { delay: visibleOffset * 0.06 + 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] }
+                                        : { type: "spring", stiffness: 320, damping: 25 }
+                                }
+                                className={`absolute cursor-pointer w-[54px] xs:w-14 rounded-sm shadow-xl flex flex-col justify-between p-2 select-none border-t border-l border-white/80 overflow-hidden transition-all duration-300 ${
                                     book.spineBg
-                                } ${book.textColor} ${isActive ? "ring-2 ring-[#4a3b2f] shadow-2xl" : "hover:shadow-2xl"}`}
+                                } ${book.textColor} ${
+                                    isActive
+                                        ? "ring-2 ring-[#d4a574] shadow-2xl shadow-[#d4a574]/25"
+                                        : "hover:shadow-2xl"
+                                }`}
                                 style={{
                                     left: `${slotIndex * 66}px`,
                                     bottom: "4px",
@@ -117,7 +138,13 @@ export default function MobileBookShelf({
                             >
                                 {/* Spine Top Accent Star */}
                                 <div className="w-full flex justify-center shrink-0 pt-0.5">
-                                    <span className="text-[9.5px] text-[#d4a574]">★</span>
+                                    <span
+                                        className={`text-[9.5px] transition-all duration-300 ${
+                                            isActive ? "text-[#ffd700] scale-125" : "text-[#d4a574]"
+                                        }`}
+                                    >
+                                        ★
+                                    </span>
                                 </div>
 
                                 {/* Vertical Title Text */}
@@ -152,8 +179,15 @@ export default function MobileBookShelf({
                     })}
                 </motion.div>
 
-                {/* Bottom Baseline Floor Rail Line Across the entire visible shelf */}
-                <div className="absolute bottom-2 left-2 right-2 h-[2.5px] bg-[#7a5c42]/30 rounded-full pointer-events-none" />
+                {/* Realistic Wooden & Brass Shelf Rail Across the entire visible shelf */}
+                <div className="absolute bottom-1.5 left-2 right-2 pointer-events-none z-10">
+                    {/* Top Brass Highlight Line */}
+                    <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#d4a574]/70 to-transparent rounded-full shadow-xs" />
+                    {/* Wooden Rail Plank Body */}
+                    <div className="h-[5px] w-full bg-gradient-to-b from-[#7a5c42]/35 via-[#5c4033]/45 to-[#3a2d23]/55 rounded-xs mt-[1px]" />
+                    {/* Bottom Soft Drop Shadow */}
+                    <div className="h-[3px] w-full bg-black/10 blur-[2px]" />
+                </div>
 
                 {/* Left Edge Blur & Smooth Fade */}
                 <div
@@ -175,10 +209,18 @@ export default function MobileBookShelf({
             </div>
 
             {/* Swipe Gesture Indicator & Infinite Train Controls (LOCATED AT THE BOTTOM) */}
-            <div className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 border border-[#7a5c42]/20 text-[#7a5c42] text-[10px] font-bold tracking-wide z-10">
-                <button
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.4 }}
+                className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 backdrop-blur-md border border-[#7a5c42]/20 text-[#4a3b2f] text-[10.5px] font-bold tracking-wide z-10 shadow-xs"
+            >
+                <motion.button
+                    animate={{ x: [-1.5, 0, -1.5] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                     onClick={(e) => {
                         e.stopPropagation();
+                        setIsInitialMounted(true);
                         setTrainIndex((prev) => prev - 1);
                     }}
                     className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 active:scale-90 transition-all font-bold text-xs"
@@ -186,11 +228,14 @@ export default function MobileBookShelf({
                     title="Geser ke kiri"
                 >
                     ‹
-                </button>
-                <span>{t("landing.swipe_bookshelf", "Geser Rak Buku")}</span>
-                <button
+                </motion.button>
+                <span className="select-none">{t("landing.swipe_bookshelf", "Geser Rak Buku")}</span>
+                <motion.button
+                    animate={{ x: [1.5, 0, 1.5] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                     onClick={(e) => {
                         e.stopPropagation();
+                        setIsInitialMounted(true);
                         setTrainIndex((prev) => prev + 1);
                     }}
                     className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 active:scale-90 transition-all font-bold text-xs"
@@ -198,8 +243,8 @@ export default function MobileBookShelf({
                     title="Geser ke kanan"
                 >
                     ›
-                </button>
-            </div>
+                </motion.button>
+            </motion.div>
 
             {/* "SAMPUL" COVER OVERLAY (APPEARS ONLY WHEN A BOOK IS CLICKED!) */}
             <MobileBookCoverModal
