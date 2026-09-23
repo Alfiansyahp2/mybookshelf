@@ -1,14 +1,19 @@
 import { useEffect, useRef } from "react";
 import { animate, stagger } from "animejs";
+import { useTranslation } from "react-i18next";
 
 export default function AnimeHeroHeadline() {
+    const { t, i18n } = useTranslation();
     const headlineRef = useRef<HTMLHeadingElement>(null);
     const underlineRef = useRef<HTMLSpanElement>(null);
+
+    const mainText = t("landing.headline_main", "Abadikan setiap lembar cerita &");
+    const highlightText = t("landing.headline_highlight", "perjalanan membacamu.");
 
     useEffect(() => {
         if (!headlineRef.current) return;
 
-        // Animate words staggered with anime.js v4
+        // Animate words staggered with anime.js
         animate(".hero-word", {
             translateY: [24, 0],
             opacity: [0, 1],
@@ -28,19 +33,17 @@ export default function AnimeHeroHeadline() {
                 }
             }
         });
-    }, []);
-
-    const mainText = "Abadikan setiap lembar cerita &";
-    const highlightText = "perjalanan membacamu.";
+    }, [i18n.language, mainText, highlightText]);
 
     return (
         <h1
             ref={headlineRef}
+            key={`hero-headline-${i18n.language}`}
             className="font-sans text-2xl sm:text-3xl lg:text-4xl font-normal tracking-tight leading-[1.2] text-[#4a3b2f] flex flex-wrap justify-center items-center gap-x-2.5 gap-y-1"
         >
             {mainText.split(" ").map((word, i) => (
                 <span
-                    key={i}
+                    key={`${word}-${i}`}
                     className="hero-word inline-block opacity-0 transform-gpu"
                 >
                     {word}

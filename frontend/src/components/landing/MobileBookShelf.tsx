@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
     type EditorialBook,
     MOBILE_BOOK_STYLES
@@ -27,6 +28,7 @@ export default function MobileBookShelf({
     imgErrors,
     setImgErrors
 }: MobileBookShelfProps) {
+    const { t } = useTranslation();
     const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
 
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -185,7 +187,7 @@ export default function MobileBookShelf({
                 >
                     ‹
                 </button>
-                <span>Geser Rak Buku</span>
+                <span>{t("landing.swipe_bookshelf", "Geser Rak Buku")}</span>
                 <button
                     onClick={(e) => {
                         e.stopPropagation();

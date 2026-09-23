@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star } from "lucide-react";
 import { animate, stagger } from "animejs";
+import { useTranslation } from "react-i18next";
 import type { EditorialBook } from "../../constants/editorialBooks";
 
 interface DesktopBookShelfProps {
@@ -25,6 +26,7 @@ export default function DesktopBookShelf({
     imgErrors,
     setImgErrors
 }: DesktopBookShelfProps) {
+    const { t } = useTranslation();
     useEffect(() => {
         const anim = animate(".demo-spine-item", {
             translateY: [45, 0],
@@ -200,7 +202,7 @@ export default function DesktopBookShelf({
                                                             : "bg-[#a855f7]"
                                                     }`}
                                                 />
-                                                {book.status === "Finished" ? "Selesai" : book.status === "Reading" ? "Sedang Dibaca" : "Wishlist"}
+                                                {book.status === "Finished" ? t("landing.finished", "Selesai") : book.status === "Reading" ? t("landing.reading", "Sedang Dibaca") : t("landing.wishlist", "Wishlist")}
                                             </span>
 
                                             <div className="flex items-center gap-1 text-xs font-bold text-[#4a3b2f]">

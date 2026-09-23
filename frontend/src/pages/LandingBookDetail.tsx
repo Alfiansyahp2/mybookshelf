@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
     Star,
     X,
@@ -10,9 +11,11 @@ import {
 import SEO from "../components/SEO";
 import { DEMO_EDITORIAL_BOOKS, type EditorialBook } from "../components/landing/InteractiveBookDemo";
 import DemoBookDetailModal from "../components/modals/DemoBookDetailModal";
+import LandingLanguageToggle from "../components/landing/LandingLanguageToggle";
 import type { Book } from "../types";
 
 export default function LandingBookDetail() {
+    const { t } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
@@ -192,11 +195,12 @@ export default function LandingBookDetail() {
                     </span>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
+                    <LandingLanguageToggle />
                     <button
                         onClick={() => navigate("/")}
                         className="p-1.5 sm:p-2.5 rounded-full hover:bg-black/5 active:scale-95 transition-all text-[#4a3b2f] flex items-center gap-1.5 font-bold text-xs"
-                        title="Tutup Editorial Showcase"
+                        title={t("landing.close", "Tutup Editorial Showcase")}
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -309,7 +313,7 @@ export default function LandingBookDetail() {
                                     <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none z-20 backdrop-blur-[2px]">
                                         <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#f5ecd7] text-[#4a3b2f] text-[10px] sm:text-xs font-bold shadow-lg flex items-center gap-1.5 sm:gap-2 transform translate-y-2 group-hover:translate-y-0 transition-transform">
                                             <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                            <span>Buka Reader View</span>
+                                            <span>{t("landing.reader_view", "Buka Reader View")}</span>
                                         </span>
                                     </div>
                                 </motion.div>
@@ -374,9 +378,9 @@ export default function LandingBookDetail() {
             <footer className="hidden sm:flex w-full max-w-7xl mx-auto items-center justify-between text-[10px] sm:text-[11px] text-[#7a5c42] shrink-0 border-t border-[#7a5c42]/15 pt-2 sm:pt-3 relative z-10">
                 <span>© {new Date().getFullYear()} A?Bookshelf. Editorial Showcase.</span>
                 <div className="flex items-center gap-4">
-                    <span className="hidden sm:inline text-[#7a5c42]/60">Gunakan scroll mouse untuk berpindah</span>
+                    <span className="hidden sm:inline text-[#7a5c42]/60">{t("landing.scroll_hint", "Gunakan scroll mouse untuk berpindah")}</span>
                     <Link to="/dashboard" className="hover:text-[#4a3b2f] underline font-bold flex items-center gap-1">
-                        <span>Buka App Dashboard</span>
+                        <span>{t("landing.open_dashboard", "Buka App Dashboard")}</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />
                     </Link>
                 </div>

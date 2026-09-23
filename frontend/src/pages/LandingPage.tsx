@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
     ArrowUpRight,
     X,
@@ -10,14 +11,17 @@ import {
     Check,
     ExternalLink,
     User,
-    Menu
+    Menu,
+    BookOpen
 } from "lucide-react";
 import SEO from "../components/SEO";
 import InteractiveBookDemo from "../components/landing/InteractiveBookDemo";
 import LibraryAmbientParticles from "../components/landing/LibraryAmbientParticles";
 import AnimeHeroHeadline from "../components/landing/AnimeHeroHeadline";
+import LandingLanguageToggle from "../components/landing/LandingLanguageToggle";
 
 export default function LandingPage() {
+    const { t } = useTranslation();
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [copiedEmail, setCopiedEmail] = useState(false);
 
@@ -56,18 +60,21 @@ export default function LandingPage() {
 
                 {/* Right Action Buttons */}
                 <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Bilingual Language Switcher */}
+                    <LandingLanguageToggle />
+
                     <button
                         onClick={() => setIsContactModalOpen(true)}
                         className="hidden md:flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#7a5c42]/30 text-[11px] sm:text-xs font-bold text-[#7a5c42] hover:bg-[#7a5c42]/10 transition-colors"
                     >
                         <User className="w-3.5 h-3.5 text-[#7a5c42]" />
-                        <span>KONTAK</span>
+                        <span>{t("landing.contact", "KONTAK")}</span>
                     </button>
                     <Link
                         to="/dashboard"
-                        className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#4a3b2f] hover:bg-[#3a2d23] text-[#f8f5f0] text-[11px] sm:text-xs font-bold shadow-md transition-all shrink-0"
+                        className="hidden md:flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#4a3b2f] hover:bg-[#3a2d23] text-[#f8f5f0] text-[11px] sm:text-xs font-bold shadow-md transition-all shrink-0"
                     >
-                        <span>MASUK APP</span>
+                        <span>{t("landing.enter_app", "MASUK APP")}</span>
                         <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </Link>
                 </div>
@@ -88,10 +95,10 @@ export default function LandingPage() {
                 {/* MOBILE HEADLINE (RESPONSIVELY CENTERED IN THE SPACE BETWEEN HEADER AND BOOKSHELF) */}
                 <div className="flex-1 w-full flex flex-col items-center justify-center md:hidden text-center max-w-xs mx-auto px-4 py-2">
                     <h1 className="font-serif italic font-bold text-2xl xs:text-[27px] text-[#3a2d23] tracking-tight leading-snug">
-                        Abadikan Setiap Lembar Cerita
+                        {t("landing.mobile_title", "Abadikan Setiap Lembar Cerita")}
                     </h1>
                     <p className="text-xs text-[#7a5c42] mt-1.5 font-sans opacity-90 leading-relaxed">
-                        Jelajahi koleksi editorial & kelola rak buku digitalmu
+                        {t("landing.mobile_subtitle", "Jelajahi koleksi editorial & kelola rak buku digitalmu")}
                     </p>
                 </div>
 
@@ -108,13 +115,13 @@ export default function LandingPage() {
 
             {/* FOOTER SINGLE LINE (HIDDEN ON MOBILE) */}
             <div className="w-full hidden md:flex items-center justify-between text-[11px] text-[#7a5c42] shrink-0 border-t border-[#7a5c42]/15 pt-3">
-                <span>© {new Date().getFullYear()} A?Bookshelf. Side Filter Single Screen Showcase.</span>
+                <span>© {new Date().getFullYear()} A?Bookshelf. {t("landing.footer_copyright", "Side Filter Single Screen Showcase.")}</span>
                 <div className="flex gap-4">
                     <button onClick={() => setIsContactModalOpen(true)} className="hover:text-[#4a3b2f] underline font-medium">
-                        Kontak Developer
+                        {t("landing.contact_dev", "Kontak Developer")}
                     </button>
                     <Link to="/dashboard" className="hover:text-[#4a3b2f] underline font-bold">
-                        Buka App Dashboard ↗
+                        {t("landing.open_dashboard", "Buka App Dashboard")} ↗
                     </Link>
                 </div>
             </div>
@@ -160,7 +167,7 @@ export default function LandingPage() {
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-1.5">
                                             <h3 className="font-serif italic text-base font-bold text-[#4a3b2f] leading-tight">
-                                                A?
+                                                Alfiansyah
                                             </h3>
                                             <span className="px-2 py-0.5 rounded-full bg-[#7a5c42]/12 text-[#7a5c42] text-[9px] font-bold tracking-wider uppercase border border-[#7a5c42]/20">
                                                 Creator
@@ -170,6 +177,35 @@ export default function LandingPage() {
                                             Developer of A?Bookshelf
                                         </p>
                                     </div>
+                                </div>
+
+                                {/* Primary App Launch Button (Prominent in Mobile / Modal) */}
+                                <div className="mb-3.5">
+                                    <Link
+                                        to="/dashboard"
+                                        onClick={() => setIsContactModalOpen(false)}
+                                        className="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#4a3b2f] hover:bg-[#3a2d23] text-[#f8f5f0] shadow-md hover:shadow-lg transition-all duration-200 group font-bold"
+                                    >
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="w-8 h-8 rounded-lg bg-[#d4a574]/20 border border-[#d4a574]/35 flex items-center justify-center text-[#d4a574] group-hover:scale-105 transition-transform shrink-0">
+                                                <BookOpen className="w-4 h-4" />
+                                            </div>
+                                            <div className="text-left min-w-0">
+                                                <div className="text-xs font-bold tracking-wide uppercase flex items-center gap-1.5 text-white">
+                                                    <span>{t("landing.enter_app", "MASUK APP")}</span>
+                                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#d4a574]/25 text-[#e8c89b] font-mono font-medium">
+                                                        App
+                                                    </span>
+                                                </div>
+                                                <div className="text-[10.5px] text-[#f8f5f0]/75 font-normal truncate mt-0.5">
+                                                    {t("landing.open_dashboard", "Buka App Dashboard")}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[#f8f5f0] group-hover:bg-[#d4a574] group-hover:text-[#4a3b2f] transition-all shrink-0">
+                                            <ArrowUpRight className="w-4 h-4" />
+                                        </div>
+                                    </Link>
                                 </div>
 
                                 {/* Contact Links Stack */}
