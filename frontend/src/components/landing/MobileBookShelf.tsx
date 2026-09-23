@@ -122,7 +122,7 @@ export default function MobileBookShelf({
                                         ? { delay: visibleOffset * 0.06 + 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] }
                                         : { type: "spring", stiffness: 320, damping: 25 }
                                 }
-                                className={`absolute cursor-pointer w-[54px] xs:w-14 rounded-sm shadow-xl flex flex-col justify-between p-2 select-none border-t border-l border-white/80 overflow-hidden transition-all duration-300 ${
+                                className={`absolute cursor-pointer w-[54px] xs:w-14 rounded-xs shadow-lg dark:shadow-[0_8px_20px_rgba(0,0,0,0.55)] flex flex-col justify-between p-2 select-none border border-black/10 dark:border-black/40 border-t-white/30 dark:border-t-white/10 overflow-hidden transition-all duration-300 ${
                                     book.spineBg
                                 } ${book.textColor} ${
                                     isActive
@@ -131,13 +131,16 @@ export default function MobileBookShelf({
                                 }`}
                                 style={{
                                     left: `${slotIndex * 66}px`,
-                                    bottom: "4px",
+                                    bottom: "12px",
                                     height: `${style.height}px`,
                                     transformOrigin
                                 }}
                             >
+                                {/* Realistic 3D Spine Cylindrical Shading & Hinge Crease */}
+                                <div className="absolute inset-0 pointer-events-none rounded-xs bg-gradient-to-r from-black/20 via-transparent to-black/25 dark:from-black/35 dark:via-white/[0.04] dark:to-black/35" />
+
                                 {/* Spine Top Accent Star */}
-                                <div className="w-full flex justify-center shrink-0 pt-0.5">
+                                <div className="w-full flex justify-center shrink-0 pt-0.5 relative z-1">
                                     <span
                                         className={`text-[9.5px] transition-all duration-300 ${
                                             isActive ? "text-[#ffd700] scale-125" : "text-[#d4a574]"
@@ -148,7 +151,7 @@ export default function MobileBookShelf({
                                 </div>
 
                                 {/* Vertical Title Text */}
-                                <div className="my-auto text-center flex items-center justify-center overflow-hidden flex-1">
+                                <div className="my-auto text-center flex items-center justify-center overflow-hidden flex-1 relative z-1">
                                     <span
                                         className="font-serif font-bold text-[11px] tracking-wider uppercase leading-none truncate"
                                         style={{
@@ -162,7 +165,7 @@ export default function MobileBookShelf({
                                 </div>
 
                                 {/* Bottom Spine Author */}
-                                <div className="w-full text-center shrink-0 pb-0.5 overflow-hidden">
+                                <div className="w-full text-center shrink-0 pb-1.5 overflow-hidden relative z-1">
                                     <span
                                         className="text-[8px] font-semibold opacity-75 uppercase block tracking-tighter truncate"
                                         style={{
@@ -180,7 +183,7 @@ export default function MobileBookShelf({
                 </motion.div>
 
                 {/* Realistic Wooden & Brass Shelf Rail Across the entire visible shelf */}
-                <div className="absolute bottom-1.5 left-2 right-2 pointer-events-none z-10">
+                <div className="absolute bottom-1.5 left-2 right-2 pointer-events-none z-0">
                     {/* Top Brass Highlight Line */}
                     <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#d4a574]/70 to-transparent rounded-full shadow-xs" />
                     {/* Wooden Rail Plank Body */}
@@ -191,7 +194,7 @@ export default function MobileBookShelf({
 
                 {/* Left Edge Blur & Smooth Fade */}
                 <div
-                    className="absolute left-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-r from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent"
+                    className="absolute left-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-r from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent dark:from-[#180f0a] dark:via-[#180f0a]/80"
                     style={{
                         WebkitMaskImage: "linear-gradient(to right, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)",
                         maskImage: "linear-gradient(to right, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)"
@@ -200,7 +203,7 @@ export default function MobileBookShelf({
 
                 {/* Right Edge Blur & Smooth Fade */}
                 <div
-                    className="absolute right-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-l from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent"
+                    className="absolute right-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-l from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent dark:from-[#180f0a] dark:via-[#180f0a]/80"
                     style={{
                         WebkitMaskImage: "linear-gradient(to left, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)",
                         maskImage: "linear-gradient(to left, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)"
@@ -213,7 +216,7 @@ export default function MobileBookShelf({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.4 }}
-                className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 backdrop-blur-md border border-[#7a5c42]/20 text-[#4a3b2f] text-[10.5px] font-bold tracking-wide z-10 shadow-xs"
+                className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 dark:bg-[#3d2516]/60 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/30 text-[#4a3b2f] dark:text-[#f5ece3] text-[10.5px] font-bold tracking-wide z-10 shadow-xs"
             >
                 <motion.button
                     animate={{ x: [-1.5, 0, -1.5] }}
@@ -223,7 +226,7 @@ export default function MobileBookShelf({
                         setIsInitialMounted(true);
                         setTrainIndex((prev) => prev - 1);
                     }}
-                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 active:scale-90 transition-all font-bold text-xs"
+                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 dark:hover:bg-[#d4a574]/25 text-[#7a5c42] dark:text-[#e5b882] active:scale-90 transition-all font-bold text-xs"
                     aria-label="Geser ke kiri"
                     title="Geser ke kiri"
                 >
@@ -238,7 +241,7 @@ export default function MobileBookShelf({
                         setIsInitialMounted(true);
                         setTrainIndex((prev) => prev + 1);
                     }}
-                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 active:scale-90 transition-all font-bold text-xs"
+                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 dark:hover:bg-[#d4a574]/25 text-[#7a5c42] dark:text-[#e5b882] active:scale-90 transition-all font-bold text-xs"
                     aria-label="Geser ke kanan"
                     title="Geser ke kanan"
                 >

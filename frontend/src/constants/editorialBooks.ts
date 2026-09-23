@@ -215,8 +215,8 @@ export const DEMO_EDITORIAL_BOOKS: EditorialBook[] = [
         rating: 5.0,
         tiltDegree: 0,
         heightPx: 335,
-        spineBg: "bg-[#dbeafe]",
-        textColor: "text-[#1e40af]",
+        spineBg: "bg-[#173d6b]",
+        textColor: "text-[#e0edfd]",
         c0: "#1e40af",
         c1: "#0284c7",
         c2: "#ea580c"

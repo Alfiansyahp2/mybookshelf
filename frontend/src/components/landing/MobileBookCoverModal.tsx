@@ -37,7 +37,7 @@ export default function MobileBookCoverModal({
                             e.stopPropagation();
                             onSelectBook(activeBook.id);
                         }}
-                        className="pointer-events-auto w-[190px] xs:w-[205px] aspect-[2/3] rounded-2xl bg-gradient-to-tr from-[#fdfbf7] via-[#faf4e8] to-[#f5ecd7] p-2 shadow-2xl border-2 border-[#4a3b2f]/40 cursor-pointer flex flex-col justify-between overflow-hidden group relative"
+                        className="pointer-events-auto w-[190px] xs:w-[205px] aspect-[2/3] rounded-2xl bg-gradient-to-tr from-[#fdfbf7] via-[#faf4e8] to-[#f5ecd7] dark:from-[#261810] dark:via-[#2d1e15] dark:to-[#362318] p-2 shadow-2xl border-2 border-[#4a3b2f]/40 dark:border-[#d4a574]/40 cursor-pointer flex flex-col justify-between overflow-hidden group relative"
                         style={{
                             boxShadow: "0 24px 50px -10px rgba(0,0,0,0.5), 0 0 30px rgba(212,165,116,0.35)"
                         }}

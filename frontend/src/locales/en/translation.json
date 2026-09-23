@@ -840,6 +840,8 @@
     "curated_demo": "Demo Curated Collection",
     "editorial_showcase": "Editorial Showcase.",
     "pages_short": "Pgs",
-    "tap_to_read": "Tap for details"
+    "tap_to_read": "Tap for details",
+    "theme_dark": "Switch to Cozy Brown Night Mode",
+    "theme_light": "Switch to Light Mode"
   }
 }

@@ -840,6 +840,8 @@
     "curated_demo": "Koleksi Kurasi Demo",
     "editorial_showcase": "Editorial Showcase.",
     "pages_short": "Hal",
-    "tap_to_read": "Ketuk untuk detail"
+    "tap_to_read": "Ketuk untuk detail",
+    "theme_dark": "Beralih ke Mode Coklat Malam",
+    "theme_light": "Beralih ke Mode Terang"
   }
 }
