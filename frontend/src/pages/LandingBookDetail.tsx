@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
     Star,
     X,
@@ -78,7 +78,7 @@ export default function LandingBookDetail() {
     if (!currentBook) return null;
 
     // Smooth page transitions variants
-    const pageVariants = {
+    const pageVariants: Variants = {
         initial: (dir: number) => ({
             opacity: 0,
             x: dir > 0 ? 50 : -50,
@@ -107,7 +107,7 @@ export default function LandingBookDetail() {
         })
     };
 
-    const coverVariants = {
+    const coverVariants: Variants = {
         initial: (dir: number) => ({
             rotateY: dir > 0 ? 20 : -20,
             scale: 0.9,
