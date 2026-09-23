@@ -611,15 +611,27 @@
       "pages": "Halaman",
       "year": "Tahun",
       "language": "Bahasa",
-      "format": "Format"
+      "format": "Format",
+      "lang_id": "Bahasa Indonesia",
+      "lang_en": "Bahasa Inggris",
+      "lang_ko": "Bahasa Korea",
+      "format_paperback": "Paperback",
+      "format_hardcover": "Hardcover",
+      "format_ebook": "E-Book"
     },
     "progress": {
       "label": "Progress",
       "page": "Hal.",
+      "page_full": "Halaman",
       "of": "dari",
       "start_to_see": "Mulai membaca untuk melihat progress",
-      "choose_finish_date": "Pilih Tanggal Selesai Dibaca:"
+      "choose_finish_date": "Pilih Tanggal Selesai Dibaca:",
+      "reading_progress": "Progres Membaca",
+      "update_progress": "Perbarui Progres",
+      "reading_since": "Membaca sejak {{date}}",
+      "add": "Tambah"
     },
+    "cover": "Sampul",
     "your_rating": "Rating Kamu",
     "actions": {
       "favorite": "Favorit",
@@ -824,6 +836,9 @@
     "send_email": "Kirim Email",
     "open_portfolio": "Buka Portfolio",
     "close_modal": "Tutup",
-    "switch_lang": "Switch to English"
+    "switch_lang": "Switch to English",
+    "curated_demo": "Koleksi Kurasi Demo",
+    "editorial_showcase": "Editorial Showcase.",
+    "pages_short": "Hal"
   }
 }

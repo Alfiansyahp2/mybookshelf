@@ -8,6 +8,24 @@ interface BookStatsSectionProps {
 
 export default function BookStatsSection({ book, c0 }: BookStatsSectionProps) {
     const { t } = useTranslation();
+
+    const formatLanguage = (lang?: string) => {
+        if (!lang) return "—";
+        if (lang === "Bahasa Indonesia") return t("bookDetail.stats.lang_id", "Bahasa Indonesia");
+        if (lang === "English") return t("bookDetail.stats.lang_en", "English");
+        if (lang === "Korean") return t("bookDetail.stats.lang_ko", "Korean");
+        return lang;
+    };
+
+    const formatFormat = (fmt?: string) => {
+        if (!fmt) return "—";
+        const lower = fmt.toLowerCase();
+        if (lower === "paperback") return t("bookDetail.stats.format_paperback", "Paperback");
+        if (lower === "hardcover") return t("bookDetail.stats.format_hardcover", "Hardcover");
+        if (lower === "ebook") return t("bookDetail.stats.format_ebook", "E-Book");
+        return fmt.charAt(0).toUpperCase() + fmt.slice(1);
+    };
+
     return (
         <div className="grid grid-cols-2 gap-2">
             {[
@@ -24,15 +42,12 @@ export default function BookStatsSection({ book, c0 }: BookStatsSectionProps) {
                 {
                     icon: "🌐",
                     label: t("bookDetail.stats.language", "Bahasa"),
-                    val: book.language || "—",
+                    val: formatLanguage(book.language),
                 },
                 {
                     icon: "📦",
                     label: t("bookDetail.stats.format", "Format"),
-                    val: book.format
-                        ? book.format.charAt(0).toUpperCase() +
-                          book.format.slice(1)
-                        : "—",
+                    val: formatFormat(book.format),
                 },
             ].map((s, i) => (
                 <div

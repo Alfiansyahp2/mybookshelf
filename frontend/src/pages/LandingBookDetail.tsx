@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
-    Star,
     X,
     ArrowUpRight,
     BookOpen
@@ -15,7 +14,7 @@ import LandingLanguageToggle from "../components/landing/LandingLanguageToggle";
 import type { Book } from "../types";
 
 export default function LandingBookDetail() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
@@ -26,6 +25,9 @@ export default function LandingBookDetail() {
 
     const bookIndex = books.findIndex((b) => b.id === id);
     const currentBook = books[bookIndex] || books[0];
+
+    const isEn = i18n.language?.startsWith("en");
+    const activeSynopsis = (isEn && currentBook?.synopsisEn) ? currentBook.synopsisEn : (currentBook?.synopsis || "");
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -159,7 +161,7 @@ export default function LandingBookDetail() {
         startedDate: "2026-07-04",
         finishedDate: currentBook.status === "Finished" ? "2026-07-04" : undefined,
         readDates: ["2026-07-04"],
-        personalNotes: currentBook.synopsis,
+        personalNotes: activeSynopsis,
         personalRating: currentBook.rating,
         dateAdded: "2026-01-01",
         lastModified: "2026-09-19"
@@ -169,7 +171,7 @@ export default function LandingBookDetail() {
         <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] text-[#4a3b2f] font-sans flex flex-col justify-between p-3 sm:p-6 md:p-10 relative selection:bg-[#7a5c42] selection:text-white">
             <SEO
                 title={`${currentBook.title} - ${currentBook.author} | A?Bookshelf`}
-                description={currentBook.synopsis}
+                description={activeSynopsis}
             />
 
             {/* Dynamic Subtle Ambient Glow */}
@@ -191,7 +193,7 @@ export default function LandingBookDetail() {
                         A?Bookshelf
                     </span>
                     <span className="text-xs font-semibold text-[#7a5c42]/60 hidden sm:inline-block border-l border-[#7a5c42]/20 pl-4 py-0.5">
-                        Koleksi Kurasi Demo
+                        {t("landing.curated_demo", "Koleksi Kurasi Demo")}
                     </span>
                 </div>
 
@@ -301,7 +303,7 @@ export default function LandingBookDetail() {
 
                                             <div className="text-[10px] sm:text-xs font-semibold text-[#f8f5f0]/75 flex justify-between border-t border-white/20 pt-1.5 sm:pt-3 relative z-1">
                                                 <span>{currentBook.year}</span>
-                                                <span>{currentBook.pages} Hal</span>
+                                                <span>{currentBook.pages} {t("landing.pages_short", "Hal")}</span>
                                             </div>
                                         </>
                                     )}
@@ -338,14 +340,9 @@ export default function LandingBookDetail() {
                                     <div className="mt-1.5 sm:mt-3 flex flex-wrap items-center gap-1.5 sm:gap-3 text-[11px] sm:text-sm text-[#7a5c42] font-medium">
                                         <span>{currentBook.category}</span>
                                         <span>•</span>
-                                        <span>{currentBook.pages} pages</span>
+                                        <span>{currentBook.pages} {t("landing.pages", "halaman")}</span>
                                         <span>•</span>
                                         <span>{currentBook.year}</span>
-                                        <span>•</span>
-                                        <span className="flex items-center gap-1 text-[#d4a574] font-bold">
-                                            <Star className="w-3.5 h-3.5 fill-[#d4a574] text-[#d4a574]" />
-                                            {currentBook.rating.toFixed(1)}
-                                        </span>
                                     </div>
 
                                     {/* Personal Quote Callout Box */}
@@ -365,7 +362,7 @@ export default function LandingBookDetail() {
                                         transition={{ delay: 0.15, duration: 0.3 }}
                                         className="mt-2 sm:mt-5 text-xs sm:text-base text-[#4a3b2f]/90 leading-relaxed font-sans max-w-2xl"
                                     >
-                                        <p>{currentBook.synopsis}</p>
+                                        <p>{activeSynopsis}</p>
                                     </motion.div>
                                 </div>
                             </div>
@@ -376,7 +373,7 @@ export default function LandingBookDetail() {
 
             {/* FOOTER SINGLE LINE */}
             <footer className="hidden sm:flex w-full max-w-7xl mx-auto items-center justify-between text-[10px] sm:text-[11px] text-[#7a5c42] shrink-0 border-t border-[#7a5c42]/15 pt-2 sm:pt-3 relative z-10">
-                <span>© {new Date().getFullYear()} A?Bookshelf. Editorial Showcase.</span>
+                <span>© {new Date().getFullYear()} A?Bookshelf. {t("landing.editorial_showcase", "Editorial Showcase.")}</span>
                 <div className="flex items-center gap-4">
                     <span className="hidden sm:inline text-[#7a5c42]/60">{t("landing.scroll_hint", "Gunakan scroll mouse untuk berpindah")}</span>
                     <Link to="/dashboard" className="hover:text-[#4a3b2f] underline font-bold flex items-center gap-1">

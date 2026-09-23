@@ -611,15 +611,27 @@
       "pages": "Pages",
       "year": "Year",
       "language": "Language",
-      "format": "Format"
+      "format": "Format",
+      "lang_id": "Indonesian",
+      "lang_en": "English",
+      "lang_ko": "Korean",
+      "format_paperback": "Paperback",
+      "format_hardcover": "Hardcover",
+      "format_ebook": "E-Book"
     },
     "progress": {
       "label": "Progress",
       "page": "Pg.",
+      "page_full": "Page",
       "of": "of",
       "start_to_see": "Start reading to see progress",
-      "choose_finish_date": "Choose Finish Date:"
+      "choose_finish_date": "Choose Finish Date:",
+      "reading_progress": "Reading Progress",
+      "update_progress": "Update Progress",
+      "reading_since": "Reading since {{date}}",
+      "add": "Add"
     },
+    "cover": "Cover",
     "your_rating": "Your Rating",
     "actions": {
       "favorite": "Favorite",
@@ -824,6 +836,9 @@
     "send_email": "Send Email",
     "open_portfolio": "Open Portfolio",
     "close_modal": "Close",
-    "switch_lang": "Ganti ke Bahasa Indonesia"
+    "switch_lang": "Ganti ke Bahasa Indonesia",
+    "curated_demo": "Demo Curated Collection",
+    "editorial_showcase": "Editorial Showcase.",
+    "pages_short": "Pgs"
   }
 }

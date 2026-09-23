@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Edit, Clock, Hash, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Book } from "../../types";
 import BookDetailLeftPage from "../book-details/BookDetailLeftPage";
 import BookDetailRightPage from "../book-details/BookDetailRightPage";
@@ -64,6 +65,7 @@ export default function DemoBookDetailModal({
     isOpen,
     onClose,
 }: DemoBookDetailModalProps) {
+    const { t } = useTranslation();
     const [book, setBook] = useState<Book | null>(initialBook);
     const [userRating, setUserRating] = useState(0);
     const [userNotes, setUserNotes] = useState("");
@@ -98,7 +100,8 @@ export default function DemoBookDetailModal({
 
     if (!isOpen || !book) return null;
 
-    const cfg = STATUS_CFG[book.status] ?? STATUS_CFG["unread"];
+    const baseCfg = STATUS_CFG[book.status] ?? STATUS_CFG["unread"];
+    const cfg = { ...baseCfg, label: t(baseCfg.labelKey, baseCfg.label) };
     const progress =
         book.pages && book.pages > 0
             ? Math.round(((book.currentPage || 0) / book.pages) * 100)
@@ -108,10 +111,10 @@ export default function DemoBookDetailModal({
     const c2 = book.spineColors?.[2] || "#5C4532";
 
     const tabs: { id: RightTab; label: string; icon: React.ReactNode }[] = [
-        { id: "progress", label: "Progress", icon: <BookOpen className="w-3.5 h-3.5" /> },
-        { id: "session", label: "Sesi", icon: <Clock className="w-3.5 h-3.5" /> },
-        { id: "notes", label: "Catatan", icon: <Edit className="w-3.5 h-3.5" /> },
-        { id: "info", label: "Info", icon: <Hash className="w-3.5 h-3.5" /> },
+        { id: "progress", label: t("bookDetail.tabs.progress", "Progress"), icon: <BookOpen className="w-3.5 h-3.5" /> },
+        { id: "session", label: t("bookDetail.tabs.session", "Sesi"), icon: <Clock className="w-3.5 h-3.5" /> },
+        { id: "notes", label: t("bookDetail.tabs.notes", "Catatan"), icon: <Edit className="w-3.5 h-3.5" /> },
+        { id: "info", label: t("bookDetail.tabs.info", "Info"), icon: <Hash className="w-3.5 h-3.5" /> },
     ];
     const tabIdx = tabs.findIndex((t) => t.id === activeTab);
 
@@ -233,7 +236,7 @@ export default function DemoBookDetailModal({
                                     : "text-[#f8f5f0]/70 hover:text-white"
                                     }`}
                             >
-                                <span>Cover</span>
+                                <span>{t("bookDetail.cover", "Cover")}</span>
                             </button>
                             <button
                                 onClick={() => setMobilePage("right")}
@@ -242,13 +245,13 @@ export default function DemoBookDetailModal({
                                     : "text-[#f8f5f0]/70 hover:text-white"
                                     }`}
                             >
-                                <span>Progress</span>
+                                <span>{t("bookDetail.tabs.progress", "Progress")}</span>
                             </button>
                         </div>
                         <button
                             onClick={onClose}
                             className="p-1 rounded-full hover:bg-white/10 text-white"
-                            aria-label="Tutup"
+                            aria-label={t("bookDetail.actions.close", "Tutup")}
                         >
                             <X className="w-4 h-4" />
                         </button>
