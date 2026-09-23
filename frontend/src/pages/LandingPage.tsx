@@ -29,7 +29,7 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] text-[#4a3b2f] font-sans flex flex-col justify-between p-4 sm:p-6 md:p-10 selection:bg-[#7a5c42] selection:text-white relative">
+        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] text-[#4a3b2f] font-sans flex flex-col justify-between p-4 pb-3 sm:p-6 md:p-10 selection:bg-[#7a5c42] selection:text-white relative">
             {/* Cozy Floating Dust Particles (Anime.js) */}
             <LibraryAmbientParticles />
 
@@ -74,7 +74,7 @@ export default function LandingPage() {
             </header>
 
             {/* ── MAIN CONTENT SECTION (FULL WIDTH) ── */}
-            <main className="my-auto w-full max-w-6xl mx-auto flex flex-col items-center text-center justify-center space-y-4 sm:space-y-12">
+            <main className="w-full max-w-6xl mx-auto flex-1 flex flex-col items-center text-center md:justify-center my-0 md:my-auto md:space-y-12">
                 {/* HERO HEADLINE (DESKTOP) */}
                 <motion.div
                     initial={{ opacity: 0, y: 15 }}
@@ -85,12 +85,12 @@ export default function LandingPage() {
                     <AnimeHeroHeadline />
                 </motion.div>
 
-                {/* MOBILE HEADLINE */}
-                <div className="block md:hidden text-center max-w-sm mx-auto pt-2 pb-2 px-2">
-                    <h1 className="font-serif italic font-bold text-2xl sm:text-3xl text-[#3a2d23] tracking-tight leading-snug">
+                {/* MOBILE HEADLINE (RESPONSIVELY CENTERED IN THE SPACE BETWEEN HEADER AND BOOKSHELF) */}
+                <div className="flex-1 w-full flex flex-col items-center justify-center md:hidden text-center max-w-xs mx-auto px-4 py-2">
+                    <h1 className="font-serif italic font-bold text-2xl xs:text-[27px] text-[#3a2d23] tracking-tight leading-snug">
                         Abadikan Setiap Lembar Cerita
                     </h1>
-                    <p className="text-xs text-[#7a5c42] mt-1 font-sans opacity-90">
+                    <p className="text-xs text-[#7a5c42] mt-1.5 font-sans opacity-90 leading-relaxed">
                         Jelajahi koleksi editorial & kelola rak buku digitalmu
                     </p>
                 </div>
@@ -100,7 +100,7 @@ export default function LandingPage() {
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
-                    className="w-full"
+                    className="w-full shrink-0"
                 >
                     <InteractiveBookDemo />
                 </motion.div>

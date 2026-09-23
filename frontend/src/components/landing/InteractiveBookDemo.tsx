@@ -270,8 +270,24 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
     const navigate = useNavigate();
     const [books] = useState<EditorialBook[]>(DEMO_EDITORIAL_BOOKS);
     const [hoveredBookId, setHoveredBookId] = useState<string | null>(null);
-    const [activeMobileIndex, setActiveMobileIndex] = useState<number>(0);
+    const [trainIndex, setTrainIndex] = useState(0);
+    const [activeMobileBookId, setActiveMobileBookId] = useState<string | null>(null);
     const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
+    const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
+
+    // Natural bookshelf rhythm: stable upright book clusters with gentle organic slants (2.2° - 2.6°) leaning against taller neighbors
+    const mobileBookStyles: { height: number; tilt: number }[] = [
+        { height: 310, tilt: 0 },    // 0: Berdamai (Muthia) - tegak kokoh
+        { height: 275, tilt: -2.6 }, // 1: Man's Search (Viktor) - miring lembut ke kiri menyandar ke Muthia
+        { height: 330, tilt: 0 },    // 2: 1984 (George) - buku tinggi kokoh, tegak lurus
+        { height: 285, tilt: 2.4 },  // 3: Janji (Tere) - miring lembut ke kanan menyandar ke Malioboro
+        { height: 320, tilt: 0 },    // 4: Malioboro (Skysphire) - pilar tegak di tengah
+        { height: 290, tilt: -2.2 }, // 5: Tuesdays with Morrie (Mitch) - miring lembut ke kiri menyandar ke Malioboro
+        { height: 310, tilt: 0 },    // 6: Courage (Ichiro) - tegak lurus
+        { height: 330, tilt: 0 },    // 7: Laut Bercerita (Leila) - tegak lurus
+        { height: 270, tilt: 2.6 },  // 8: Seorang Pria (dr. Andreas) - miring lembut ke kanan menyandar ke Little Prince
+        { height: 315, tilt: 0 }     // 9: The Little Prince (Antoine) - tegak lurus
+    ];
 
     useEffect(() => {
         const anim = animate(".demo-spine-item", {
@@ -282,7 +298,7 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
             ease: "outQuad",
             onComplete: () => {
                 animate(".demo-spine-item", {
-                    translateY: (_el: any, i: number) => (i % 2 === 0 ? [-3, 3] : [3, -3]),
+                    translateY: ((_el: any, i: number) => (i % 2 === 0 ? [-3, 3] : [3, -3])) as any,
                     duration: 3600,
                     delay: stagger(140),
                     loop: true,
@@ -301,8 +317,6 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
         navigate(`/landing/book/${id}`);
     };
 
-    const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
-
     const handleMobileTouchStart = (e: React.TouchEvent) => {
         setTouchStartPos({
             x: e.touches[0].clientX,
@@ -318,38 +332,17 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
         const diffX = touchStartPos.x - endX;
         const diffY = touchStartPos.y - endY;
 
-        if (Math.abs(diffX) > 18 || Math.abs(diffY) > 18) {
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 0) {
-                    setActiveMobileIndex((prev) => (prev + 1) % books.length);
-                } else {
-                    setActiveMobileIndex((prev) => (prev - 1 + books.length) % books.length);
-                }
+        // Intentional horizontal swipe (> 25px horizontal, and horizontal > vertical * 1.3)
+        if (Math.abs(diffX) > 25 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
+            if (diffX > 0) {
+                // Swipe Left -> next book in train (infinite, no limit)
+                setTrainIndex((prev) => prev + 1);
             } else {
-                if (diffY > 0) {
-                    setActiveMobileIndex((prev) => (prev + 1) % books.length);
-                } else {
-                    setActiveMobileIndex((prev) => (prev - 1 + books.length) % books.length);
-                }
+                // Swipe Right -> previous book in train (infinite, no limit)
+                setTrainIndex((prev) => prev - 1);
             }
         }
         setTouchStartPos(null);
-    };
-
-    const [lastWheelTime, setLastWheelTime] = useState(0);
-
-    const handleMobileWheel = (e: React.WheelEvent) => {
-        const now = Date.now();
-        if (now - lastWheelTime < 280) return;
-
-        if (Math.abs(e.deltaY) > 10 || Math.abs(e.deltaX) > 10) {
-            setLastWheelTime(now);
-            if (e.deltaY > 0 || e.deltaX > 0) {
-                setActiveMobileIndex((prev) => (prev + 1) % books.length);
-            } else {
-                setActiveMobileIndex((prev) => (prev - 1 + books.length) % books.length);
-            }
-        }
     };
 
     return (
@@ -372,14 +365,17 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                             <motion.div
                                 style={{
                                     height: `${book.heightPx}px`,
-                                    transform: `rotate(${book.tiltDegree || 0}deg)`
+                                    transformOrigin: "bottom center"
+                                }}
+                                animate={{
+                                    rotate: isHovered ? 0 : (book.tiltDegree || 0)
                                 }}
                                 whileHover={{ y: -16, scale: 1.05 }}
                                 whileTap={{ scale: 0.96 }}
                                 onClick={() => handleSelectBook(book.id)}
                                 className={`cursor-pointer group relative w-12 ${book.spineBg} ${book.textColor} rounded-sm shadow-xl transition-all duration-300 flex flex-col justify-between p-2 select-none border-t border-l border-white/80 overflow-hidden ${isMatch
-                                        ? "opacity-100 hover:shadow-[#7a5c42]/30 hover:ring-2 hover:ring-[#4a3b2f]"
-                                        : "opacity-25 grayscale-[60%] blur-[0.4px] scale-95 pointer-events-none"
+                                    ? "opacity-100 hover:shadow-[#7a5c42]/30 hover:ring-2 hover:ring-[#4a3b2f]"
+                                    : "opacity-25 grayscale-[60%] blur-[0.4px] scale-95 pointer-events-none"
                                     }`}
                             >
                                 {/* Top Spine Accent Star */}
@@ -484,16 +480,16 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                                             {/* Status Badge & Rating Footer */}
                                             <div className="flex items-center justify-between text-xs font-semibold">
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10.5px] font-semibold ${book.status === "Finished"
-                                                        ? "bg-[#dbeafe] text-[#1e40af]"
-                                                        : book.status === "Reading"
-                                                            ? "bg-[#dcfce7] text-[#166534]"
-                                                            : "bg-[#f3e8ff] text-[#6b21a8]"
+                                                    ? "bg-[#dbeafe] text-[#1e40af]"
+                                                    : book.status === "Reading"
+                                                        ? "bg-[#dcfce7] text-[#166534]"
+                                                        : "bg-[#f3e8ff] text-[#6b21a8]"
                                                     }`}>
                                                     <span className={`w-2 h-2 rounded-full ${book.status === "Finished"
-                                                            ? "bg-[#3b82f6]"
-                                                            : book.status === "Reading"
-                                                                ? "bg-[#22c55e]"
-                                                                : "bg-[#a855f7]"
+                                                        ? "bg-[#3b82f6]"
+                                                        : book.status === "Reading"
+                                                            ? "bg-[#22c55e]"
+                                                            : "bg-[#a855f7]"
                                                         }`} />
                                                     {book.status === "Finished" ? "Selesai" : book.status === "Reading" ? "Sedang Dibaca" : "Wishlist"}
                                                 </span>
@@ -515,123 +511,210 @@ export default function InteractiveBookDemo({ statusFilter = "All", langFilter =
                 <div className="absolute bottom-1 left-2 right-2 h-[2px] bg-[#7a5c42]/30 rounded-full" />
             </div>
 
-            {/* ── MOBILE STACKED HORIZONTAL SPINES SHOWCASE (TOUCH & WHEEL SCROLLABLE) ── */}
+            {/* ── MOBILE SHOWCASE (PHYSICAL CONTINUOUS SLIDING TRAIN OF STANDING BOOKS) ── */}
             <div
                 onTouchStart={handleMobileTouchStart}
                 onTouchEnd={handleMobileTouchEnd}
-                onWheel={handleMobileWheel}
-                className="flex md:hidden flex-col items-center justify-between w-full py-2 sm:py-4 min-h-[350px] select-none relative touch-pan-y"
+                className="flex md:hidden flex-col items-center justify-end w-full pt-1 pb-2 px-1 select-none relative touch-pan-y"
             >
-                {/* Horizontal Tilted Spine Stack */}
-                <div className="w-full flex flex-col items-center justify-center space-y-3 my-auto px-1 sm:px-2">
-                    {[-1, 0, 1].map((offset) => {
-                        const idx = (activeMobileIndex + offset + books.length) % books.length;
-                        const book = books[idx];
-                        const isActive = offset === 0;
+                {/* 5 VISIBLE BOOKS VIEWPORT WINDOW OVER THE INFINITE CONTINUOUS TRAIN TRACK */}
+                <div className="w-full max-w-[365px] xs:max-w-[385px] mx-auto overflow-hidden relative min-h-[355px] pb-3 flex items-end">
+                    <motion.div
+                        animate={{ x: -trainIndex * 66 }}
+                        transition={{ type: "spring", stiffness: 180, damping: 24, mass: 0.7 }}
+                        className="relative h-[340px] w-full"
+                    >
+                        {(() => {
+                            // Infinite virtual sliding window: render buffer of items around trainIndex
+                            const slots: number[] = [];
+                            for (let i = trainIndex - 4; i <= trainIndex + 8; i++) {
+                                slots.push(i);
+                            }
+
+                            return slots.map((slotIndex) => {
+                                const bookIdx = ((slotIndex % books.length) + books.length) % books.length;
+                                const book = books[bookIdx];
+                                const isActive = activeMobileBookId === book.id;
+                                const style = mobileBookStyles[bookIdx] || { height: 280, tilt: 0 };
+                                const transformOrigin = style.tilt < 0 ? "left bottom" : style.tilt > 0 ? "right bottom" : "center bottom";
+
+                                return (
+                                    <motion.div
+                                        key={`infinite-book-slot-${slotIndex}`}
+                                        onClick={() => {
+                                            if (activeMobileBookId === book.id) {
+                                                setActiveMobileBookId(null);
+                                            } else {
+                                                setActiveMobileBookId(book.id);
+                                            }
+                                        }}
+                                        animate={{
+                                            y: isActive ? -80 : 0,
+                                            scale: isActive ? 1.05 : 1,
+                                            rotate: isActive ? 0 : style.tilt,
+                                            zIndex: isActive ? 50 : (style.tilt !== 0 ? 15 : 10)
+                                        }}
+                                        transition={{ type: "spring", stiffness: 320, damping: 25 }}
+                                        className={`absolute cursor-pointer w-[54px] xs:w-14 rounded-sm shadow-xl flex flex-col justify-between p-2 select-none border-t border-l border-white/80 overflow-hidden transition-shadow duration-300 ${book.spineBg
+                                            } ${book.textColor} ${isActive ? "ring-2 ring-[#4a3b2f] shadow-2xl" : "hover:shadow-2xl"
+                                            }`}
+                                        style={{
+                                            left: `${slotIndex * 66}px`,
+                                            bottom: "4px",
+                                            height: `${style.height}px`,
+                                            transformOrigin
+                                        }}
+                                    >
+                                        {/* Spine Top Accent Star */}
+                                        <div className="w-full flex justify-center shrink-0 pt-0.5">
+                                            <span className="text-[9.5px] text-[#d4a574]">★</span>
+                                        </div>
+
+                                        {/* Vertical Title Text */}
+                                        <div className="my-auto text-center flex items-center justify-center overflow-hidden flex-1">
+                                            <span
+                                                className="font-serif font-bold text-[11px] tracking-wider uppercase leading-none truncate"
+                                                style={{
+                                                    writingMode: "vertical-rl",
+                                                    transform: "rotate(180deg)",
+                                                    maxHeight: `${style.height - 70}px`
+                                                }}
+                                            >
+                                                {book.shortTitle || book.title}
+                                            </span>
+                                        </div>
+
+                                        {/* Bottom Spine Author */}
+                                        <div className="w-full text-center shrink-0 pb-0.5 overflow-hidden">
+                                            <span
+                                                className="text-[8px] font-semibold opacity-75 uppercase block tracking-tighter truncate"
+                                                style={{
+                                                    writingMode: "vertical-rl",
+                                                    transform: "rotate(180deg)",
+                                                    maxHeight: "40px"
+                                                }}
+                                            >
+                                                {book.author.split(" ")[0]}
+                                            </span>
+                                        </div>
+                                    </motion.div>
+                                );
+                            });
+                        })()}
+                    </motion.div>
+
+                    {/* Bottom Baseline Floor Rail Line Across the entire visible shelf */}
+                    <div className="absolute bottom-2 left-2 right-2 h-[2.5px] bg-[#7a5c42]/30 rounded-full pointer-events-none" />
+
+                    {/* Left Edge Blur & Smooth Fade */}
+                    <div
+                        className="absolute left-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-r from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent"
+                        style={{
+                            WebkitMaskImage: "linear-gradient(to right, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)",
+                            maskImage: "linear-gradient(to right, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)"
+                        }}
+                    />
+
+                    {/* Right Edge Blur & Smooth Fade */}
+                    <div
+                        className="absolute right-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-l from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent"
+                        style={{
+                            WebkitMaskImage: "linear-gradient(to left, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)",
+                            maskImage: "linear-gradient(to left, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)"
+                        }}
+                    />
+                </div>
+
+                {/* Swipe Gesture Indicator & Infinite Train Controls (LOCATED AT THE BOTTOM) */}
+                <div className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 border border-[#7a5c42]/20 text-[#7a5c42] text-[10px] font-bold tracking-wide z-10">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setTrainIndex((prev) => prev - 1);
+                        }}
+                        className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 active:scale-90 transition-all font-bold text-xs"
+                        aria-label="Geser ke kiri"
+                        title="Geser ke kiri"
+                    >
+                        ‹
+                    </button>
+                    <span>
+                        Geser Rak Buku
+                    </span>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setTrainIndex((prev) => prev + 1);
+                        }}
+                        className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 active:scale-90 transition-all font-bold text-xs"
+                        aria-label="Geser ke kanan"
+                        title="Geser ke kanan"
+                    >
+                        ›
+                    </button>
+                </div>
+
+                {/* "SAMPUL" COVER OVERLAY (APPEARS ONLY WHEN A BOOK IS CLICKED!) */}
+                <AnimatePresence mode="wait">
+                    {activeMobileBookId && (() => {
+                        const activeBook = books.find((b) => b.id === activeMobileBookId);
+                        if (!activeBook) return null;
 
                         return (
                             <motion.div
-                                key={`slot-${offset}`}
+                                key={`sampul-box-${activeBook.id}`}
+                                initial={{ opacity: 0, scale: 0.85, y: 25 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.85, y: 25 }}
+                                transition={{ type: "spring", stiffness: 350, damping: 25 }}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    if (isActive) {
-                                        handleSelectBook(book.id);
-                                    } else {
-                                        setActiveMobileIndex(idx);
-                                    }
+                                    handleSelectBook(activeBook.id);
                                 }}
-                                animate={{
-                                    opacity: isActive ? 1 : 0.5,
-                                    scale: isActive ? 1 : 0.92,
-                                    filter: isActive ? "blur(0px)" : "blur(0.5px)"
-                                }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 240,
-                                    damping: 24,
-                                    mass: 0.8
-                                }}
-                                className={`w-full max-w-[360px] rounded-2xl transition-colors duration-300 cursor-pointer flex items-center justify-between shadow-lg relative ${
-                                    isActive
-                                        ? "p-3 sm:p-3.5 bg-gradient-to-r from-[#fdfbf7] via-[#faf4e8] to-[#f5ecd7] text-[#4a3b2f] border-l-4 border-[#7a5c42] shadow-2xl z-20 ring-1 ring-[#7a5c42]/25"
-                                        : "px-4 py-2.5 bg-[#f5ecd7]/80 text-[#7a5c42]/90 z-10 border border-[#7a5c42]/10"
-                                }`}
+                                className="absolute bottom-10 z-50 w-[185px] xs:w-[200px] aspect-[2/3] rounded-2xl bg-gradient-to-tr from-[#fdfbf7] via-[#faf4e8] to-[#f5ecd7] p-2 shadow-2xl border-2 border-[#4a3b2f]/40 cursor-pointer flex flex-col justify-between overflow-hidden group left-0 right-0 mx-auto"
                                 style={{
-                                    transform: `rotate(${offset === 0 ? -1.5 : offset * 2}deg)`
+                                    boxShadow: "0 24px 50px -10px rgba(0,0,0,0.45), 0 0 25px rgba(122,92,66,0.3)"
                                 }}
                             >
-                                <AnimatePresence mode="popLayout" initial={false}>
-                                    <motion.div
-                                        key={book.id}
-                                        initial={{ opacity: 0, y: offset > 0 ? 8 : -8 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: offset > 0 ? -8 : 8 }}
-                                        transition={{ duration: 0.22, ease: "easeOut" }}
-                                        className="flex items-center gap-3 min-w-0 flex-1 w-full"
-                                    >
-                                        {/* Mini Cover Thumbnail */}
-                                        <div className={`${isActive ? "w-11 h-15" : "w-8 h-11"} rounded-md shadow-md overflow-hidden shrink-0 border border-black/15 bg-[#e8deca] relative transition-all duration-300`}>
-                                            {book.coverImage && !imgErrors[book.id] ? (
-                                                <img
-                                                    src={book.coverImage}
-                                                    alt={book.title}
-                                                    onError={() => setImgErrors((prev) => ({ ...prev, [book.id]: true }))}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className={`w-full h-full bg-gradient-to-tr ${book.coverGradient} p-1 flex flex-col justify-between text-white text-[7px]`}>
-                                                    <span className="font-serif font-bold line-clamp-2 leading-tight">{book.title}</span>
-                                                    <span className="text-[6px] opacity-75 truncate">{book.author}</span>
-                                                </div>
-                                            )}
-                                        </div>
+                                {/* Inner Cover Box */}
+                                <div className={`w-full h-full rounded-xl bg-gradient-to-tr ${activeBook.coverGradient} text-white p-2 relative overflow-hidden flex flex-col justify-start border border-white/30 shadow-md`}>
+                                    {/* Glossy Sheen Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/15 to-transparent pointer-events-none" />
 
-                                        {/* Book Metadata */}
-                                        <div className="flex flex-col min-w-0 flex-1">
-                                            <span className="text-[9.5px] font-bold uppercase tracking-wider text-[#7a5c42]/80 truncate">
-                                                {book.author}
-                                            </span>
-                                            <h4 className={`font-serif font-bold text-[#2a1a08] leading-snug truncate ${isActive ? "text-sm sm:text-base" : "text-xs"}`}>
-                                                {book.title}
-                                            </h4>
+                                    {/* Book Cover Image background if available */}
+                                    {activeBook.coverImage && !imgErrors[activeBook.id] ? (
+                                        <img
+                                            src={activeBook.coverImage}
+                                            alt={activeBook.title}
+                                            onError={() => setImgErrors((prev) => ({ ...prev, [activeBook.id]: true }))}
+                                            className="absolute inset-0 w-full h-full object-cover opacity-100 z-0"
+                                        />
+                                    ) : (
+                                        /* Fallback text only if cover image is missing */
+                                        <div className="my-auto text-center p-3 relative z-10">
+                                            <h4 className="font-serif font-bold text-sm text-white drop-shadow-md">{activeBook.title}</h4>
+                                            <p className="text-[10px] font-serif italic text-white/90 mt-1">{activeBook.author}</p>
                                         </div>
-                                    </motion.div>
-                                </AnimatePresence>
+                                    )}
+
+                                    {/* Top Right Close Button */}
+                                    <div className="relative z-10 flex items-center justify-end w-full">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setActiveMobileBookId(null);
+                                            }}
+                                            className="w-6 h-6 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-xs text-white flex items-center justify-center text-xs font-bold border border-white/20 transition-all active:scale-90 shadow-md"
+                                            title="Tutup"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
                             </motion.div>
                         );
-                    })}
-                </div>
-
-                {/* Bottom Horizontal Pill Dash Scroll Indicator */}
-                <div className="flex items-center justify-center gap-[2.5px] pt-3 pb-1 z-30">
-                    {books.map((b, idx) => {
-                        const isActive = idx === activeMobileIndex;
-                        return (
-                            <button
-                                key={`dash-${b.id}`}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveMobileIndex(idx);
-                                }}
-                                className="p-0 focus:outline-none flex items-center justify-center min-h-[20px] transition-transform active:scale-90 cursor-pointer"
-                                aria-label={`Scroll to item ${idx + 1}`}
-                                title={`${idx + 1}. ${b.title}`}
-                            >
-                                <motion.div
-                                    initial={false}
-                                    animate={{
-                                        height: isActive ? 16 : 10,
-                                        width: isActive ? 4 : 3,
-                                        backgroundColor: isActive ? "#7a5c42" : "rgba(122, 92, 66, 0.25)",
-                                        boxShadow: isActive ? "0px 2px 6px rgba(122, 92, 66, 0.35)" : "none"
-                                    }}
-                                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                                    className="rounded-full"
-                                />
-                            </button>
-                        );
-                    })}
-                </div>
+                    })()}
+                </AnimatePresence>
             </div>
         </div>
     );
