@@ -55,7 +55,7 @@ export default function AppLayout() {
     const deleteShelf = useDeleteShelf();
 
     // Get shelves data for edit functionality
-    const { shelves } = useShelves();
+    const { data: shelves = [] } = useShelves();
     
     // Global Dark Mode State from centralized theme store
     const { isDarkMode, toggleDarkMode } = useThemeStore();
