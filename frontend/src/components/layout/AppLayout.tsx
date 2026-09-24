@@ -35,6 +35,7 @@ import { Toaster } from "react-hot-toast";
 import MobileMenu from "./MobileMenu";
 import AppHeader from "./AppHeader";
 import { useAchievementTracker } from "../../hooks/useAchievementTracker";
+import { useThemeStore } from "../../store/useThemeStore";
 
 const navItems = [
     { path: "/library", icon: Library, labelKey: "nav.library" },
@@ -56,40 +57,8 @@ export default function AppLayout() {
     // Get shelves data for edit functionality
     const { shelves } = useShelves();
     
-    // Global Dark Mode State
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        try {
-            return localStorage.getItem("theme") === "dark";
-        } catch (e) {
-            return false;
-        }
-    });
-
-    const toggleDarkMode = () => {
-        setIsDarkMode((prev: boolean) => {
-            const next = !prev;
-            try { localStorage.setItem("theme", next ? "dark" : "light"); } catch (e) {}
-            
-            // For CSS fallbacks
-            if (next) {
-                document.documentElement.classList.add("dark");
-                document.body.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
-                document.body.classList.remove("dark");
-            }
-            
-            return next;
-        });
-    };
-
-    // Ensure body gets class on mount
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add("dark");
-            document.body.classList.add("dark");
-        }
-    }, []);
+    // Global Dark Mode State from centralized theme store
+    const { isDarkMode, toggleDarkMode } = useThemeStore();
 
     // Handle scroll physics
     const { data: selectedBook } = useBook(selectedBookId || "");

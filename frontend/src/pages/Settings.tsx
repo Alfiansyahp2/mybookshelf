@@ -17,6 +17,7 @@ import AppPreferences from "../components/settings/AppPreferences";
 import DataManagement from "../components/settings/DataManagement";
 import AboutSettings from "../components/settings/AboutSettings";
 import SEO from "../components/SEO";
+import { useThemeStore } from "../store/useThemeStore";
 
 export default function Settings() {
     const { t } = useTranslation();
@@ -24,14 +25,22 @@ export default function Settings() {
     const authUser = authData?.user || (authData as any)?.data?.user;
 
     const queryClient = useQueryClient();
+    const { isDarkMode } = useThemeStore();
 
     const [settings, setSettings] = useState({
-        theme: "light",
+        theme: isDarkMode ? "dark" : "light",
         notifications: true,
         emailUpdates: false,
         autoSave: true,
         readingReminders: true,
     });
+
+    useEffect(() => {
+        setSettings((prev) => ({
+            ...prev,
+            theme: isDarkMode ? "dark" : "light",
+        }));
+    }, [isDarkMode]);
 
     const [user, setUser] = useState({
         name: "User Name",

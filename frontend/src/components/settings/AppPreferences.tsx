@@ -10,6 +10,7 @@ import {
     Clock,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useThemeStore } from "../../store/useThemeStore";
 
 interface AppPreferencesProps {
     settings: any;
@@ -21,6 +22,7 @@ export default function AppPreferences({
     setSettings,
 }: AppPreferencesProps) {
     const { t } = useTranslation();
+    const { isDarkMode, setDarkMode } = useThemeStore();
 
     const preferencesItems = [
         {
@@ -32,7 +34,7 @@ export default function AppPreferences({
             ),
             icon: Palette,
             type: "toggle",
-            value: settings.theme === "dark",
+            value: isDarkMode,
         },
         {
             label: "Notifications",
@@ -121,11 +123,11 @@ export default function AppPreferences({
                             <button
                                 onClick={() => {
                                     if (item.label === "Theme") {
+                                        const nextDark = !isDarkMode;
+                                        setDarkMode(nextDark);
                                         setSettings({
                                             ...settings,
-                                            theme: item.value
-                                                ? "light"
-                                                : "dark",
+                                            theme: nextDark ? "dark" : "light",
                                         });
                                     } else {
                                         setSettings({

@@ -10,8 +10,7 @@ const getInitialTheme = (): boolean => {
     if (typeof window === "undefined") return false;
     try {
         const stored = localStorage.getItem("theme");
-        if (stored) return stored === "dark";
-        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        return stored === "dark";
     } catch {
         return false;
     }
