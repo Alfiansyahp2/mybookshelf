@@ -528,6 +528,14 @@
     "title": "Catatan",
     "coming_soon": "Segera hadir..."
   },
+  "register_coming_soon": {
+    "title": "Pendaftaran Anggota",
+    "badge": "Tahap Pengembangan",
+    "headline": "Pendaftaran Masih Dalam Pengembangan",
+    "subheadline": "Fitur pembuatan akun baru sedang kami persiapkan dan akan hadir pada pembaruan selanjutnya. Untuk saat ini, silakan masuk menggunakan akun yang sudah terdaftar.",
+    "back_to_login": "Masuk ke Akun",
+    "back_to_home": "Kembali ke Beranda"
+  },
   "login": {
     "failed": "Login gagal",
     "register_failed": "Pendaftaran gagal",

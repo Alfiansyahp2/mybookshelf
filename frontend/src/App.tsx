@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ReactQueryProvider } from "./lib/ReactQueryProvider";
 import AppLayout from "./components/layout/AppLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -7,6 +7,7 @@ import ToastContainer from "./components/ui/ToastContainer";
 import LandingPage from "./pages/LandingPage";
 import LandingBookDetail from "./pages/LandingBookDetail";
 import Login from "./pages/Login";
+import RegisterComingSoon from "./pages/RegisterComingSoon";
 import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
 import ExploreLibrary from "./pages/ExploreLibrary";
@@ -31,6 +32,10 @@ function App() {
                     <Route path="/landing/book/:id" element={<LandingBookDetail />} />
                     <Route path="/book/:id" element={<LandingBookDetail />} />
                     <Route path="/login" element={<Login />} />
+
+                    {/* Route ke Register (dinonaktifkan sementara dan diganti ke halaman Coming Soon) */}
+                    {/* <Route path="/register" element={<Register />} /> */}
+                    <Route path="/register" element={<RegisterComingSoon />} />
 
                     {/* App / Protected Routes */}
                     <Route

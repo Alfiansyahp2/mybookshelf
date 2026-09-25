@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useLogin, useRegister, useAuthUser } from "../hooks/useAuth";
+import { useLogin, useAuthUser } from "../hooks/useAuth";
+// import { useRegister } from "../hooks/useAuth"; // Dinonaktifkan sementara - dialihkan ke Coming Soon
 import { useNotifications } from "../hooks/useNotifications";
 import { BookOpen } from "lucide-react";
 import LoginForm from "../components/auth/LoginForm";
-import RegisterForm from "../components/auth/RegisterForm";
+// import RegisterForm from "../components/auth/RegisterForm"; // Dinonaktifkan sementara - dialihkan ke Coming Soon
 import AuthDecoration from "../components/auth/AuthDecoration";
 import AuthLeftPage from "../components/auth/AuthLeftPage";
 import SEO from "../components/SEO";
@@ -15,7 +16,7 @@ export default function Login() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const login = useLogin();
-    const register = useRegister();
+    // const register = useRegister();
     const { data: user } = useAuthUser();
     const addNotification = useNotifications((state) => state.addNotification);
 
@@ -33,54 +34,35 @@ export default function Login() {
         password: "",
         password_confirmation: "",
     });
-    const [isLogin, setIsLogin] = useState(true);
+    const isLogin = true;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const authFn = isLogin ? login : register;
-        const credentials = isLogin
-            ? { email: formData.email, password: formData.password }
-            : {
-                  name: formData.name,
-                  email: formData.email,
-                  password: formData.password,
-                  password_confirmation: formData.password_confirmation,
-              };
-
-        authFn.mutate(credentials as any, {
-            onSuccess: () => {
-                setTimeout(() => {
-                    navigate("/dashboard", { replace: true });
-                }, 100);
+        login.mutate(
+            { email: formData.email, password: formData.password },
+            {
+                onSuccess: () => {
+                    setTimeout(() => {
+                        navigate("/dashboard", { replace: true });
+                    }, 100);
+                },
+                onError: (error: any) => {
+                    const errorMessage =
+                        error.response?.data?.message ||
+                        error.message ||
+                        "Unknown error";
+                    addNotification({
+                        title: t("login.failed", "Login failed"),
+                        message: errorMessage,
+                        type: "warning",
+                    });
+                },
             },
-            onError: (error: any) => {
-                const errorMessage =
-                    error.response?.data?.message ||
-                    error.message ||
-                    "Unknown error";
-                addNotification({
-                    title: isLogin
-                        ? t("login.failed", "Login failed")
-                        : t("login.register_failed", "Registration failed"),
-                    message: errorMessage,
-                    type: "warning",
-                });
-            },
-        });
+        );
     };
 
-    const toggleMode = () => {
-        setIsLogin(!isLogin);
-        setFormData({
-            name: "",
-            email: "",
-            password: "",
-            password_confirmation: "",
-        });
-    };
-
-    const isLoading = login.isPending || register.isPending;
+    const isLoading = login.isPending;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 flex flex-col items-center justify-center p-4">
@@ -152,42 +134,41 @@ export default function Login() {
                                 </div>
 
                                 <h2 className="text-xl sm:text-2xl font-serif font-bold text-darkBrown mb-4 sm:mb-6 text-center">
-                                    {isLogin
-                                        ? t("login.sign_in", "Sign In")
-                                        : t("login.register", "Register")}
+                                    {t("login.sign_in", "Sign In")}
                                 </h2>
 
-                                {isLogin ? (
-                                    <LoginForm
-                                        formData={formData}
-                                        setFormData={setFormData}
-                                        onSubmit={handleSubmit}
-                                        isLoading={isLoading}
-                                    />
-                                ) : (
+                                <LoginForm
+                                    formData={formData}
+                                    setFormData={setFormData}
+                                    onSubmit={handleSubmit}
+                                    isLoading={isLoading}
+                                />
+
+                                {/* 
+                                    Form Register dinonaktifkan sementara dan dialihkan ke page Coming Soon di /register:
                                     <RegisterForm
                                         formData={formData}
                                         setFormData={setFormData}
                                         onSubmit={handleSubmit}
                                         isLoading={isLoading}
                                     />
-                                )}
+                                */}
 
                                 <div className="mt-5 text-center">
                                     <button
                                         type="button"
-                                        onClick={toggleMode}
-                                        className="text-walnut/80 hover:text-walnut text-xs sm:text-sm font-medium transition-colors"
+                                        onClick={() => navigate("/register")}
+                                        className="text-walnut/80 hover:text-walnut text-xs sm:text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5"
                                     >
-                                        {isLogin
-                                            ? t(
-                                                  "login.no_account",
-                                                  "Don't have a library card? Create one",
-                                              )
-                                            : t(
-                                                  "login.has_account",
-                                                  "Already have a library card? Sign in",
-                                              )}
+                                        <span>
+                                            {t(
+                                                "login.no_account",
+                                                "Don't have a library card? Create one",
+                                            )}
+                                        </span>
+                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold border border-amber-300">
+                                            Coming Soon
+                                        </span>
                                     </button>
                                 </div>
                             </div>

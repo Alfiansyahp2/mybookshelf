@@ -528,6 +528,14 @@
     "title": "Notes",
     "coming_soon": "Coming soon..."
   },
+  "register_coming_soon": {
+    "title": "Member Registration",
+    "badge": "Under Development",
+    "headline": "Registration Under Development",
+    "subheadline": "The new account registration feature is currently being crafted for our upcoming release. For now, you can sign in with an existing account.",
+    "back_to_login": "Sign In to Account",
+    "back_to_home": "Back to Home"
+  },
   "login": {
     "failed": "Login failed",
     "register_failed": "Registration failed",
