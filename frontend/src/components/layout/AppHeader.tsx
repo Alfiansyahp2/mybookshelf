@@ -88,7 +88,7 @@ export default function AppHeader({
             >
                 <div className="flex items-center justify-between gap-2 sm:gap-4 md:gap-8">
                     {/* Logo & Brand */}
-                    <Link to="/" className="flex items-center gap-2 md:gap-3 shrink-0 group">
+                    <Link to="/dashboard" className="flex items-center gap-2 md:gap-3 shrink-0 group">
                         <motion.div
                             className="w-8 h-8 md:w-10 md:h-10 bg-walnut rounded-lg md:rounded-xl flex items-center justify-center transition-colors duration-300 shadow-xs"
                             whileHover={{ scale: 1.05 }}
