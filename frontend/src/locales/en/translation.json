@@ -97,6 +97,13 @@
     "error_desc": "Check your connection and try again.",
     "done": "Done",
     "edit_layout": "Edit Layout",
+    "view_shelf": "Bookshelf View",
+    "view_shelf_short": "Shelf",
+    "view_grid": "Cover Grid View",
+    "view_grid_short": "Grid",
+    "swipe_hint": "Swipe to see more books",
+    "swipe": "swipe",
+    "empty_shelf": "No books on this shelf yet.",
     "empty": {
       "all_title": "Your collection is empty",
       "all_desc": "Start building your personal library",

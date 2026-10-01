@@ -6,8 +6,9 @@ import { useShelves } from "../hooks/useShelves";
 import { useBookstore } from "../store/useBookstore";
 import type { Book } from "../types";
 import Bookshelf from "../components/shelf/Bookshelf";
+import MobileCoverGrid from "../components/shelf/MobileCoverGrid";
 import AddBookModal from "../components/modals/AddBookModal";
-import { LayoutGrid, Save, Filter, X } from "lucide-react";
+import { LayoutGrid, Save, Filter, X, BookOpen, Layers } from "lucide-react";
 import { useUpdateShelfLayout } from "../hooks/useShelves";
 import ReadingCalendarModal from "../components/modals/ReadingCalendarModal";
 import LightingControl from "../components/shelf/LightingControl";
@@ -49,6 +50,7 @@ export default function Library() {
     }, [searchParams]);
 
     const [activeFilter, setActiveFilter] = useState<string>("all");
+    const [viewMode, setViewMode] = useState<"shelf" | "grid">("shelf");
     const [isEditMode, setIsEditMode] = useState(false);
     const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
@@ -137,62 +139,87 @@ export default function Library() {
             />
 
             {/* Filter tabs + Widgets on top of shelf */}
-            <div className="relative z-50 flex flex-col md:flex-row md:items-end justify-between gap-4 mb-0 pt-1 md:pt-4 px-1 md:px-0">
-                {/* Left Side (Filters & Layout) */}
-                <div className="flex items-center gap-3 overflow-x-auto hide-scrollbar mb-2 md:mb-6">
-                    {/* Edit Layout Button */}
-                    <div className="flex gap-2">
-                        {isEditMode ? (
-                            <button
-                                onClick={() => setIsEditMode(false)}
-                                className="h-12 px-5 rounded-xl bg-green-600/90 text-white backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-green-500 shadow-xl transition-all"
-                            >
-                                <Save size={18} />
-                                <span className="text-sm font-bold">
-                                    {t("library.done")}
-                                </span>
-                            </button>
-                        ) : (
-                            <motion.button
-                                onClick={() => setIsEditMode(true)}
-                                className="w-12 h-12 rounded-xl bg-white/40 backdrop-blur-md border border-white/40 shadow-lg flex items-center justify-center text-[#5a3410] transition-all hover:bg-white/60"
-                                title={t("library.edit_layout")}
-                                whileHover={{ scale: 1.15 }}
-                                whileTap={{ scale: 0.9 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <motion.div
-                                    whileHover={{ rotate: 360 }}
-                                    transition={{
-                                        duration: 0.6,
-                                        ease: [0.34, 1.56, 0.64, 1],
-                                    }}
-                                >
-                                    <LayoutGrid size={20} />
-                                </motion.div>
-                            </motion.button>
-                        )}
+            <div className="relative z-50 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-2 md:mb-0 pt-1 md:pt-4 px-1 md:px-0">
+                {/* Left Side (Filters, View Switcher & Layout) */}
+                <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto hide-scrollbar mb-1 md:mb-6">
+                    {/* View Mode Switcher (Shelf vs Grid) */}
+                    <div className="flex items-center bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/50 dark:border-white/10 p-1 rounded-2xl shadow-xs shrink-0">
+                        <button
+                            onClick={() => setViewMode("shelf")}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold transition-all ${
+                                viewMode === "shelf"
+                                    ? "bg-white text-darkBrown shadow-sm"
+                                    : "text-walnut/70 hover:text-darkBrown"
+                            }`}
+                            title={t("library.view_shelf", "Tampilan Rak")}
+                        >
+                            <BookOpen size={16} />
+                            <span className="hidden xs:inline">{t("library.view_shelf_short", "Rak")}</span>
+                        </button>
+                        <button
+                            onClick={() => {
+                                setViewMode("grid");
+                                setIsEditMode(false);
+                            }}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold transition-all ${
+                                viewMode === "grid"
+                                    ? "bg-white text-darkBrown shadow-sm"
+                                    : "text-walnut/70 hover:text-darkBrown"
+                            }`}
+                            title={t("library.view_grid", "Tampilan Grid Sampul")}
+                        >
+                            <LayoutGrid size={16} />
+                            <span className="hidden xs:inline">{t("library.view_grid_short", "Grid")}</span>
+                        </button>
                     </div>
+
+                    {/* Edit Layout Button (Only available in Shelf view) */}
+                    {viewMode === "shelf" && (
+                        <div className="flex gap-2 shrink-0">
+                            {isEditMode ? (
+                                <button
+                                    onClick={() => setIsEditMode(false)}
+                                    className="h-9 md:h-12 px-3 md:px-5 rounded-xl bg-green-600/90 text-white backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-green-500 shadow-xl transition-all"
+                                >
+                                    <Save size={16} />
+                                    <span className="text-xs md:text-sm font-bold">
+                                        {t("library.done")}
+                                    </span>
+                                </button>
+                            ) : (
+                                <motion.button
+                                    onClick={() => setIsEditMode(true)}
+                                    className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-white/40 backdrop-blur-md border border-white/40 shadow-sm md:shadow-lg flex items-center justify-center text-[#5a3410] transition-all hover:bg-white/60"
+                                    title={t("library.edit_layout")}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <Layers size={18} />
+                                </motion.button>
+                            )}
+                        </div>
+                    )}
 
                     {/* Filter Tabs (Animated Expandable Sliding Pill) */}
                     <motion.div 
                         layout
                         transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                        className="flex items-center bg-white/30 backdrop-blur-md border border-white/50 p-1 md:p-1.5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.05)]"
+                        className="flex items-center bg-white/30 backdrop-blur-md border border-white/50 p-1 md:p-1.5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.05)] shrink-0"
                     >
                         {/* Toggle Button */}
                         <motion.button
                             layout
                             transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
                             onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                            className={`flex items-center justify-center h-9 md:h-10 px-3 md:px-4 rounded-xl transition-all shrink-0 ${
+                            className={`flex items-center justify-center h-8 md:h-10 px-2.5 md:px-4 rounded-xl transition-all shrink-0 ${
                                 isFilterExpanded 
                                     ? "bg-white/40 text-darkBrown hover:bg-white/60" 
                                     : "bg-white/80 text-darkBrown shadow-sm hover:bg-white"
                             }`}
                         >
                             <motion.div layout transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}>
-                                {isFilterExpanded ? <X size={18} /> : <Filter size={18} />}
+                                {isFilterExpanded ? <X size={16} /> : <Filter size={16} />}
                             </motion.div>
                             <AnimatePresence mode="popLayout">
                                 {!isFilterExpanded && (
@@ -201,7 +228,7 @@ export default function Library() {
                                         animate={{ opacity: 1, width: "auto", scale: 1 }}
                                         exit={{ opacity: 0, width: 0, scale: 0.95 }}
                                         transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
-                                        className="ml-2 flex items-center gap-1.5 overflow-hidden whitespace-nowrap"
+                                        className="ml-1.5 md:ml-2 flex items-center gap-1.5 overflow-hidden whitespace-nowrap"
                                     >
                                     <span className="text-xs md:text-sm font-bold">
                                         {t(FILTER_TABS.find(t => t.key === activeFilter)?.labelKey as any)}
@@ -236,7 +263,7 @@ export default function Library() {
                                                 <button
                                                     key={tab.key}
                                                     onClick={() => setActiveFilter(tab.key)}
-                                                    className={`relative flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
+                                                    className={`relative flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
                                                         active
                                                             ? "text-darkBrown"
                                                             : "text-walnut/70 hover:text-darkBrown"
@@ -269,40 +296,54 @@ export default function Library() {
                     </motion.div>
                 </div>
 
-                {/* Widgets sitting exactly on the bookshelf rail */}
-                <div className="flex flex-shrink-0 items-end justify-end gap-3 md:gap-5 relative z-10 w-full md:w-auto scale-90 md:scale-100 origin-bottom-right mb-[-2px]">
-                    <FlipCalendar
-                        onClick={() => setIsCalendarModalOpen(true)}
-                    />
-                    <div className="pb-1">
-                        <BigDigitalClock />
+                {/* Widgets sitting on top of bookshelf rail */}
+                {viewMode === "shelf" && (
+                    <div className="flex flex-shrink-0 items-end justify-center sm:justify-end gap-2 sm:gap-4 md:gap-5 relative z-10 w-full md:w-auto scale-80 xs:scale-85 sm:scale-95 md:scale-100 origin-bottom sm:origin-bottom-right mb-[-2px]">
+                        <FlipCalendar
+                            onClick={() => setIsCalendarModalOpen(true)}
+                        />
+                        <div className="pb-1">
+                            <BigDigitalClock />
+                        </div>
+                        <div className="pb-0.5">
+                            <LightingControl />
+                        </div>
                     </div>
-                    <div className="pb-0.5">
-                        <LightingControl />
-                    </div>
-                </div>
+                )}
             </div>
 
-            {/* Bookshelf */}
+            {/* Main Library View: Bookshelf or Cover Grid */}
             <div
                 className="relative z-0"
                 style={{ flex: 1, opacity: isEditMode ? 0.95 : 1 }}
             >
-                <Bookshelf
-                    books={books}
-                    shelves={shelves}
-                    isEditMode={isEditMode}
-                    onSaveLayout={(layoutData) => {
-                        updateLayout(layoutData);
-                    }}
-                    onAddBook={isEditMode ? undefined : handleAddBook}
-                    filterStatus={
-                        activeFilter === "all" ? undefined : activeFilter
-                    }
-                    selectedBookId={selectedBookId}
-                    isDrawerOpen={isBookDetailOpen}
-                    onBookClick={isEditMode ? undefined : handleBookClick}
-                />
+                {viewMode === "shelf" ? (
+                    <Bookshelf
+                        books={books}
+                        shelves={shelves}
+                        isEditMode={isEditMode}
+                        onSaveLayout={(layoutData) => {
+                            updateLayout(layoutData);
+                        }}
+                        onAddBook={isEditMode ? undefined : handleAddBook}
+                        filterStatus={
+                            activeFilter === "all" ? undefined : activeFilter
+                        }
+                        selectedBookId={selectedBookId}
+                        isDrawerOpen={isBookDetailOpen}
+                        onBookClick={isEditMode ? undefined : handleBookClick}
+                    />
+                ) : (
+                    <MobileCoverGrid
+                        shelves={shelves}
+                        books={books}
+                        onBookClick={handleBookClick}
+                        onAddBook={handleAddBook}
+                        filterStatus={
+                            activeFilter === "all" ? undefined : activeFilter
+                        }
+                    />
+                )}
             </div>
 
             {/* Empty state */}

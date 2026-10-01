@@ -64,6 +64,32 @@ export default function LibraryShelf({
     const menuRef = useRef<HTMLDivElement>(null);
     const updateShelf = useUpdateShelf();
 
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(false);
+    const booksTrackRef = useRef<HTMLDivElement>(null);
+
+    const checkScroll = () => {
+        if (booksTrackRef.current) {
+            const { scrollLeft, scrollWidth, clientWidth } = booksTrackRef.current;
+            setCanScrollLeft(scrollLeft > 6);
+            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
+        }
+    };
+
+    const handleTrackScroll = () => {
+        checkScroll();
+    };
+
+    useEffect(() => {
+        checkScroll();
+        const el = booksTrackRef.current;
+        if (el) {
+            const observer = new ResizeObserver(() => checkScroll());
+            observer.observe(el);
+            return () => observer.disconnect();
+        }
+    }, [books]);
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent | TouchEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -381,9 +407,39 @@ export default function LibraryShelf({
                             zIndex: 15,
                             display: "flex",
                             alignItems: "flex-end",
-                            overflow: "visible",
+                            overflow: "hidden", // Keeps books inside the wooden cavity!
                         }}
                     >
+                        {/* Scroll Cue (Left) */}
+                        {canScrollLeft && (
+                            <div
+                                className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 z-30 transition-opacity duration-300 flex items-center justify-start pl-1"
+                                style={{
+                                    background:
+                                        "linear-gradient(to right, rgba(40, 24, 10, 0.75), transparent)",
+                                }}
+                            >
+                                <span className="text-amber-200/90 text-sm font-bold animate-pulse select-none">
+                                    ‹
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Scroll Cue (Right) */}
+                        {canScrollRight && (
+                            <div
+                                className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-30 transition-opacity duration-300 flex items-center justify-end pr-1"
+                                style={{
+                                    background:
+                                        "linear-gradient(to left, rgba(40, 24, 10, 0.75), transparent)",
+                                }}
+                            >
+                                <span className="text-amber-200/90 text-sm font-bold animate-pulse select-none">
+                                    ›
+                                </span>
+                            </div>
+                        )}
+
                         {/* Left decoration slot */}
                         <div
                             style={{
@@ -460,6 +516,8 @@ export default function LibraryShelf({
 
                         {/* Books */}
                         <div
+                            ref={booksTrackRef}
+                            onScroll={handleTrackScroll}
                             className="hide-scrollbar"
                             style={{
                                 flex: 1,
@@ -469,12 +527,16 @@ export default function LibraryShelf({
                                 display: "flex",
                                 alignItems: "flex-end",
                                 gap: 1,
-                                overflowX: "visible",
-                                overflowY: "visible",
+                                overflowX: "auto",
+                                overflowY: "hidden",
                                 perspective: "500px",
                                 perspectiveOrigin: "50% 100%",
                                 paddingBottom: 2,
+                                paddingLeft: 4,
+                                paddingRight: 4,
                                 WebkitOverflowScrolling: "touch",
+                                touchAction: "pan-x",
+                                scrollBehavior: "smooth",
                             }}
                         >
                             {books.map((book) => {
@@ -660,23 +722,33 @@ export default function LibraryShelf({
                     }}
                 >
                     {/* Shelf name */}
-                    <span
-                        style={{
-                            color: "rgba(255,210,140,0.85)",
-                            fontSize: 10,
-                            fontWeight: 600,
-                            letterSpacing: "0.14em",
-                            textTransform: "uppercase",
-                            fontFamily: "'Georgia',serif",
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            flex: "0 0 auto",
-                            maxWidth: 120,
-                        }}
-                    >
-                        {shelf.name}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                        <span
+                            style={{
+                                color: "rgba(255,210,140,0.85)",
+                                fontSize: 10,
+                                fontWeight: 600,
+                                letterSpacing: "0.14em",
+                                textTransform: "uppercase",
+                                fontFamily: "'Georgia',serif",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                maxWidth: 120,
+                            }}
+                        >
+                            {shelf.name}
+                        </span>
+                        {(canScrollRight || canScrollLeft) && (
+                            <span
+                                className="text-[9px] text-[#d4a574]/80 font-mono tracking-wider px-1.5 py-0.5 rounded bg-white/5 border border-white/10 flex items-center gap-1"
+                                title={t("library.swipe_hint", "Geser untuk melihat buku lainnya")}
+                            >
+                                <span>⇄</span>
+                                <span className="hidden xs:inline">{t("library.swipe", "geser")}</span>
+                            </span>
+                        )}
+                    </div>
 
                     {/* Progress bar */}
                     <div

@@ -97,6 +97,13 @@
     "error_desc": "Periksa koneksi dan coba lagi.",
     "done": "Selesai",
     "edit_layout": "Edit Layout",
+    "view_shelf": "Tampilan Rak",
+    "view_shelf_short": "Rak",
+    "view_grid": "Tampilan Grid Sampul",
+    "view_grid_short": "Grid",
+    "swipe_hint": "Geser untuk melihat buku lainnya",
+    "swipe": "geser",
+    "empty_shelf": "Belum ada buku di rak ini.",
     "empty": {
       "all_title": "Koleksimu masih kosong",
       "all_desc": "Mulai bangun perpustakaan pribadimu",
