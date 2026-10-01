@@ -32,7 +32,7 @@ const COLORS: Record<NotificationType, { icon: string; bg: string }> = {
     warning: { icon: "#ef4444", bg: "#fee2e2" }, // red
 };
 
-export default function NotificationCenter() {
+export default function NotificationCenter({ isScrolled = false }: { isScrolled?: boolean }) {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -89,10 +89,14 @@ export default function NotificationCenter() {
             {/* Bell Button */}
             <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 rounded-full transition-colors hover:bg-walnut/10 text-darkBrown focus:outline-none"
+                className={`relative w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-300 focus:outline-none border shadow-xs ${
+                    isScrolled
+                        ? "bg-cream hover:bg-walnut/10 text-walnut border-walnut/10 hover:border-walnut/20"
+                        : "bg-walnut/10 hover:bg-walnut/20 text-walnut border-transparent hover:border-walnut/20"
+                }`}
                 title={t("notification.title", "Notifikasi")}
-                whileHover={{ scale: 1.15 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 transition={{ duration: 0.2 }}
             >
                 <motion.div
@@ -100,13 +104,12 @@ export default function NotificationCenter() {
                     transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
                 >
                     <Bell
-                        size={20}
-                        className={
+                        className={`w-4 h-4 md:w-5 md:h-5 ${
                             unreadCount > 0 ? "fill-current opacity-20" : ""
-                        }
+                        }`}
                     />
                     {unreadCount > 0 && (
-                        <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm ring-2 ring-cream">
+                        <span className="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5 md:h-4 md:w-4 items-center justify-center rounded-full bg-red-500 text-[8px] md:text-[9px] font-bold text-white shadow-xs ring-2 ring-white">
                             {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
                     )}
@@ -121,7 +124,7 @@ export default function NotificationCenter() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-cream border border-walnut/15 shadow-xl z-50 overflow-hidden flex flex-col"
+                        className="absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-24px)] rounded-2xl bg-cream border border-walnut/15 shadow-xl z-50 overflow-hidden flex flex-col"
                         style={{ maxHeight: "calc(100vh - 100px)" }}
                     >
                         {/* Header */}

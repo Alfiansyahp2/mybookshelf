@@ -44,15 +44,26 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
         return () => document.removeEventListener("mousedown", handler);
     }, [searchQuery]);
 
-    const expandedWidth = window.innerWidth < 640 ? "180px" : "256px";
+    const [isMobile, setIsMobile] = useState(
+        typeof window !== "undefined" ? window.innerWidth < 640 : false,
+    );
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 640);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const expandedWidth = isMobile ? "150px" : "256px";
+    const collapsedWidth = isMobile ? "32px" : "40px";
 
     return (
         <div ref={searchRef} className="relative flex items-center justify-end z-[70]">
             <motion.div
                 initial={false}
-                animate={{ width: isExpanded ? expandedWidth : "40px" }}
+                animate={{ width: isExpanded ? expandedWidth : collapsedWidth }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative h-10 flex items-center"
+                className="relative h-8 md:h-10 flex items-center"
             >
                 <motion.div 
                     whileHover={!isExpanded ? "hover" : ""}
@@ -88,7 +99,7 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
                             }}
                         >
                             <Search className={`transition-colors duration-300 ${
-                                isExpanded ? "w-4 h-4 text-walnut/50" : "w-5 h-5 text-walnut"
+                                isExpanded ? "w-3.5 h-3.5 text-walnut/50" : "w-4 h-4 md:w-5 md:h-5 text-walnut"
                             }`} />
                         </motion.div>
                     </div>
