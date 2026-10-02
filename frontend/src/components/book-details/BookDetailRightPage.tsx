@@ -100,55 +100,55 @@ export default function BookDetailRightPage({
                 stiffness: 130,
                 delay: 0.12,
             }}
-            className="w-full md:flex-1 relative flex flex-col min-h-[500px] overflow-hidden"
+            className="w-full md:flex-1 relative flex flex-col min-h-[500px] overflow-hidden rounded-b-2xl md:rounded-l-none md:rounded-r-md"
             style={{
                 transformOrigin: "left center",
                 background: PAPER_BG,
                 backgroundImage: PAPER_LINES,
-                boxShadow: "inset 18px 0 28px rgba(0,0,0,0.13)",
-                borderRadius: "0 6px 6px 0",
+                boxShadow: typeof window !== "undefined" && window.innerWidth >= 768 ? "inset 18px 0 28px rgba(0,0,0,0.13)" : "none",
             }}
         >
-            {/* top accent strip */}
-            <div className="flex-shrink-0 h-2 bg-walnut" />
+            {/* top accent strip (desktop only; mobile has the top switcher bar) */}
+            <div className="hidden md:block flex-shrink-0 h-2 bg-walnut" />
 
             {/* ── Tab bar ─────────────────────────────────── */}
             <div
-                className="flex-shrink-0 flex items-center gap-0.5 px-4 pt-3 pb-0 border-b"
+                className="flex-shrink-0 flex items-center justify-between gap-1 px-3 sm:px-4 pt-2 sm:pt-3 pb-0 border-b overflow-hidden"
                 style={{ borderColor: `${c1}22` }}
             >
-                {tabs.map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => {
-                            if (tab.id !== "session") setSelectedReadDate(null);
-                            setActiveTab(tab.id);
-                        }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-t-lg transition-all border-b-2"
-                        style={
-                            activeTab === tab.id
-                                ? {
-                                      color: "#2a1a08",
-                                      borderBottomColor: c1,
-                                      background: "rgba(255,255,255,0.85)",
-                                      boxShadow: "0 -2px 6px rgba(0,0,0,0.06)",
-                                  }
-                                : {
-                                      color: "#9c6d3a",
-                                      borderBottomColor: "transparent",
-                                      background: "transparent",
-                                  }
-                        }
-                    >
-                        {tab.icon}
-                        {tab.label}
-                    </button>
-                ))}
+                {/* Horizontal scrollable tab buttons */}
+                <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto hide-scrollbar scrollbar-none flex-1 pb-0.5">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => {
+                                if (tab.id !== "session") setSelectedReadDate(null);
+                                setActiveTab(tab.id);
+                            }}
+                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 shrink-0 whitespace-nowrap"
+                            style={
+                                activeTab === tab.id
+                                    ? {
+                                          color: "#2a1a08",
+                                          borderBottomColor: c1,
+                                          background: "rgba(255,255,255,0.85)",
+                                          boxShadow: "0 -2px 6px rgba(0,0,0,0.06)",
+                                      }
+                                    : {
+                                          color: "#9c6d3a",
+                                          borderBottomColor: "transparent",
+                                          background: "transparent",
+                                      }
+                            }
+                        >
+                            {tab.icon}
+                            <span>{tab.label}</span>
+                        </button>
+                    ))}
+                </div>
 
-                <div className="flex-1" />
-
-                {/* action icons */}
-                <div className="flex items-center gap-0.5 pb-1">
+                {/* action icons (Desktop only, mobile has them in the top header bar) */}
+                <div className="hidden md:flex items-center gap-0.5 pb-1 shrink-0 ml-2">
                     {onEdit && (
                         <button
                             onClick={() => onEdit(book)}

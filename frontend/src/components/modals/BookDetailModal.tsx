@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Edit, Clock, Hash, X } from "lucide-react";
+import { BookOpen, Edit, Clock, Hash, X, Trash2 } from "lucide-react";
 import {
     useUpdateProgress,
     useToggleFavorite,
@@ -310,13 +310,46 @@ export default function BookDetailModal({
                                             <span>Progress</span>
                                         </button>
                                     </div>
-                                    <button
-                                        onClick={onClose}
-                                        className="p-1 rounded-full hover:bg-white/10 text-white"
-                                        aria-label="Tutup"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </button>
+                                    <div className="flex items-center gap-1">
+                                        {onEdit && (
+                                            <button
+                                                onClick={() => onEdit(book)}
+                                                className="p-1.5 rounded-full hover:bg-white/10 text-amber-200 transition-colors"
+                                                title={t("bookDetail.actions.edit", "Edit")}
+                                            >
+                                                <Edit className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
+                                        {onDelete && (
+                                            <button
+                                                onClick={() => {
+                                                    if (
+                                                        window.confirm(
+                                                            t(
+                                                                "bookDetail.confirm_delete",
+                                                                'Hapus "{{title}}"?',
+                                                                { title: book.title },
+                                                            ),
+                                                        )
+                                                    ) {
+                                                        onDelete(book.id);
+                                                        onClose();
+                                                    }
+                                                }}
+                                                className="p-1.5 rounded-full hover:bg-white/10 text-red-400 transition-colors"
+                                                title={t("bookDetail.actions.delete", "Hapus")}
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={onClose}
+                                            className="p-1 rounded-full hover:bg-white/10 text-white ml-0.5"
+                                            aria-label="Tutup"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Book Spine / Center Fold Shadow (Desktop) */}
