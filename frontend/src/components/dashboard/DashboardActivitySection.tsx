@@ -122,18 +122,46 @@ export default function DashboardActivitySection({
     const [isTimelineVisible, setIsTimelineVisible] = useState(false);
 
     return (
-        <div className="grid grid-cols-[minmax(0,1fr)_60px] gap-[30px] pb-[40px]">
+        <div className="flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_60px] gap-4 md:gap-[30px] pb-[40px]">
+            {/* Year Selector: Horizontal chips on mobile, right column on desktop */}
+            <div className="flex flex-row md:flex-col gap-1.5 md:gap-2 overflow-x-auto pb-1 md:pb-0 md:pt-[30px] order-first md:order-last">
+                {[0, 1, 2, 3].map((offset) => {
+                    const year = currentYear - offset;
+                    const isActive = selectedYear === year;
+                    return (
+                        <button
+                            type="button"
+                            key={year}
+                            onClick={() => setSelectedYear(year)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                                isActive
+                                    ? "bg-[#7A5C42] text-white shadow-xs"
+                                    : "bg-[rgba(139,99,56,0.06)] md:bg-transparent text-[rgba(122,92,66,0.7)] hover:bg-[rgba(139,99,56,0.1)]"
+                            }`}
+                        >
+                            {year}
+                        </button>
+                    );
+                })}
+            </div>
+
             {/* Left Column: Graph + Timeline */}
-            <div className="flex flex-col gap-8 min-w-0">
+            <div className="flex flex-col gap-8 min-w-0 order-last md:order-first">
                 {/* Heatmap Card */}
                 <motion.div {...fadeUp(0.6)}>
-                    <div className="text-[14px] text-darkBrown mb-3 pl-1 font-medium">
-                        {t("dashboard.activity.pages_read", {
-                            count: totalPagesInYear,
-                            year: selectedYear,
-                        })}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3 pl-1">
+                        <div className="text-[13px] sm:text-[14px] text-darkBrown font-medium">
+                            {t("dashboard.activity.pages_read", {
+                                count: totalPagesInYear,
+                                year: selectedYear,
+                            })}
+                        </div>
+                        <div className="text-[11px] text-[rgba(122,92,66,0.6)] flex items-center gap-1 sm:hidden">
+                            <span>⇄</span>
+                            <span>{t("dashboard.activity.scroll_hint", "Geser untuk lihat grafik")}</span>
+                        </div>
                     </div>
-                    <Card className="px-5 py-4">
+                    <Card className="p-3.5 sm:px-5 sm:py-4">
                         <div className="pb-5">
                             {augmentedDailyActivity.length === 0 ? (
                                 <div className="text-center py-6 text-[rgba(122,92,66,0.4)] text-[12px]">
@@ -312,54 +340,6 @@ export default function DashboardActivitySection({
                         </div>
                     </Card>
                 </motion.div>
-            </div>
-
-            {/* Right Column: Year Selector */}
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 8,
-                    paddingTop: 30,
-                }}
-            >
-                {[0, 1, 2, 3].map((offset) => {
-                    const year = currentYear - offset;
-                    const isActive = selectedYear === year;
-                    return (
-                        <div
-                            key={year}
-                            onClick={() => setSelectedYear(year)}
-                            style={{
-                                background: isActive
-                                    ? "#7A5C42"
-                                    : "transparent",
-                                color: isActive
-                                    ? "white"
-                                    : "rgba(122,92,66,0.7)",
-                                padding: "6px 12px",
-                                borderRadius: 6,
-                                fontSize: 12,
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                textAlign: "center",
-                                transition: "all 0.2s",
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isActive)
-                                    e.currentTarget.style.background =
-                                        "rgba(139,99,56,0.05)";
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!isActive)
-                                    e.currentTarget.style.background =
-                                        "transparent";
-                            }}
-                        >
-                            {year}
-                        </div>
-                    );
-                })}
             </div>
         </div>
     );

@@ -29,21 +29,10 @@ export default function DashboardReadingSection({
     return (
         <motion.div {...fadeUp(0.35)}>
             <Card
-                style={{
-                    height: 340,
-                    display: "flex",
-                    flexDirection: "column",
-                }}
+                className="flex flex-col min-h-[300px] lg:h-[340px]"
             >
                 <div
-                    style={{
-                        padding: "18px 20px 14px",
-                        borderBottom: "1px solid rgba(139,99,56,0.08)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        flexShrink: 0,
-                    }}
+                    className="px-4 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between shrink-0 border-b border-[rgba(139,99,56,0.08)]"
                 >
                     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                         <button

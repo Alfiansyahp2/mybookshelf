@@ -28,14 +28,7 @@ export default function DashboardStatCardsSection({
         accountingOverview?.data?.summary?.formatted_total || "Rp 0";
 
     return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))",
-                gap: 12,
-                marginBottom: 24,
-            }}
-        >
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-6">
             {[
                 {
                     icon: Library,
@@ -96,15 +89,18 @@ export default function DashboardStatCardsSection({
                 return (
                     <motion.div
                         key={s.label}
-                        {...fadeUp(i * 0.06)}
+                        {...fadeUp(i * 0.05)}
                         onClick={() => s.route && navigate(s.route)}
                         style={{ cursor: s.route ? "pointer" : "default" }}
                     >
                         <Card
+                            className="transition-all duration-200 hover:-translate-y-0.5"
                             style={{
-                                padding: "16px 14px",
+                                padding: "12px 12px",
                                 height: "100%",
-                                transition: "all 0.2s ease-in-out",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "space-between",
                                 ...(s.route
                                     ? {
                                           boxShadow:
@@ -113,57 +109,26 @@ export default function DashboardStatCardsSection({
                                     : {}),
                             }}
                         >
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 10,
-                                    marginBottom: 10,
-                                }}
-                            >
-                                <div
-                                    style={{
-                                        width: 36,
-                                        height: 36,
-                                        borderRadius: 10,
-                                        background: s.bg,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        flexShrink: 0,
-                                    }}
-                                >
-                                    <Icon size={18} color={s.color} />
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div
+                                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0"
+                                        style={{ background: s.bg }}
+                                    >
+                                        <Icon size={15} color={s.color} />
+                                    </div>
+                                    <span className="text-[10px] sm:text-[11px] font-medium text-walnut leading-tight line-clamp-1">
+                                        {s.label}
+                                    </span>
                                 </div>
-                                <span
-                                    style={{
-                                        fontSize: 11,
-                                        color: BRAND.walnut,
-                                        fontWeight: 500,
-                                        lineHeight: 1.3,
-                                    }}
+                                <div
+                                    className="font-extrabold text-darkBrown leading-none mb-1 break-words text-xl sm:text-2xl lg:text-[24px]"
+                                    style={s.valSize ? { fontSize: s.valSize } : {}}
                                 >
-                                    {s.label}
-                                </span>
+                                    {s.val}
+                                </div>
                             </div>
-                            <div
-                                style={{
-                                    fontSize: s.valSize || 28,
-                                    fontWeight: 800,
-                                    color: BRAND.darkBrown,
-                                    lineHeight: 1,
-                                    marginBottom: 3,
-                                    wordBreak: "break-word",
-                                }}
-                            >
-                                {s.val}
-                            </div>
-                            <div
-                                style={{
-                                    fontSize: 10,
-                                    color: "rgba(122,92,66,0.5)",
-                                }}
-                            >
+                            <div className="text-[9px] sm:text-[10px] text-walnut/50 mt-1 truncate">
                                 {s.sub}
                             </div>
                         </Card>

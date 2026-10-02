@@ -15,7 +15,19 @@
     "loading": "Memuat dashboard...",
     "hero": {
       "subtitle": "Perpustakaan Pribadi",
-      "title": "Dashboard"
+      "title": "Dashboard",
+      "greeting": "Halo, {{name}}!"
+    },
+    "quick_actions": {
+      "library": "Rak Buku",
+      "reading": "Sedang Baca",
+      "accounting": "Keuangan",
+      "calendar": "Kalender"
+    },
+    "tabs": {
+      "analytics_title": "Statistik & Wawasan",
+      "charts": "Grafik & Genre",
+      "authors": "Penulis"
     },
     "stat_cards": {
       "total_books": "Total Buku",
@@ -35,6 +47,7 @@
       "pages_read": "{{count}} halaman dibaca pada {{year}}",
       "no_activity": "Tidak ada aktivitas membaca tahun ini",
       "read_activity": "Riwayat bacaan",
+      "scroll_hint": "Geser untuk lihat grafik",
       "no_books": "Tidak ada riwayat buku pada tahun ini.",
       "book_activities": "Terdapat {{count}} aktivitas buku",
       "finished": "Selesai dibaca",

@@ -15,7 +15,19 @@
     "loading": "Loading dashboard...",
     "hero": {
       "subtitle": "Personal Library",
-      "title": "Dashboard"
+      "title": "Dashboard",
+      "greeting": "Hello, {{name}}!"
+    },
+    "quick_actions": {
+      "library": "Bookshelf",
+      "reading": "Now Reading",
+      "accounting": "Finance",
+      "calendar": "Calendar"
+    },
+    "tabs": {
+      "analytics_title": "Stats & Insights",
+      "charts": "Charts & Genres",
+      "authors": "Authors"
     },
     "stat_cards": {
       "total_books": "Total Books",
@@ -35,6 +47,7 @@
       "pages_read": "{{count}} pages read in {{year}}",
       "no_activity": "No reading activity this year",
       "read_activity": "Read activity",
+      "scroll_hint": "Swipe to view chart",
       "no_books": "No book history this year.",
       "book_activities": "There are {{count}} book activities",
       "finished": "Finished reading",

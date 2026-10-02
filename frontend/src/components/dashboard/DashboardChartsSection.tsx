@@ -51,13 +51,7 @@ export default function DashboardChartsSection({
     }, [stats.genreChart, genreFilter]);
 
     return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: 20,
-            }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
             <motion.div {...fadeUp(0.5)} style={{ height: "100%" }}>
                 <Card
                     style={{

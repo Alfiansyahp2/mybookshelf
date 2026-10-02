@@ -36,6 +36,7 @@ export default function Dashboard() {
 
     const [genreFilter, setGenreFilter] = useState<string>("Semua");
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+    const [mobileAnalyticsTab, setMobileAnalyticsTab] = useState<"charts" | "authors">("charts");
 
     const stats = useDashboardStats(books);
 
@@ -69,21 +70,18 @@ export default function Dashboard() {
         <div className="px-4 md:px-5 pt-[88px] md:pt-[100px] pb-10 max-w-[1200px] mx-auto">
             <SEO title={t("navigation.dashboard", "Dashboard")} />
             {/* ─── Hero header ──────────────────────────── */}
-            <DashboardHeroSection bookColors={stats.bookColors} />
+            <DashboardHeroSection
+                bookColors={stats.bookColors}
+                onOpenCalendar={() => setIsCalendarModalOpen(true)}
+            />
 
             {/* ─── KPI stat cards ───────────────────────── */}
             <DashboardStatCardsSection stats={stats} />
 
-            {/* ─── Main content area ────────────────────── */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5 mb-5">
-                {/* LEFT — Currently reading + unread */}
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 20,
-                    }}
-                >
+            {/* ─── Main content area: Desktop (lg+) ────── */}
+            <div className="hidden lg:grid lg:grid-cols-[1fr_320px] gap-5 mb-5">
+                {/* LEFT — Currently reading + unread & Charts */}
+                <div className="flex flex-col gap-5">
                     <DashboardReadingSection
                         currentlyReading={stats.currentlyReading}
                         topReadBooks={stats.topReadBooks || []}
@@ -97,19 +95,71 @@ export default function Dashboard() {
                 </div>
 
                 {/* RIGHT — Goals & Authors */}
-                <div
-                    style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 16,
-                        minHeight: 0,
-                    }}
-                >
+                <div className="flex flex-col gap-4 min-h-0">
                     <DashboardGoalsSection
                         stats={stats}
                         shelvesLength={shelves.length}
                     />
                     <DashboardAuthorsSection stats={stats} />
+                </div>
+            </div>
+
+            {/* ─── Main content area: Mobile (< lg) ─────── */}
+            <div className="flex flex-col gap-5 mb-5 lg:hidden">
+                {/* 1. Priority #1: Currently reading & Unread */}
+                <DashboardReadingSection
+                    currentlyReading={stats.currentlyReading}
+                    topReadBooks={stats.topReadBooks || []}
+                />
+
+                {/* 2. Priority #2: Reading Goals & Shelves */}
+                <DashboardGoalsSection
+                    stats={stats}
+                    shelvesLength={shelves.length}
+                />
+
+                {/* 3. Priority #3: Analytics & Insights with Segmented Tabs */}
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between px-1">
+                        <span className="text-xs font-bold uppercase tracking-wider text-walnut/70">
+                            {t("dashboard.tabs.analytics_title", "Statistik & Wawasan")}
+                        </span>
+                        {/* Segmented Control */}
+                        <div className="inline-flex p-1 rounded-xl bg-walnut/10 border border-walnut/15 text-xs font-medium">
+                            <button
+                                type="button"
+                                onClick={() => setMobileAnalyticsTab("charts")}
+                                className={`px-3 py-1 rounded-lg transition-all text-xs font-semibold cursor-pointer ${
+                                    mobileAnalyticsTab === "charts"
+                                        ? "bg-white text-darkBrown shadow-xs"
+                                        : "text-walnut/80 hover:text-darkBrown"
+                                }`}
+                            >
+                                {t("dashboard.tabs.charts", "Grafik & Genre")}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setMobileAnalyticsTab("authors")}
+                                className={`px-3 py-1 rounded-lg transition-all text-xs font-semibold cursor-pointer ${
+                                    mobileAnalyticsTab === "authors"
+                                        ? "bg-white text-darkBrown shadow-xs"
+                                        : "text-walnut/80 hover:text-darkBrown"
+                                }`}
+                            >
+                                {t("dashboard.tabs.authors", "Penulis")}
+                            </button>
+                        </div>
+                    </div>
+
+                    {mobileAnalyticsTab === "charts" ? (
+                        <DashboardChartsSection
+                            stats={stats}
+                            genreFilter={genreFilter}
+                            setGenreFilter={setGenreFilter}
+                        />
+                    ) : (
+                        <DashboardAuthorsSection stats={stats} />
+                    )}
                 </div>
             </div>
 
