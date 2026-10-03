@@ -83,10 +83,34 @@ export default function MobileCoverGrid({
                 return (
                     <div
                         key={shelf.id}
-                        className="rounded-2xl bg-[#fdfbf7]/80 dark:bg-[#20140e]/90 border border-[#7a5c42]/20 dark:border-[#d4a574]/25 shadow-lg p-3 sm:p-5 backdrop-blur-sm"
+                        className="rounded-2xl bg-[#fdfbf7]/80 dark:bg-[#20140e]/90 border border-[#7a5c42]/20 dark:border-[#d4a574]/25 shadow-lg overflow-hidden backdrop-blur-sm"
                     >
-                        {/* Shelf Header Banner */}
-                        <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#7a5c42]/15 dark:border-[#d4a574]/20">
+                        {/* Wooden top rail of shelf */}
+                        <div
+                            className="h-4 sm:h-5 w-full relative overflow-hidden"
+                            style={{
+                                background:
+                                    "linear-gradient(180deg, #c09060 0%, #9a7040 40%, #7a5428 70%, #624018 100%)",
+                                boxShadow:
+                                    "inset 0 2px 0 rgba(255,255,255,0.25), inset 0 -3px 6px rgba(0,0,0,0.25)",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: 2,
+                                    background: "rgba(255,255,255,0.2)",
+                                }}
+                            />
+                        </div>
+
+                        {/* Shelf Content */}
+                        <div className="p-3 sm:p-5 pt-3 sm:pt-4">
+                            {/* Shelf Header Banner */}
+                            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#7a5c42]/15 dark:border-[#d4a574]/20">
                             <div className="flex items-center gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-[#d4a574] shadow-xs" />
                                 <h2 className="font-serif font-bold text-base sm:text-lg text-[#4a3b2f] dark:text-[#f5ece3] tracking-wide uppercase">
@@ -234,6 +258,7 @@ export default function MobileCoverGrid({
                                 })}
                             </div>
                         )}
+                        </div>
                     </div>
                 );
             })}

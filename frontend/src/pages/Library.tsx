@@ -139,7 +139,7 @@ export default function Library() {
             />
 
             {/* Filter tabs + Widgets on top of shelf */}
-            <div className="relative z-50 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-2 md:mb-0 pt-0 px-1 md:px-0">
+            <div className="relative z-50 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-0 pt-0 px-1 md:px-0">
                 {/* Left Side (Filters, View Switcher & Layout) */}
                 <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto hide-scrollbar mb-1 md:mb-1.5">
                     {/* View Mode Switcher (Shelf vs Grid) */}
@@ -204,54 +204,71 @@ export default function Library() {
                     {/* Filter Tabs (Animated Expandable Sliding Pill) */}
                     <motion.div 
                         layout
-                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                         className="flex items-center bg-white/30 backdrop-blur-md border border-white/50 p-1 md:p-1.5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.05)] shrink-0"
                     >
                         {/* Toggle Button */}
                         <motion.button
                             layout
-                            transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                             onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                            className={`flex items-center justify-center h-8 md:h-10 px-2.5 md:px-4 rounded-xl transition-all shrink-0 ${
+                            className={`flex items-center justify-center h-8 md:h-10 px-2.5 md:px-3.5 rounded-xl shrink-0 ${
                                 isFilterExpanded 
                                     ? "bg-white/40 text-darkBrown hover:bg-white/60" 
-                                    : "bg-white/80 text-darkBrown shadow-sm hover:bg-white"
+                                    : "bg-white text-darkBrown shadow-xs hover:bg-white/90"
                             }`}
                         >
-                            <motion.div layout transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}>
-                                {isFilterExpanded ? <X size={16} /> : <Filter size={16} />}
-                            </motion.div>
-                            <AnimatePresence mode="popLayout">
+                            <div className="w-4 h-4 relative flex items-center justify-center shrink-0">
+                                <AnimatePresence mode="wait" initial={false}>
+                                    <motion.div
+                                        key={isFilterExpanded ? "close" : "open"}
+                                        initial={{ rotate: isFilterExpanded ? -90 : 90, opacity: 0, scale: 0.7 }}
+                                        animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                                        exit={{ rotate: isFilterExpanded ? 90 : -90, opacity: 0, scale: 0.7 }}
+                                        transition={{ duration: 0.2, ease: "easeOut" }}
+                                        className="absolute inset-0 flex items-center justify-center"
+                                    >
+                                        {isFilterExpanded ? <X size={16} /> : <Filter size={16} />}
+                                    </motion.div>
+                                </AnimatePresence>
+                            </div>
+                            <AnimatePresence initial={false}>
                                 {!isFilterExpanded && (
                                     <motion.div 
-                                        initial={{ opacity: 0, width: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, width: "auto", scale: 1 }}
-                                        exit={{ opacity: 0, width: 0, scale: 0.95 }}
-                                        transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                                        initial={{ opacity: 0, width: 0, x: -6 }}
+                                        animate={{ opacity: 1, width: "auto", x: 0 }}
+                                        exit={{ opacity: 0, width: 0, x: -6 }}
+                                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                                         className="ml-1.5 md:ml-2 flex items-center gap-1.5 overflow-hidden whitespace-nowrap"
                                     >
-                                    <span className="text-xs md:text-sm font-bold">
-                                        {t(FILTER_TABS.find(t => t.key === activeFilter)?.labelKey as any)}
-                                    </span>
-                                    <span className="text-[10px] md:text-[11px] px-1.5 bg-walnut/10 text-darkBrown font-bold rounded-full">
-                                        {counts[activeFilter as keyof typeof counts]}
-                                    </span>
+                                        <span className="text-xs md:text-sm font-bold">
+                                            {t(FILTER_TABS.find(t => t.key === activeFilter)?.labelKey as any)}
+                                        </span>
+                                        <span className="text-[10px] md:text-[11px] px-1.5 bg-walnut/10 text-darkBrown font-bold rounded-full">
+                                            {counts[activeFilter as keyof typeof counts]}
+                                        </span>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
                         </motion.button>
 
                         {/* Expandable Tabs */}
-                        <AnimatePresence mode="popLayout">
+                        <AnimatePresence initial={false}>
                             {isFilterExpanded && (
                                 <motion.div
-                                    initial={{ width: 0, opacity: 0, scale: 0.95 }}
-                                    animate={{ width: "auto", opacity: 1, scale: 1 }}
-                                    exit={{ width: 0, opacity: 0, scale: 0.95 }}
-                                    transition={{ type: "spring", bounce: 0.15, duration: 0.5 }}
+                                    initial={{ width: 0, opacity: 0 }}
+                                    animate={{ width: "auto", opacity: 1 }}
+                                    exit={{ width: 0, opacity: 0 }}
+                                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="flex items-center pl-1.5 md:pl-2 gap-1 w-max">
+                                    <motion.div
+                                        initial={{ x: -10, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: -10, opacity: 0 }}
+                                        transition={{ duration: 0.25, ease: "easeOut" }}
+                                        className="flex items-center pl-1.5 md:pl-2 gap-1 w-max"
+                                    >
                                         {FILTER_TABS.filter(
                                             (t) =>
                                                 t.key === "all" ||
@@ -263,22 +280,27 @@ export default function Library() {
                                                 <button
                                                     key={tab.key}
                                                     onClick={() => setActiveFilter(tab.key)}
-                                                    className={`relative flex items-center gap-1.5 md:gap-2 px-2.5 md:px-4 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-colors duration-300 z-10 ${
+                                                    className={`relative flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap z-10 select-none ${
                                                         active
                                                             ? "text-darkBrown"
-                                                            : "text-walnut/70 hover:text-darkBrown"
+                                                            : "text-walnut/70 hover:text-darkBrown hover:bg-white/30"
                                                     }`}
+                                                    style={{ transition: "color 0.2s ease, background-color 0.2s ease" }}
                                                 >
                                                     {active && (
                                                         <motion.div
                                                             layoutId="activeFilterTab"
-                                                            className="absolute inset-0 bg-white rounded-xl shadow-sm z-[-1]"
-                                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                            className="absolute inset-0 bg-white rounded-xl shadow-xs z-[-1]"
+                                                            transition={{
+                                                                type: "spring",
+                                                                stiffness: 450,
+                                                                damping: 32,
+                                                            }}
                                                         />
                                                     )}
                                                     <span className="relative z-10">{t(tab.labelKey as any)}</span>
                                                     <span
-                                                        className={`relative z-10 text-[10px] md:text-[11px] px-1.5 md:px-2 py-0.5 rounded-full transition-colors ${
+                                                        className={`relative z-10 text-[10px] md:text-[11px] px-1.5 md:px-2 py-0.5 rounded-full transition-colors duration-200 ${
                                                             active
                                                                 ? "bg-walnut/10 text-darkBrown font-bold"
                                                                 : "bg-walnut/10 text-walnut/60 font-medium"
@@ -289,42 +311,23 @@ export default function Library() {
                                                 </button>
                                             );
                                         })}
-                                    </div>
+                                    </motion.div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
                     </motion.div>
                 </div>
 
-                {/* Widgets sitting on top of bookshelf rail / floating shelf in grid mode */}
-                <div
-                    className={`flex flex-col items-center sm:items-end flex-shrink-0 relative z-10 w-full md:w-auto ${
-                        viewMode === "shelf" ? "mb-[-2px]" : "mb-2 md:mb-4"
-                    }`}
-                >
-                    <div className="flex flex-col items-center sm:items-end scale-80 xs:scale-85 sm:scale-95 md:scale-100 origin-bottom sm:origin-bottom-right">
-                        <div className="flex flex-shrink-0 items-end justify-center sm:justify-end gap-2 sm:gap-4 md:gap-5 relative z-10">
-                            <FlipCalendar
-                                onClick={() => setIsCalendarModalOpen(true)}
-                            />
-                            <div className="pb-1">
-                                <BigDigitalClock />
-                            </div>
-                            <div className="pb-0.5">
-                                <LightingControl />
-                            </div>
-                        </div>
-                        {viewMode === "grid" && (
-                            <div
-                                className="w-full h-2.5 sm:h-3 rounded-full mt-[-2px]"
-                                style={{
-                                    background:
-                                        "linear-gradient(180deg, #c09060 0%, #9a7040 40%, #7a5428 70%, #624018 100%)",
-                                    boxShadow:
-                                        "0 4px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.3)",
-                                }}
-                            />
-                        )}
+                {/* Widgets sitting on top of bookshelf rail / shelf card */}
+                <div className="flex flex-shrink-0 items-end justify-center sm:justify-end gap-2 sm:gap-4 md:gap-5 relative z-10 w-full md:w-auto scale-80 xs:scale-85 sm:scale-95 md:scale-100 origin-bottom sm:origin-bottom-right mb-[-2px]">
+                    <FlipCalendar
+                        onClick={() => setIsCalendarModalOpen(true)}
+                    />
+                    <div className="pb-1">
+                        <BigDigitalClock />
+                    </div>
+                    <div className="pb-0.5">
+                        <LightingControl />
                     </div>
                 </div>
             </div>
