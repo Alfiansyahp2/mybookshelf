@@ -296,20 +296,37 @@ export default function Library() {
                     </motion.div>
                 </div>
 
-                {/* Widgets sitting on top of bookshelf rail */}
-                {viewMode === "shelf" && (
-                    <div className="flex flex-shrink-0 items-end justify-center sm:justify-end gap-2 sm:gap-4 md:gap-5 relative z-10 w-full md:w-auto scale-80 xs:scale-85 sm:scale-95 md:scale-100 origin-bottom sm:origin-bottom-right mb-[-2px]">
-                        <FlipCalendar
-                            onClick={() => setIsCalendarModalOpen(true)}
-                        />
-                        <div className="pb-1">
-                            <BigDigitalClock />
+                {/* Widgets sitting on top of bookshelf rail / floating shelf in grid mode */}
+                <div
+                    className={`flex flex-col items-center sm:items-end flex-shrink-0 relative z-10 w-full md:w-auto ${
+                        viewMode === "shelf" ? "mb-[-2px]" : "mb-2 md:mb-4"
+                    }`}
+                >
+                    <div className="flex flex-col items-center sm:items-end scale-80 xs:scale-85 sm:scale-95 md:scale-100 origin-bottom sm:origin-bottom-right">
+                        <div className="flex flex-shrink-0 items-end justify-center sm:justify-end gap-2 sm:gap-4 md:gap-5 relative z-10">
+                            <FlipCalendar
+                                onClick={() => setIsCalendarModalOpen(true)}
+                            />
+                            <div className="pb-1">
+                                <BigDigitalClock />
+                            </div>
+                            <div className="pb-0.5">
+                                <LightingControl />
+                            </div>
                         </div>
-                        <div className="pb-0.5">
-                            <LightingControl />
-                        </div>
+                        {viewMode === "grid" && (
+                            <div
+                                className="w-full h-2.5 sm:h-3 rounded-full mt-[-2px]"
+                                style={{
+                                    background:
+                                        "linear-gradient(180deg, #c09060 0%, #9a7040 40%, #7a5428 70%, #624018 100%)",
+                                    boxShadow:
+                                        "0 4px 8px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.3)",
+                                }}
+                            />
+                        )}
                     </div>
-                )}
+                </div>
             </div>
 
             {/* Main Library View: Bookshelf or Cover Grid */}
