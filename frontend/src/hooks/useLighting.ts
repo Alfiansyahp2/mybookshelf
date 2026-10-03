@@ -16,11 +16,15 @@ export interface LightingState {
     setColorTemp: (t: ColorTemp) => void;
 }
 
+export interface TempColorConfig {
+    strip: string;
+    glow: string;
+    label: string;
+    emoji: string;
+}
+
 /** Colour temperature presets → hex */
-export const TEMP_COLORS: Record<
-    ColorTemp,
-    { strip: string; glow: string; label: string; emoji: string }
-> = {
+export const TEMP_COLORS: Record<ColorTemp, TempColorConfig> = {
     warm: {
         strip: "#FFB020",
         glow: "rgba(255,176,32,",

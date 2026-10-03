@@ -1,24 +1,27 @@
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Pencil, Trash2, Sparkles, MoreHorizontal } from "lucide-react";
-import RealisticBook from "./Book";
+import React, { useState, useCallback, useMemo } from "react";
+import { motion } from "framer-motion";
 import DecorationPicker from "../decorations/DecorationPicker";
 import {
-    renderDecoration,
     addDecoration,
     removeDecoration,
     type DecorationKind,
     type ShelfDecoration,
 } from "../decorations/DecorationSystem";
 import { useUpdateShelf } from "../../hooks/useShelves";
-import { useLighting, TEMP_COLORS } from "../../hooks/useLighting";
 import type { Shelf, Book as BookType } from "../../types";
-import { useTranslation } from "react-i18next";
+import {
+    getShelfCapacity,
+    useShelfScroll,
+    DeleteShelfModal,
+    ShelfWoodFrame,
+    ShelfBooksTrack,
+    ShelfInfoBar,
+} from "./shelf-elements";
 
-interface ShelfProps {
+export interface ShelfProps {
     shelf: Shelf;
     books: BookType[];
-    onBookClick: (book: BookType) => void;
+    onBookClick?: (book: BookType) => void;
     onAddBook?: (shelfId: string) => void;
     onEditShelf?: (shelfId: string) => void;
     onDeleteShelf?: (shelfId: string) => void;
@@ -27,26 +30,7 @@ interface ShelfProps {
     shelfIndex?: number;
 }
 
-/* ── Dimensions ─────────────────────────────────── */
-const BOOK_AREA_H = 200; // book cavity height
-const BOARD_H = 14; // shelf board thickness
-const INFO_H = 32; // info strip below board
-
-/* ── Wood palette (warm teak, like the photo ref) ─ */
-const WOOD = {
-    // Back wall: visible warm teak grain — NOT black
-    back: "linear-gradient(180deg, #b8844a 0%, #a87038 50%, #926030 100%)",
-    backDark: "linear-gradient(180deg, #9a6e3a 0%, #8a5e2c 50%, #7a5025 100%)",
-    // Shelf board top face
-    board: "linear-gradient(180deg, #d4a464 0%, #bc8c48 30%, #a07030 65%, #845020 100%)",
-    // Side panels
-    side: "linear-gradient(to right, #6a4018 0%, #8a5a28 45%, #7a4e20 70%, #5a3410 100%)",
-    sideR: "linear-gradient(to left,  #6a4018 0%, #8a5a28 45%, #7a4e20 70%, #5a3410 100%)",
-    // Info strip
-    info: "linear-gradient(180deg, #3a2008 0%, #2c1606 100%)",
-};
-
-export default function LibraryShelf({
+export function LibraryShelf({
     shelf,
     books,
     onBookClick,
@@ -57,93 +41,54 @@ export default function LibraryShelf({
     selectedBookId,
     shelfIndex = 0,
 }: ShelfProps) {
-    const { t } = useTranslation();
     const [pickerSlot, setPickerSlot] = useState<"left" | "right" | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
     const updateShelf = useUpdateShelf();
 
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(false);
-    const booksTrackRef = useRef<HTMLDivElement>(null);
+    // Horizontal scroll and swipe cues
+    const { booksTrackRef, canScrollLeft, canScrollRight, handleTrackScroll } =
+        useShelfScroll(books);
 
-    const checkScroll = () => {
-        if (booksTrackRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = booksTrackRef.current;
-            setCanScrollLeft(scrollLeft > 6);
-            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
-        }
-    };
-
-    const handleTrackScroll = () => {
-        checkScroll();
-    };
-
-    useEffect(() => {
-        checkScroll();
-        const el = booksTrackRef.current;
-        if (el) {
-            const observer = new ResizeObserver(() => checkScroll());
-            observer.observe(el);
-            return () => observer.disconnect();
-        }
-    }, [books]);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsMenuOpen(false);
-            }
-        };
-        if (isMenuOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-            document.addEventListener("touchstart", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-            document.removeEventListener("touchstart", handleClickOutside);
-        };
-    }, [isMenuOpen]);
-
-    /* ── Lighting state ──────────────────────────── */
-    const { on: lightOn, brightness, colorTemp } = useLighting();
-    const ct = TEMP_COLORS[colorTemp];
-    const ledOpacity = lightOn ? brightness / 100 : 0;
-
+    // Shelf decorations
     const myDecos: ShelfDecoration[] = shelf.decorations || [];
     const leftDeco = myDecos.find((d) => d.slot === "left");
     const rightDeco = myDecos.find((d) => d.slot === "right");
 
-    const handleSelectDeco = (kind: DecorationKind, customData?: any) => {
-        if (!pickerSlot) return;
-        const newDecos = addDecoration(myDecos, kind, pickerSlot, customData);
-        updateShelf.mutate({
-            id: shelf.id,
-            updates: { decorations: newDecos },
-        });
-    };
-    const handleRemoveDeco = () => {
+    const handleSelectDeco = useCallback(
+        (kind: DecorationKind, customData?: any) => {
+            if (!pickerSlot) return;
+            const newDecos = addDecoration(myDecos, kind, pickerSlot, customData);
+            updateShelf.mutate({
+                id: shelf.id,
+                updates: { decorations: newDecos },
+            });
+        },
+        [myDecos, pickerSlot, shelf.id, updateShelf]
+    );
+
+    const handleRemoveDeco = useCallback(() => {
         if (!pickerSlot) return;
         const newDecos = removeDecoration(myDecos, pickerSlot);
         updateShelf.mutate({
             id: shelf.id,
             updates: { decorations: newDecos },
         });
-    };
+    }, [myDecos, pickerSlot, shelf.id, updateShelf]);
 
-    /* ── Capacity ──────────────────────────────────── */
-    const occupied = books.filter((b) => b.status !== "borrowed").length;
-    const percentage = Math.min((occupied / shelf.capacity) * 100, 100);
-    const pctColor =
-        percentage >= 90 ? "#f87171" : percentage >= 70 ? "#fbbf24" : "#34d399";
+    // Shelf Capacity & Status
+    const { occupied, percentage, pctColor } = useMemo(
+        () => getShelfCapacity(books, shelf.capacity),
+        [books, shelf.capacity]
+    );
 
-    /* ── Wood grain helper ─────────────────────────── */
-    const grainY = [14, 32, 52, 80, 115, 154, 186];
+    const handleDeleteConfirm = useCallback(() => {
+        setIsDeleting(false);
+        onDeleteShelf?.(shelf.id);
+    }, [onDeleteShelf, shelf.id]);
 
     return (
         <>
-            {/* DecorationPicker bottom sheet */}
+            {/* Decoration Picker Bottom Sheet */}
             <DecorationPicker
                 isOpen={pickerSlot !== null}
                 onClose={() => setPickerSlot(null)}
@@ -153,77 +98,13 @@ export default function LibraryShelf({
                 onRemove={handleRemoveDeco}
             />
 
-            {/* Delete Confirmation Modal */}
-            <AnimatePresence>
-                {isDeleting && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute inset-0"
-                            style={{
-                                background: "rgba(10,5,0,0.6)",
-                                backdropFilter: "blur(4px)",
-                            }}
-                            onClick={() => setIsDeleting(false)}
-                        />
-                        <motion.div
-                            initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.95, opacity: 0, y: -10 }}
-                            transition={{
-                                type: "spring",
-                                damping: 25,
-                                stiffness: 300,
-                            }}
-                            className="relative rounded-2xl shadow-2xl p-6 max-w-sm w-full"
-                            style={{
-                                background: "#fef9ec",
-                                border: "1px solid #fcd34d66",
-                            }}
-                        >
-                            <h3
-                                className="text-lg font-bold mb-2"
-                                style={{ color: "#2a1a08" }}
-                            >
-                                {t("shelf.delete_title")}
-                            </h3>
-                            <p
-                                className="text-sm mb-6"
-                                style={{ color: "#6b4c2a" }}
-                            >
-                                {t("shelf.delete_confirm_1")}{" "}
-                                <strong>"{shelf.name}"</strong>?{" "}
-                                {t("shelf.delete_confirm_2")}
-                            </p>
-                            <div className="flex gap-3 justify-end">
-                                <button
-                                    onClick={() => setIsDeleting(false)}
-                                    className="px-4 py-2 rounded-xl text-sm font-semibold transition-colors hover:bg-black/5"
-                                    style={{ color: "#6b4c2a" }}
-                                >
-                                    {t("shelf.cancel")}
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setIsDeleting(false);
-                                        onDeleteShelf?.(shelf.id);
-                                    }}
-                                    className="px-4 py-2 rounded-xl text-sm font-semibold text-white transition-transform hover:scale-105 active:scale-95 shadow-md shadow-red-500/20"
-                                    style={{
-                                        background:
-                                            "linear-gradient(135deg, #ef4444, #dc2626)",
-                                    }}
-                                >
-                                    {t("shelf.delete")}
-                                </button>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
+            {/* Delete Shelf Confirmation Modal */}
+            <DeleteShelfModal
+                isOpen={isDeleting}
+                shelfName={shelf.name}
+                onClose={() => setIsDeleting(false)}
+                onConfirm={handleDeleteConfirm}
+            />
 
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -231,695 +112,39 @@ export default function LibraryShelf({
                 transition={{ duration: 0.3, delay: shelfIndex * 0.06 }}
                 style={{ position: "relative", overflow: "visible" }}
             >
-                {/* ═══════════════════════════════════════════
-            SHELF CAVITY
-            ═══════════════════════════════════════════ */}
-                <div
-                    style={{
-                        position: "relative",
-                        height: BOOK_AREA_H + BOARD_H,
-                        overflow: "visible",
-                    }}
-                >
-                    {/* Left panel */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: 20,
-                            zIndex: 10,
-                            background: WOOD.side,
-                            boxShadow:
-                                "inset -4px 0 8px rgba(0,0,0,0.25), 2px 0 4px rgba(0,0,0,0.15)",
-                        }}
-                    >
-                        {grainY.map((y) => (
-                            <div
-                                key={y}
-                                style={{
-                                    position: "absolute",
-                                    left: 3,
-                                    right: 3,
-                                    top: y,
-                                    height: 1,
-                                    background: "rgba(0,0,0,0.1)",
-                                    borderRadius: 1,
-                                }}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Right panel */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            right: 0,
-                            top: 0,
-                            bottom: 0,
-                            width: 20,
-                            zIndex: 10,
-                            background: WOOD.sideR,
-                            boxShadow:
-                                "inset 4px 0 8px rgba(0,0,0,0.25), -2px 0 4px rgba(0,0,0,0.15)",
-                        }}
-                    >
-                        {grainY.map((y) => (
-                            <div
-                                key={y}
-                                style={{
-                                    position: "absolute",
-                                    left: 3,
-                                    right: 3,
-                                    top: y,
-                                    height: 1,
-                                    background: "rgba(0,0,0,0.1)",
-                                    borderRadius: 1,
-                                }}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Back wall — warm visible teak */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: 20,
-                            right: 20,
-                            top: 0,
-                            bottom: BOARD_H,
-                            zIndex: 0,
-                            background: WOOD.back,
-                            overflow: "hidden",
-                            transition: "filter 0.5s",
-                        }}
-                    >
-                        {/* Teak vertical grain lines */}
-                        {[8, 16, 24, 33, 42, 51, 60, 69, 78, 87, 94].map(
-                            (p) => (
-                                <div
-                                    key={p}
-                                    style={{
-                                        position: "absolute",
-                                        top: 0,
-                                        bottom: 0,
-                                        left: `${p}%`,
-                                        width: 1,
-                                        background: "rgba(0,0,0,0.055)",
-                                    }}
-                                />
-                            ),
-                        )}
-                        {/* Horizontal variation */}
-                        {[30, 80, 130, 170].map((y) => (
-                            <div
-                                key={y}
-                                style={{
-                                    position: "absolute",
-                                    left: 0,
-                                    right: 0,
-                                    top: y,
-                                    height: 20,
-                                    background: "rgba(0,0,0,0.04)",
-                                }}
-                            />
-                        ))}
-
-                        {/* ── LED glow spreading downward — driven by lighting state ── */}
-                        <motion.div
-                            animate={{ opacity: ledOpacity * 0.85 }}
-                            transition={{ duration: 0.5 }}
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: 120,
-                                background: `linear-gradient(180deg,${ct.glow}1) 0%,${ct.glow}0.1) 60%,transparent 100%)`,
-                                zIndex: 1,
-                                pointerEvents: "none",
-                            }}
-                        />
-                        {/* Ambient dimming overlay — darker when brightness is low */}
-                        <motion.div
-                            animate={{ opacity: (1 - ledOpacity) * 0.85 }}
-                            transition={{ duration: 0.5 }}
-                            style={{
-                                position: "absolute",
-                                inset: 0,
-                                background: "rgba(0,0,0,1)",
-                                zIndex: 2,
-                                pointerEvents: "none",
-                            }}
-                        />
-
-                        {/* ── LED strip physical bar ── */}
-                        <motion.div
-                            animate={{
-                                opacity: ledOpacity,
-                                boxShadow:
-                                    ledOpacity > 0
-                                        ? `0 0 ${25 * ledOpacity}px ${8 * ledOpacity}px ${ct.glow}${(ledOpacity * 0.9).toFixed(2)}), 0 0 6px ${ct.strip}`
-                                        : "none",
-                            }}
-                            transition={{ duration: 0.4 }}
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: 3,
-                                zIndex: 3,
-                                background: `linear-gradient(to right,${ct.strip}aa,${ct.strip},${ct.strip}aa)`,
-                            }}
-                        />
-                    </div>
-
-                    {/* ── Content row: left deco + books + right deco ── */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: 20,
-                            right: 20,
-                            top: 0,
-                            bottom: BOARD_H,
-                            zIndex: 15,
-                            display: "flex",
-                            alignItems: "flex-end",
-                            overflow: "hidden", // Keeps books inside the wooden cavity!
-                        }}
-                    >
-                        {/* Scroll Cue (Left) */}
-                        {canScrollLeft && (
-                            <div
-                                className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 z-30 transition-opacity duration-300 flex items-center justify-start pl-1"
-                                style={{
-                                    background:
-                                        "linear-gradient(to right, rgba(40, 24, 10, 0.75), transparent)",
-                                }}
-                            >
-                                <span className="text-amber-200/90 text-sm font-bold animate-pulse select-none">
-                                    ‹
-                                </span>
-                            </div>
-                        )}
-
-                        {/* Scroll Cue (Right) */}
-                        {canScrollRight && (
-                            <div
-                                className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-30 transition-opacity duration-300 flex items-center justify-end pr-1"
-                                style={{
-                                    background:
-                                        "linear-gradient(to left, rgba(40, 24, 10, 0.75), transparent)",
-                                }}
-                            >
-                                <span className="text-amber-200/90 text-sm font-bold animate-pulse select-none">
-                                    ›
-                                </span>
-                            </div>
-                        )}
-
-                        {/* Left decoration slot */}
-                        <div
-                            style={{
-                                flexShrink: 0,
-                                display: "flex",
-                                alignItems:
-                                    leftDeco?.kind === "plant_hanging"
-                                        ? "flex-start"
-                                        : "flex-end",
-                                height: "100%",
-                                paddingLeft: 4,
-                                paddingRight: 6,
-                                cursor: "pointer",
-                                position: "relative",
-                                minWidth: 8,
-                            }}
-                            onClick={() => setPickerSlot("left")}
-                            title={t("shelf.add_left_deco")}
-                        >
-                            {leftDeco ? (
-                                <motion.div
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    style={{
-                                        paddingBottom:
-                                            leftDeco.kind === "plant_hanging"
-                                                ? 0
-                                                : 2,
-                                    }}
-                                >
-                                    {renderDecoration(leftDeco, leftDeco.id)}
-                                </motion.div>
-                            ) : (
-                                <div
-                                    style={{
-                                        width: 22,
-                                        height: 40,
-                                        border: "1.5px dashed rgba(255,210,100,0.3)",
-                                        borderRadius: 4,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        background: "rgba(255,200,80,0.06)",
-                                        transition: "all 0.15s",
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.background =
-                                            "rgba(255,200,80,0.14)";
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.borderColor =
-                                            "rgba(255,210,100,0.5)";
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.background =
-                                            "rgba(255,200,80,0.06)";
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.borderColor =
-                                            "rgba(255,210,100,0.3)";
-                                    }}
-                                >
-                                    <Sparkles
-                                        size={10}
-                                        color="rgba(255,210,100,0.5)"
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Books */}
-                        <div
-                            ref={booksTrackRef}
-                            onScroll={handleTrackScroll}
-                            className="hide-scrollbar"
-                            style={{
-                                flex: 1,
-                                height: "calc(100% + 30px)",
-                                marginTop: -30,
-                                paddingTop: 30,
-                                display: "flex",
-                                alignItems: "flex-end",
-                                gap: 1,
-                                overflowX: "auto",
-                                overflowY: "hidden",
-                                perspective: "500px",
-                                perspectiveOrigin: "50% 100%",
-                                paddingBottom: 2,
-                                paddingLeft: 4,
-                                paddingRight: 4,
-                                WebkitOverflowScrolling: "touch",
-                                touchAction: "pan-x",
-                                scrollBehavior: "smooth",
-                            }}
-                        >
-                            {books.map((book) => {
-                                if (book.status === "borrowed") {
-                                    return (
-                                        <div
-                                            key={book.id}
-                                            onClick={() => onBookClick(book)}
-                                            className="cursor-pointer hover:border-white/40 transition-colors"
-                                            style={{
-                                                width: 22,
-                                                height: BOOK_AREA_H * 0.82,
-                                                flexShrink: 0,
-                                                background:
-                                                    "repeating-linear-gradient(45deg,rgba(255,255,255,0.04),rgba(255,255,255,0.04) 3px,transparent 3px,transparent 7px)",
-                                                border: "1px dashed rgba(255,255,255,0.15)",
-                                                borderRadius: 2,
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            <span
-                                                style={{
-                                                    fontSize: 11,
-                                                    opacity: 0.4,
-                                                }}
-                                                title={t("shelf.borrowed_by", {
-                                                    name:
-                                                        book.borrowedBy ||
-                                                        "someone",
-                                                })}
-                                            >
-                                                📤
-                                            </span>
-                                        </div>
-                                    );
-                                }
-                                return (
-                                    <RealisticBook
-                                        key={book.id}
-                                        book={book}
-                                        onClick={() => onBookClick(book)}
-                                        isDrawerOpen={
-                                            isDrawerOpen &&
-                                            selectedBookId === book.id
-                                        }
-                                        bookAreaHeight={BOOK_AREA_H}
-                                    />
-                                );
-                            })}
-                        </div>
-
-                        {/* Right decoration slot */}
-                        <div
-                            style={{
-                                flexShrink: 0,
-                                display: "flex",
-                                alignItems:
-                                    rightDeco?.kind === "plant_hanging"
-                                        ? "flex-start"
-                                        : "flex-end",
-                                height: "100%",
-                                paddingLeft: 6,
-                                paddingRight: 4,
-                                cursor: "pointer",
-                                position: "relative",
-                                minWidth: 8,
-                            }}
-                            onClick={() => setPickerSlot("right")}
-                            title={t("shelf.add_right_deco")}
-                        >
-                            {rightDeco ? (
-                                <motion.div
-                                    initial={{ scale: 0.8, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    style={{
-                                        paddingBottom:
-                                            rightDeco.kind === "plant_hanging"
-                                                ? 0
-                                                : 2,
-                                    }}
-                                >
-                                    {renderDecoration(rightDeco, rightDeco.id)}
-                                </motion.div>
-                            ) : (
-                                <div
-                                    style={{
-                                        width: 22,
-                                        height: 40,
-                                        border: "1.5px dashed rgba(255,210,100,0.3)",
-                                        borderRadius: 4,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        background: "rgba(255,200,80,0.06)",
-                                        transition: "all 0.15s",
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.background =
-                                            "rgba(255,200,80,0.14)";
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.borderColor =
-                                            "rgba(255,210,100,0.5)";
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.background =
-                                            "rgba(255,200,80,0.06)";
-                                        (
-                                            e.currentTarget as HTMLDivElement
-                                        ).style.borderColor =
-                                            "rgba(255,210,100,0.3)";
-                                    }}
-                                >
-                                    <Sparkles
-                                        size={10}
-                                        color="rgba(255,210,100,0.5)"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Shelf board */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            height: BOARD_H,
-                            zIndex: 8,
-                            background: WOOD.board,
-                            boxShadow:
-                                "inset 0 3px 4px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.35)",
-                        }}
-                    >
-                        <div
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: 2,
-                                background: "rgba(255,255,255,0.2)",
-                            }}
-                        />
-                        {[6, 18, 32, 48, 65, 82, 93].map((p) => (
-                            <div
-                                key={p}
-                                style={{
-                                    position: "absolute",
-                                    top: 2,
-                                    bottom: 2,
-                                    left: `${p}%`,
-                                    width: 1,
-                                    background: "rgba(0,0,0,0.06)",
-                                }}
-                            />
-                        ))}
-                    </div>
-                </div>
-
-                {/* ═══════════════════════════════════════════
-            INFO STRIP
-            ═══════════════════════════════════════════ */}
-                <div
-                    style={{
-                        height: INFO_H,
-                        background: WOOD.info,
-                        borderTop: "1px solid rgba(0,0,0,0.3)",
-                        display: "flex",
-                        alignItems: "center",
-                        paddingLeft: 24,
-                        paddingRight: 10,
-                        gap: 10,
-                        overflow: "visible",
-                    }}
-                >
-                    {/* Shelf name */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                        <span
-                            style={{
-                                color: "rgba(255,210,140,0.85)",
-                                fontSize: 10,
-                                fontWeight: 600,
-                                letterSpacing: "0.14em",
-                                textTransform: "uppercase",
-                                fontFamily: "'Georgia',serif",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                maxWidth: 120,
-                            }}
-                        >
-                            {shelf.name}
-                        </span>
-                        {(canScrollRight || canScrollLeft) && (
-                            <span
-                                className="text-[9px] text-[#d4a574]/80 font-mono tracking-wider px-1.5 py-0.5 rounded bg-white/5 border border-white/10 flex items-center gap-1"
-                                title={t("library.swipe_hint", "Geser untuk melihat buku lainnya")}
-                            >
-                                <span>⇄</span>
-                                <span className="hidden xs:inline">{t("library.swipe", "geser")}</span>
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Progress bar */}
-                    <div
-                        style={{
-                            flex: 1,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 6,
-                            minWidth: 0,
-                        }}
-                    >
-                        <div
-                            style={{
-                                flex: 1,
-                                height: 3,
-                                borderRadius: 2,
-                                background: "rgba(255,255,255,0.08)",
-                                overflow: "hidden",
-                            }}
-                        >
-                            <motion.div
-                                initial={{ width: 0 }}
-                                animate={{ width: `${percentage}%` }}
-                                transition={{
-                                    duration: 0.9,
-                                    ease: "easeOut",
-                                    delay: shelfIndex * 0.07 + 0.3,
-                                }}
-                                style={{
-                                    height: "100%",
-                                    borderRadius: 2,
-                                    background: pctColor,
-                                }}
-                            />
-                        </div>
-                        <span
-                            style={{
-                                fontSize: 9,
-                                color: "rgba(255,195,110,0.5)",
-                                whiteSpace: "nowrap",
-                                flexShrink: 0,
-                            }}
-                        >
-                            {occupied}/{shelf.capacity}
-                        </span>
-                    </div>
-
-                    <div
-                        style={{
-                            width: 1,
-                            height: 14,
-                            background: "rgba(255,255,255,0.1)",
-                            flexShrink: 0,
-                        }}
+                {/* ── Shelf Cavity: Frame & Books ── */}
+                <ShelfWoodFrame>
+                    <ShelfBooksTrack
+                        books={books}
+                        onBookClick={onBookClick}
+                        isDrawerOpen={isDrawerOpen}
+                        selectedBookId={selectedBookId}
+                        leftDeco={leftDeco}
+                        rightDeco={rightDeco}
+                        onOpenDecoPicker={setPickerSlot}
+                        booksTrackRef={booksTrackRef}
+                        canScrollLeft={canScrollLeft}
+                        canScrollRight={canScrollRight}
+                        onScroll={handleTrackScroll}
                     />
+                </ShelfWoodFrame>
 
-                    {/* Action buttons */}
-                    <div
-                        ref={menuRef}
-                        style={{
-                            position: "relative",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 4,
-                            flexShrink: 0,
-                        }}
-                    >
-                        <AnimatePresence>
-                            {isMenuOpen && (
-                                <motion.div
-                                    key="shelf-menu"
-                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    transition={{ duration: 0.15 }}
-                                    style={{
-                                        position: "absolute",
-                                        bottom: "100%",
-                                        right: 0,
-                                        marginBottom: 8,
-                                        background: "rgba(30, 20, 10, 0.95)",
-                                        backdropFilter: "blur(8px)",
-                                        border: "1px solid rgba(255,255,255,0.1)",
-                                        borderRadius: 8,
-                                        padding: 6,
-                                        display: "flex",
-                                        gap: 6,
-                                        boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-                                        zIndex: 50,
-                                    }}
-                                >
-                                    <ActionBtn
-                                        icon={<Plus size={14} />}
-                                        title={t("shelf.add_book")}
-                                        onClick={() => {
-                                            setIsMenuOpen(false);
-                                            onAddBook?.(shelf.id);
-                                        }}
-                                        color="#ffffff"
-                                    />
-                                    <ActionBtn
-                                        icon={<Pencil size={13} />}
-                                        title={t("shelf.edit_shelf")}
-                                        onClick={() => {
-                                            setIsMenuOpen(false);
-                                            onEditShelf?.(shelf.id);
-                                        }}
-                                        color="#60a5fa"
-                                    />
-                                    <ActionBtn
-                                        icon={<Trash2 size={13} />}
-                                        title={t("shelf.delete_shelf")}
-                                        onClick={() => {
-                                            setIsMenuOpen(false);
-                                            setIsDeleting(true);
-                                        }}
-                                        color="#f87171"
-                                    />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                        
-                        <ActionBtn
-                            icon={<MoreHorizontal size={14} />}
-                            title={t("shelf.options", "Opsi Rak")}
-                            onClick={() => setIsMenuOpen((prev) => !prev)}
-                            color="#ffffff"
-                        />
-                    </div>
-                </div>
+                {/* ── Bottom Info Strip & Action Menu ── */}
+                <ShelfInfoBar
+                    shelfName={shelf.name}
+                    occupied={occupied}
+                    capacity={shelf.capacity}
+                    percentage={percentage}
+                    pctColor={pctColor}
+                    shelfIndex={shelfIndex}
+                    hasScrollOverflow={canScrollLeft || canScrollRight}
+                    onAddBook={onAddBook ? () => onAddBook(shelf.id) : undefined}
+                    onEditShelf={onEditShelf ? () => onEditShelf(shelf.id) : undefined}
+                    onDeleteClick={() => setIsDeleting(true)}
+                />
             </motion.div>
         </>
     );
 }
 
-function ActionBtn({
-    icon,
-    title,
-    onClick,
-    color,
-}: {
-    icon: React.ReactNode;
-    title: string;
-    onClick: () => void;
-    color: string;
-}) {
-    return (
-        <button
-            onClick={onClick}
-            title={title}
-            style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: 22,
-                height: 22,
-                borderRadius: 5,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.09)",
-                color,
-                cursor: "pointer",
-                transition: "all 0.12s",
-            }}
-            onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.13)")
-            }
-            onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.05)")
-            }
-        >
-            {icon}
-        </button>
-    );
-}
+export default React.memo(LibraryShelf);
