@@ -102,9 +102,8 @@ export function RealisticBook({
             <BookTooltip
                 book={book}
                 colors={colors}
-                bookAreaHeight={bookAreaHeight}
-                bookH={bookH}
                 visible={hovered && !clicked}
+                triggerRef={bookRef}
             />
         </div>
     );
