@@ -117,7 +117,7 @@ export default function Library() {
 
     return (
         <div
-            className="p-3 md:p-5 pt-[88px] md:pt-[100px] flex flex-col min-h-full relative"
+            className="px-3 md:px-5 pb-3 md:pb-5 pt-14 md:pt-16 flex flex-col min-h-full relative"
             style={{
                 background:
                     "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
@@ -139,9 +139,9 @@ export default function Library() {
             />
 
             {/* Filter tabs + Widgets on top of shelf */}
-            <div className="relative z-50 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-2 md:mb-0 pt-1 md:pt-4 px-1 md:px-0">
+            <div className="relative z-50 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-2 md:mb-0 pt-0 px-1 md:px-0">
                 {/* Left Side (Filters, View Switcher & Layout) */}
-                <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto hide-scrollbar mb-1 md:mb-6">
+                <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto hide-scrollbar mb-1 md:mb-1.5">
                     {/* View Mode Switcher (Shelf vs Grid) */}
                     <div className="flex items-center bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/50 dark:border-white/10 p-1 rounded-2xl shadow-xs shrink-0">
                         <button

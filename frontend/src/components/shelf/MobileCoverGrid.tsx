@@ -114,7 +114,7 @@ export default function MobileCoverGrid({
                                 {t("library.empty_shelf", "Belum ada buku di rak ini.")}
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4">
+                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 2xl:grid-cols-9 gap-2.5 sm:gap-3 md:gap-3.5">
                                 {shelfBooks.map((book) => {
                                     const badge =
                                         STATUS_BADGES[book.status] ||
@@ -141,7 +141,7 @@ export default function MobileCoverGrid({
                                         >
                                             {/* Book Cover Card */}
                                             <div
-                                                className="w-full aspect-[2/3] rounded-xl overflow-hidden shadow-md relative flex flex-col justify-between p-2.5 border border-black/15 dark:border-white/10 transition-shadow duration-300 group-hover:shadow-xl"
+                                                className="w-full aspect-[2/3] rounded-lg sm:rounded-xl overflow-hidden shadow-sm relative flex flex-col justify-between p-2 sm:p-2.5 border border-black/15 dark:border-white/10 transition-shadow duration-300 group-hover:shadow-lg"
                                                 style={{
                                                     background: book.coverImage
                                                         ? undefined
@@ -159,23 +159,23 @@ export default function MobileCoverGrid({
 
                                                 {/* Spine Crease & Shimmer Overlay */}
                                                 <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/20 pointer-events-none z-10" />
-                                                <div className="absolute left-1.5 top-0 bottom-0 w-1 bg-white/20 blur-[0.5px] pointer-events-none z-10" />
+                                                <div className="absolute left-1 top-0 bottom-0 w-0.5 sm:w-1 bg-white/20 blur-[0.5px] pointer-events-none z-10" />
 
                                                 {/* Status Pill Badge (Top Left) */}
-                                                <div className="relative z-20 flex justify-between items-start">
+                                                <div className="relative z-20 flex justify-between items-start gap-1">
                                                     <span
-                                                        className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-md shadow-xs flex items-center gap-1 ${badge.bg} backdrop-blur-xs`}
+                                                        className={`text-[8.5px] sm:text-[9.5px] font-bold px-1 sm:px-1.5 py-0.5 rounded-md shadow-xs flex items-center gap-1 ${badge.bg} backdrop-blur-xs`}
                                                     >
-                                                        <StatusIcon size={10} />
-                                                        <span className="hidden xs:inline truncate max-w-[65px]">
+                                                        <StatusIcon size={9} />
+                                                        <span className="hidden md:inline truncate max-w-[55px]">
                                                             {badge.label}
                                                         </span>
                                                     </span>
 
                                                     {book.personalRating ? (
-                                                        <div className="bg-black/60 backdrop-blur-xs px-1.5 py-0.5 rounded-md flex items-center gap-0.5 text-amber-300 text-[10px] font-bold shadow-xs">
+                                                        <div className="bg-black/60 backdrop-blur-xs px-1 sm:px-1.5 py-0.5 rounded-md flex items-center gap-0.5 text-amber-300 text-[8.5px] sm:text-[9.5px] font-bold shadow-xs shrink-0">
                                                             <Star
-                                                                size={10}
+                                                                size={9}
                                                                 className="fill-amber-400 text-amber-400"
                                                             />
                                                             <span>{book.personalRating}</span>
@@ -186,10 +186,10 @@ export default function MobileCoverGrid({
                                                 {/* Cover Title Preview (If No Cover Image) */}
                                                 {!book.coverImage && (
                                                     <div className="relative z-20 my-auto text-center px-1">
-                                                        <p className="font-serif font-bold text-xs sm:text-sm text-amber-100 leading-snug line-clamp-3 drop-shadow-md">
+                                                        <p className="font-serif font-bold text-[11px] sm:text-xs text-amber-100 leading-tight line-clamp-3 drop-shadow-md">
                                                             {book.title}
                                                         </p>
-                                                        <p className="text-[10px] text-amber-200/80 mt-1 truncate font-medium">
+                                                        <p className="text-[9px] text-amber-200/80 mt-0.5 truncate font-medium">
                                                             {book.author}
                                                         </p>
                                                     </div>
@@ -198,7 +198,7 @@ export default function MobileCoverGrid({
                                                 {/* Progress Bar (Bottom of Cover) */}
                                                 {book.status === "reading" && (
                                                     <div className="relative z-20 w-full bg-black/50 backdrop-blur-xs p-1 rounded-md mt-auto">
-                                                        <div className="flex justify-between text-[9px] text-white/90 font-mono mb-0.5">
+                                                        <div className="flex justify-between text-[8px] sm:text-[8.5px] text-white/90 font-mono mb-0.5">
                                                             <span>Progres</span>
                                                             <span>{progressPct}%</span>
                                                         </div>
@@ -215,15 +215,15 @@ export default function MobileCoverGrid({
                                             </div>
 
                                             {/* Book Metadata Under Cover */}
-                                            <div className="pt-2 px-0.5 flex-1 flex flex-col justify-between">
-                                                <h3 className="font-serif font-bold text-xs text-[#4a3b2f] dark:text-[#f5ece3] line-clamp-1 leading-snug group-hover:text-[#7a5c42] dark:group-hover:text-[#e5b882] transition-colors">
+                                            <div className="pt-1.5 px-0.5 flex-1 flex flex-col justify-between">
+                                                <h3 className="font-serif font-bold text-[11px] sm:text-xs text-[#4a3b2f] dark:text-[#f5ece3] line-clamp-1 leading-snug group-hover:text-[#7a5c42] dark:group-hover:text-[#e5b882] transition-colors" title={book.title}>
                                                     {book.title}
                                                 </h3>
-                                                <p className="text-[11px] text-[#7a5c42]/80 dark:text-[#c9ab91] truncate mt-0.5">
+                                                <p className="text-[10px] text-[#7a5c42]/80 dark:text-[#c9ab91] truncate mt-0.5" title={book.author}>
                                                     {book.author}
                                                 </p>
                                                 {book.pages && (
-                                                    <span className="text-[10px] text-walnut/60 dark:text-stone-400 font-mono mt-0.5">
+                                                    <span className="text-[9px] sm:text-[9.5px] text-walnut/60 dark:text-stone-400 font-mono mt-0.5">
                                                         {book.currentPage ? `${book.currentPage} / ` : ""}
                                                         {book.pages} hal
                                                     </span>

@@ -71,7 +71,7 @@ export default function AppHeader({
 
     return (
         <header
-            className={`fixed w-full top-0 z-50 transition-all duration-500 ease-in-out pt-2 pb-2 ${
+            className={`fixed w-full top-0 z-50 transition-all duration-500 ease-in-out pt-1.5 pb-1.5 ${
                 isHeaderVisible ? "translate-y-0" : "-translate-y-full"
             } ${
                 isScrolled 
@@ -83,7 +83,7 @@ export default function AppHeader({
                 className={`transition-all duration-500 ease-in-out mx-auto ${
                     isScrolled 
                         ? "bg-white/95 dark:bg-[#1a1612]/95 backdrop-blur-md rounded-2xl md:rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-walnut/10 dark:border-walnut/20 py-1.5 sm:py-2 px-3 sm:px-6 max-w-6xl" 
-                        : "bg-transparent py-2.5 sm:py-3 md:py-4 px-3 sm:px-4 md:px-8 w-full max-w-none"
+                        : "bg-transparent py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-8 w-full max-w-none"
                 }`}
             >
                 <div className="flex items-center justify-between gap-2 sm:gap-4 md:gap-8">
