@@ -837,6 +837,28 @@
     "tall_vase": "Vas Tinggi",
     "tall_vase_desc": "Vas elegan dengan bunga kering"
   },
+  "wishlist": {
+    "title": "Wishlist",
+    "badge": "Daftar Keinginan",
+    "subtitle": "Buku impian yang ingin kamu koleksi dan baca selanjutnya",
+    "items_count": "{{count}} buku",
+    "add_book": "Tambah Buku",
+    "total_wished": "Total Ingin",
+    "top_genre": "Genre Favorit",
+    "top_author": "Penulis Populer",
+    "view_list": "Daftar",
+    "view_grid": "Grid",
+    "start_reading": "Mulai Baca",
+    "read_now": "Mulai Baca",
+    "details": "Detail",
+    "empty": "Wishlist masih kosong",
+    "empty_desc": "Simpan buku yang ingin kamu beli atau baca nanti",
+    "browse_library": "Jelajahi Library",
+    "add_to_wishlist": "Tambah ke Wishlist",
+    "pages": "Halaman",
+    "format": "Format",
+    "genre": "Genre"
+  },
   "landing": {
     "contact": "KONTAK",
     "enter_app": "MASUK APP",

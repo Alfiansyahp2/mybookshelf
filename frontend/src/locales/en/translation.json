@@ -837,6 +837,28 @@
     "tall_vase": "Tall Vase",
     "tall_vase_desc": "Elegant vase with dried flowers"
   },
+  "wishlist": {
+    "title": "Wishlist",
+    "badge": "Wishlist",
+    "subtitle": "Books you are planning to acquire and read next",
+    "items_count": "{{count}} books",
+    "add_book": "Add Book",
+    "total_wished": "Total Wished",
+    "top_genre": "Top Genre",
+    "top_author": "Top Author",
+    "view_list": "List",
+    "view_grid": "Grid",
+    "start_reading": "Start Reading",
+    "read_now": "Read",
+    "details": "Details",
+    "empty": "Your wishlist is empty",
+    "empty_desc": "Save books you want to purchase or read later",
+    "browse_library": "Browse Library",
+    "add_to_wishlist": "Add to Wishlist",
+    "pages": "Pages",
+    "format": "Format",
+    "genre": "Genre"
+  },
   "landing": {
     "contact": "CONTACT",
     "enter_app": "ENTER APP",

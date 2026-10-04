@@ -1,91 +1,208 @@
+import React from "react";
 import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
 import type { Book } from "../../types";
+import BookmarkHeart from "../icons/BookmarkHeart";
 
 interface WishlistCardProps {
     book: Book;
     index: number;
     onClick: (book: Book) => void;
-    t: (key: string, defaultText: string) => string;
+    onStartReading?: (bookId: string, e: React.MouseEvent) => void;
+    viewMode?: "list" | "grid";
+    t: (key: string, defaultText: string, options?: any) => string;
 }
 
 export default function WishlistCard({
     book,
     index,
     onClick,
+    onStartReading,
+    viewMode = "list",
     t,
 }: WishlistCardProps) {
+    const c0 = book.spineColors?.[0] || "#8B7355";
+    const c1 = book.spineColors?.[1] || "#6B5344";
+    const c2 = book.spineColors?.[2] || "#5C4532";
+
+    // GRID VIEW: Realistic vertical book cover with caption
+    if (viewMode === "grid") {
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.04 }}
+                onClick={() => onClick(book)}
+                className="group cursor-pointer flex flex-col"
+            >
+                <div className="w-full aspect-[2/3] rounded-xl overflow-hidden shadow-sm group-hover:shadow-lg transition-all relative border border-black/15 dark:border-white/10 flex flex-col justify-between p-2">
+                    {book.coverImage ? (
+                        <img
+                            src={book.coverImage}
+                            alt={book.title}
+                            className="absolute inset-0 w-full h-full object-cover z-0"
+                        />
+                    ) : (
+                        <div
+                            className="absolute inset-0 z-0"
+                            style={{
+                                background: `linear-gradient(145deg, ${c0} 0%, ${c1} 60%, ${c2} 100%)`,
+                            }}
+                        />
+                    )}
+
+                    {/* Spine Crease & Reflection */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/20 pointer-events-none z-10" />
+                    <div className="absolute left-1 top-0 bottom-0 w-0.5 sm:w-1 bg-white/20 blur-[0.5px] pointer-events-none z-10" />
+
+                    {/* Ribbon Tag */}
+                    <div className="relative z-20 flex justify-end">
+                        <span className="w-3.5 h-4.5 bg-gradient-to-b from-pink-500 to-rose-600 rounded-b-xs shadow-xs flex items-center justify-center">
+                            <BookmarkHeart className="w-2 h-2 text-white fill-white" />
+                        </span>
+                    </div>
+
+                    {/* Title & Author if no cover image */}
+                    {!book.coverImage && (
+                        <div className="relative z-20 my-auto text-center px-1">
+                            <p className="font-serif font-bold text-xs sm:text-sm text-amber-100 leading-tight line-clamp-3 drop-shadow-md">
+                                {book.title}
+                            </p>
+                            <p className="text-[10px] text-amber-200/80 mt-1 truncate font-medium">
+                                {book.author}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Bottom bar */}
+                    <div className="relative z-20 mt-auto flex justify-between items-center text-[9px] text-white/90 bg-black/50 backdrop-blur-xs px-1.5 py-0.5 rounded-md">
+                        <span className="truncate capitalize">{book.format || "Buku"}</span>
+                        {book.pages ? <span>{book.pages}p</span> : null}
+                    </div>
+                </div>
+
+                {/* Caption */}
+                <div className="mt-1.5 px-0.5">
+                    <h4 className="font-serif font-bold text-xs sm:text-sm text-darkBrown dark:text-[#f5ece3] line-clamp-1 leading-snug group-hover:text-[#7a5c42] transition-colors">
+                        {book.title}
+                    </h4>
+                    <p className="text-[11px] text-walnut/70 dark:text-[#c9ab91] truncate">
+                        {book.author}
+                    </p>
+                </div>
+            </motion.div>
+        );
+    }
+
+    // LIST VIEW: Warm parchment catalog card with vertical book cover and actions
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.05 }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.04 }}
             onClick={() => onClick(book)}
-            className="group bg-white rounded-2xl p-5 border border-walnut/10 hover:border-walnut/30 hover:shadow-xl transition-all cursor-pointer flex flex-col h-full"
+            className="group bg-[#fdfbf7]/90 dark:bg-[#20140e]/95 rounded-2xl p-3 sm:p-4 border border-[#7a5c42]/15 dark:border-[#d4a574]/20 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-3 sm:gap-4 backdrop-blur-sm relative overflow-hidden"
         >
-            {/* Book Cover Placeholder */}
-            <div className="w-full aspect-video rounded-xl mb-4 flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-walnut/5 to-walnut/10 border border-walnut/10 group-hover:shadow-inner transition-all">
-                <div className="text-center p-4 z-10 w-full">
-                    <div className="text-lg font-serif font-bold text-darkBrown leading-tight mb-2 line-clamp-3">
-                        {book.title}
-                    </div>
-                    <div className="text-sm font-medium text-walnut/80 line-clamp-2">
-                        {book.author}
-                    </div>
-                </div>
+            {/* Left: Realistic 2:3 Book Cover */}
+            <div className="w-20 xs:w-24 sm:w-28 aspect-[2/3] shrink-0 rounded-xl overflow-hidden shadow-sm group-hover:shadow-md relative border border-black/15 dark:border-white/10 transition-shadow">
+                {book.coverImage ? (
+                    <img
+                        src={book.coverImage}
+                        alt={book.title}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div
+                        className="w-full h-full flex flex-col justify-between p-2 relative"
+                        style={{
+                            background: `linear-gradient(145deg, ${c0} 0%, ${c1} 60%, ${c2} 100%)`,
+                        }}
+                    >
+                        {/* Spine crease & reflection */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-black/20 pointer-events-none" />
+                        <div className="absolute left-1 top-0 bottom-0 w-0.5 bg-white/20 blur-[0.5px] pointer-events-none" />
 
-                <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/5 to-transparent"></div>
-            </div>
-
-            {/* Book Info */}
-            <div className="flex-1 flex flex-col">
-                <div className="space-y-3 mt-auto">
-                    <div className="flex items-start justify-between text-sm gap-2">
-                        <span className="text-walnut/60 shrink-0">
-                            {t("wishlist.genre", "Genre")}
-                        </span>
-                        <div className="flex flex-wrap gap-1.5 justify-end">
-                            {book.genre ? (
-                                book.genre
-                                    .split(",")
-                                    .map((g: string, i: number) => (
-                                        <span
-                                            key={i}
-                                            className="font-medium text-[11px] text-darkBrown bg-walnut/10 px-2 py-0.5 rounded-full"
-                                        >
-                                            {g.trim()}
-                                        </span>
-                                    ))
-                            ) : (
-                                <span className="font-medium text-darkBrown">
-                                    -
-                                </span>
-                            )}
+                        <div className="my-auto text-center relative z-10 px-0.5">
+                            <p className="font-serif font-bold text-[10px] xs:text-[11px] text-amber-100 leading-tight line-clamp-3 drop-shadow-sm">
+                                {book.title}
+                            </p>
+                            <p className="text-[8.5px] text-amber-200/80 mt-1 truncate font-medium">
+                                {book.author}
+                            </p>
                         </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                        <span className="text-walnut/60">
-                            {t("wishlist.pages", "Pages")}
-                        </span>
-                        <span className="font-medium text-darkBrown">
-                            {book.pages || "-"}
-                        </span>
+                )}
+
+                {/* Bookmark Ribbon on Cover */}
+                <div className="absolute top-0 right-2 w-3.5 h-4.5 bg-gradient-to-b from-pink-500 to-rose-600 rounded-b-xs shadow-xs flex items-center justify-center z-20">
+                    <BookmarkHeart className="w-2 h-2 text-white fill-white" />
+                </div>
+            </div>
+
+            {/* Right: Book Details & Actions */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between">
+                <div>
+                    {/* Title & Author */}
+                    <div className="flex items-start justify-between gap-1.5 mb-1">
+                        <h3 className="font-serif font-bold text-sm sm:text-base text-darkBrown dark:text-[#f5ece3] line-clamp-2 leading-snug group-hover:text-[#7a5c42] dark:group-hover:text-[#d4a574] transition-colors">
+                            {book.title}
+                        </h3>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                        <span className="text-walnut/60">
-                            {t("wishlist.format", "Format")}
-                        </span>
-                        <span className="font-medium text-darkBrown capitalize">
-                            {book.format || "-"}
-                        </span>
-                    </div>
+                    <p className="text-xs text-walnut/75 dark:text-[#c9ab91] truncate font-medium">
+                        {book.author}
+                    </p>
+
+                    {/* Genre Tags */}
+                    {book.genre && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                            {book.genre
+                                .split(",")
+                                .slice(0, 2)
+                                .map((g: string, i: number) => (
+                                    <span
+                                        key={i}
+                                        className="font-medium text-[10px] text-[#5c3e28] dark:text-[#d4a574] bg-[#7a5c42]/10 dark:bg-[#d4a574]/15 px-2 py-0.5 rounded-md truncate max-w-[130px]"
+                                    >
+                                        {g.trim()}
+                                    </span>
+                                ))}
+                        </div>
+                    )}
                 </div>
 
-                {/* Action Button */}
-                <div className="mt-5 pt-4 border-t border-walnut/10">
-                    <div className="w-full py-2.5 bg-cream group-hover:bg-walnut group-hover:text-white text-walnut rounded-xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
-                        <BookOpen className="w-4 h-4" />
-                        {t("wishlist.view_details", "View Details")}
+                {/* Metadata & Actions */}
+                <div className="mt-2.5 pt-2 border-t border-[#7a5c42]/10 dark:border-[#d4a574]/15 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-[11px] text-walnut/70 dark:text-[#c9ab91]">
+                        {book.pages ? (
+                            <span className="flex items-center gap-1 font-medium">
+                                <BookOpen size={12} className="text-[#7a5c42] dark:text-[#d4a574]" />
+                                <span>{book.pages} hal</span>
+                            </span>
+                        ) : null}
+                        {book.format ? (
+                            <span className="capitalize px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 text-[10px] font-medium truncate max-w-[80px]">
+                                {book.format}
+                            </span>
+                        ) : null}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                        {onStartReading && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onStartReading(book.id, e);
+                                }}
+                                className="px-2.5 py-1 bg-[#7a5c42] hover:bg-[#5c3e28] text-white rounded-lg text-xs font-medium shadow-xs transition-colors flex items-center gap-1"
+                                title={t("wishlist.start_reading", "Mulai Baca")}
+                            >
+                                <span>{t("wishlist.read_now", "Baca")}</span>
+                            </button>
+                        )}
+                        <div className="px-2 py-1 bg-white/70 dark:bg-black/30 hover:bg-white text-darkBrown dark:text-[#f5ece3] rounded-lg text-xs font-medium border border-[#7a5c42]/15 dark:border-white/10 transition-colors flex items-center gap-1">
+                            <span>{t("wishlist.details", "Detail")}</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -61,11 +61,11 @@ export default function Reading() {
     const averageProgress =
         totalReadingBooks > 0
             ? Math.round(
-                  readingBooks.reduce(
-                      (sum: number, book: Book) => sum + (book.progress || 0),
-                      0,
-                  ) / totalReadingBooks,
-              )
+                readingBooks.reduce(
+                    (sum: number, book: Book) => sum + (book.progress || 0),
+                    0,
+                ) / totalReadingBooks,
+            )
             : 0;
     // Calculate yearly statistics using custom hook
     const { yearlyStats } = useYearlyStats(allBooks);
@@ -84,7 +84,7 @@ export default function Reading() {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-16">
-            <SEO title={t("navigation.reading", "Reading")} />
+                <SEO title={t("navigation.reading", "Reading")} />
                 <div className="text-walnut">
                     {t("reading.loading", "Loading reading progress...")}
                 </div>
@@ -94,7 +94,7 @@ export default function Reading() {
 
     return (
         <div
-            className="px-3.5 sm:px-6 md:px-8 pb-8 md:pb-12 pt-14 md:pt-18 flex flex-col min-h-full relative"
+            className="px-3.5 sm:px-6 md:px-8 pb-8 md:pb-12 pt-[84px] sm:pt-[92px] md:pt-[104px] flex flex-col min-h-full relative"
             style={{
                 background:
                     "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
@@ -118,8 +118,8 @@ export default function Reading() {
                 {/* Header */}
                 <div className="mb-6">
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-walnut/10 dark:bg-[#d4a574]/15 text-walnut dark:text-[#d4a574] text-xs font-semibold tracking-wider uppercase mb-2">
-                        <BookOpen size={13} />
-                        <span>{t("reading.badge", "Progres Membaca")}</span>
+                        {/* <BookOpen size={13} />
+                        <span>{t("reading.badge", "Progres Membaca")}</span> */}
                     </div>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-darkBrown dark:text-cream tracking-tight mb-1">
                         {t("reading.currently_reading", "Currently Reading")}
@@ -298,8 +298,8 @@ export default function Reading() {
                                 <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f5ece3] leading-tight">
                                     {totalPages > 0
                                         ? Math.round(
-                                              (totalPagesRead / totalPages) * 100,
-                                          )
+                                            (totalPagesRead / totalPages) * 100,
+                                        )
                                         : 0}%
                                 </div>
                             </div>
@@ -323,11 +323,10 @@ export default function Reading() {
                             <div className="flex items-center bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/50 dark:border-white/10 p-1 rounded-xl shadow-xs shrink-0">
                                 <button
                                     onClick={() => setViewMode("shelf")}
-                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                                        viewMode === "shelf"
+                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === "shelf"
                                             ? "bg-white text-darkBrown shadow-xs"
                                             : "text-walnut/70 hover:text-darkBrown"
-                                    }`}
+                                        }`}
                                     title={t("library.view_shelf", "Tampilan Rak")}
                                 >
                                     <BookOpen size={14} />
@@ -335,11 +334,10 @@ export default function Reading() {
                                 </button>
                                 <button
                                     onClick={() => setViewMode("grid")}
-                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                                        viewMode === "grid"
+                                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === "grid"
                                             ? "bg-white text-darkBrown shadow-xs"
                                             : "text-walnut/70 hover:text-darkBrown"
-                                    }`}
+                                        }`}
                                     title={t("library.view_grid", "Tampilan Grid Sampul")}
                                 >
                                     <LayoutGrid size={14} />
@@ -363,31 +361,31 @@ export default function Reading() {
                                 shelves={[
                                     ...(totalReadingBooks > 0
                                         ? [
-                                              {
-                                                  id: "reading-shelf",
-                                                  name: t(
-                                                      "reading.reading_shelf",
-                                                      "Sedang Dibaca",
-                                                  ),
-                                                  order: 0,
-                                                  span: 12,
-                                                  capacity: 100,
-                                              },
-                                          ]
+                                            {
+                                                id: "reading-shelf",
+                                                name: t(
+                                                    "reading.reading_shelf",
+                                                    "Sedang Dibaca",
+                                                ),
+                                                order: 0,
+                                                span: 12,
+                                                capacity: 100,
+                                            },
+                                        ]
                                         : []),
                                     ...(totalUnreadBooks > 0
                                         ? [
-                                              {
-                                                  id: "unread-shelf",
-                                                  name: t(
-                                                      "reading.unread_shelf",
-                                                      "Belum Dibaca",
-                                                  ),
-                                                  order: 1,
-                                                  span: 12,
-                                                  capacity: 100,
-                                              },
-                                          ]
+                                            {
+                                                id: "unread-shelf",
+                                                name: t(
+                                                    "reading.unread_shelf",
+                                                    "Belum Dibaca",
+                                                ),
+                                                order: 1,
+                                                span: 12,
+                                                capacity: 100,
+                                            },
+                                        ]
                                         : []),
                                 ]}
                                 onAddBook={handleAddBook}
@@ -400,31 +398,31 @@ export default function Reading() {
                                 shelves={[
                                     ...(totalReadingBooks > 0
                                         ? [
-                                              {
-                                                  id: "reading-shelf",
-                                                  name: t(
-                                                      "reading.reading_shelf",
-                                                      "Sedang Dibaca",
-                                                  ),
-                                                  order: 0,
-                                                  span: 12,
-                                                  capacity: 100,
-                                              },
-                                          ]
+                                            {
+                                                id: "reading-shelf",
+                                                name: t(
+                                                    "reading.reading_shelf",
+                                                    "Sedang Dibaca",
+                                                ),
+                                                order: 0,
+                                                span: 12,
+                                                capacity: 100,
+                                            },
+                                        ]
                                         : []),
                                     ...(totalUnreadBooks > 0
                                         ? [
-                                              {
-                                                  id: "unread-shelf",
-                                                  name: t(
-                                                      "reading.unread_shelf",
-                                                      "Belum Dibaca",
-                                                  ),
-                                                  order: 1,
-                                                  span: 12,
-                                                  capacity: 100,
-                                              },
-                                          ]
+                                            {
+                                                id: "unread-shelf",
+                                                name: t(
+                                                    "reading.unread_shelf",
+                                                    "Belum Dibaca",
+                                                ),
+                                                order: 1,
+                                                span: 12,
+                                                capacity: 100,
+                                            },
+                                        ]
                                         : []),
                                 ]}
                                 books={[

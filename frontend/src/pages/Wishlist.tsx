@@ -3,7 +3,6 @@ import { useShelves } from "../hooks/useShelves";
 import { useStartReading } from "../hooks/useBooks";
 import { useNavigate } from "react-router-dom";
 import { useBookstore } from "../store/useBookstore";
-import Bookshelf from "../components/shelf/Bookshelf";
 import AddWishlistBookModal from "../components/modals/AddWishlistBookModal";
 import WishlistCard from "../components/assets/WishlistCard";
 import { useState } from "react";
@@ -11,12 +10,9 @@ import type { Book } from "../types";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
-    ShoppingCart,
-    Clock,
-    BookOpen,
-    Target,
-    Gift,
     Plus,
+    List,
+    LayoutGrid,
 } from "lucide-react";
 import BookmarkHeart from "../components/icons/BookmarkHeart";
 import SEO from "../components/SEO";
@@ -25,18 +21,17 @@ export default function Wishlist() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const {
-        selectedBookId,
-        isBookDetailOpen,
         toggleBookDetail,
         setSelectedBookId,
     } = useBookstore();
+    const [viewMode, setViewMode] = useState<"list" | "grid">("list");
     const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
-    const [addShelfId, setAddShelfId] = useState<string | undefined>();
-    const [addShelfName, setAddShelfName] = useState<string | undefined>();
+    const [, setAddShelfId] = useState<string | undefined>();
+    const [, setAddShelfName] = useState<string | undefined>();
 
     // Fetch all books and shelves from API
     const { data: allBooksResponse, isLoading } = useBooks({});
-    const { data: shelves = [], isLoading: shelvesLoading } = useShelves();
+    const { isLoading: shelvesLoading } = useShelves();
     const startReadingMutation = useStartReading();
 
     const allBooks = allBooksResponse?.data?.data || [];
@@ -83,17 +78,11 @@ export default function Wishlist() {
         toggleBookDetail(book.id);
     };
 
-    const handleAddBook = (shelfId: string, shelfName?: string) => {
-        setAddShelfId(shelfId);
-        setAddShelfName(shelfName);
-        setIsAddBookModalOpen(true);
-    };
-
     // Loading state
     if (isLoading || shelvesLoading) {
         return (
             <div className="flex items-center justify-center py-16">
-            <SEO title={t("navigation.wishlist", "Wishlist")} />
+                <SEO title={t("navigation.wishlist", "Wishlist")} />
                 <div className="text-walnut">
                     {t("wishlist.loading", "Loading wishlist...")}
                 </div>
@@ -103,13 +92,19 @@ export default function Wishlist() {
 
     return (
         <div
-            className="p-4 md:p-8 pt-[88px] md:pt-[100px] flex flex-col min-h-full relative"
+            className="px-3.5 sm:px-6 md:px-8 pb-16 md:pb-20 pt-[84px] sm:pt-[92px] md:pt-[104px] flex flex-col min-h-full relative"
             style={{
                 background:
                     "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
             }}
         >
-            <SEO title={t("navigation.wishlist", "Wishlist")} description={t("wishlist.seo_description", "Manage your book wishlist and track what you want to read next.")} />
+            <SEO
+                title={t("navigation.wishlist", "Wishlist")}
+                description={t(
+                    "wishlist.seo_description",
+                    "Manage your book wishlist and track what you want to read next.",
+                )}
+            />
             {/* Plaster / linen wall texture */}
             <div
                 style={{
@@ -124,67 +119,133 @@ export default function Wishlist() {
                 }}
             />
             <div className="max-w-7xl mx-auto w-full relative z-10">
-                {/* Header */}
-                <div className="mb-8 md:mb-10 flex items-center justify-between gap-4 md:gap-6">
-                    <div>
-                        <div className="flex flex-wrap items-center gap-3 md:gap-4 mb-2">
-                            <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown">
-                                {t("wishlist.title", "Wishlist")}
-                            </h1>
-
-                            {/* Minimalist Count Badge */}
-                            {totalWishlist > 0 && (
-                                <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full border border-walnut/10 shadow-sm text-sm">
-                                    <BookmarkHeart className="w-4 h-4 text-pink-500 fill-pink-500" />
-                                    <span className="font-bold text-darkBrown">
-                                        {totalWishlist}
-                                    </span>
-                                </div>
-                            )}
+                {/* Header Container */}
+                <div className="mb-6 sm:mb-8 flex flex-col gap-3.5 sm:gap-4">
+                    {/* Top Row: Badge & Header Actions */}
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-walnut/10 dark:bg-[#d4a574]/15 border border-walnut/10 dark:border-[#d4a574]/20 text-xs font-semibold text-walnut dark:text-[#d4a574] uppercase tracking-wider">
+                            <BookmarkHeart className="w-3.5 h-3.5 text-pink-600 dark:text-pink-400 fill-pink-600/30" />
+                            <span>{t("wishlist.badge", "Daftar Keinginan")}</span>
                         </div>
 
-                        <p className="text-walnut/70">
+                        {/* Right: View Switcher & Add Button */}
+                        <div className="flex items-center gap-2">
+                            {totalWishlist > 0 && (
+                                <div className="flex items-center bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/50 dark:border-white/10 p-1 rounded-xl shadow-xs">
+                                    <button
+                                        onClick={() => setViewMode("list")}
+                                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                                            viewMode === "list"
+                                                ? "bg-white dark:bg-[#322015] text-darkBrown dark:text-cream shadow-xs"
+                                                : "text-walnut/70 hover:text-darkBrown dark:text-stone-300"
+                                        }`}
+                                        title={t("wishlist.view_list", "Daftar")}
+                                    >
+                                        <List size={14} />
+                                        <span className="hidden xs:inline">
+                                            {t("wishlist.view_list", "Daftar")}
+                                        </span>
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode("grid")}
+                                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                                            viewMode === "grid"
+                                                ? "bg-white dark:bg-[#322015] text-darkBrown dark:text-cream shadow-xs"
+                                                : "text-walnut/70 hover:text-darkBrown dark:text-stone-300"
+                                        }`}
+                                        title={t("wishlist.view_grid", "Grid")}
+                                    >
+                                        <LayoutGrid size={14} />
+                                        <span className="hidden xs:inline">
+                                            {t("wishlist.view_grid", "Grid")}
+                                        </span>
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Add to Wishlist Button */}
+                            <motion.button
+                                onClick={() => setIsAddBookModalOpen(true)}
+                                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#7a5c42] hover:bg-[#5c3e28] text-white rounded-xl flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all text-xs sm:text-sm font-medium shrink-0"
+                                title={t("wishlist.add_to_wishlist", "Tambah Buku")}
+                                whileTap={{ scale: 0.96 }}
+                            >
+                                <Plus className="w-4 h-4" />
+                                <span>{t("wishlist.add_book", "Tambah")}</span>
+                            </motion.button>
+                        </div>
+                    </div>
+
+                    {/* Main Title & Subtitle */}
+                    <div>
+                        <div className="flex items-center gap-2.5 mb-1">
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-darkBrown dark:text-[#f5ece3] tracking-tight">
+                                {t("wishlist.title", "Wishlist")}
+                            </h1>
+                            {totalWishlist > 0 && (
+                                <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-[#7a5c42]/15 dark:bg-[#d4a574]/20 text-[#5c3e28] dark:text-[#d4a574] font-serif font-bold text-xs sm:text-sm">
+                                    {totalWishlist}
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xs sm:text-sm text-walnut/70 dark:text-[#c9ab91]">
                             {t(
                                 "wishlist.subtitle",
-                                "Books you are planning to acquire - {{count}} item{{s}}",
-                                {
-                                    count: totalWishlist,
-                                    s: totalWishlist !== 1 ? "s" : "",
-                                },
+                                "Buku impian yang ingin kamu koleksi dan baca selanjutnya",
                             )}
                         </p>
                     </div>
-
-                    {/* Add to Wishlist Button */}
-                    <motion.button
-                        onClick={() => setIsAddBookModalOpen(true)}
-                        className="w-10 h-10 bg-walnut text-white rounded-xl flex items-center justify-center hover:bg-darkBrown transition-colors shadow-sm hover:shadow-md shrink-0"
-                        title={t("wishlist.add_to_wishlist", "Add Book")}
-                        whileHover={{ scale: 1.15 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        <motion.div
-                            whileHover={{ rotate: 360 }}
-                            transition={{
-                                duration: 0.6,
-                                ease: [0.34, 1.56, 0.64, 1],
-                            }}
-                        >
-                            <Plus className="w-5 h-5" />
-                        </motion.div>
-                    </motion.button>
                 </div>
 
-                {/* Wishlist Books Grid */}
+                {/* Quick Insight Stats Bar */}
                 {totalWishlist > 0 && (
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
+                        className="mb-6 grid grid-cols-3 divide-x divide-[#7a5c42]/10 dark:divide-[#d4a574]/15 bg-[#fdfbf7]/80 dark:bg-[#20140e]/90 rounded-2xl p-3 border border-[#7a5c42]/15 dark:border-[#d4a574]/20 shadow-xs backdrop-blur-xs text-center"
+                    >
+                        <div className="px-1">
+                            <div className="text-base sm:text-lg font-serif font-bold text-darkBrown dark:text-[#f5ece3]">
+                                {totalWishlist}
+                            </div>
+                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/70 dark:text-[#c9ab91] font-medium truncate">
+                                {t("wishlist.total_wished", "Total Ingin")}
+                            </div>
+                        </div>
+                        <div className="px-1">
+                            <div className="text-base sm:text-lg font-serif font-bold text-darkBrown dark:text-[#f5ece3] truncate">
+                                {topGenre}
+                            </div>
+                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/70 dark:text-[#c9ab91] font-medium truncate">
+                                {t("wishlist.top_genre", "Genre Favorit")}
+                            </div>
+                        </div>
+                        <div className="px-1">
+                            <div className="text-base sm:text-lg font-serif font-bold text-darkBrown dark:text-[#f5ece3] truncate">
+                                {topAuthor}
+                            </div>
+                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/70 dark:text-[#c9ab91] font-medium truncate">
+                                {t("wishlist.top_author", "Penulis Populer")}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Wishlist Books Grid / List */}
+                {totalWishlist > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15 }}
                         className="mb-8"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div
+                            className={
+                                viewMode === "list"
+                                    ? "grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4"
+                                    : "grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-4"
+                            }
+                        >
                             {wishlistBooks.map((book: Book, index: number) => {
                                 return (
                                     <WishlistCard
@@ -192,6 +253,8 @@ export default function Wishlist() {
                                         book={book}
                                         index={index}
                                         onClick={handleBookClick}
+                                        onStartReading={handleStartReading}
+                                        viewMode={viewMode}
                                         t={t}
                                     />
                                 );
@@ -205,34 +268,34 @@ export default function Wishlist() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-center py-16"
+                        className="text-center py-16 bg-[#fdfbf7]/80 dark:bg-[#20140e]/90 rounded-2xl border border-[#7a5c42]/15 dark:border-[#d4a574]/20 p-8 backdrop-blur-sm"
                     >
-                        <div className="w-20 h-20 bg-walnut/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <BookmarkHeart className="w-10 h-10 text-walnut/30" />
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#7a5c42]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <BookmarkHeart className="w-8 h-8 sm:w-10 sm:h-10 text-[#7a5c42]/40 fill-pink-500/20" />
                         </div>
-                        <h3 className="text-xl font-serif text-darkBrown mb-2">
-                            {t("wishlist.empty", "Your wishlist is empty")}
+                        <h3 className="text-xl font-serif font-bold text-darkBrown dark:text-[#f5ece3] mb-2">
+                            {t("wishlist.empty", "Wishlist masih kosong")}
                         </h3>
-                        <p className="text-walnut/70 mb-6">
+                        <p className="text-sm text-walnut/70 dark:text-[#c9ab91] mb-6 max-w-sm mx-auto">
                             {t(
                                 "wishlist.empty_desc",
-                                "Save books you want to read later",
+                                "Simpan buku yang ingin kamu beli atau baca nanti",
                             )}
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xs mx-auto">
                             <button
                                 onClick={() => navigate("/library")}
-                                className="px-6 py-3 bg-walnut text-white rounded-xl font-medium hover:bg-darkBrown transition-colors"
+                                className="px-5 py-2.5 bg-[#7a5c42] hover:bg-[#5c3e28] text-white rounded-xl font-medium transition-colors text-sm shadow-xs"
                             >
-                                {t("wishlist.browse_library", "Browse Library")}
+                                {t("wishlist.browse_library", "Jelajahi Library")}
                             </button>
                             <button
                                 onClick={() => setIsAddBookModalOpen(true)}
-                                className="px-6 py-3 bg-white text-walnut rounded-xl font-medium hover:bg-walnut/10 transition-colors border border-walnut/20"
+                                className="px-5 py-2.5 bg-white/70 dark:bg-black/30 text-darkBrown dark:text-[#f5ece3] rounded-xl font-medium hover:bg-white transition-colors border border-[#7a5c42]/20 text-sm"
                             >
                                 {t(
                                     "wishlist.add_to_wishlist",
-                                    "Add to Wishlist",
+                                    "Tambah ke Wishlist",
                                 )}
                             </button>
                         </div>
