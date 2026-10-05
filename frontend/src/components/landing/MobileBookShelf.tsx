@@ -83,7 +83,13 @@ export default function MobileBookShelf({
             className="flex md:hidden flex-col items-center justify-end w-full pt-1 pb-2 px-1 select-none relative touch-pan-y"
         >
             {/* 5 VISIBLE BOOKS VIEWPORT WINDOW OVER THE INFINITE CONTINUOUS TRAIN TRACK */}
-            <div className="w-full max-w-[365px] xs:max-w-[385px] mx-auto overflow-hidden relative min-h-[355px] pb-3 flex items-end">
+            <div
+                className="w-full max-w-[365px] xs:max-w-[385px] mx-auto overflow-hidden relative min-h-[355px] pb-3 flex items-end"
+                style={{
+                    maskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)",
+                    WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)"
+                }}
+            >
                 <motion.div
                     animate={{ x: -trainIndex * 66 }}
                     transition={{ type: "spring", stiffness: 180, damping: 24, mass: 0.7 }}
@@ -122,7 +128,7 @@ export default function MobileBookShelf({
                                         ? { delay: visibleOffset * 0.06 + 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] }
                                         : { type: "spring", stiffness: 320, damping: 25 }
                                 }
-                                className={`absolute cursor-pointer w-[54px] xs:w-14 rounded-xs shadow-lg dark:shadow-[0_8px_20px_rgba(0,0,0,0.55)] flex flex-col justify-between p-2 select-none border border-black/10 dark:border-black/40 border-t-white/30 dark:border-t-white/10 overflow-hidden transition-all duration-300 ${
+                                className={`absolute cursor-pointer w-[54px] xs:w-14 rounded-xs shadow-lg dark:shadow-[0_8px_20px_rgba(0,0,0,0.55)] flex flex-col justify-between p-2 select-none border border-black/10 dark:border-black/40 border-t-white/30 dark:border-t-white/10 overflow-hidden transition-all duration-500 ${
                                     book.spineBg
                                 } ${book.textColor} ${
                                     isActive
@@ -137,7 +143,7 @@ export default function MobileBookShelf({
                                 }}
                             >
                                 {/* Realistic 3D Spine Cylindrical Shading & Hinge Crease */}
-                                <div className="absolute inset-0 pointer-events-none rounded-xs bg-gradient-to-r from-black/20 via-transparent to-black/25 dark:from-black/35 dark:via-white/[0.04] dark:to-black/35" />
+                                <div className="absolute inset-0 pointer-events-none rounded-xs bg-gradient-to-r from-black/20 via-transparent to-black/25 dark:from-black/35 dark:via-white/[0.04] dark:to-black/35 transition-opacity duration-700" />
 
                                 {/* Spine Top Accent Star */}
                                 <div className="w-full flex justify-center shrink-0 pt-0.5 relative z-1">
@@ -187,28 +193,10 @@ export default function MobileBookShelf({
                     {/* Top Brass Highlight Line */}
                     <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#d4a574]/70 to-transparent rounded-full shadow-xs" />
                     {/* Wooden Rail Plank Body */}
-                    <div className="h-[5px] w-full bg-gradient-to-b from-[#7a5c42]/35 via-[#5c4033]/45 to-[#3a2d23]/55 rounded-xs mt-[1px]" />
+                    <div className="h-[5px] w-full bg-gradient-to-b from-[#7a5c42]/35 via-[#5c4033]/45 to-[#3a2d23]/55 rounded-xs mt-[1px] transition-colors duration-700" />
                     {/* Bottom Soft Drop Shadow */}
                     <div className="h-[3px] w-full bg-black/10 blur-[2px]" />
                 </div>
-
-                {/* Left Edge Blur & Smooth Fade */}
-                <div
-                    className="absolute left-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-r from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent dark:from-[#180f0a] dark:via-[#180f0a]/80"
-                    style={{
-                        WebkitMaskImage: "linear-gradient(to right, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)",
-                        maskImage: "linear-gradient(to right, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)"
-                    }}
-                />
-
-                {/* Right Edge Blur & Smooth Fade */}
-                <div
-                    className="absolute right-0 top-0 bottom-0 w-12 xs:w-16 pointer-events-none z-20 backdrop-blur-xs sm:backdrop-blur-sm bg-gradient-to-l from-[#f8f5f0] via-[#f8f5f0]/80 to-transparent dark:from-[#180f0a] dark:via-[#180f0a]/80"
-                    style={{
-                        WebkitMaskImage: "linear-gradient(to left, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)",
-                        maskImage: "linear-gradient(to left, black 30%, rgba(0,0,0,0.5) 65%, transparent 100%)"
-                    }}
-                />
             </div>
 
             {/* Swipe Gesture Indicator & Infinite Train Controls (LOCATED AT THE BOTTOM) */}
@@ -216,7 +204,7 @@ export default function MobileBookShelf({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.4 }}
-                className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 dark:bg-[#3d2516]/60 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/30 text-[#4a3b2f] dark:text-[#f5ece3] text-[10.5px] font-bold tracking-wide z-10 shadow-xs"
+                className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 dark:bg-[#3d2516]/60 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/30 text-[#4a3b2f] dark:text-[#f5ece3] text-[10.5px] font-bold tracking-wide z-10 shadow-xs transition-colors duration-700 ease-in-out"
             >
                 <motion.button
                     animate={{ x: [-1.5, 0, -1.5] }}

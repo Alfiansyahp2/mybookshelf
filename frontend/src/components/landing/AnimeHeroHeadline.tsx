@@ -39,7 +39,7 @@ export default function AnimeHeroHeadline() {
         <h1
             ref={headlineRef}
             key={`hero-headline-${i18n.language}`}
-            className="font-sans text-2xl sm:text-3xl lg:text-4xl font-normal tracking-tight leading-[1.2] text-[#4a3b2f] flex flex-wrap justify-center items-center gap-x-2.5 gap-y-1"
+            className="font-sans text-2xl sm:text-3xl lg:text-4xl font-normal tracking-tight leading-[1.2] text-[#4a3b2f] dark:text-[#f5ece3] flex flex-wrap justify-center items-center gap-x-2.5 gap-y-1 transition-colors duration-700 ease-in-out"
         >
             {mainText.split(" ").map((word, i) => (
                 <span
@@ -49,7 +49,7 @@ export default function AnimeHeroHeadline() {
                     {word}
                 </span>
             ))}
-            <span className="hero-word inline-block relative font-serif italic font-bold text-[#7a5c42] opacity-0 transform-gpu ml-1">
+            <span className="hero-word inline-block relative font-serif italic font-bold text-[#7a5c42] dark:text-[#e5b882] opacity-0 transform-gpu ml-1 transition-colors duration-700 ease-in-out">
                 {highlightText}
                 <span
                     ref={underlineRef}

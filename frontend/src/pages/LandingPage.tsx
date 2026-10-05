@@ -34,7 +34,7 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] dark:bg-[#180f0a] text-[#4a3b2f] dark:text-[#f5ece3] font-sans flex flex-col justify-between p-4 pb-3 sm:p-6 md:p-10 selection:bg-[#7a5c42] selection:text-white relative transition-colors duration-500">
+        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] dark:bg-[#180f0a] text-[#4a3b2f] dark:text-[#f5ece3] font-sans flex flex-col justify-between p-4 pb-3 sm:p-6 md:p-10 selection:bg-[#7a5c42] selection:text-white relative transition-colors duration-700 ease-in-out">
             {/* Cozy Floating Dust Particles (Anime.js) */}
             <LibraryAmbientParticles />
 
@@ -49,12 +49,12 @@ export default function LandingPage() {
                 <div className="flex items-center gap-2 sm:gap-3">
                     <button
                         onClick={() => setIsContactModalOpen(true)}
-                        className="md:hidden p-1.5 text-[#7a5c42] dark:text-[#c9ab91] hover:bg-[#7a5c42]/10 dark:hover:bg-[#d4a574]/15 rounded-lg transition-colors"
+                        className="md:hidden p-1.5 text-[#7a5c42] dark:text-[#c9ab91] hover:bg-[#7a5c42]/10 dark:hover:bg-[#d4a574]/15 rounded-lg transition-colors duration-700"
                         aria-label="Menu"
                     >
                         <Menu className="w-5 h-5" />
                     </button>
-                    <span className="font-serif italic font-bold text-xl sm:text-2xl md:text-3xl tracking-tight text-[#4a3b2f] dark:text-[#f5ece3]">
+                    <span className="font-serif italic font-bold text-xl sm:text-2xl md:text-3xl tracking-tight text-[#4a3b2f] dark:text-[#f5ece3] transition-colors duration-700">
                         A?Bookshelf
                     </span>
                 </div>
@@ -69,14 +69,14 @@ export default function LandingPage() {
 
                     <button
                         onClick={() => setIsContactModalOpen(true)}
-                        className="hidden md:flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#7a5c42]/30 dark:border-[#d4a574]/40 text-[11px] sm:text-xs font-bold text-[#7a5c42] dark:text-[#e5b882] hover:bg-[#7a5c42]/10 dark:hover:bg-[#d4a574]/15 transition-colors"
+                        className="hidden md:flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[#7a5c42]/30 dark:border-[#d4a574]/40 text-[11px] sm:text-xs font-bold text-[#7a5c42] dark:text-[#e5b882] hover:bg-[#7a5c42]/10 dark:hover:bg-[#d4a574]/15 transition-all duration-700"
                     >
-                        <User className="w-3.5 h-3.5 text-[#7a5c42] dark:text-[#e5b882]" />
+                        <User className="w-3.5 h-3.5 text-[#7a5c42] dark:text-[#e5b882] transition-colors duration-700" />
                         <span>{t("landing.contact", "KONTAK")}</span>
                     </button>
                     <Link
                         to="/dashboard"
-                        className="hidden md:flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#4a3b2f] hover:bg-[#3a2d23] dark:bg-[#3e281b] dark:hover:bg-[#4d3222] text-[#f8f5f0] border dark:border-[#d4a574]/30 text-[11px] sm:text-xs font-bold shadow-md transition-all shrink-0"
+                        className="hidden md:flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#4a3b2f] hover:bg-[#3a2d23] dark:bg-[#3e281b] dark:hover:bg-[#4d3222] text-[#f8f5f0] border dark:border-[#d4a574]/30 text-[11px] sm:text-xs font-bold shadow-md transition-all duration-700 shrink-0"
                     >
                         <span>{t("landing.enter_app", "MASUK APP")}</span>
                         <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -108,7 +108,7 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-                        className="font-serif italic font-bold text-2xl xs:text-[27px] text-[#3a2d23] dark:text-[#f5ece3] tracking-tight leading-snug"
+                        className="font-serif italic font-bold text-2xl xs:text-[27px] text-[#3a2d23] dark:text-[#f5ece3] tracking-tight leading-snug transition-colors duration-700"
                     >
                         {t("landing.mobile_title", "Abadikan Setiap Lembar Cerita")}
                     </motion.h1>
@@ -126,7 +126,7 @@ export default function LandingPage() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.45, delay: 0.28, ease: "easeOut" }}
-                        className="text-xs text-[#7a5c42] dark:text-[#c9ab91] font-sans opacity-90 leading-relaxed"
+                        className="text-xs text-[#7a5c42] dark:text-[#c9ab91] font-sans opacity-90 leading-relaxed transition-colors duration-700"
                     >
                         {t("landing.mobile_subtitle", "Jelajahi koleksi editorial & kelola rak buku digitalmu")}
                     </motion.p>
@@ -144,13 +144,13 @@ export default function LandingPage() {
             </main>
 
             {/* FOOTER SINGLE LINE (HIDDEN ON MOBILE) */}
-            <div className="w-full hidden md:flex items-center justify-between text-[11px] text-[#7a5c42] dark:text-[#c9ab91] shrink-0 border-t border-[#7a5c42]/15 dark:border-[#3e281b] pt-3">
+            <div className="w-full hidden md:flex items-center justify-between text-[11px] text-[#7a5c42] dark:text-[#c9ab91] shrink-0 border-t border-[#7a5c42]/15 dark:border-[#3e281b] pt-3 transition-colors duration-700">
                 <span>© {new Date().getFullYear()} A?Bookshelf. {t("landing.footer_copyright", "Side Filter Single Screen Showcase.")}</span>
                 <div className="flex gap-4">
-                    <button onClick={() => setIsContactModalOpen(true)} className="hover:text-[#4a3b2f] dark:hover:text-[#f5ece3] underline font-medium">
+                    <button onClick={() => setIsContactModalOpen(true)} className="hover:text-[#4a3b2f] dark:hover:text-[#f5ece3] underline font-medium transition-colors duration-700">
                         {t("landing.contact_dev", "Kontak Developer")}
                     </button>
-                    <Link to="/dashboard" className="hover:text-[#4a3b2f] dark:hover:text-[#f5ece3] underline font-bold">
+                    <Link to="/dashboard" className="hover:text-[#4a3b2f] dark:hover:text-[#f5ece3] underline font-bold transition-colors duration-700">
                         {t("landing.open_dashboard", "Buka App Dashboard")} ↗
                     </Link>
                 </div>
