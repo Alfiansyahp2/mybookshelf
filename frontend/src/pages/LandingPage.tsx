@@ -12,7 +12,8 @@ import {
     ExternalLink,
     User,
     Menu,
-    BookOpen
+    BookOpen,
+    ChevronLeft
 } from "lucide-react";
 import SEO from "../components/SEO";
 import InteractiveBookDemo from "../components/landing/InteractiveBookDemo";
@@ -156,207 +157,181 @@ export default function LandingPage() {
                 </div>
             </div>
 
-            {/* CONTACT DEVELOPER MODAL */}
+            {/* ── SIDEBAR DRAWER (REPLACES FLOATING MODAL) ── */}
             <AnimatePresence>
                 {isContactModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        {/* Backdrop */}
+                    <div className="fixed inset-0 z-50 overflow-hidden pointer-events-auto flex">
+                        {/* Backdrop Overlay */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
                             onClick={() => setIsContactModalOpen(false)}
-                            className="absolute inset-0 bg-black/60 backdrop-blur-xs"
+                            className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
                         />
 
-                        {/* Modal Container */}
+                        {/* Sidebar Drawer Container (Frosted Glassmorphism Drawer) */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.94, y: 14 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.94, y: 14 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 280 }}
-                            className="relative w-full max-w-sm bg-[#f5ecd7] dark:bg-[#261810] text-[#4a3b2f] dark:text-[#f5ece3] rounded-2xl shadow-2xl z-10 border border-[#7a5c42]/25 dark:border-[#d4a574]/30 overflow-hidden"
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            transition={{ type: "spring", damping: 28, stiffness: 280 }}
+                            className="relative w-[310px] xs:w-[330px] sm:w-[360px] max-w-[85vw] h-full bg-[#f8f5f0]/70 dark:bg-[#180f0a]/75 backdrop-blur-xl text-[#4a3b2f] dark:text-[#f5ece3] z-10 border-r border-[#7a5c42]/20 dark:border-[#d4a574]/25 shadow-2xl flex flex-col justify-between"
                         >
-                            {/* Top Gold/Walnut Accent Bar */}
-                            <div className="h-1 w-full bg-gradient-to-r from-[#4a3b2f] via-[#d4a574] to-[#4a3b2f]" />
+                            {/* Middle Edge Arrow Close Button */}
+                            <button
+                                onClick={() => setIsContactModalOpen(false)}
+                                className="absolute -right-3.5 sm:-right-4 top-1/2 -translate-y-1/2 w-7 h-11 sm:w-8 sm:h-12 rounded-r-xl bg-[#f8f5f0]/95 dark:bg-[#20140e]/95 backdrop-blur-md border-y border-r border-[#7a5c42]/25 dark:border-[#d4a574]/35 shadow-md flex items-center justify-center text-[#7a5c42] dark:text-[#e8c89b] hover:text-[#3a2d23] dark:hover:text-white hover:bg-white dark:hover:bg-[#2a1b13] transition-all duration-200 active:scale-90 z-30 group"
+                                aria-label="Tutup Sidebar"
+                                title="Tutup Menu"
+                            >
+                                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
+                            </button>
 
-                            <div className="p-4 sm:p-5">
-                                {/* Close Button */}
-                                <button
-                                    onClick={() => setIsContactModalOpen(false)}
-                                    className="absolute top-3.5 right-3.5 p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-[#7a5c42] dark:text-[#c9ab91]"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
+                            {/* Top Subtle Gold Accent Line */}
+                            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#d4a574] to-transparent shrink-0 relative z-10" />
 
-                                {/* Header Profile */}
-                                <div className="flex items-center gap-3 mb-3.5 pb-3 border-b border-[#7a5c42]/15 dark:border-[#3e281b]">
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#4a3b2f] via-[#5c4532] to-[#2c1a0e] text-[#f8f5f0] shadow-md border border-[#d4a574]/40 flex items-center justify-center font-bold text-sm tracking-wider shrink-0">
-                                        A?
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <div className="flex items-center gap-1.5">
-                                            <h3 className="font-serif italic text-base font-bold text-[#4a3b2f] dark:text-[#f5ece3] leading-tight">
-                                                Alfiansyah
-                                            </h3>
-                                            <span className="px-2 py-0.5 rounded-full bg-[#7a5c42]/12 dark:bg-[#d4a574]/20 text-[#7a5c42] dark:text-[#e5b882] text-[9px] font-bold tracking-wider uppercase border border-[#7a5c42]/20 dark:border-[#d4a574]/30">
-                                                Creator
-                                            </span>
+                            <div className="p-4 sm:p-5 flex-1 flex flex-col relative z-10 overflow-y-auto hide-scrollbar">
+                                {/* Sidebar Top Header */}
+                                <div className="flex items-center pb-3.5 mb-4 border-b border-[#7a5c42]/15 dark:border-[#d4a574]/20">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-9 h-9 rounded-xl bg-white/70 dark:bg-white/10 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/30 flex items-center justify-center text-[#7a5c42] dark:text-[#d4a574] shadow-xs shrink-0">
+                                            <BookOpen className="w-4 h-4" />
                                         </div>
-                                        <p className="text-[10.5px] text-[#7a5c42]/80 dark:text-[#c9ab91] font-medium truncate mt-0.5">
-                                            Developer of A?Bookshelf
-                                        </p>
+                                        <div>
+                                            <h2 className="font-serif italic font-bold text-base text-[#4a3b2f] dark:text-[#f5ece3] leading-tight">
+                                                A?Bookshelf
+                                            </h2>
+                                            <p className="text-[10px] text-[#7a5c42]/80 dark:text-[#c9ab91] font-medium tracking-wide">
+                                                Personal Digital Bookshelf
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Primary App Launch Button (Prominent in Mobile / Modal) */}
-                                <div className="mb-3.5">
+                                {/* Primary App Launch Button */}
+                                <div className="mb-4">
                                     <Link
                                         to="/dashboard"
                                         onClick={() => setIsContactModalOpen(false)}
-                                        className="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#4a3b2f] hover:bg-[#3a2d23] dark:bg-[#3e281b] dark:hover:bg-[#4d3222] text-[#f8f5f0] shadow-md hover:shadow-lg transition-all duration-200 group font-bold border dark:border-[#d4a574]/30"
+                                        className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-[#4a3b2f] via-[#544132] to-[#3e2e22] dark:from-[#2e1d13] dark:via-[#3d2719] dark:to-[#24150c] text-[#f8f5f0] shadow-[0_4px_16px_rgba(74,59,47,0.25)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_22px_rgba(212,165,116,0.35)] hover:border-[#d4a574]/70 active:scale-[0.98] transition-all duration-300 group font-bold border border-[#d4a574]/40 relative overflow-hidden"
                                     >
-                                        <div className="flex items-center gap-2.5 min-w-0">
-                                            <div className="w-8 h-8 rounded-lg bg-[#d4a574]/20 border border-[#d4a574]/35 flex items-center justify-center text-[#d4a574] group-hover:scale-105 transition-transform shrink-0">
+                                        <div className="flex items-center gap-3 min-w-0 relative z-10">
+                                            <div className="w-8 h-8 rounded-xl bg-[#d4a574]/25 border border-[#d4a574]/40 flex items-center justify-center text-[#d4a574] group-hover:scale-105 group-hover:bg-[#d4a574]/35 transition-all shrink-0">
                                                 <BookOpen className="w-4 h-4" />
                                             </div>
                                             <div className="text-left min-w-0">
-                                                <div className="text-xs font-bold tracking-wide uppercase flex items-center gap-1.5 text-white">
+                                                <div className="text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 text-white">
                                                     <span>{t("landing.enter_app", "MASUK APP")}</span>
-                                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#d4a574]/25 text-[#e8c89b] font-mono font-medium">
-                                                        App
+                                                    <span className="text-[8.5px] px-1.5 py-0.5 rounded bg-[#d4a574]/30 text-[#f3caa1] font-mono font-medium border border-[#d4a574]/40">
+                                                        APP
                                                     </span>
                                                 </div>
-                                                <div className="text-[10.5px] text-[#f8f5f0]/75 font-normal truncate mt-0.5">
+                                                <div className="text-[10px] text-[#f8f5f0]/80 font-normal truncate mt-0.5">
                                                     {t("landing.open_dashboard", "Buka App Dashboard")}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[#f8f5f0] group-hover:bg-[#d4a574] group-hover:text-[#4a3b2f] transition-all shrink-0">
+                                        <div className="w-7 h-7 rounded-lg bg-white/10 dark:bg-white/5 border border-white/15 flex items-center justify-center text-[#f8f5f0] group-hover:bg-[#d4a574] group-hover:text-[#2c1a0e] group-hover:border-[#d4a574] transition-all shrink-0 relative z-10">
                                             <ArrowUpRight className="w-4 h-4" />
                                         </div>
                                     </Link>
                                 </div>
 
-                                {/* Contact Links Stack */}
-                                <div className="space-y-2">
+                                {/* Contact & Social Links Section */}
+                                <div className="space-y-2.5 mb-2">
+                                    <div className="text-[10px] font-bold text-[#7a5c42] dark:text-[#c9ab91] uppercase tracking-widest px-1 mb-1.5 flex items-center gap-2">
+                                        <span>{t("landing.contact", "KONTAK")}</span>
+                                        <span className="h-[1px] flex-1 bg-gradient-to-r from-[#7a5c42]/20 dark:from-[#d4a574]/25 to-transparent" />
+                                    </div>
+
                                     {/* Email */}
-                                    <div className="p-2 px-3 rounded-xl bg-white/80 dark:bg-[#1a100b]/80 backdrop-blur-xs border border-[#7a5c42]/15 dark:border-[#3e281b] flex items-center justify-between hover:bg-white dark:hover:bg-[#1a100b] hover:border-[#7a5c42]/30 dark:hover:border-[#d4a574]/40 transition-all duration-200 group">
+                                    <div className="p-2.5 px-3 rounded-xl bg-white/70 dark:bg-[#251810]/70 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/25 flex items-center justify-between hover:bg-white/90 dark:hover:bg-[#251810]/90 hover:border-[#7a5c42]/35 dark:hover:border-[#d4a574]/40 transition-all duration-200 group shadow-xs">
                                         <a
                                             href="mailto:alfiansyahdev12@gmail.com"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="flex items-center gap-2.5 min-w-0 flex-1"
                                         >
-                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-xs flex items-center justify-center shrink-0">
+                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                                 <Mail className="w-3.5 h-3.5" />
                                             </div>
-                                            <span className="text-[11px] font-bold text-[#4a3b2f] dark:text-[#f5ece3] group-hover:text-red-700 transition-colors uppercase tracking-wider">
+                                            <span className="text-[11px] font-bold text-[#4a3b2f] dark:text-[#f5ece3] group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors uppercase tracking-wider">
                                                 Email
                                             </span>
                                         </a>
                                         <button
                                             onClick={handleCopyEmail}
-                                            className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all duration-200 flex items-center gap-1 shrink-0 ${copiedEmail
-                                                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                                                : "bg-[#7a5c42]/10 dark:bg-[#d4a574]/15 hover:bg-[#7a5c42] hover:text-white text-[#7a5c42] dark:text-[#e5b882]"
-                                                }`}
+                                            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 flex items-center gap-1 shrink-0 ${
+                                                copiedEmail
+                                                    ? "bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 border border-emerald-500/40"
+                                                    : "bg-[#7a5c42]/12 dark:bg-[#d4a574]/20 hover:bg-[#7a5c42] hover:text-white dark:hover:bg-[#d4a574] dark:hover:text-[#180f0a] text-[#7a5c42] dark:text-[#e8c89b] border border-[#7a5c42]/20 dark:border-[#d4a574]/30"
+                                            }`}
                                             title="Salin Email"
                                         >
                                             {copiedEmail ? (
                                                 <>
-                                                    <Check className="w-3 h-3 text-emerald-600" />
+                                                    <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                                                     <span>Tersalin</span>
                                                 </>
                                             ) : (
                                                 <>
                                                     <Copy className="w-3 h-3" />
+                                                    <span>Salin</span>
                                                 </>
                                             )}
                                         </button>
                                     </div>
-
-                                    {/* LinkedIn */}
-                                    {/* <a
-                                        href="https://linkedin.com/in/alfiansyahpp"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2 px-3 rounded-xl bg-white/80 backdrop-blur-xs border border-[#7a5c42]/15 flex items-center justify-between hover:bg-white hover:border-[#7a5c42]/30 transition-all duration-200 group"
-                                    >
-                                        <div className="flex items-center gap-2.5 min-w-0">
-                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-xs flex items-center justify-center shrink-0">
-                                                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.74a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28Z" />
-                                                </svg>
-                                            </div>
-                                            <span className="text-[11px] font-bold text-[#4a3b2f] group-hover:text-blue-700 transition-colors uppercase tracking-wider">
-                                                LinkedIn
-                                            </span>
-                                        </div>
-                                        <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-blue-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                                    </a> */}
-
-                                    {/* GitHub */}
-                                    {/* <a
-                                        href="https://github.com/Alfiansyahp2"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2 px-3 rounded-xl bg-white/80 backdrop-blur-xs border border-[#7a5c42]/15 flex items-center justify-between hover:bg-white hover:border-[#7a5c42]/30 transition-all duration-200 group"
-                                    >
-                                        <div className="flex items-center gap-2.5 min-w-0">
-                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-zinc-800 to-zinc-950 text-white shadow-xs flex items-center justify-center shrink-0">
-                                                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                                                    <path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z" />
-                                                </svg>
-                                            </div>
-                                            <span className="text-[11px] font-bold text-[#4a3b2f] group-hover:text-zinc-900 transition-colors uppercase tracking-wider">
-                                                GitHub
-                                            </span>
-                                        </div>
-                                        <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                                    </a> */}
-
-                                    {/* Website / Portfolio */}
-                                    {/* <a
-                                        href="https://alfiansyahpp.vercel.app"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2 px-3 rounded-xl bg-white/80 backdrop-blur-xs border border-[#7a5c42]/15 flex items-center justify-between hover:bg-white hover:border-[#7a5c42]/30 transition-all duration-200 group"
-                                    >
-                                        <div className="flex items-center gap-2.5 min-w-0">
-                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-xs flex items-center justify-center shrink-0">
-                                                <Globe className="w-3.5 h-3.5" />
-                                            </div>
-                                            <span className="text-[11px] font-bold text-[#4a3b2f] group-hover:text-amber-800 transition-colors uppercase tracking-wider">
-                                                Portofolio / Website
-                                            </span>
-                                        </div>
-                                        <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-amber-700 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
-                                    </a> */}
 
                                     {/* Medium */}
                                     <a
                                         href="https://medium.com/@putraalfiansyahp0"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2 px-3 rounded-xl bg-white/80 backdrop-blur-xs border border-[#7a5c42]/15 flex items-center justify-between hover:bg-white hover:border-[#7a5c42]/30 transition-all duration-200 group"
+                                        className="p-2.5 px-3 rounded-xl bg-white/70 dark:bg-[#251810]/70 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/25 flex items-center justify-between hover:bg-white/90 dark:hover:bg-[#251810]/90 hover:border-[#7a5c42]/35 dark:hover:border-[#d4a574]/40 transition-all duration-200 group shadow-xs"
                                     >
                                         <div className="flex items-center gap-2.5 min-w-0">
-                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-black to-zinc-900 text-white shadow-xs flex items-center justify-center shrink-0">
+                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-zinc-800 to-zinc-950 text-white shadow-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                                                 <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
                                                     <path d="M13.54 12a6.8 6.8 0 0 1-6.77 6.82A6.8 6.8 0 0 1 0 12a6.8 6.8 0 0 1 6.77-6.82A6.8 6.8 0 0 1 13.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42c1.87 0 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z" />
                                                 </svg>
                                             </div>
-                                            <span className="text-[11px] font-bold text-[#4a3b2f] group-hover:text-black transition-colors uppercase tracking-wider">
+                                            <span className="text-[11px] font-bold text-[#4a3b2f] dark:text-[#f5ece3] group-hover:text-black dark:group-hover:text-white transition-colors uppercase tracking-wider">
                                                 Medium
                                             </span>
                                         </div>
-                                        <ArrowUpRight className="w-3.5 h-3.5 text-[#7a5c42]/50 group-hover:text-black group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all shrink-0" />
+                                        <div className="w-6 h-6 rounded-md bg-[#7a5c42]/10 dark:bg-white/10 flex items-center justify-center text-[#7a5c42] dark:text-[#d4a574] group-hover:text-black dark:group-hover:text-white transition-all shrink-0">
+                                            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                        </div>
                                     </a>
                                 </div>
+                            </div>
 
-                                {/* Footer Note */}
-                                <p className="text-center text-[10px] text-[#7a5c42]/80 mt-3 pt-2.5 border-t border-[#7a5c42]/15 italic">
+                            {/* Sidebar Footer Section (Creator Profile & Note Seamlessly at Bottom) */}
+                            <div className="p-4 pt-3 border-t border-[#7a5c42]/15 dark:border-[#d4a574]/20 bg-white/40 dark:bg-black/30 backdrop-blur-md relative z-10 flex flex-col gap-2">
+                                {/* Creator Profile (Seamless, No Card Box) */}
+                                <div className="flex items-center gap-2.5 px-0.5">
+                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4a3b2f] via-[#5c4532] to-[#2c1a0e] text-[#f8f5f0] shadow-xs border border-[#d4a574]/40 flex items-center justify-center font-serif font-bold text-[11px] tracking-wider shrink-0">
+                                        A?
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-1.5">
+                                            <h3 className="font-serif italic text-xs font-bold text-[#4a3b2f] dark:text-[#f5ece3] leading-tight">
+                                                Alfiansyah
+                                            </h3>
+                                            <span className="px-1.5 py-0.2 rounded-full bg-[#d4a574]/20 dark:bg-[#d4a574]/25 text-[#7a5c42] dark:text-[#f3caa1] text-[8px] font-bold tracking-widest uppercase border border-[#d4a574]/35">
+                                                Creator
+                                            </span>
+                                        </div>
+                                        <p className="text-[9.5px] text-[#7a5c42]/85 dark:text-[#c9ab91] font-medium truncate">
+                                            Developer of A?Bookshelf
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Footer Quote Note */}
+                                <p className="text-center text-[10px] text-[#7a5c42]/85 dark:text-[#c9ab91] leading-relaxed italic font-serif px-0.5">
                                     Silakan hubungi untuk saran, diskusi, atau kolaborasi seputar A?Bookshelf.
                                 </p>
                             </div>
