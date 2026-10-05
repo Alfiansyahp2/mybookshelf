@@ -179,14 +179,16 @@ export default function LandingPage() {
                             transition={{ type: "spring", damping: 28, stiffness: 280 }}
                             className="relative w-[310px] xs:w-[330px] sm:w-[360px] max-w-[85vw] h-full bg-[#f8f5f0]/70 dark:bg-[#180f0a]/75 backdrop-blur-xl text-[#4a3b2f] dark:text-[#f5ece3] z-10 border-r border-[#7a5c42]/20 dark:border-[#d4a574]/25 shadow-2xl flex flex-col justify-between"
                         >
-                            {/* Middle Edge Arrow Close Button */}
+                            {/* Middle Edge Vintage Leather Bookmark Close Tab */}
                             <button
                                 onClick={() => setIsContactModalOpen(false)}
-                                className="absolute -right-3.5 sm:-right-4 top-1/2 -translate-y-1/2 w-7 h-11 sm:w-8 sm:h-12 rounded-r-xl bg-[#f8f5f0]/95 dark:bg-[#20140e]/95 backdrop-blur-md border-y border-r border-[#7a5c42]/25 dark:border-[#d4a574]/35 shadow-md flex items-center justify-center text-[#7a5c42] dark:text-[#e8c89b] hover:text-[#3a2d23] dark:hover:text-white hover:bg-white dark:hover:bg-[#2a1b13] transition-all duration-200 active:scale-90 z-30 group"
+                                className="absolute -right-6 top-1/2 -translate-y-1/2 w-8 h-12 rounded-r-full bg-gradient-to-r from-[#4a3b2f] via-[#564233] to-[#3a281c] dark:from-[#2c1a0e] dark:via-[#3d2719] dark:to-[#201208] border-y border-r border-[#d4a574]/60 dark:border-[#d4a574]/50 shadow-[3px_0_14px_rgba(74,59,47,0.35)] dark:shadow-[3px_0_16px_rgba(0,0,0,0.7)] flex items-center justify-center text-[#f3caa1] hover:text-white hover:border-[#d4a574] active:scale-95 transition-all duration-200 z-30 group"
                                 aria-label="Tutup Sidebar"
                                 title="Tutup Menu"
                             >
-                                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-0.5 transition-transform" />
+                                {/* Subtle inner gold stitch line */}
+                                <div className="absolute left-1 top-1/2 -translate-y-1/2 h-5 w-[1.5px] bg-[#d4a574]/35 rounded-full" />
+                                <ChevronLeft className="w-4 h-4 ml-1 group-hover:-translate-x-0.5 transition-transform" />
                             </button>
 
                             {/* Top Subtle Gold Accent Line */}
