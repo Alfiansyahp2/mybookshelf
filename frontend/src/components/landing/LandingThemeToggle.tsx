@@ -24,13 +24,13 @@ export default function LandingThemeToggle({ className = "" }: LandingThemeToggl
             whileTap={{ scale: 0.95 }}
             className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border transition-all duration-700 ease-in-out shadow-xs select-none ${
                 isDarkMode
-                    ? "bg-[#3e281b]/70 border-[#d4a574]/50 text-[#e5b882] hover:bg-[#4d3222] shadow-[0_0_12px_rgba(212,165,116,0.2)]"
+                    ? "bg-[#131b2e]/80 border-[#d4a574]/50 text-[#e5b882] hover:bg-[#1e293b] shadow-[0_0_12px_rgba(212,165,116,0.2)]"
                     : "bg-[#7a5c42]/5 border-[#7a5c42]/30 text-[#7a5c42] hover:bg-[#7a5c42]/10"
             } ${className}`}
             title={
                 isDarkMode
                     ? t("landing.theme_light", "Beralih ke Mode Terang")
-                    : t("landing.theme_dark", "Beralih ke Mode Coklat Malam")
+                    : t("landing.theme_dark", "Beralih ke Mode Langit Kosmik")
             }
             aria-label="Toggle theme"
         >

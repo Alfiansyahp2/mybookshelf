@@ -16,7 +16,7 @@ export default function RegisterComingSoon() {
     const { t } = useTranslation();
 
     return (
-        <div className="h-screen w-full bg-[#f8f5f0] dark:bg-[#180f0a] text-[#4a3b2f] dark:text-[#f5ece3] font-sans flex flex-col justify-between p-4 sm:p-6 md:px-10 md:py-6 selection:bg-[#7a5c42] selection:text-white relative overflow-hidden select-none transition-colors duration-500">
+        <div className="h-screen w-full bg-[#f8f5f0] dark:bg-[#0a0e1a] text-[#4a3b2f] dark:text-[#f1f5f9] font-sans flex flex-col justify-between p-4 sm:p-6 md:px-10 md:py-6 selection:bg-[#7a5c42] selection:text-white relative overflow-hidden select-none transition-colors duration-500">
             <SEO
                 title={`${t("register_coming_soon.title", "Pendaftaran")} - A?Bookshelf`}
                 description={t(

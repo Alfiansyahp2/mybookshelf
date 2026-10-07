@@ -15,13 +15,13 @@ module.exports = {
         gold: 'rgb(var(--color-gold-rgb) / <alpha-value>)',
         beige: 'rgb(var(--color-beige-rgb) / <alpha-value>)',
         
-        // Cozy Night Mode Colors
+        // Cosmic Night Sky Colors
         night: {
-            base: '#1a100b',     /* Sangat gelap, espresso (hampir hitam tapi coklat) */
-            surface: '#2a1a10',  /* Sedikit lebih terang, warna kayu gelap */
-            accent: '#3d2516',   /* Aksen coklat tua */
-            text: '#f2e8d9',     /* Putih cream untuk teks */
-            muted: '#a38d78'     /* Abu-abu hangat */
+            base: '#0a0e1a',     /* Deep Celestial Midnight */
+            surface: '#131b2e',  /* Cosmic Navy Surface */
+            accent: '#1e293b',   /* Deep Starlight Accent */
+            text: '#f1f5f9',     /* Clean Star White */
+            muted: '#94a3b8'     /* Cosmic Muted Gray */
         }
       },
       fontFamily: {

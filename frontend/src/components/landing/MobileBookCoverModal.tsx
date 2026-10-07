@@ -96,7 +96,7 @@ export default function MobileBookCoverModal({
                                     e.stopPropagation();
                                     onSelectBook(activeBook.id);
                                 }}
-                                className="px-3.5 py-1.5 rounded-full bg-[#4a3b2f]/95 hover:bg-[#3a2d23] dark:bg-[#3d2719]/95 dark:hover:bg-[#4d3222] backdrop-blur-md text-xs text-[#f8f5f0] font-medium tracking-wide flex items-center gap-2 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 active:scale-95 transition-all cursor-pointer group"
+                                className="px-3.5 py-1.5 rounded-full bg-[#4a3b2f]/95 hover:bg-[#3a2d23] dark:bg-[#131b2e]/95 dark:hover:bg-[#1e293b] backdrop-blur-md text-xs text-[#f8f5f0] font-medium tracking-wide flex items-center gap-2 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 active:scale-95 transition-all cursor-pointer group"
                             >
                                 <BookOpen className="w-3.5 h-3.5 text-[#d4a574]" />
                                 <span>{t("landing.tap_to_read", "Ketuk untuk detail")}</span>

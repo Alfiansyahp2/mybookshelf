@@ -108,7 +108,7 @@ export default function YearlyTargetCards({
                                     : "sm:w-[320px] sm:shrink-0"
                             } snap-start cursor-pointer transition-all duration-200 ${
                                 isSelected
-                                    ? "scale-[1.01] ring-2 ring-[#d4a574] ring-offset-2 ring-offset-cream dark:ring-offset-[#1a100b] shadow-md"
+                                    ? "scale-[1.01] ring-2 ring-[#d4a574] ring-offset-2 ring-offset-cream dark:ring-offset-[#0a0e1a] shadow-md"
                                     : "hover:scale-[1.005]"
                             }`}
                         >

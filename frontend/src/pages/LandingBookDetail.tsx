@@ -169,7 +169,7 @@ export default function LandingBookDetail() {
     };
 
     return (
-        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] dark:bg-[#180f0a] text-[#4a3b2f] dark:text-[#f5ece3] font-sans flex flex-col justify-between p-3 sm:p-6 md:p-10 relative selection:bg-[#7a5c42] selection:text-white transition-colors duration-500">
+        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] dark:bg-[#0a0e1a] text-[#4a3b2f] dark:text-[#f1f5f9] font-sans flex flex-col justify-between p-3 sm:p-6 md:p-10 relative selection:bg-[#7a5c42] selection:text-white transition-colors duration-500">
             <SEO
                 title={`${currentBook.title} - ${currentBook.author} | A?Bookshelf`}
                 description={activeSynopsis}
@@ -193,7 +193,7 @@ export default function LandingBookDetail() {
                     <span className="font-serif italic font-bold text-xl sm:text-2xl md:text-3xl tracking-tight text-[#4a3b2f] dark:text-[#f5ece3]">
                         A?Bookshelf
                     </span>
-                    <span className="text-xs font-semibold text-[#7a5c42]/60 dark:text-[#c9ab91] hidden sm:inline-block border-l border-[#7a5c42]/20 dark:border-[#3e281b] pl-4 py-0.5">
+                    <span className="text-xs font-semibold text-[#7a5c42]/60 dark:text-[#c9ab91] hidden sm:inline-block border-l border-[#7a5c42]/20 dark:border-indigo-500/20 pl-4 py-0.5">
                         {t("landing.curated_demo", "Koleksi Kurasi Demo")}
                     </span>
                 </div>
@@ -214,7 +214,7 @@ export default function LandingBookDetail() {
             {/* ── MAIN EDITORIAL CONTENT ── */}
             <main className="my-auto w-full max-w-6xl mx-auto flex-1 flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-6 lg:gap-12 py-1 sm:py-4 relative z-10 overflow-hidden">
                 {/* ── LEFT VERTICAL DASH SCROLL BAR (DESKTOP) ── */}
-                <div className="hidden lg:flex flex-col items-center justify-center gap-3 shrink-0 py-4 pr-6 border-r border-[#7a5c42]/15 dark:border-[#3e281b] my-auto select-none">
+                <div className="hidden lg:flex flex-col items-center justify-center gap-3 shrink-0 py-4 pr-6 border-r border-[#7a5c42]/15 dark:border-indigo-500/20 my-auto select-none">
                     <div className="flex flex-col items-center gap-2.5">
                         {books.map((b, idx) => {
                             const isActive = idx === bookIndex;
@@ -374,7 +374,7 @@ export default function LandingBookDetail() {
             </main>
 
             {/* FOOTER SINGLE LINE */}
-            <footer className="hidden sm:flex w-full max-w-7xl mx-auto items-center justify-between text-[10px] sm:text-[11px] text-[#7a5c42] dark:text-[#c9ab91] shrink-0 border-t border-[#7a5c42]/15 dark:border-[#3e281b] pt-2 sm:pt-3 relative z-10">
+            <footer className="hidden sm:flex w-full max-w-7xl mx-auto items-center justify-between text-[10px] sm:text-[11px] text-[#7a5c42] dark:text-[#c9ab91] shrink-0 border-t border-[#7a5c42]/15 dark:border-indigo-500/20 pt-2 sm:pt-3 relative z-10">
                 <span>© {new Date().getFullYear()} A?Bookshelf. {t("landing.editorial_showcase", "Editorial Showcase.")}</span>
                 <div className="flex items-center gap-4">
                     <span className="hidden sm:inline text-[#7a5c42]/60 dark:text-[#c9ab91]/70">{t("landing.scroll_hint", "Gunakan scroll mouse untuk berpindah")}</span>

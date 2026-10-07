@@ -35,7 +35,19 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] dark:bg-[#180f0a] text-[#4a3b2f] dark:text-[#f5ece3] font-sans flex flex-col justify-between p-4 pb-3 sm:p-6 md:p-10 selection:bg-[#7a5c42] selection:text-white relative transition-colors duration-700 ease-in-out">
+        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f8f5f0] dark:bg-[#0a0e1a] text-[#4a3b2f] dark:text-[#f5ece3] font-sans flex flex-col justify-between p-4 pb-3 sm:p-6 md:p-10 selection:bg-[#7a5c42] selection:text-white relative transition-colors duration-700 ease-in-out">
+            {/* ── CELESTIAL COSMIC NEBULA GLOWS (DARK MODE ONLY) ── */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 hidden dark:block transition-opacity duration-1000">
+                {/* Deep Cosmic Starlight Radial Glow at the Top / Center */}
+                <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[700px] sm:w-[950px] h-[480px] bg-gradient-to-b from-indigo-500/12 via-purple-600/8 to-transparent rounded-full blur-[90px]" />
+                {/* Soft Violet Nebula Whispers at the Top-Right */}
+                <div className="absolute top-[10%] -right-20 w-[420px] h-[420px] bg-purple-600/10 rounded-full blur-[100px]" />
+                {/* Subtle Celestial Blue/Teal Nebula Starlight on Top-Left */}
+                <div className="absolute top-[18%] -left-20 w-[380px] h-[380px] bg-sky-500/10 rounded-full blur-[100px]" />
+                {/* Warm Ambient Shelf Starlight Glow below books */}
+                <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 w-[800px] h-[220px] bg-gradient-to-t from-indigo-900/15 via-[#d4a574]/8 to-transparent rounded-full blur-[80px]" />
+            </div>
+
             {/* Cozy Floating Dust Particles (Anime.js) */}
             <LibraryAmbientParticles />
 
@@ -77,7 +89,7 @@ export default function LandingPage() {
                     </button>
                     <Link
                         to="/dashboard"
-                        className="hidden md:flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#4a3b2f] hover:bg-[#3a2d23] dark:bg-[#3e281b] dark:hover:bg-[#4d3222] text-[#f8f5f0] border dark:border-[#d4a574]/30 text-[11px] sm:text-xs font-bold shadow-md transition-all duration-700 shrink-0"
+                        className="hidden md:flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#4a3b2f] hover:bg-[#3a2d23] dark:bg-[#131b2e] dark:hover:bg-[#1e293b] text-[#f8f5f0] border dark:border-[#d4a574]/40 text-[11px] sm:text-xs font-bold shadow-md transition-all duration-700 shrink-0"
                     >
                         <span>{t("landing.enter_app", "MASUK APP")}</span>
                         <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -145,7 +157,7 @@ export default function LandingPage() {
             </main>
 
             {/* FOOTER SINGLE LINE (HIDDEN ON MOBILE) */}
-            <div className="w-full hidden md:flex items-center justify-between text-[11px] text-[#7a5c42] dark:text-[#c9ab91] shrink-0 border-t border-[#7a5c42]/15 dark:border-[#3e281b] pt-3 transition-colors duration-700">
+            <div className="w-full hidden md:flex items-center justify-between text-[11px] text-[#7a5c42] dark:text-[#c9ab91] shrink-0 border-t border-[#7a5c42]/15 dark:border-indigo-500/20 pt-3 transition-colors duration-700">
                 <span>© {new Date().getFullYear()} A?Bookshelf. {t("landing.footer_copyright", "Side Filter Single Screen Showcase.")}</span>
                 <div className="flex gap-4">
                     <button onClick={() => setIsContactModalOpen(true)} className="hover:text-[#4a3b2f] dark:hover:text-[#f5ece3] underline font-medium transition-colors duration-700">
@@ -177,12 +189,12 @@ export default function LandingPage() {
                             animate={{ x: 0 }}
                             exit={{ x: "-100%" }}
                             transition={{ type: "spring", damping: 28, stiffness: 280 }}
-                            className="relative w-[310px] xs:w-[330px] sm:w-[360px] max-w-[85vw] h-full bg-[#f8f5f0]/70 dark:bg-[#180f0a]/75 backdrop-blur-xl text-[#4a3b2f] dark:text-[#f5ece3] z-10 border-r border-[#7a5c42]/20 dark:border-[#d4a574]/25 shadow-2xl flex flex-col justify-between"
+                            className="relative w-[310px] xs:w-[330px] sm:w-[360px] max-w-[85vw] h-full bg-[#f8f5f0]/70 dark:bg-[#0d1322]/90 backdrop-blur-xl text-[#4a3b2f] dark:text-[#f5ece3] z-10 border-r border-[#7a5c42]/20 dark:border-indigo-400/20 shadow-2xl flex flex-col justify-between"
                         >
                             {/* Middle Edge Vintage Leather Bookmark Close Tab */}
                             <button
                                 onClick={() => setIsContactModalOpen(false)}
-                                className="absolute -right-6 top-1/2 -translate-y-1/2 w-8 h-12 rounded-r-full bg-gradient-to-r from-[#4a3b2f] via-[#564233] to-[#3a281c] dark:from-[#2c1a0e] dark:via-[#3d2719] dark:to-[#201208] border-y border-r border-[#d4a574]/60 dark:border-[#d4a574]/50 shadow-[3px_0_14px_rgba(74,59,47,0.35)] dark:shadow-[3px_0_16px_rgba(0,0,0,0.7)] flex items-center justify-center text-[#f3caa1] hover:text-white hover:border-[#d4a574] active:scale-95 transition-all duration-200 z-30 group"
+                                className="absolute -right-6 top-1/2 -translate-y-1/2 w-8 h-12 rounded-r-full bg-gradient-to-r from-[#4a3b2f] via-[#564233] to-[#3a281c] dark:from-[#0d1322] dark:via-[#131b2e] dark:to-[#0a0e1a] border-y border-r border-[#d4a574]/60 dark:border-[#d4a574]/50 shadow-[3px_0_14px_rgba(74,59,47,0.35)] dark:shadow-[3px_0_18px_rgba(0,0,0,0.85)] flex items-center justify-center text-[#f3caa1] hover:text-white hover:border-[#d4a574] active:scale-95 transition-all duration-200 z-30 group"
                                 aria-label="Tutup Sidebar"
                                 title="Tutup Menu"
                             >
@@ -217,7 +229,7 @@ export default function LandingPage() {
                                     <Link
                                         to="/dashboard"
                                         onClick={() => setIsContactModalOpen(false)}
-                                        className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-[#4a3b2f] via-[#544132] to-[#3e2e22] dark:from-[#2e1d13] dark:via-[#3d2719] dark:to-[#24150c] text-[#f8f5f0] shadow-[0_4px_16px_rgba(74,59,47,0.25)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_22px_rgba(212,165,116,0.35)] hover:border-[#d4a574]/70 active:scale-[0.98] transition-all duration-300 group font-bold border border-[#d4a574]/40 relative overflow-hidden"
+                                        className="w-full flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-[#4a3b2f] via-[#544132] to-[#3e2e22] dark:from-[#131b2e] dark:via-[#1c2438] dark:to-[#0f172a] text-[#f8f5f0] shadow-[0_4px_16px_rgba(74,59,47,0.25)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:shadow-[0_6px_22px_rgba(212,165,116,0.35)] hover:border-[#d4a574]/70 active:scale-[0.98] transition-all duration-300 group font-bold border border-[#d4a574]/40 relative overflow-hidden"
                                     >
                                         <div className="flex items-center gap-3 min-w-0 relative z-10">
                                             <div className="w-8 h-8 rounded-xl bg-[#d4a574]/25 border border-[#d4a574]/40 flex items-center justify-center text-[#d4a574] group-hover:scale-105 group-hover:bg-[#d4a574]/35 transition-all shrink-0">
@@ -249,7 +261,7 @@ export default function LandingPage() {
                                     </div>
 
                                     {/* Email */}
-                                    <div className="p-2.5 px-3 rounded-xl bg-white/70 dark:bg-[#251810]/70 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/25 flex items-center justify-between hover:bg-white/90 dark:hover:bg-[#251810]/90 hover:border-[#7a5c42]/35 dark:hover:border-[#d4a574]/40 transition-all duration-200 group shadow-xs">
+                                    <div className="p-2.5 px-3 rounded-xl bg-white/70 dark:bg-[#131b2e]/70 backdrop-blur-md border border-[#7a5c42]/20 dark:border-indigo-500/20 flex items-center justify-between hover:bg-white/90 dark:hover:bg-[#131b2e]/90 hover:border-[#7a5c42]/35 dark:hover:border-indigo-400/30 transition-all duration-200 group shadow-xs">
                                         <a
                                             href="mailto:alfiansyahdev12@gmail.com"
                                             target="_blank"
@@ -268,7 +280,7 @@ export default function LandingPage() {
                                             className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all duration-200 flex items-center gap-1 shrink-0 ${
                                                 copiedEmail
                                                     ? "bg-emerald-500/25 text-emerald-800 dark:text-emerald-300 border border-emerald-500/40"
-                                                    : "bg-[#7a5c42]/12 dark:bg-[#d4a574]/20 hover:bg-[#7a5c42] hover:text-white dark:hover:bg-[#d4a574] dark:hover:text-[#180f0a] text-[#7a5c42] dark:text-[#e8c89b] border border-[#7a5c42]/20 dark:border-[#d4a574]/30"
+                                                    : "bg-[#7a5c42]/12 dark:bg-[#d4a574]/20 hover:bg-[#7a5c42] hover:text-white dark:hover:bg-[#d4a574] dark:hover:text-[#0a0e1a] text-[#7a5c42] dark:text-[#e8c89b] border border-[#7a5c42]/20 dark:border-[#d4a574]/30"
                                             }`}
                                             title="Salin Email"
                                         >
@@ -291,7 +303,7 @@ export default function LandingPage() {
                                         href="https://medium.com/@putraalfiansyahp0"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="p-2.5 px-3 rounded-xl bg-white/70 dark:bg-[#251810]/70 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/25 flex items-center justify-between hover:bg-white/90 dark:hover:bg-[#251810]/90 hover:border-[#7a5c42]/35 dark:hover:border-[#d4a574]/40 transition-all duration-200 group shadow-xs"
+                                        className="p-2.5 px-3 rounded-xl bg-white/70 dark:bg-[#131b2e]/70 backdrop-blur-md border border-[#7a5c42]/20 dark:border-indigo-500/20 flex items-center justify-between hover:bg-white/90 dark:hover:bg-[#131b2e]/90 hover:border-[#7a5c42]/35 dark:hover:border-indigo-400/30 transition-all duration-200 group shadow-xs"
                                     >
                                         <div className="flex items-center gap-2.5 min-w-0">
                                             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-zinc-800 to-zinc-950 text-white shadow-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -303,7 +315,7 @@ export default function LandingPage() {
                                                 Medium
                                             </span>
                                         </div>
-                                        <div className="w-6 h-6 rounded-md bg-[#7a5c42]/10 dark:bg-white/10 flex items-center justify-center text-[#7a5c42] dark:text-[#d4a574] group-hover:text-black dark:group-hover:text-white transition-all shrink-0">
+                                        <div className="w-6 h-6 rounded-md bg-[#7a5c42]/10 dark:bg-indigo-500/15 flex items-center justify-center text-[#7a5c42] dark:text-[#e5b882] group-hover:text-black dark:group-hover:text-white transition-all shrink-0">
                                             <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                         </div>
                                     </a>
@@ -311,10 +323,10 @@ export default function LandingPage() {
                             </div>
 
                             {/* Sidebar Footer Section (Creator Profile & Note Seamlessly at Bottom) */}
-                            <div className="p-4 pt-3 border-t border-[#7a5c42]/15 dark:border-[#d4a574]/20 bg-white/40 dark:bg-black/30 backdrop-blur-md relative z-10 flex flex-col gap-2">
+                            <div className="p-4 pt-3 border-t border-[#7a5c42]/15 dark:border-indigo-500/20 bg-white/40 dark:bg-[#070b14]/75 backdrop-blur-md relative z-10 flex flex-col gap-2">
                                 {/* Creator Profile (Seamless, No Card Box) */}
                                 <div className="flex items-center gap-2.5 px-0.5">
-                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4a3b2f] via-[#5c4532] to-[#2c1a0e] text-[#f8f5f0] shadow-xs border border-[#d4a574]/40 flex items-center justify-center font-serif font-bold text-[11px] tracking-wider shrink-0">
+                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4a3b2f] via-[#5c4532] to-[#2c1a0e] dark:from-[#131b2e] dark:via-[#1c2438] dark:to-[#0a0e1a] text-[#f8f5f0] shadow-xs border border-[#d4a574]/40 dark:border-[#d4a574]/50 flex items-center justify-center font-serif font-bold text-[11px] tracking-wider shrink-0">
                                         A?
                                     </div>
                                     <div className="min-w-0 flex-1">

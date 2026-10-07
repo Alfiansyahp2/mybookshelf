@@ -151,7 +151,7 @@ export default function DesktopBookShelf({
                                         />
 
                                         {/* Glassmorphic Action Pill Badge */}
-                                        <div className="mt-2 px-3.5 py-1 rounded-full bg-[#3a2d23]/92 dark:bg-[#180f0a]/95 backdrop-blur-md text-[#f8f5f0] text-[10px] font-medium tracking-wide flex items-center gap-1 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 transition-all duration-200 whitespace-nowrap group/pill">
+                                        <div className="mt-2 px-3.5 py-1 rounded-full bg-[#3a2d23]/92 dark:bg-[#0d1527]/95 backdrop-blur-md text-[#f8f5f0] text-[10px] font-medium tracking-wide flex items-center gap-1 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 transition-all duration-200 whitespace-nowrap group/pill">
                                             <span className="text-[#e5b882] text-[9.5px] font-sans flex items-center gap-1 group-hover/pill:text-white transition-colors">
                                                 {t("landing.click_to_read", "Klik untuk detail")}
                                                 <span className="text-[#d4a574] font-bold group-hover/pill:translate-x-0.5 transition-transform">→</span>
