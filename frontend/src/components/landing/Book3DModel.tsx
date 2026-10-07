@@ -1,6 +1,101 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 import type { EditorialBook } from "../../constants/editorialBooks";
+
+interface AnimationPreset {
+    y: number[];
+    rotateY: number[];
+    rotateX: number[];
+    rotateZ: number[];
+    yDuration: number;
+    rotateYDuration: number;
+    rotateXDuration: number;
+    rotateZDuration: number;
+    gleamDuration: number;
+    gleamDelay: number;
+}
+
+// 6 handcrafted distinct 3D animation archetypes
+const ANIMATION_PRESETS: AnimationPreset[] = [
+    // 0: Deep Spine & Paper Showcase (memperlihatkan punggung emas dan tebalnya lembaran)
+    {
+        y: [0, -8, 0],
+        rotateY: [-31, -18, -31],
+        rotateX: [9, 14, 9],
+        rotateZ: [-3, 0, -3],
+        yDuration: 4.6,
+        rotateYDuration: 5.2,
+        rotateXDuration: 4.8,
+        rotateZDuration: 4.4,
+        gleamDuration: 2.0,
+        gleamDelay: 2.5
+    },
+    // 1: Front Cover Spotlight (lebih menghadap ke depan, cover depan terlihat sangat jelas & tenang)
+    {
+        y: [0, -10, 0],
+        rotateY: [-19, -11, -19],
+        rotateX: [7, 12, 7],
+        rotateZ: [-1, 1.5, -1],
+        yDuration: 4.0,
+        rotateYDuration: 4.6,
+        rotateXDuration: 4.2,
+        rotateZDuration: 3.9,
+        gleamDuration: 2.4,
+        gleamDelay: 3.2
+    },
+    // 2: Dynamic Multi-Axis Sway (ayunan 3D melingkar yang hidup dan dinamis)
+    {
+        y: [-1, -11, 2, -1],
+        rotateY: [-26, -14, -28, -26],
+        rotateX: [13, 8, 15, 13],
+        rotateZ: [-4, 1, -2, -4],
+        yDuration: 5.2,
+        rotateYDuration: 5.8,
+        rotateXDuration: 5.0,
+        rotateZDuration: 4.6,
+        gleamDuration: 2.2,
+        gleamDelay: 2.2
+    },
+    // 3: High Floating Drift (melayang lebih tinggi di udara dengan efek gravitasi ringan)
+    {
+        y: [0, -13, 0],
+        rotateY: [-24, -16, -24],
+        rotateX: [11, 16, 11],
+        rotateZ: [-2, -4, -2],
+        yDuration: 4.3,
+        rotateYDuration: 4.9,
+        rotateXDuration: 4.4,
+        rotateZDuration: 4.1,
+        gleamDuration: 1.8,
+        gleamDelay: 2.8
+    },
+    // 4: Calm Horizon (gerakan lambat, anggun dan menenangkan)
+    {
+        y: [0, -6, 0],
+        rotateY: [-22, -15, -22],
+        rotateX: [8, 11, 8],
+        rotateZ: [1, -2, 1],
+        yDuration: 5.6,
+        rotateYDuration: 6.0,
+        rotateXDuration: 5.4,
+        rotateZDuration: 5.2,
+        gleamDuration: 2.6,
+        gleamDelay: 3.8
+    },
+    // 5: Playful Tilt (sedikit miring asimetris dengan rotasi dinamis)
+    {
+        y: [0, -9, 0],
+        rotateY: [-27, -15, -27],
+        rotateX: [14, 9, 14],
+        rotateZ: [2, -3, 2],
+        yDuration: 4.1,
+        rotateYDuration: 4.5,
+        rotateXDuration: 4.2,
+        rotateZDuration: 3.8,
+        gleamDuration: 2.1,
+        gleamDelay: 2.0
+    }
+];
 
 interface Book3DModelProps {
     book: EditorialBook;
@@ -31,6 +126,23 @@ export default function Book3DModel({
     const bookH = height;
     const bookD = depth;
 
+    // Menghasilkan profil animasi 3D acak & unik per buku/interaksi
+    const animProfile = useMemo(() => {
+        const seed = book.id ? book.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
+        const randomOffset = Math.floor(Math.random() * ANIMATION_PRESETS.length);
+        const preset = ANIMATION_PRESETS[(seed + randomOffset) % ANIMATION_PRESETS.length];
+
+        // Variasi mikro (jitter +/- 0.2 detik) agar ritme animasi setiap buku tidak monoton
+        const jitter = (Math.random() - 0.5) * 0.4;
+        return {
+            ...preset,
+            yDuration: Math.max(2.6, Number((preset.yDuration + jitter).toFixed(2))),
+            rotateYDuration: Math.max(3.0, Number((preset.rotateYDuration + jitter).toFixed(2))),
+            rotateXDuration: Math.max(2.8, Number((preset.rotateXDuration + jitter).toFixed(2))),
+            rotateZDuration: Math.max(2.5, Number((preset.rotateZDuration + jitter).toFixed(2))),
+        };
+    }, [book.id]);
+
     return (
         <div className={`relative flex flex-col items-center select-none ${className}`}>
             {/* ── 3D HARDCOVER BOOK BODY ── */}
@@ -38,24 +150,24 @@ export default function Book3DModel({
                 animate={
                     floatingAnimation
                         ? {
-                              y: [0, -7, 0],
-                              rotateY: [-26, -18, -26],
-                              rotateX: [10, 13, 10],
-                              rotateZ: [-2, -1, -2]
+                              y: animProfile.y,
+                              rotateY: animProfile.rotateY,
+                              rotateX: animProfile.rotateX,
+                              rotateZ: animProfile.rotateZ
                           }
                         : {
-                              rotateY: -22,
-                              rotateX: 11,
-                              rotateZ: -1.5
+                              rotateY: animProfile.rotateY[0] || -22,
+                              rotateX: animProfile.rotateX[0] || 11,
+                              rotateZ: animProfile.rotateZ[0] || -1.5
                           }
                 }
                 transition={
                     floatingAnimation
                         ? {
-                              y: { repeat: Infinity, duration: 4.2, ease: "easeInOut" },
-                              rotateY: { repeat: Infinity, duration: 5, ease: "easeInOut" },
-                              rotateX: { repeat: Infinity, duration: 4.6, ease: "easeInOut" },
-                              rotateZ: { repeat: Infinity, duration: 4.2, ease: "easeInOut" }
+                              y: { repeat: Infinity, duration: animProfile.yDuration, ease: "easeInOut" },
+                              rotateY: { repeat: Infinity, duration: animProfile.rotateYDuration, ease: "easeInOut" },
+                              rotateX: { repeat: Infinity, duration: animProfile.rotateXDuration, ease: "easeInOut" },
+                              rotateZ: { repeat: Infinity, duration: animProfile.rotateZDuration, ease: "easeInOut" }
                           }
                         : undefined
                 }
@@ -101,7 +213,7 @@ export default function Book3DModel({
                         {/* Dynamic Specular Foil Light Gleam */}
                         <motion.div
                             animate={{ x: ["-130%", "220%"], opacity: [0, 0.45, 0] }}
-                            transition={{ duration: 2.2, repeat: Infinity, repeatDelay: 2.8, ease: "easeInOut" }}
+                            transition={{ duration: animProfile.gleamDuration, repeat: Infinity, repeatDelay: animProfile.gleamDelay, ease: "easeInOut" }}
                             className="absolute inset-0 w-3/5 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-25deg] pointer-events-none z-20"
                         />
 
@@ -221,15 +333,15 @@ export default function Book3DModel({
                     animate={
                         floatingAnimation
                             ? {
-                                  scale: [1, 1.1, 1],
-                                  opacity: [0.5, 0.32, 0.5],
+                                  scale: [1, 1.14, 1],
+                                  opacity: [0.55, 0.3, 0.55],
                                   x: [0, 2, 0]
                               }
                             : undefined
                     }
                     transition={
                         floatingAnimation
-                            ? { repeat: Infinity, duration: 4.2, ease: "easeInOut" }
+                            ? { repeat: Infinity, duration: animProfile.yDuration, ease: "easeInOut" }
                             : undefined
                     }
                     className="w-[150px] h-[15px] bg-black/60 rounded-full blur-md mx-auto mt-2 pointer-events-none"
