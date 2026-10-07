@@ -117,11 +117,11 @@ export default function DesktopBookShelf({
                         <AnimatePresence>
                             {isHovered && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: 14, scale: 0.82 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 10, scale: 0.85 }}
-                                    transition={{ type: "spring", stiffness: 360, damping: 26 }}
-                                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3.5 z-[9999] pointer-events-auto cursor-pointer flex flex-col items-center select-none"
+                                    initial={{ opacity: 0, scale: 0.75 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.75 }}
+                                    transition={{ type: "spring", stiffness: 380, damping: 26 }}
+                                    className="absolute bottom-10 left-1/2 -translate-x-1/2 z-[9999] pointer-events-auto cursor-pointer flex flex-col items-center select-none"
                                     style={{
                                         perspective: "1200px",
                                         perspectiveOrigin: "50% 50%"
@@ -134,9 +134,9 @@ export default function DesktopBookShelf({
                                     {/* 3D Realistic Hardcover Book Model */}
                                     <Book3DModel
                                         book={book}
-                                        width={152}
-                                        height={222}
-                                        depth={28}
+                                        width={142}
+                                        height={206}
+                                        depth={26}
                                         imgErrors={imgErrors}
                                         setImgErrors={setImgErrors}
                                         floatingAnimation={true}
@@ -144,14 +144,14 @@ export default function DesktopBookShelf({
                                     />
 
                                     {/* Glassmorphic Metadata & Action Pill Badge */}
-                                    <div className="mt-2.5 px-3.5 py-1 rounded-full bg-[#3a2d23]/92 dark:bg-[#180f0a]/95 backdrop-blur-md text-[#f8f5f0] text-[10.5px] font-medium tracking-wide flex items-center gap-2 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 transition-all duration-200 whitespace-nowrap group/pill">
+                                    <div className="mt-2 px-3 py-1 rounded-full bg-[#3a2d23]/92 dark:bg-[#180f0a]/95 backdrop-blur-md text-[#f8f5f0] text-[10px] font-medium tracking-wide flex items-center gap-1.5 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 transition-all duration-200 whitespace-nowrap group/pill">
                                         <span className="font-serif italic font-bold text-white/95">{book.title}</span>
                                         <span className="text-[#d4a574]/60">•</span>
-                                        <span className="text-[#ffd700] text-[10px] flex items-center gap-0.5 font-bold">
+                                        <span className="text-[#ffd700] text-[9.5px] flex items-center gap-0.5 font-bold">
                                             ★ {book.rating.toFixed(1)}
                                         </span>
                                         <span className="text-[#d4a574]/60">•</span>
-                                        <span className="text-[#e5b882] text-[10px] font-sans flex items-center gap-1 group-hover/pill:text-white transition-colors">
+                                        <span className="text-[#e5b882] text-[9.5px] font-sans flex items-center gap-1 group-hover/pill:text-white transition-colors">
                                             {t("landing.click_to_read", "Klik untuk detail")} →
                                         </span>
                                     </div>
