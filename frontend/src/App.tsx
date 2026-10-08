@@ -33,9 +33,8 @@ function App() {
                     <Route path="/book/:id" element={<LandingBookDetail />} />
                     <Route path="/login" element={<Login />} />
 
-                    {/* Route ke Register (dinonaktifkan sementara dan diganti ke halaman Coming Soon) */}
-                    {/* <Route path="/register" element={<Register />} /> */}
-                    <Route path="/register" element={<RegisterComingSoon />} />
+                    {/* Route ke Register (tampilan buku dengan 3D page-flip) */}
+                    <Route path="/register" element={<Login />} />
 
                     {/* App / Protected Routes */}
                     <Route
