@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Book } from "../../types";
 import BookmarkHeart from "../icons/BookmarkHeart";
 
@@ -10,7 +11,7 @@ interface WishlistCardProps {
     onClick: (book: Book) => void;
     onStartReading?: (bookId: string, e: React.MouseEvent) => void;
     viewMode?: "list" | "grid";
-    t: (key: string, defaultText: string, options?: any) => string;
+    t?: any;
 }
 
 export default function WishlistCard({
@@ -19,8 +20,10 @@ export default function WishlistCard({
     onClick,
     onStartReading,
     viewMode = "list",
-    t,
+    t: customT,
 }: WishlistCardProps) {
+    const { t: hookT } = useTranslation();
+    const t = customT || hookT;
     const c0 = book.spineColors?.[0] || "#8B7355";
     const c1 = book.spineColors?.[1] || "#6B5344";
     const c2 = book.spineColors?.[2] || "#5C4532";
