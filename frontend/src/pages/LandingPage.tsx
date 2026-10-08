@@ -72,16 +72,22 @@ export default function LandingPage() {
                     {/* Dark/Light Theme Toggle */}
                     <LandingThemeToggle />
 
-                    {/* Single 3-line Menu Button */}
+                    {/* Single 3-line Menu Button with Spring 90° Bookshelf Rotation & Glow */}
                     <motion.button
                         onClick={() => setIsContactModalOpen(true)}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-300 dark:border-indigo-400/40 bg-white/70 dark:bg-[#131b2e]/90 text-slate-700 dark:text-[#ffd166] hover:bg-slate-100 dark:hover:bg-[#1e293b] shadow-xs select-none transition-all duration-300 cursor-pointer"
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
+                        className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-300 dark:border-indigo-400/40 bg-white/70 dark:bg-[#131b2e]/90 text-slate-700 dark:text-[#ffd166] hover:bg-slate-100 dark:hover:bg-[#1e293b] hover:border-indigo-400 dark:hover:border-[#ffd166] shadow-xs hover:shadow-[0_0_15px_rgba(255,209,102,0.45)] select-none transition-all duration-300 cursor-pointer group"
                         aria-label="Menu"
                         title="Menu"
                     >
-                        <Menu className="w-4 h-4 sm:w-5 sm:h-5 transition-transform" />
+                        <motion.div
+                            whileHover={{ rotate: 90 }}
+                            transition={{ type: "spring", stiffness: 360, damping: 20 }}
+                            className="flex items-center justify-center"
+                        >
+                            <Menu className="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 dark:text-[#ffd166] transition-colors" />
+                        </motion.div>
                     </motion.button>
                 </div>
             </header>

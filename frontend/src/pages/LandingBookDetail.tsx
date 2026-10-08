@@ -201,13 +201,21 @@ export default function LandingBookDetail() {
                 <div className="flex items-center gap-2 sm:gap-3">
                     <LandingLanguageToggle />
                     <LandingThemeToggle />
-                    <button
+                    <motion.button
                         onClick={() => navigate("/")}
-                        className="p-1.5 sm:p-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all text-[#0f172a] dark:text-[#f8fafc] flex items-center gap-1.5 font-bold text-xs"
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.92 }}
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-300 dark:border-indigo-400/40 bg-white/70 dark:bg-[#131b2e]/90 text-slate-700 dark:text-[#ffd166] hover:bg-slate-100 dark:hover:bg-[#1e293b] hover:border-indigo-400 dark:hover:border-[#ffd166] shadow-xs hover:shadow-[0_0_15px_rgba(255,209,102,0.45)] select-none transition-all duration-300 cursor-pointer flex items-center justify-center group"
                         title={t("landing.close", "Tutup Editorial Showcase")}
                     >
-                        <X className="w-5 h-5" />
-                    </button>
+                        <motion.div
+                            whileHover={{ rotate: 90 }}
+                            transition={{ type: "spring", stiffness: 360, damping: 20 }}
+                            className="flex items-center justify-center"
+                        >
+                            <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 dark:text-[#ffd166] transition-colors" />
+                        </motion.div>
+                    </motion.button>
                 </div>
             </header>
 
