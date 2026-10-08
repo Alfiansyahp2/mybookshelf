@@ -169,7 +169,7 @@ export default function LandingBookDetail() {
     };
 
     return (
-        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f0f4f8] dark:bg-[#0a0e1a] text-[#0f172a] dark:text-[#f8fafc] font-sans flex flex-col justify-between p-3 sm:p-6 md:p-10 relative selection:bg-indigo-600 selection:text-white transition-colors duration-500">
+        <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f0f4f8] dark:bg-[#0a0e1a] text-[#0f172a] dark:text-[#f8fafc] font-sans flex flex-col justify-between p-3 sm:p-5 md:py-3 md:px-8 lg:py-4 lg:px-10 relative selection:bg-indigo-600 selection:text-white transition-colors duration-500">
             <SEO
                 title={`${currentBook.title} - ${currentBook.author} | A?Bookshelf`}
                 description={activeSynopsis}
@@ -212,7 +212,7 @@ export default function LandingBookDetail() {
             </header>
 
             {/* ── MAIN EDITORIAL CONTENT ── */}
-            <main className="my-auto w-full max-w-6xl mx-auto flex-1 flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-6 lg:gap-12 py-1 sm:py-4 relative z-10 overflow-hidden">
+            <main className="my-auto w-full max-w-6xl mx-auto flex-1 flex flex-col lg:flex-row items-center justify-between gap-3 sm:gap-6 lg:gap-10 py-1 sm:py-2 relative z-10">
                 {/* ── LEFT VERTICAL DASH SCROLL BAR (DESKTOP) ── */}
                 <div className="hidden lg:flex flex-col items-center justify-center gap-3 shrink-0 py-4 pr-6 border-r border-slate-300/60 dark:border-indigo-500/20 my-auto select-none">
                     <div className="flex flex-col items-center gap-2.5">
@@ -265,9 +265,9 @@ export default function LandingBookDetail() {
                                     navigateToBook(bookIndex - 1);
                                 }
                             }}
-                            className="w-full flex-1 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-6 md:gap-14 px-2 sm:px-8 md:px-12"
+                            className="w-full flex-1 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-6 md:gap-10 lg:gap-14 px-2 sm:px-6 md:px-8"
                         >
-                            {/* LEFT COLUMN: 3D COVER ART (RESIZED RESPONSIVELY FOR MOBILE) */}
+                            {/* LEFT COLUMN: 3D COVER ART (RESIZED RESPONSIVELY FOR ALL SCREENS) */}
                             <div className="w-full md:w-5/12 flex items-center justify-center shrink-0 perspective-1000">
                                 <motion.div
                                     custom={direction}
@@ -278,7 +278,7 @@ export default function LandingBookDetail() {
                                     whileHover={{ scale: 1.03, y: -4, rotateY: -4 }}
                                     whileTap={{ scale: 0.98 }}
                                     onClick={() => setIsReaderModalOpen(true)}
-                                    className={`w-full max-w-[145px] xs:max-w-[170px] sm:max-w-[240px] md:max-w-[320px] aspect-[3/4.2] rounded-r-xl sm:rounded-r-2xl rounded-l-xs bg-gradient-to-tr ${currentBook.coverGradient} shadow-xl sm:shadow-2xl p-3 sm:p-6 text-[#f8f5f0] flex flex-col justify-between border-r-4 border-b-4 border-black/40 relative overflow-hidden cursor-pointer group transition-shadow duration-300 hover:shadow-3xl`}
+                                    className={`w-full max-w-[140px] xs:max-w-[165px] sm:max-w-[210px] md:max-w-[240px] lg:max-w-[265px] xl:max-w-[280px] 2xl:max-w-[310px] aspect-[3/4.2] rounded-r-xl sm:rounded-r-2xl rounded-l-xs bg-gradient-to-tr ${currentBook.coverGradient} shadow-xl sm:shadow-2xl p-3 sm:p-4 text-[#f8f5f0] flex flex-col justify-between border-r-4 border-b-4 border-black/40 relative overflow-hidden cursor-pointer group transition-shadow duration-300 hover:shadow-3xl`}
                                 >
                                     {/* Cover Image background if available */}
                                     {currentBook.coverImage && !coverImgError ? (
@@ -294,16 +294,16 @@ export default function LandingBookDetail() {
                                                 {currentBook.category.split(",")[0]}
                                             </span>
 
-                                            <div className="my-auto py-2 sm:py-6 relative z-1">
+                                            <div className="my-auto py-2 sm:py-5 relative z-1">
                                                 <h3 className="font-serif font-bold text-lg sm:text-2xl md:text-3xl leading-tight text-[#f8f5f0] drop-shadow-md">
                                                     {currentBook.title}
                                                 </h3>
-                                                <p className="text-xs sm:text-sm text-[#f8f5f0]/85 font-medium mt-1 sm:mt-3">
+                                                <p className="text-xs sm:text-sm text-[#f8f5f0]/85 font-medium mt-1 sm:mt-2.5">
                                                     {currentBook.author}
                                                 </p>
                                             </div>
 
-                                            <div className="text-[10px] sm:text-xs font-semibold text-[#f8f5f0]/75 flex justify-between border-t border-white/20 pt-1.5 sm:pt-3 relative z-1">
+                                            <div className="text-[10px] sm:text-xs font-semibold text-[#f8f5f0]/75 flex justify-between border-t border-white/20 pt-1.5 sm:pt-2.5 relative z-1">
                                                 <span>{currentBook.year}</span>
                                                 <span>{currentBook.pages} {t("landing.pages_short", "Hal")}</span>
                                             </div>
@@ -323,10 +323,10 @@ export default function LandingBookDetail() {
                                 </motion.div>
                             </div>
 
-                            {/* RIGHT COLUMN: EDITORIAL DETAILS & SYNOPSIS (COMPACT ON MOBILE) */}
-                            <div className="w-full md:w-7/12 flex flex-col justify-center text-left space-y-2 sm:space-y-4">
+                            {/* RIGHT COLUMN: EDITORIAL DETAILS & SYNOPSIS (SCALED PROPORTIONALLY) */}
+                            <div className="w-full md:w-7/12 flex flex-col justify-center text-left py-1 max-h-full overflow-y-auto hide-scrollbar">
                                 <div>
-                                    <div className="flex items-center justify-between mb-0.5 sm:mb-2">
+                                    <div className="flex items-center justify-between mb-0.5 sm:mb-1">
                                         <span className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-[#ffd166]">
                                             {currentBook.author}
                                         </span>
@@ -335,11 +335,11 @@ export default function LandingBookDetail() {
                                         </span>
                                     </div>
 
-                                    <h1 className="font-serif italic font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-[#0f172a] dark:text-[#f8fafc] leading-tight sm:leading-none tracking-tight">
+                                    <h1 className="font-serif italic font-bold text-2xl sm:text-3xl md:text-[32px] lg:text-[35px] xl:text-[38px] 2xl:text-[44px] text-[#0f172a] dark:text-[#f8fafc] leading-tight sm:leading-tight lg:leading-[1.14] tracking-tight">
                                         {currentBook.title}
                                     </h1>
 
-                                    <div className="mt-1.5 sm:mt-3 flex flex-wrap items-center gap-1.5 sm:gap-3 text-[11px] sm:text-sm text-slate-500 dark:text-[#94a3b8] font-medium">
+                                    <div className="mt-1 sm:mt-1.5 flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs lg:text-[13px] text-slate-500 dark:text-[#94a3b8] font-medium">
                                         <span>{currentBook.category}</span>
                                         <span>•</span>
                                         <span>{currentBook.pages} {t("landing.pages", "halaman")}</span>
@@ -349,20 +349,20 @@ export default function LandingBookDetail() {
 
                                     {/* Personal Quote Callout Box */}
                                     <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
+                                        initial={{ opacity: 0, y: 8 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.1, duration: 0.3 }}
-                                        className="mt-2 sm:mt-5 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-white/60 dark:bg-[#131b2e]/60 border-l-3 sm:border-l-4 border-indigo-500 dark:border-[#ffd166] text-xs sm:text-base font-serif italic text-[#0f172a] dark:text-[#f8fafc] leading-snug sm:leading-relaxed shadow-xs"
+                                        className="mt-2 sm:mt-2.5 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-white/60 dark:bg-[#131b2e]/60 border-l-3 sm:border-l-4 border-indigo-500 dark:border-[#ffd166] text-xs sm:text-sm lg:text-[13.5px] font-serif italic text-[#0f172a] dark:text-[#f8fafc] leading-snug sm:leading-relaxed shadow-xs"
                                     >
                                         "{currentBook.personalQuote}"
                                     </motion.div>
 
                                     {/* Synopsis */}
                                     <motion.div
-                                        initial={{ opacity: 0, y: 12 }}
+                                        initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: 0.15, duration: 0.3 }}
-                                        className="mt-2 sm:mt-5 text-xs sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed font-sans max-w-2xl"
+                                        className="mt-2 sm:mt-2.5 text-xs sm:text-sm lg:text-[14px] text-slate-700 dark:text-slate-200 leading-relaxed font-sans max-w-xl"
                                     >
                                         <p>{activeSynopsis}</p>
                                     </motion.div>
