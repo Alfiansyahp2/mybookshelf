@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -20,14 +19,14 @@ export default function LoginForm({
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
             {/* Email */}
             <div>
-                <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
+                <label className="block text-xs font-bold tracking-wider text-slate-700 dark:text-[#94a3b8] uppercase mb-1.5">
                     {t("login.email", "Email Address")}
                 </label>
                 <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500 dark:text-[#ffd166] w-4 h-4" />
                     <input
                         type="email"
                         required
@@ -35,20 +34,19 @@ export default function LoginForm({
                         onChange={(e) =>
                             setFormData({ ...formData, email: e.target.value })
                         }
-                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:border-walnut focus:ring-1 focus:ring-walnut transition-all text-sm"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50/80 dark:bg-[#131b2e]/80 border border-slate-200 dark:border-indigo-500/30 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 transition-all text-sm text-[#0f172a] dark:text-[#f8fafc] placeholder:text-slate-400"
                         placeholder="your@email.com"
-                        style={{ fontFamily: "Georgia, serif" }}
                     />
                 </div>
             </div>
 
             {/* Password */}
             <div>
-                <label className="block text-xs font-bold tracking-wider text-walnut uppercase mb-1">
+                <label className="block text-xs font-bold tracking-wider text-slate-700 dark:text-[#94a3b8] uppercase mb-1.5">
                     {t("login.password", "Password")}
                 </label>
                 <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-walnut/40 w-4 h-4" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-500 dark:text-[#ffd166] w-4 h-4" />
                     <input
                         type={showPassword ? "text" : "password"}
                         required
@@ -59,14 +57,13 @@ export default function LoginForm({
                                 password: e.target.value,
                             })
                         }
-                        className="w-full pl-10 pr-10 py-2.5 bg-white border border-walnut/20 rounded-lg focus:outline-none focus:border-walnut focus:ring-1 focus:ring-walnut transition-all text-sm"
+                        className="w-full pl-10 pr-10 py-2.5 bg-slate-50/80 dark:bg-[#131b2e]/80 border border-slate-200 dark:border-indigo-500/30 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 transition-all text-sm text-[#0f172a] dark:text-[#f8fafc] placeholder:text-slate-400"
                         placeholder="••••••••"
-                        style={{ fontFamily: "Georgia, serif" }}
                     />
                     <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-walnut/40 hover:text-walnut/60 transition-colors z-10"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10"
                     >
                         {showPassword ? (
                             <EyeOff size={16} />
@@ -81,7 +78,7 @@ export default function LoginForm({
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full py-3 bg-walnut text-white rounded-lg font-medium shadow-md hover:bg-darkBrown transition-colors hover:shadow-lg disabled:opacity-70 flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-gradient-to-r from-[#0f172a] via-[#1e293b] to-[#0f172a] dark:from-indigo-600 dark:via-indigo-500 dark:to-indigo-600 text-white rounded-xl font-bold shadow-md hover:shadow-indigo-500/25 border border-indigo-400/30 active:scale-[0.99] transition-all disabled:opacity-70 flex items-center justify-center gap-2"
                 >
                     {isLoading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

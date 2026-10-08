@@ -35,12 +35,12 @@ const CELESTIAL_SVG_TYPES = [
 ];
 
 const CELESTIAL_COLORS = [
-    "#d4a574", // Warm Gold
-    "#7a5c42", // Deep Walnut
-    "#c29b68", // Muted Brass
-    "#e8c89b", // Soft Amber
-    "#b58552", // Cinnamon Gold
-    "#f3e5d8"  // Soft Cream Glow
+    "#ffd166", // Starlight Gold
+    "#38bdf8", // Electric Cosmic Cyan
+    "#818cf8", // Nebula Indigo
+    "#a78bfa", // Soft Violet Aurora
+    "#c7d2fe", // Pale Celestial Diamond
+    "#ffffff"  // Pure Starlight White
 ];
 
 export default function LibraryAmbientParticles() {
@@ -98,11 +98,11 @@ export default function LibraryAmbientParticles() {
             rotator.innerHTML = `
                 <svg viewBox="0 0 120 24" fill="none" class="w-[110px] h-[20px] overflow-visible">
                     <path d="M0 12 L100 12" stroke="url(#shooting-grad-${idx})" stroke-width="2.2" stroke-linecap="round"/>
-                    <circle cx="102" cy="12" r="3.2" fill="#ffffff" filter="drop-shadow(0 0 6px #f3e5d8)"/>
+                    <circle cx="102" cy="12" r="3.2" fill="#ffffff" filter="drop-shadow(0 0 8px #38bdf8)"/>
                     <defs>
                         <linearGradient id="shooting-grad-${idx}" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stop-color="#d4a574" stop-opacity="0"/>
-                            <stop offset="50%" stop-color="#d4a574" stop-opacity="0.6"/>
+                            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0"/>
+                            <stop offset="50%" stop-color="#818cf8" stop-opacity="0.6"/>
                             <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95"/>
                         </linearGradient>
                     </defs>

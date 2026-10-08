@@ -188,14 +188,14 @@ export default function MobileBookShelf({
                     })}
                 </motion.div>
 
-                {/* Realistic Wooden & Brass Shelf Rail Across the entire visible shelf */}
+                {/* Realistic Cosmic & Starlight Shelf Rail Across the entire visible shelf */}
                 <div className="absolute bottom-1.5 left-2 right-2 pointer-events-none z-0">
-                    {/* Top Brass Highlight Line */}
-                    <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#d4a574]/70 to-transparent rounded-full shadow-xs" />
-                    {/* Wooden Rail Plank Body */}
-                    <div className="h-[5px] w-full bg-gradient-to-b from-[#7a5c42]/35 via-[#5c4033]/45 to-[#3a2d23]/55 rounded-xs mt-[1px] transition-colors duration-700" />
+                    {/* Top Starlight Highlight Line */}
+                    <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#ffd166]/80 dark:via-[#38bdf8]/85 to-transparent rounded-full shadow-xs" />
+                    {/* Cosmic Rail Plank Body */}
+                    <div className="h-[6px] w-full bg-gradient-to-b from-[#475569] via-[#334155] to-[#1e293b] dark:from-[#1e293b] dark:via-[#0f172a] dark:to-[#020617] rounded-xs mt-[1px] transition-colors duration-700 border-t border-[#ffd166]/30 dark:border-[#38bdf8]/30" />
                     {/* Bottom Soft Drop Shadow */}
-                    <div className="h-[3px] w-full bg-black/10 blur-[2px]" />
+                    <div className="h-[3px] w-full bg-slate-900/15 dark:bg-sky-950/30 blur-[2px]" />
                 </div>
             </div>
 
@@ -204,7 +204,7 @@ export default function MobileBookShelf({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.4 }}
-                className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-[#7a5c42]/10 dark:bg-[#3d2516]/60 backdrop-blur-md border border-[#7a5c42]/20 dark:border-[#d4a574]/30 text-[#4a3b2f] dark:text-[#f5ece3] text-[10.5px] font-bold tracking-wide z-10 shadow-xs transition-colors duration-700 ease-in-out"
+                className="flex items-center gap-2 px-3.5 py-1 mt-1 mb-1 rounded-full bg-slate-200/80 dark:bg-[#131b2e]/90 backdrop-blur-md border border-slate-300 dark:border-indigo-500/30 text-[#0f172a] dark:text-[#f8fafc] text-[10.5px] font-bold tracking-wide z-10 shadow-xs transition-colors duration-700 ease-in-out"
             >
                 <motion.button
                     animate={{ x: [-1.5, 0, -1.5] }}
@@ -214,7 +214,7 @@ export default function MobileBookShelf({
                         setIsInitialMounted(true);
                         setTrainIndex((prev) => prev - 1);
                     }}
-                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 dark:hover:bg-[#d4a574]/25 text-[#7a5c42] dark:text-[#e5b882] active:scale-90 transition-all font-bold text-xs"
+                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-slate-300 dark:hover:bg-indigo-500/30 text-slate-700 dark:text-[#38bdf8] active:scale-90 transition-all font-bold text-xs"
                     aria-label="Geser ke kiri"
                     title="Geser ke kiri"
                 >
@@ -229,7 +229,7 @@ export default function MobileBookShelf({
                         setIsInitialMounted(true);
                         setTrainIndex((prev) => prev + 1);
                     }}
-                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#7a5c42]/20 dark:hover:bg-[#d4a574]/25 text-[#7a5c42] dark:text-[#e5b882] active:scale-90 transition-all font-bold text-xs"
+                    className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-slate-300 dark:hover:bg-indigo-500/30 text-slate-700 dark:text-[#38bdf8] active:scale-90 transition-all font-bold text-xs"
                     aria-label="Geser ke kanan"
                     title="Geser ke kanan"
                 >

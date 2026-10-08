@@ -342,7 +342,7 @@ export const BookTooltip: React.FC<BookTooltipProps> = React.memo(
                                                 style={{
                                                     fontSize: 11,
                                                     fontWeight: 700,
-                                                    color: "#4a3b2f",
+                                                    color: "#0f172a",
                                                 }}
                                             >
                                                 {book.personalRating}
@@ -370,7 +370,7 @@ export const BookTooltip: React.FC<BookTooltipProps> = React.memo(
                                                     justifyContent:
                                                         "space-between",
                                                     fontSize: 9,
-                                                    color: "#9c7a5a",
+                                                    color: "#64748b",
                                                     marginBottom: 3,
                                                 }}
                                             >
@@ -404,7 +404,7 @@ export const BookTooltip: React.FC<BookTooltipProps> = React.memo(
                                                         height: "100%",
                                                         borderRadius: 2,
                                                         width: `${readingProgressPct}%`,
-                                                        background: "#7a5c42",
+                                                        background: "#6366f1",
                                                     }}
                                                 />
                                             </div>

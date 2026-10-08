@@ -231,12 +231,12 @@ export default function Book3DModel({
                         left: "50%",
                         top: "50%",
                         transform: `translate(-50%, -50%) rotateY(-90deg) translateZ(${bookW / 2}px)`,
-                        backgroundColor: book.c0 || "#3a2d23",
+                        backgroundColor: book.c0 || "#0f172a",
                         backfaceVisibility: "hidden"
                     }}
                 >
-                    {/* Top Gold Foil Accent Stripe */}
-                    <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-[#d4a574] to-transparent shrink-0 opacity-85" />
+                    {/* Top Starlight Foil Accent Stripe */}
+                    <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-[#ffd166] to-transparent shrink-0 opacity-85" />
 
                     {/* Vertical Spine Title */}
                     <div className="flex-1 flex flex-col items-center justify-center overflow-hidden my-1">
@@ -251,8 +251,8 @@ export default function Book3DModel({
                         </span>
                     </div>
 
-                    {/* Bottom Gold Foil Accent Stripe */}
-                    <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-[#d4a574] to-transparent shrink-0 opacity-85" />
+                    {/* Bottom Starlight Foil Accent Stripe */}
+                    <div className="h-1.5 w-full bg-gradient-to-r from-transparent via-[#ffd166] to-transparent shrink-0 opacity-85" />
                 </div>
 
                 {/* ── 3. BOOK PAGES BLOCK (RIGHT FACE, +X) ── */}
@@ -315,7 +315,7 @@ export default function Book3DModel({
                     }}
                 >
                     <div className={`w-full h-full bg-gradient-to-tr ${book.coverGradient} opacity-95 p-2 flex flex-col justify-between text-white/80 rounded-xs`}>
-                        <div className="h-1 w-12 bg-[#d4a574]/60 mx-auto rounded-full mt-2" />
+                        <div className="h-1 w-12 bg-[#ffd166]/60 mx-auto rounded-full mt-2" />
                         <p className="text-[8.5px] font-serif italic text-center line-clamp-3 opacity-75 px-1">
                             "{book.personalQuote || book.title}"
                         </p>

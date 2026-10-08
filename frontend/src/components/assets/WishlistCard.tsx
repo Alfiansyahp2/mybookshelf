@@ -83,10 +83,10 @@ export default function WishlistCard({
 
                 {/* Caption */}
                 <div className="mt-1.5 px-0.5">
-                    <h4 className="font-serif font-bold text-xs sm:text-sm text-darkBrown dark:text-[#f5ece3] line-clamp-1 leading-snug group-hover:text-[#7a5c42] transition-colors">
+                    <h4 className="font-serif font-bold text-xs sm:text-sm text-darkBrown dark:text-[#f8fafc] line-clamp-1 leading-snug group-hover:text-indigo-600 dark:group-hover:text-[#ffd166] transition-colors">
                         {book.title}
                     </h4>
-                    <p className="text-[11px] text-walnut/70 dark:text-[#c9ab91] truncate">
+                    <p className="text-[11px] text-walnut/70 dark:text-[#94a3b8] truncate">
                         {book.author}
                     </p>
                 </div>
@@ -101,7 +101,7 @@ export default function WishlistCard({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
             onClick={() => onClick(book)}
-            className="group bg-[#fdfbf7]/90 dark:bg-[#20140e]/95 rounded-2xl p-3 sm:p-4 border border-[#7a5c42]/15 dark:border-[#d4a574]/20 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-3 sm:gap-4 backdrop-blur-sm relative overflow-hidden"
+            className="group bg-white/90 dark:bg-[#131b2e]/95 rounded-2xl p-3 sm:p-4 border border-slate-200 dark:border-indigo-500/20 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-3 sm:gap-4 backdrop-blur-sm relative overflow-hidden"
         >
             {/* Left: Realistic 2:3 Book Cover */}
             <div className="w-20 xs:w-24 sm:w-28 aspect-[2/3] shrink-0 rounded-xl overflow-hidden shadow-sm group-hover:shadow-md relative border border-black/15 dark:border-white/10 transition-shadow">
@@ -144,11 +144,11 @@ export default function WishlistCard({
                 <div>
                     {/* Title & Author */}
                     <div className="flex items-start justify-between gap-1.5 mb-1">
-                        <h3 className="font-serif font-bold text-sm sm:text-base text-darkBrown dark:text-[#f5ece3] line-clamp-2 leading-snug group-hover:text-[#7a5c42] dark:group-hover:text-[#d4a574] transition-colors">
+                        <h3 className="font-serif font-bold text-sm sm:text-base text-darkBrown dark:text-[#f8fafc] line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-[#ffd166] transition-colors">
                             {book.title}
                         </h3>
                     </div>
-                    <p className="text-xs text-walnut/75 dark:text-[#c9ab91] truncate font-medium">
+                    <p className="text-xs text-walnut/75 dark:text-[#94a3b8] truncate font-medium">
                         {book.author}
                     </p>
 
@@ -161,7 +161,7 @@ export default function WishlistCard({
                                 .map((g: string, i: number) => (
                                     <span
                                         key={i}
-                                        className="font-medium text-[10px] text-[#5c3e28] dark:text-[#d4a574] bg-[#7a5c42]/10 dark:bg-[#d4a574]/15 px-2 py-0.5 rounded-md truncate max-w-[130px]"
+                                        className="font-medium text-[10px] text-indigo-700 dark:text-[#ffd166] bg-indigo-500/10 dark:bg-indigo-500/20 px-2 py-0.5 rounded-md truncate max-w-[130px]"
                                     >
                                         {g.trim()}
                                     </span>
@@ -171,11 +171,11 @@ export default function WishlistCard({
                 </div>
 
                 {/* Metadata & Actions */}
-                <div className="mt-2.5 pt-2 border-t border-[#7a5c42]/10 dark:border-[#d4a574]/15 flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-[11px] text-walnut/70 dark:text-[#c9ab91]">
+                <div className="mt-2.5 pt-2 border-t border-slate-200 dark:border-indigo-500/20 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-[11px] text-walnut/70 dark:text-[#94a3b8]">
                         {book.pages ? (
                             <span className="flex items-center gap-1 font-medium">
-                                <BookOpen size={12} className="text-[#7a5c42] dark:text-[#d4a574]" />
+                                <BookOpen size={12} className="text-indigo-600 dark:text-[#ffd166]" />
                                 <span>{book.pages} hal</span>
                             </span>
                         ) : null}
@@ -194,13 +194,13 @@ export default function WishlistCard({
                                     e.stopPropagation();
                                     onStartReading(book.id, e);
                                 }}
-                                className="px-2.5 py-1 bg-[#7a5c42] hover:bg-[#5c3e28] text-white rounded-lg text-xs font-medium shadow-xs transition-colors flex items-center gap-1"
+                                className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium shadow-xs transition-colors flex items-center gap-1"
                                 title={t("wishlist.start_reading", "Mulai Baca")}
                             >
                                 <span>{t("wishlist.read_now", "Baca")}</span>
                             </button>
                         )}
-                        <div className="px-2 py-1 bg-white/70 dark:bg-black/30 hover:bg-white text-darkBrown dark:text-[#f5ece3] rounded-lg text-xs font-medium border border-[#7a5c42]/15 dark:border-white/10 transition-colors flex items-center gap-1">
+                        <div className="px-2 py-1 bg-white/70 dark:bg-black/30 hover:bg-white text-darkBrown dark:text-[#f8fafc] rounded-lg text-xs font-medium border border-slate-200 dark:border-white/10 transition-colors flex items-center gap-1">
                             <span>{t("wishlist.details", "Detail")}</span>
                         </div>
                     </div>

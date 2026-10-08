@@ -69,7 +69,7 @@ export default function DesktopBookShelf({
                             onClick={() => onSelectBook(book.id)}
                             className={`cursor-pointer group relative w-12 ${book.spineBg} ${book.textColor} rounded-xs shadow-lg dark:shadow-[0_8px_20px_rgba(0,0,0,0.55)] transition-all duration-300 flex flex-col justify-between p-2 select-none border border-black/10 dark:border-black/40 border-t-white/30 dark:border-t-white/10 overflow-hidden ${
                                 isMatch
-                                    ? "opacity-100 hover:shadow-[#7a5c42]/30 hover:ring-2 hover:ring-[#4a3b2f] dark:hover:ring-[#d4a574]/60"
+                                    ? "opacity-100 hover:shadow-indigo-500/30 hover:ring-2 hover:ring-indigo-600 dark:hover:ring-[#38bdf8]/60"
                                     : "opacity-25 grayscale-[60%] blur-[0.4px] scale-95 pointer-events-none"
                             }`}
                         >
@@ -78,7 +78,7 @@ export default function DesktopBookShelf({
 
                             {/* Top Spine Accent Star */}
                             <div className="w-full flex justify-center shrink-0 pt-0.5 relative z-1">
-                                <span className="text-[9px] text-[#d4a574]">★</span>
+                                <span className="text-[9px] text-[#ffd166] dark:text-[#38bdf8]">★</span>
                             </div>
 
                             {/* Vertical Title Text */}
@@ -151,10 +151,10 @@ export default function DesktopBookShelf({
                                         />
 
                                         {/* Glassmorphic Action Pill Badge */}
-                                        <div className="mt-2 px-3.5 py-1 rounded-full bg-[#3a2d23]/92 dark:bg-[#0d1527]/95 backdrop-blur-md text-[#f8f5f0] text-[10px] font-medium tracking-wide flex items-center gap-1 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 transition-all duration-200 whitespace-nowrap group/pill">
-                                            <span className="text-[#e5b882] text-[9.5px] font-sans flex items-center gap-1 group-hover/pill:text-white transition-colors">
+                                        <div className="mt-2 px-3.5 py-1 rounded-full bg-[#0f172a]/92 dark:bg-[#0d1527]/95 backdrop-blur-md text-[#f8fafc] text-[10px] font-medium tracking-wide flex items-center gap-1 shadow-xl border border-indigo-500/30 dark:border-sky-400/35 hover:border-indigo-400/60 dark:hover:border-sky-400/70 transition-all duration-200 whitespace-nowrap group/pill">
+                                            <span className="text-slate-200 dark:text-slate-100 text-[9.5px] font-sans flex items-center gap-1 group-hover/pill:text-white transition-colors">
                                                 {t("landing.click_to_read", "Klik untuk detail")}
-                                                <span className="text-[#d4a574] font-bold group-hover/pill:translate-x-0.5 transition-transform">→</span>
+                                                <span className="text-[#ffd166] dark:text-[#38bdf8] font-bold group-hover/pill:translate-x-0.5 transition-transform">→</span>
                                             </span>
                                         </div>
                                     </motion.div>
@@ -165,14 +165,14 @@ export default function DesktopBookShelf({
                 );
             })}
 
-            {/* Realistic Wooden & Brass Bookshelf Rail */}
+            {/* Sleek Floating Cosmic & Starlight Bookshelf Rail */}
             <div className="absolute bottom-2 left-2 right-2 pointer-events-none z-0">
-                {/* Brass Lip Highlight Line */}
-                <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#d4a574]/85 to-transparent rounded-full shadow-xs" />
-                {/* Solid Wooden Shelf Plank Body */}
-                <div className="h-[12px] w-full bg-gradient-to-b from-[#8c6239] via-[#6d4c2b] to-[#4a331c] dark:from-[#432717] dark:via-[#2e190e] dark:to-[#1a0e08] rounded-b-xs shadow-md border-t border-[#d4a574]/30" />
-                {/* Soft Drop Shadow under shelf */}
-                <div className="h-[6px] w-full bg-black/25 dark:bg-black/55 blur-[3px]" />
+                {/* Luminescent Cosmic Starlight Beam / Lip */}
+                <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#ffd166]/90 dark:via-[#38bdf8]/85 to-transparent rounded-full shadow-xs" />
+                {/* Floating Cosmic Titanium & Obsidian Shelf Plank */}
+                <div className="h-[12px] w-full bg-gradient-to-b from-[#475569] via-[#334155] to-[#1e293b] dark:from-[#1e293b] dark:via-[#0f172a] dark:to-[#020617] rounded-b-xs shadow-md border-t border-[#ffd166]/40 dark:border-[#38bdf8]/35 transition-colors duration-700" />
+                {/* Soft Cosmic Drop Shadow under shelf */}
+                <div className="h-[6px] w-full bg-slate-900/20 dark:bg-sky-950/40 blur-[4px]" />
             </div>
         </div>
     );

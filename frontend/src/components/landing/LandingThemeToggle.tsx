@@ -24,12 +24,12 @@ export default function LandingThemeToggle({ className = "" }: LandingThemeToggl
             whileTap={{ scale: 0.95 }}
             className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border transition-all duration-700 ease-in-out shadow-xs select-none ${
                 isDarkMode
-                    ? "bg-[#131b2e]/80 border-[#d4a574]/50 text-[#e5b882] hover:bg-[#1e293b] shadow-[0_0_12px_rgba(212,165,116,0.2)]"
-                    : "bg-[#7a5c42]/5 border-[#7a5c42]/30 text-[#7a5c42] hover:bg-[#7a5c42]/10"
+                    ? "bg-[#131b2e]/90 border-indigo-400/40 text-[#ffd166] hover:bg-[#1e293b] shadow-[0_0_12px_rgba(56,189,248,0.25)]"
+                    : "bg-slate-200/60 border-slate-300 text-slate-700 hover:bg-slate-200"
             } ${className}`}
             title={
                 isDarkMode
-                    ? t("landing.theme_light", "Beralih ke Mode Terang")
+                    ? t("landing.theme_light", "Beralih ke Mode Stellar Dawn")
                     : t("landing.theme_dark", "Beralih ke Mode Langit Kosmik")
             }
             aria-label="Toggle theme"
@@ -43,9 +43,9 @@ export default function LandingThemeToggle({ className = "" }: LandingThemeToggl
                 className="flex items-center justify-center"
             >
                 {isDarkMode ? (
-                    <Sun className="w-4 h-4 text-[#e5b882]" />
+                    <Sun className="w-4 h-4 text-[#ffd166]" />
                 ) : (
-                    <Moon className="w-4 h-4 text-[#7a5c42]" />
+                    <Moon className="w-4 h-4 text-indigo-600" />
                 )}
             </motion.div>
         </motion.button>

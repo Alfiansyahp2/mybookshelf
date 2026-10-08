@@ -21,11 +21,11 @@ export default function LandingLanguageToggle({ className = "" }: LandingLanguag
             onClick={toggleLanguage}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full border border-[#7a5c42]/30 dark:border-[#d4a574]/40 text-[11px] sm:text-xs font-bold text-[#7a5c42] dark:text-[#e5b882] hover:bg-[#7a5c42]/10 dark:hover:bg-[#d4a574]/15 transition-all duration-700 ease-in-out shadow-xs select-none ${className}`}
+            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full border border-slate-300 dark:border-indigo-400/40 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-[#ffd166] hover:bg-slate-100 dark:hover:bg-indigo-500/20 transition-all duration-700 ease-in-out shadow-xs select-none ${className}`}
             title={t("landing.switch_lang", isEn ? "Ganti ke Bahasa Indonesia" : "Switch to English")}
             aria-label="Toggle language"
         >
-            <Globe className="w-3.5 h-3.5 text-[#7a5c42] dark:text-[#e5b882] transition-colors duration-700" />
+            <Globe className="w-3.5 h-3.5 text-indigo-600 dark:text-[#ffd166] transition-colors duration-700" />
             <span className="tracking-wider font-sans">{isEn ? "EN" : "ID"}</span>
         </motion.button>
     );

@@ -108,23 +108,23 @@ export default function YearlyTargetCards({
                                     : "sm:w-[320px] sm:shrink-0"
                             } snap-start cursor-pointer transition-all duration-200 ${
                                 isSelected
-                                    ? "scale-[1.01] ring-2 ring-[#d4a574] ring-offset-2 ring-offset-cream dark:ring-offset-[#0a0e1a] shadow-md"
+                                    ? "scale-[1.01] ring-2 ring-indigo-500 dark:ring-[#ffd166] ring-offset-2 ring-offset-cream dark:ring-offset-[#0a0e1a] shadow-md"
                                     : "hover:scale-[1.005]"
                             }`}
                         >
-                            <div className="bg-[#fdfbf7]/90 dark:bg-[#20140e]/95 rounded-2xl border border-[#7a5c42]/20 dark:border-[#d4a574]/25 shadow-sm overflow-hidden h-full backdrop-blur-sm">
-                                {/* Card Header (Rich Walnut & Gold Accent) */}
+                            <div className="bg-white/90 dark:bg-[#131b2e]/95 rounded-2xl border border-slate-200 dark:border-indigo-500/25 shadow-sm overflow-hidden h-full backdrop-blur-sm">
+                                {/* Card Header (Cosmic Deep Space & Starlight Accent) */}
                                 <div
                                     style={{
                                         padding: "16px 18px",
                                         background:
-                                            "linear-gradient(135deg, #3d2516 0%, #56361e 50%, #422917 100%)",
+                                            "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
                                     }}
-                                    className="border-b border-[#d4a574]/20 relative overflow-hidden"
+                                    className="border-b border-indigo-400/30 relative overflow-hidden"
                                 >
                                     <div className="flex items-center justify-between gap-3 mb-2.5">
-                                        <h3 className="m-0 text-sm sm:text-base font-bold text-amber-100 font-serif flex items-center gap-2 tracking-wide whitespace-nowrap">
-                                            <Target size={16} className="text-[#d4a574] shrink-0" />
+                                        <h3 className="m-0 text-sm sm:text-base font-bold text-white font-serif flex items-center gap-2 tracking-wide whitespace-nowrap">
+                                            <Target size={16} className="text-[#ffd166] shrink-0" />
                                             <span>
                                                 {t(
                                                     "reading.target",
@@ -137,7 +137,7 @@ export default function YearlyTargetCards({
                                             <span className="text-lg sm:text-xl font-serif font-bold text-white tracking-tight">
                                                 {stat.finished}
                                             </span>
-                                            <span className="text-amber-200/60 text-xs sm:text-sm font-sans font-normal">
+                                            <span className="text-slate-300 text-xs sm:text-sm font-sans font-normal">
                                                 / 12
                                             </span>
                                         </div>
@@ -155,12 +155,12 @@ export default function YearlyTargetCards({
                                             className={`h-full rounded-full ${
                                                 stat.goalPct >= 100
                                                     ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
-                                                    : "bg-gradient-to-r from-[#d4a574] to-[#f3cf9f]"
+                                                    : "bg-gradient-to-r from-indigo-500 to-[#ffd166]"
                                             }`}
                                         />
                                     </div>
 
-                                    <p className="mt-2 text-[11px] sm:text-xs text-amber-100/75 m-0 font-medium truncate">
+                                    <p className="mt-2 text-[11px] sm:text-xs text-slate-300 m-0 font-medium truncate">
                                         {stat.goalPct >= 100
                                             ? t(
                                                   "reading.target_achieved",
@@ -174,13 +174,13 @@ export default function YearlyTargetCards({
                                     </p>
                                 </div>
 
-                                {/* Card Metrics Grid (Warm Parchment) */}
-                                <div className="grid grid-cols-3 divide-x divide-[#7a5c42]/10 dark:divide-[#d4a574]/15 p-3 sm:p-4 bg-[#fdfbf7]/70 dark:bg-[#1a120c]/80">
+                                {/* Card Metrics Grid */}
+                                <div className="grid grid-cols-3 divide-x divide-slate-200 dark:divide-indigo-500/15 p-3 sm:p-4 bg-white/70 dark:bg-[#0d1322]/80">
                                     <div className="text-center px-1">
-                                        <div className="text-base sm:text-xl font-serif font-bold text-[#4a3b2f] dark:text-[#f5ece3] truncate">
+                                        <div className="text-base sm:text-xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] truncate">
                                             {stat.pagesRead.toLocaleString()}
                                         </div>
-                                        <div className="text-[10px] sm:text-[11px] text-[#7a5c42]/70 dark:text-[#c9ab91] mt-0.5 font-medium uppercase tracking-wider truncate">
+                                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#94a3b8] mt-0.5 font-medium uppercase tracking-wider truncate">
                                             {t(
                                                 "reading.pages_read",
                                                 "Halaman",
@@ -188,10 +188,10 @@ export default function YearlyTargetCards({
                                         </div>
                                     </div>
                                     <div className="text-center px-1">
-                                        <div className="text-base sm:text-xl font-serif font-bold text-[#4a3b2f] dark:text-[#f5ece3] truncate">
+                                        <div className="text-base sm:text-xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] truncate">
                                             {stat.totalPages.toLocaleString()}
                                         </div>
-                                        <div className="text-[10px] sm:text-[11px] text-[#7a5c42]/70 dark:text-[#c9ab91] mt-0.5 font-medium uppercase tracking-wider truncate">
+                                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#94a3b8] mt-0.5 font-medium uppercase tracking-wider truncate">
                                             {t(
                                                 "reading.total_pages",
                                                 "Total Hal.",
@@ -199,10 +199,10 @@ export default function YearlyTargetCards({
                                         </div>
                                     </div>
                                     <div className="text-center px-1">
-                                        <div className="text-base sm:text-xl font-serif font-bold text-[#4a3b2f] dark:text-[#f5ece3] truncate">
+                                        <div className="text-base sm:text-xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] truncate">
                                             {stat.readPct}%
                                         </div>
-                                        <div className="text-[10px] sm:text-[11px] text-[#7a5c42]/70 dark:text-[#c9ab91] mt-0.5 font-medium uppercase tracking-wider truncate">
+                                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#94a3b8] mt-0.5 font-medium uppercase tracking-wider truncate">
                                             {t("reading.percent_read", "% Terbaca")}
                                         </div>
                                     </div>
@@ -222,8 +222,8 @@ export default function YearlyTargetCards({
                             onClick={() => scrollToCard(i)}
                             className={`h-1.5 rounded-full transition-all duration-300 ${
                                 activeIndex === i
-                                    ? "w-6 bg-[#7a5c42] dark:bg-[#d4a574]"
-                                    : "w-1.5 bg-[#7a5c42]/25 dark:bg-[#d4a574]/25"
+                                    ? "w-6 bg-indigo-600 dark:bg-[#ffd166]"
+                                    : "w-1.5 bg-slate-300 dark:bg-slate-700"
                             }`}
                             aria-label={`Slide ${stat.year}`}
                         />

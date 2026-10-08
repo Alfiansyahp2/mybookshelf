@@ -96,14 +96,14 @@ export default function MobileBookCoverModal({
                                     e.stopPropagation();
                                     onSelectBook(activeBook.id);
                                 }}
-                                className="px-3.5 py-1.5 rounded-full bg-[#4a3b2f]/95 hover:bg-[#3a2d23] dark:bg-[#131b2e]/95 dark:hover:bg-[#1e293b] backdrop-blur-md text-xs text-[#f8f5f0] font-medium tracking-wide flex items-center gap-2 shadow-xl border border-[#d4a574]/40 hover:border-[#d4a574]/80 active:scale-95 transition-all cursor-pointer group"
+                                className="px-3.5 py-1.5 rounded-full bg-[#0f172a]/95 hover:bg-[#1e293b] dark:bg-[#131b2e]/95 dark:hover:bg-[#1e293b] backdrop-blur-md text-xs text-[#f8fafc] font-medium tracking-wide flex items-center gap-2 shadow-xl border border-indigo-400/40 hover:border-[#ffd166]/80 dark:border-indigo-500/40 dark:hover:border-[#38bdf8] active:scale-95 transition-all cursor-pointer group"
                             >
-                                <BookOpen className="w-3.5 h-3.5 text-[#d4a574]" />
+                                <BookOpen className="w-3.5 h-3.5 text-[#ffd166] dark:text-[#38bdf8]" />
                                 <span>{t("landing.tap_to_read", "Ketuk untuk detail")}</span>
                                 <motion.span
                                     animate={{ x: [0, 3, 0] }}
                                     transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
-                                    className="text-[#d4a574] font-bold"
+                                    className="text-[#ffd166] dark:text-[#38bdf8] font-bold"
                                 >
                                     →
                                 </motion.span>

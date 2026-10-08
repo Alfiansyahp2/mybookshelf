@@ -31,7 +31,7 @@ export default function InteractiveBookDemo({
     };
 
     return (
-        <div className="w-full text-[#4a3b2f] font-sans">
+        <div className="w-full text-[#0f172a] dark:text-[#f8fafc] font-sans">
             {/* Desktop & Tablet Showcase with hover tooltips and Anime.js stagger */}
             <DesktopBookShelf
                 books={books}

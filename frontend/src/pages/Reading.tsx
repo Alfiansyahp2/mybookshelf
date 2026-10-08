@@ -117,14 +117,14 @@ export default function Reading() {
             <div className="max-w-7xl mx-auto w-full relative z-10">
                 {/* Header */}
                 <div className="mb-6">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-walnut/10 dark:bg-[#d4a574]/15 text-walnut dark:text-[#d4a574] text-xs font-semibold tracking-wider uppercase mb-2">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-walnut/10 dark:bg-indigo-500/15 text-walnut dark:text-[#ffd166] text-xs font-semibold tracking-wider uppercase mb-2">
                         {/* <BookOpen size={13} />
                         <span>{t("reading.badge", "Progres Membaca")}</span> */}
                     </div>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-darkBrown dark:text-cream tracking-tight mb-1">
                         {t("reading.currently_reading", "Currently Reading")}
                     </h1>
-                    <p className="text-xs sm:text-sm text-walnut/70 dark:text-[#c9ab91]">
+                    <p className="text-xs sm:text-sm text-walnut/70 dark:text-[#94a3b8]">
                         {t(
                             "reading.track_progress",
                             "Track your progress on {{count}} book{{s}}",
@@ -147,8 +147,8 @@ export default function Reading() {
                     <div className="mb-8 sm:mb-10">
                         <div className="flex items-center justify-between gap-3 mb-3 px-0.5">
                             <div className="flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-[#d4a574] shadow-xs" />
-                                <h2 className="font-serif font-bold text-base sm:text-lg text-[#4a3b2f] dark:text-[#f5ece3] tracking-wide">
+                                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 dark:bg-[#ffd166] shadow-xs" />
+                                <h2 className="font-serif font-bold text-base sm:text-lg text-[#0f172a] dark:text-[#f8fafc] tracking-wide">
                                     {t(
                                         "reading.books_read_in_year",
                                         "Buku yang Dibaca Tahun {{year}}",
@@ -218,18 +218,18 @@ export default function Reading() {
                         <motion.div
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-[#fdfbf7]/90 dark:bg-[#20140e]/95 rounded-2xl p-3 sm:p-4 border border-[#7a5c42]/15 dark:border-[#d4a574]/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
+                            className="bg-white/90 dark:bg-[#131b2e]/95 rounded-2xl p-3 sm:p-4 border border-slate-200 dark:border-indigo-500/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
                         >
                             <div className="flex items-center gap-2 sm:gap-2.5 mb-2.5">
                                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/15 text-emerald-700 dark:text-emerald-400 flex items-center justify-center shrink-0">
                                     <BookOpen className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                 </div>
-                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#c9ab91] line-clamp-1">
+                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#94a3b8] line-clamp-1">
                                     {t("reading.reading_status", "Sedang Dibaca")}
                                 </span>
                             </div>
                             <div>
-                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f5ece3] leading-tight">
+                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f8fafc] leading-tight">
                                     {totalReadingBooks} <span className="text-xs font-sans font-normal text-walnut/50 dark:text-stone-400">buku</span>
                                 </div>
                             </div>
@@ -240,18 +240,18 @@ export default function Reading() {
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.05 }}
-                            className="bg-[#fdfbf7]/90 dark:bg-[#20140e]/95 rounded-2xl p-3 sm:p-4 border border-[#7a5c42]/15 dark:border-[#d4a574]/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
+                            className="bg-white/90 dark:bg-[#131b2e]/95 rounded-2xl p-3 sm:p-4 border border-slate-200 dark:border-indigo-500/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
                         >
                             <div className="flex items-center gap-2 sm:gap-2.5 mb-2.5">
                                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-500/10 dark:bg-blue-400/15 text-blue-700 dark:text-blue-400 flex items-center justify-center shrink-0">
                                     <TrendingUp className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                 </div>
-                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#c9ab91] line-clamp-1">
+                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#94a3b8] line-clamp-1">
                                     {t("reading.avg_progress", "Rata-rata Progres")}
                                 </span>
                             </div>
                             <div>
-                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f5ece3] leading-tight">
+                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f8fafc] leading-tight">
                                     {averageProgress}%
                                 </div>
                             </div>
@@ -262,18 +262,18 @@ export default function Reading() {
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-[#fdfbf7]/90 dark:bg-[#20140e]/95 rounded-2xl p-3 sm:p-4 border border-[#7a5c42]/15 dark:border-[#d4a574]/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
+                            className="bg-white/90 dark:bg-[#131b2e]/95 rounded-2xl p-3 sm:p-4 border border-slate-200 dark:border-indigo-500/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
                         >
                             <div className="flex items-center gap-2 sm:gap-2.5 mb-2.5">
                                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-500/10 dark:bg-purple-400/15 text-purple-700 dark:text-purple-400 flex items-center justify-center shrink-0">
                                     <Target className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                 </div>
-                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#c9ab91] line-clamp-1">
+                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#94a3b8] line-clamp-1">
                                     {t("reading.pages_read", "Halaman Dibaca")}
                                 </span>
                             </div>
                             <div>
-                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f5ece3] leading-tight">
+                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f8fafc] leading-tight">
                                     {totalPagesRead.toLocaleString()} <span className="text-xs font-sans font-normal text-walnut/50 dark:text-stone-400">hal</span>
                                 </div>
                             </div>
@@ -284,18 +284,18 @@ export default function Reading() {
                             initial={{ opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15 }}
-                            className="bg-[#fdfbf7]/90 dark:bg-[#20140e]/95 rounded-2xl p-3 sm:p-4 border border-[#7a5c42]/15 dark:border-[#d4a574]/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
+                            className="bg-white/90 dark:bg-[#131b2e]/95 rounded-2xl p-3 sm:p-4 border border-slate-200 dark:border-indigo-500/20 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex flex-col justify-between"
                         >
                             <div className="flex items-center gap-2 sm:gap-2.5 mb-2.5">
                                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/10 dark:bg-amber-400/15 text-amber-700 dark:text-amber-400 flex items-center justify-center shrink-0">
                                     <Clock className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                 </div>
-                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#c9ab91] line-clamp-1">
+                                <span className="text-[11px] sm:text-xs font-semibold text-walnut/70 dark:text-[#94a3b8] line-clamp-1">
                                     {t("reading.total_progress", "Total Progres")}
                                 </span>
                             </div>
                             <div>
-                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f5ece3] leading-tight">
+                                <div className="text-xl sm:text-2xl font-serif font-bold text-darkBrown dark:text-[#f8fafc] leading-tight">
                                     {totalPages > 0
                                         ? Math.round(
                                             (totalPagesRead / totalPages) * 100,
@@ -313,8 +313,8 @@ export default function Reading() {
                         {/* Section Header with View Mode Switcher */}
                         <div className="flex items-center justify-between gap-3 mb-3 px-0.5">
                             <div className="flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-[#d4a574] shadow-xs" />
-                                <h2 className="font-serif font-bold text-base sm:text-lg text-[#4a3b2f] dark:text-[#f5ece3] tracking-wide">
+                                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 dark:bg-[#ffd166] shadow-xs" />
+                                <h2 className="font-serif font-bold text-base sm:text-lg text-[#0f172a] dark:text-[#f8fafc] tracking-wide">
                                     {t("reading.shelf_title", "Koleksi Bacaan")}
                                 </h2>
                             </div>
@@ -452,7 +452,7 @@ export default function Reading() {
                     >
                         <button
                             onClick={() => navigate("/library")}
-                            className="px-5 py-2.5 sm:px-6 sm:py-3 bg-[#7a5c42] hover:bg-[#5a381e] text-white rounded-xl font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-xs sm:text-sm"
+                            className="px-5 py-2.5 sm:px-6 sm:py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-xs sm:text-sm"
                         >
                             <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                             {t("reading.browse_library", "Browse Library")}

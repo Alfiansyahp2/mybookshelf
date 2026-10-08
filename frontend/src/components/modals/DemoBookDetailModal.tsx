@@ -227,13 +227,13 @@ export default function DemoBookDetailModal({
                     style={{ perspective: 1200 }}
                 >
                     {/* Mobile 2-Page Switcher Bar */}
-                    <div className="md:hidden flex items-center justify-between px-3 py-2 bg-[#4a3b2f] text-[#f8f5f0] border-b border-[#7a5c42]/30 shrink-0 z-40">
+                    <div className="md:hidden flex items-center justify-between px-3 py-2 bg-[#0f172a] text-[#f8fafc] border-b border-slate-700/60 shrink-0 z-40">
                         <div className="flex items-center gap-1.5">
                             <button
                                 onClick={() => setMobilePage("left")}
                                 className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${mobilePage === "left"
-                                    ? "bg-[#d4a574] text-[#2c1a0e] shadow-sm"
-                                    : "text-[#f8f5f0]/70 hover:text-white"
+                                    ? "bg-indigo-600 text-white shadow-sm"
+                                    : "text-[#f8fafc]/70 hover:text-white"
                                     }`}
                             >
                                 <span>{t("bookDetail.cover", "Cover")}</span>
@@ -241,8 +241,8 @@ export default function DemoBookDetailModal({
                             <button
                                 onClick={() => setMobilePage("right")}
                                 className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 ${mobilePage === "right"
-                                    ? "bg-[#d4a574] text-[#2c1a0e] shadow-sm"
-                                    : "text-[#f8f5f0]/70 hover:text-white"
+                                    ? "bg-indigo-600 text-white shadow-sm"
+                                    : "text-[#f8fafc]/70 hover:text-white"
                                     }`}
                             >
                                 <span>{t("bookDetail.tabs.progress", "Progress")}</span>

@@ -83,16 +83,16 @@ export default function MobileCoverGrid({
                 return (
                     <div
                         key={shelf.id}
-                        className="rounded-2xl bg-[#fdfbf7]/80 dark:bg-[#20140e]/90 border border-[#7a5c42]/20 dark:border-[#d4a574]/25 shadow-lg overflow-hidden backdrop-blur-sm"
+                        className="rounded-2xl bg-white/80 dark:bg-[#131b2e]/90 border border-slate-200 dark:border-indigo-500/25 shadow-lg overflow-hidden backdrop-blur-sm"
                     >
-                        {/* Wooden top rail of shelf */}
+                        {/* Cosmic titanium & starlight top rail */}
                         <div
-                            className="h-4 sm:h-5 w-full relative overflow-hidden"
+                            className="h-3 sm:h-3.5 w-full relative overflow-hidden"
                             style={{
                                 background:
-                                    "linear-gradient(180deg, #c09060 0%, #9a7040 40%, #7a5428 70%, #624018 100%)",
+                                    "linear-gradient(180deg, #334155 0%, #1e293b 50%, #0f172a 100%)",
                                 boxShadow:
-                                    "inset 0 2px 0 rgba(255,255,255,0.25), inset 0 -3px 6px rgba(0,0,0,0.25)",
+                                    "inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.4)",
                             }}
                         >
                             <div
@@ -101,8 +101,8 @@ export default function MobileCoverGrid({
                                     top: 0,
                                     left: 0,
                                     right: 0,
-                                    height: 2,
-                                    background: "rgba(255,255,255,0.2)",
+                                    height: 1,
+                                    background: "rgba(56,189,248,0.5)",
                                 }}
                             />
                         </div>
@@ -110,13 +110,13 @@ export default function MobileCoverGrid({
                         {/* Shelf Content */}
                         <div className="p-3 sm:p-5 pt-3 sm:pt-4">
                             {/* Shelf Header Banner */}
-                            <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#7a5c42]/15 dark:border-[#d4a574]/20">
+                            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-indigo-500/20">
                             <div className="flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-[#d4a574] shadow-xs" />
-                                <h2 className="font-serif font-bold text-base sm:text-lg text-[#4a3b2f] dark:text-[#f5ece3] tracking-wide uppercase">
+                                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 dark:bg-[#ffd166] shadow-xs" />
+                                <h2 className="font-serif font-bold text-base sm:text-lg text-[#0f172a] dark:text-[#f8fafc] tracking-wide uppercase">
                                     {shelf.name}
                                 </h2>
-                                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[#7a5c42]/10 dark:bg-[#d4a574]/15 text-[#7a5c42] dark:text-[#e5b882] font-semibold">
+                                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-[#ffd166] font-semibold">
                                     {shelfBooks.length} / {maxCapacity}
                                 </span>
                             </div>
@@ -124,7 +124,7 @@ export default function MobileCoverGrid({
                             {onAddBook && (
                                 <button
                                     onClick={() => onAddBook(shelf.id, shelf.name)}
-                                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#7a5c42]/10 hover:bg-[#7a5c42]/20 dark:bg-[#d4a574]/15 dark:hover:bg-[#d4a574]/25 text-[#4a3b2f] dark:text-[#f5ece3] text-xs font-bold transition-colors"
+                                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 dark:bg-indigo-500/20 dark:hover:bg-indigo-500/30 text-[#0f172a] dark:text-[#f8fafc] text-xs font-bold transition-colors"
                                 >
                                     <Plus size={14} />
                                     <span>{t("shelf.add_book", "Tambah")}</span>
@@ -240,10 +240,10 @@ export default function MobileCoverGrid({
 
                                             {/* Book Metadata Under Cover */}
                                             <div className="pt-1.5 px-0.5 flex-1 flex flex-col justify-between">
-                                                <h3 className="font-serif font-bold text-[11px] sm:text-xs text-[#4a3b2f] dark:text-[#f5ece3] line-clamp-1 leading-snug group-hover:text-[#7a5c42] dark:group-hover:text-[#e5b882] transition-colors" title={book.title}>
+                                                <h3 className="font-serif font-bold text-[11px] sm:text-xs text-[#0f172a] dark:text-[#f8fafc] line-clamp-1 leading-snug group-hover:text-indigo-600 dark:group-hover:text-[#ffd166] transition-colors" title={book.title}>
                                                     {book.title}
                                                 </h3>
-                                                <p className="text-[10px] text-[#7a5c42]/80 dark:text-[#c9ab91] truncate mt-0.5" title={book.author}>
+                                                <p className="text-[10px] text-slate-500 dark:text-[#94a3b8] truncate mt-0.5" title={book.author}>
                                                     {book.author}
                                                 </p>
                                                 {book.pages && (
