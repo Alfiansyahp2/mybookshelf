@@ -319,6 +319,28 @@ export default function LandingPage() {
                                             <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                                         </div>
                                     </a>
+
+                                    {/* Substack */}
+                                    <a
+                                        href="https://substack.com/@altraln"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-2.5 px-3 rounded-xl bg-white/80 dark:bg-[#131b2e]/70 backdrop-blur-md border border-slate-200 dark:border-indigo-500/20 flex items-center justify-between hover:bg-white dark:hover:bg-[#131b2e]/90 hover:border-slate-300 dark:hover:border-indigo-400/30 transition-all duration-200 group shadow-xs"
+                                    >
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#FF6719] to-[#E05300] text-white shadow-xs flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                                                    <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z" />
+                                                </svg>
+                                            </div>
+                                            <span className="text-[11px] font-bold text-[#0f172a] dark:text-[#f8fafc] group-hover:text-[#FF6719] dark:group-hover:text-[#FF823E] transition-colors uppercase tracking-wider">
+                                                Substack
+                                            </span>
+                                        </div>
+                                        <div className="w-6 h-6 rounded-md bg-slate-100 dark:bg-indigo-500/15 flex items-center justify-center text-slate-700 dark:text-[#ffd166] group-hover:text-[#FF6719] dark:group-hover:text-[#FF823E] transition-all shrink-0">
+                                            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                                        </div>
+                                    </a>
                                 </div>
                             </div>
 
