@@ -10,7 +10,6 @@ import {
     Copy,
     Check,
     ExternalLink,
-    User,
     Menu,
     BookOpen,
     ChevronLeft
@@ -60,13 +59,6 @@ export default function LandingPage() {
             <header className="w-full max-w-7xl mx-auto flex items-center justify-between shrink-0 py-2 gap-2">
                 {/* Brand Header */}
                 <div className="flex items-center gap-2 sm:gap-3">
-                    <button
-                        onClick={() => setIsContactModalOpen(true)}
-                        className="md:hidden p-1.5 text-slate-600 dark:text-[#94a3b8] hover:bg-slate-200/50 dark:hover:bg-indigo-500/20 rounded-lg transition-colors duration-700"
-                        aria-label="Menu"
-                    >
-                        <Menu className="w-5 h-5" />
-                    </button>
                     <span className="font-serif italic font-bold text-xl sm:text-2xl md:text-3xl tracking-tight text-[#0f172a] dark:text-[#f8fafc] transition-colors duration-700">
                         A?Bookshelf
                     </span>
@@ -80,20 +72,17 @@ export default function LandingPage() {
                     {/* Dark/Light Theme Toggle */}
                     <LandingThemeToggle />
 
-                    <button
+                    {/* Single 3-line Menu Button */}
+                    <motion.button
                         onClick={() => setIsContactModalOpen(true)}
-                        className="hidden md:flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-slate-300 dark:border-indigo-400/40 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-[#ffd166] hover:bg-slate-100 dark:hover:bg-indigo-500/20 transition-all duration-700"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-slate-300 dark:border-indigo-400/40 bg-white/70 dark:bg-[#131b2e]/90 text-slate-700 dark:text-[#ffd166] hover:bg-slate-100 dark:hover:bg-[#1e293b] shadow-xs select-none transition-all duration-300 cursor-pointer"
+                        aria-label="Menu"
+                        title="Menu"
                     >
-                        <User className="w-3.5 h-3.5 text-indigo-600 dark:text-[#ffd166] transition-colors duration-700" />
-                        <span>{t("landing.contact", "KONTAK")}</span>
-                    </button>
-                    <Link
-                        to="/dashboard"
-                        className="hidden md:flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#0f172a] hover:bg-[#1e293b] dark:bg-[#131b2e] dark:hover:bg-[#1e293b] text-white border border-slate-700/40 dark:border-indigo-400/40 text-[11px] sm:text-xs font-bold shadow-md transition-all duration-700 shrink-0"
-                    >
-                        <span>{t("landing.enter_app", "MASUK APP")}</span>
-                        <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    </Link>
+                        <Menu className="w-4 h-4 sm:w-5 sm:h-5 transition-transform" />
+                    </motion.button>
                 </div>
             </header>
 
