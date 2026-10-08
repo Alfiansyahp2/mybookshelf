@@ -14,7 +14,7 @@ import ReadingProgressSection from "./right/ReadingProgressSection";
 import ReadingSessionTimer from "./right/ReadingSessionTimer";
 import BookNotesSection from "./right/BookNotesSection";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface BookDetailRightPageProps {
     book: Book;
@@ -53,6 +53,48 @@ const PAPER_BG = "#f5ecd7";
 const PAPER_LINES =
     "repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(139,100,60,0.09) 28px)";
 
+const bookPageLeafVariants = {
+    enter: (direction: number) => ({
+        rotateY: direction > 0 ? 35 : -85,
+        opacity: 0,
+        skewY: direction > 0 ? 1.5 : -2.5,
+        scale: 0.98,
+        transformOrigin: "left center",
+        boxShadow: direction > 0
+            ? "inset 20px 0 30px -10px rgba(0,0,0,0.18)"
+            : "-25px 0 35px rgba(0,0,0,0.35)",
+        filter: "brightness(0.92)",
+    }),
+    center: {
+        rotateY: 0,
+        opacity: 1,
+        skewY: 0,
+        scale: 1,
+        transformOrigin: "left center",
+        boxShadow: "inset 18px 0 25px -15px rgba(0,0,0,0.12)",
+        filter: "brightness(1)",
+        transition: {
+            duration: 0.45,
+            ease: [0.22, 1, 0.36, 1], // natural paper settle
+        },
+    },
+    exit: (direction: number) => ({
+        rotateY: direction > 0 ? -90 : 35,
+        opacity: 0,
+        skewY: direction > 0 ? -2.5 : 1.5,
+        scale: 0.98,
+        transformOrigin: "left center",
+        boxShadow: direction > 0
+            ? "-30px 0 45px rgba(0,0,0,0.45)"
+            : "inset 25px 0 35px -10px rgba(0,0,0,0.22)",
+        filter: "brightness(0.85)",
+        transition: {
+            duration: 0.38,
+            ease: [0.35, 0.05, 0.2, 1], // natural page peel acceleration
+        },
+    }),
+};
+
 export default function BookDetailRightPage({
     book,
     c0,
@@ -87,6 +129,50 @@ export default function BookDetailRightPage({
 }: BookDetailRightPageProps) {
     const { t } = useTranslation();
     const [selectedReadDate, setSelectedReadDate] = useState<string | null>(null);
+    const [direction, setDirection] = useState<number>(1);
+    const [prevTabIdx, setPrevTabIdx] = useState<number>(tabIdx);
+
+    const handleTabChange = (newTabId: string) => {
+        const newIdx = tabs.findIndex((t) => t.id === newTabId);
+        if (newIdx !== -1 && newIdx !== tabIdx) {
+            setDirection(newIdx > tabIdx ? 1 : -1);
+            setPrevTabIdx(tabIdx);
+        }
+        if (newTabId !== "session") setSelectedReadDate(null);
+        setActiveTab(newTabId);
+    };
+
+    // Keep direction updated if tabIdx changes externally
+    if (tabIdx !== prevTabIdx) {
+        setDirection(tabIdx > prevTabIdx ? 1 : -1);
+        setPrevTabIdx(tabIdx);
+    }
+
+    // Keyboard arrow navigation for turning pages like a real book
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+            if (
+                target &&
+                (target.tagName === "INPUT" ||
+                    target.tagName === "TEXTAREA" ||
+                    target.isContentEditable)
+            ) {
+                return;
+            }
+            if (e.key === "ArrowRight") {
+                if (tabIdx < tabs.length - 1) {
+                    handleTabChange(tabs[tabIdx + 1].id);
+                }
+            } else if (e.key === "ArrowLeft") {
+                if (tabIdx > 0) {
+                    handleTabChange(tabs[tabIdx - 1].id);
+                }
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [tabIdx, tabs]);
 
     return (
         <motion.div
@@ -122,10 +208,9 @@ export default function BookDetailRightPage({
                         <button
                             key={tab.id}
                             onClick={() => {
-                                if (tab.id !== "session") setSelectedReadDate(null);
-                                setActiveTab(tab.id);
+                                handleTabChange(tab.id);
                             }}
-                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 shrink-0 whitespace-nowrap"
+                            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 shrink-0 whitespace-nowrap cursor-pointer"
                             style={
                                 activeTab === tab.id
                                     ? {
@@ -193,30 +278,40 @@ export default function BookDetailRightPage({
                 </div>
             </div>
 
-            {/* ── Tab content ─────────────────────────────── */}
-            <div className="flex-1 overflow-y-auto px-5 py-4">
-                <AnimatePresence mode="wait">
-                    {activeTab === "progress" && (
-                        <motion.div
-                            key="tp"
-                            initial={{ opacity: 0, x: 12 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -12 }}
-                            transition={{ duration: 0.16 }}
-                            className="space-y-4"
-                        >
-                            {book.status === "reading" ||
-                            book.status === "finished" ? (
-                                <ReadingProgressSection
-                                    book={book}
-                                    onProgressChange={handleProgress}
-                                    onAddReadDate={handleAddReadDate}
-                                    onRemoveReadDate={handleRemoveReadDate}
-                                    onSelectReadDate={(date) => {
-                                        setSelectedReadDate(date);
-                                        setActiveTab("session");
-                                    }}
-                                />
+            {/* ── 3D Page Leaf Flip Container ───────────────── */}
+            <div className="flex-1 overflow-hidden relative" style={{ perspective: 1400 }}>
+                <AnimatePresence mode="wait" custom={direction}>
+                    <motion.div
+                        key={activeTab}
+                        custom={direction}
+                        variants={bookPageLeafVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        className="w-full h-full overflow-y-auto px-5 py-4 hide-scrollbar"
+                        style={{
+                            transformOrigin: "left center",
+                            transformStyle: "preserve-3d",
+                            backfaceVisibility: "hidden",
+                        }}
+                    >
+                        {/* Dynamic Spine Crease Shadow overlay on the turning page leaf */}
+                        <div className="absolute left-0 top-0 bottom-0 w-6 pointer-events-none bg-gradient-to-r from-black/15 via-black/5 to-transparent z-10" />
+
+                        {activeTab === "progress" && (
+                            <div className="space-y-4">
+                                {book.status === "reading" ||
+                                book.status === "finished" ? (
+                                    <ReadingProgressSection
+                                        book={book}
+                                        onProgressChange={handleProgress}
+                                        onAddReadDate={handleAddReadDate}
+                                        onRemoveReadDate={handleRemoveReadDate}
+                                        onSelectReadDate={(date) => {
+                                            setSelectedReadDate(date);
+                                            handleTabChange("session");
+                                        }}
+                                    />
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-14 text-center">
                                     <BookOpen
@@ -338,61 +433,41 @@ export default function BookDetailRightPage({
                                         )}
                                 </div>
                             )}
-                        </motion.div>
+                        </div>
                     )}
 
-                    {activeTab === "session" && (
-                        <motion.div
-                            key="ts"
-                            initial={{ opacity: 0, x: 12 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -12 }}
-                            transition={{ duration: 0.16 }}
-                        >
-                            <ReadingSessionTimer
-                                book={book}
-                                updateProgress={updateProgress}
-                                selectedReadDate={selectedReadDate}
-                                onClearSelectedReadDate={() => setSelectedReadDate(null)}
-                            />
-                        </motion.div>
-                    )}
+                        {activeTab === "session" && (
+                            <div>
+                                <ReadingSessionTimer
+                                    book={book}
+                                    updateProgress={updateProgress}
+                                    selectedReadDate={selectedReadDate}
+                                    onClearSelectedReadDate={() => setSelectedReadDate(null)}
+                                />
+                            </div>
+                        )}
 
-                    {activeTab === "notes" && (
-                        <motion.div
-                            key="tn"
-                            initial={{ opacity: 0, x: 12 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -12 }}
-                            transition={{ duration: 0.16 }}
-                            className="h-full flex flex-col"
-                        >
-                            <BookNotesSection
-                                book={book}
-                                userNotes={userNotes}
-                                tempNotes={tempNotes}
-                                isEditingNotes={isEditingNotes}
-                                updateNotes={updateNotes}
-                                onEdit={() => {
-                                    setTempNotes(userNotes);
-                                    setIsEditingNotes(true);
-                                }}
-                                onSave={handleNotes}
-                                onCancel={() => setIsEditingNotes(false)}
-                                onTempNotesChange={setTempNotes}
-                            />
-                        </motion.div>
-                    )}
+                        {activeTab === "notes" && (
+                            <div className="h-full flex flex-col">
+                                <BookNotesSection
+                                    book={book}
+                                    userNotes={userNotes}
+                                    tempNotes={tempNotes}
+                                    isEditingNotes={isEditingNotes}
+                                    updateNotes={updateNotes}
+                                    onEdit={() => {
+                                        setTempNotes(userNotes);
+                                        setIsEditingNotes(true);
+                                    }}
+                                    onSave={handleNotes}
+                                    onCancel={() => setIsEditingNotes(false)}
+                                    onTempNotesChange={setTempNotes}
+                                />
+                            </div>
+                        )}
 
-                    {activeTab === "info" && (
-                        <motion.div
-                            key="ti"
-                            initial={{ opacity: 0, x: 12 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -12 }}
-                            transition={{ duration: 0.16 }}
-                            className="space-y-2.5"
-                        >
+                        {activeTab === "info" && (
+                            <div className="space-y-2.5">
                             {/* Note: I removed the lucide-react icons from the array definition to prevent JSX in object literal type issues if not careful, passing them directly here or letting them be defined in parent if needed. For simplicity, we inline them. */}
 
                             <div
@@ -720,47 +795,71 @@ export default function BookDetailRightPage({
                                     </div>
                                 </div>
                             )}
-                        </motion.div>
-                    )}
+                            </div>
+                        )}
+                    </motion.div>
                 </AnimatePresence>
             </div>
 
             {/* ── Page footer with navigator ───────────────── */}
             <div
-                className="flex-shrink-0 flex items-center justify-between px-5 py-2 border-t"
+                className="flex-shrink-0 flex items-center justify-between px-5 py-2 border-t select-none"
                 style={{ borderColor: `${c1}18` }}
             >
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.15, x: -2 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => {
-                        if (tabIdx > 0) setActiveTab(tabs[tabIdx - 1].id);
+                        if (tabIdx > 0) {
+                            handleTabChange(tabs[tabIdx - 1].id);
+                        }
                     }}
                     disabled={tabIdx === 0}
-                    className="p-1 rounded transition-colors hover:bg-black/5 disabled:opacity-0"
+                    className="p-1 rounded transition-colors hover:bg-black/5 disabled:opacity-0 cursor-pointer"
+                    title={t("bookDetail.actions.prev_page", "Halaman Sebelumnya")}
                 >
                     <ChevronLeft
                         className="w-4 h-4"
                         style={{ color: "#9c6d3a" }}
                     />
-                </button>
+                </motion.button>
                 <span
-                    className="text-xs italic"
-                    style={{ color: `${c1}60`, fontFamily: "Georgia, serif" }}
+                    className="text-xs italic inline-flex items-center gap-1.5"
+                    style={{ color: `${c1}80`, fontFamily: "Georgia, serif" }}
                 >
-                    {tabIdx + 1} / {tabs.length}
+                    <AnimatePresence mode="wait" initial={false}>
+                        <motion.span
+                            key={tabIdx}
+                            initial={{ y: direction > 0 ? 6 : -6, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: direction > 0 ? -6 : 6, opacity: 0 }}
+                            transition={{ duration: 0.18 }}
+                            className="font-bold inline-block"
+                            style={{ color: "#2a1a08" }}
+                        >
+                            {tabIdx + 1}
+                        </motion.span>
+                    </AnimatePresence>
+                    <span>/</span>
+                    <span>{tabs.length}</span>
                 </span>
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.15, x: 2 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => {
-                        if (tabIdx < tabs.length - 1)
-                            setActiveTab(tabs[tabIdx + 1].id);
+                        if (tabIdx < tabs.length - 1) {
+                            handleTabChange(tabs[tabIdx + 1].id);
+                        }
                     }}
                     disabled={tabIdx === tabs.length - 1}
-                    className="p-1 rounded transition-colors hover:bg-black/5 disabled:opacity-0"
+                    className="p-1 rounded transition-colors hover:bg-black/5 disabled:opacity-0 cursor-pointer"
+                    title={t("bookDetail.actions.next_page", "Halaman Selanjutnya")}
                 >
                     <ChevronRight
                         className="w-4 h-4"
                         style={{ color: "#9c6d3a" }}
                     />
-                </button>
+                </motion.button>
             </div>
         </motion.div>
     );
