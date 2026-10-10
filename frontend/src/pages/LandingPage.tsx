@@ -20,16 +20,11 @@ import LibraryAmbientParticles from "../components/landing/LibraryAmbientParticl
 import AnimeHeroHeadline from "../components/landing/AnimeHeroHeadline";
 import LandingLanguageToggle from "../components/landing/LandingLanguageToggle";
 import LandingThemeToggle from "../components/landing/LandingThemeToggle";
-import LandingMeteorToggle from "../components/landing/LandingMeteorToggle";
 
 export default function LandingPage() {
     const { t } = useTranslation();
     const [isContactModalOpen, setIsContactModalOpen] = useState(false);
     const [copiedEmail, setCopiedEmail] = useState(false);
-    const [isMeteorShower, setIsMeteorShower] = useState<boolean>(() => {
-        const h = new Date().getHours();
-        return h >= 22 || h < 5;
-    });
 
     const handleCopyEmail = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -52,8 +47,8 @@ export default function LandingPage() {
                 <div className="absolute bottom-[2%] left-1/2 -translate-x-1/2 w-[800px] h-[220px] bg-gradient-to-t from-indigo-900/15 via-sky-500/10 to-transparent rounded-full blur-[80px]" />
             </div>
 
-            {/* Cozy Floating Dust Particles & Meteor Shower */}
-            <LibraryAmbientParticles isMeteorShower={isMeteorShower} />
+            {/* Cozy Floating Dust Particles, Comets & Meteor Shower (Auto Midnight) */}
+            <LibraryAmbientParticles />
 
             <SEO
                 title="A?Bookshelf - Abadikan Setiap Lembar Cerita & Perjalanan Membacamu"
@@ -71,12 +66,6 @@ export default function LandingPage() {
 
                 {/* Right Action Buttons */}
                 <div className="flex items-center gap-2 sm:gap-3">
-                    {/* Meteor Shower Trigger Easter Egg Toggle */}
-                    <LandingMeteorToggle
-                        isActive={isMeteorShower}
-                        onToggle={() => setIsMeteorShower((prev) => !prev)}
-                    />
-
                     {/* Bilingual Language Switcher */}
                     <LandingLanguageToggle />
 
