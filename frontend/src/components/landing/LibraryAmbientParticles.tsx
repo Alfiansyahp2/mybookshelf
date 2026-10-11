@@ -212,10 +212,10 @@ export default function LibraryAmbientParticles({
     const meteorThemes = isDarkMode ? METEOR_THEMES_DARK : METEOR_THEMES_LIGHT;
     const celestialColors = isDarkMode ? CELESTIAL_COLORS_DARK : CELESTIAL_COLORS_LIGHT;
 
-    // Generate celestial background particles (85 particles during meteor shower)
+    // Generate celestial background particles (optimized for smooth 60fps on all devices)
     const particles = useMemo(() => {
         const list = [];
-        const count = activeMeteorShower ? 85 : 38;
+        const count = activeMeteorShower ? 46 : 24;
 
         for (let i = 0; i < count; i++) {
             const typeObj =
@@ -258,27 +258,26 @@ export default function LibraryAmbientParticles({
         return list;
     }, [activeMeteorShower, celestialColors]);
 
-    // Shooting Stars: 66 vibrant meteors blazing in full meteor shower mode!
+    // Shooting Stars: Optimized Perseid cascades (dense, majestic & silky-smooth 60fps)
     const shootingStars = useMemo(() => {
         if (activeMeteorShower) {
-            // High-density Perseid Meteor Shower: 66 shooting stars with continuous dense cascades
             const meteors = [];
-            const count = 66;
+            const count = 26;
 
             for (let i = 0; i < count; i++) {
-                const colStep = (i % 22) / 22;
-                const rowBand = Math.floor(i / 22);
+                const colStep = (i % 13) / 13;
+                const rowBand = Math.floor(i / 13);
                 
-                const left = (colStep * 96 + (rowBand * 7)) % 96 + 1;
-                const top = rowBand * 14 + ((i * 3.7) % 15) + 1;
+                const left = (colStep * 96 + (rowBand * 12)) % 96 + 1;
+                const top = rowBand * 18 + ((i * 4.3) % 20) + 1;
                 const angle = 33 + ((i * 7) % 11);
-                const duration = (4.0 + ((i * 1.3) % 2.2)).toFixed(2);
-                const delay = ((i * 0.09) + ((i % 5) * 0.04)).toFixed(2);
+                const duration = (4.0 + ((i * 1.2) % 2.0)).toFixed(2);
+                const delay = ((i * 0.22) + ((i % 4) * 0.08)).toFixed(2);
                 const scale = (0.8 + ((i * 0.23) % 0.65)).toFixed(2);
                 const theme = i % meteorThemes.length;
 
                 meteors.push({
-                    id: `m-shower-66-${i}`,
+                    id: `m-shower-opt-${i}`,
                     left: `${left.toFixed(1)}%`,
                     top: `${top.toFixed(1)}%`,
                     angle,
@@ -305,71 +304,91 @@ export default function LibraryAmbientParticles({
 
     return (
         <div
-            className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-90"
+            className="absolute inset-0 overflow-hidden pointer-events-none z-0 opacity-90 [transform:translateZ(0)]"
             aria-hidden="true"
         >
-            {/* Embedded GPU-accelerated Keyframes for seamless floating, comets & alien UFO */}
+            {/* Shared Meteor Gradients (Single Defs instance to prevent duplicate rasterizers) */}
+            <svg className="absolute w-0 h-0 overflow-hidden pointer-events-none" aria-hidden="true">
+                <defs>
+                    {meteorThemes.map((theme, idx) => (
+                        <linearGradient
+                            key={`shared-meteor-grad-${idx}`}
+                            id={`meteor-shared-grad-${idx}`}
+                            x1="0"
+                            y1="0"
+                            x2="1"
+                            y2="0"
+                        >
+                            <stop offset="0%" stopColor={theme.from} stopOpacity="0" />
+                            <stop offset="50%" stopColor={theme.mid} stopOpacity="0.85" />
+                            <stop offset="100%" stopColor={theme.head} stopOpacity="1" />
+                        </linearGradient>
+                    ))}
+                </defs>
+            </svg>
+
+            {/* Embedded GPU-accelerated Keyframes (Compositor only, zero dynamic blur repaints) */}
             <style>{`
                 @keyframes celestialFloatA {
                     0% {
-                        transform: translate3d(0px, 0px, 0px) rotate(0deg) scale(1);
+                        transform: translate3d(0px, 0px, 0px) rotate(0deg);
                     }
                     50% {
-                        transform: translate3d(14px, -22px, 0px) rotate(14deg) scale(1.08);
+                        transform: translate3d(14px, -22px, 0px) rotate(14deg);
                     }
                     100% {
-                        transform: translate3d(-10px, -36px, 0px) rotate(-12deg) scale(0.96);
+                        transform: translate3d(-10px, -36px, 0px) rotate(-12deg);
                     }
                 }
 
                 @keyframes celestialFloatB {
                     0% {
-                        transform: translate3d(0px, 0px, 0px) rotate(0deg) scale(0.95);
+                        transform: translate3d(0px, 0px, 0px) rotate(0deg);
                     }
                     50% {
-                        transform: translate3d(-16px, -18px, 0px) rotate(-18deg) scale(1.06);
+                        transform: translate3d(-16px, -18px, 0px) rotate(-18deg);
                     }
                     100% {
-                        transform: translate3d(12px, -30px, 0px) rotate(10deg) scale(1.02);
+                        transform: translate3d(12px, -30px, 0px) rotate(10deg);
                     }
                 }
 
                 @keyframes celestialFloatC {
                     0% {
-                        transform: translate3d(0px, 0px, 0px) rotate(0deg) scale(1.04);
+                        transform: translate3d(0px, 0px, 0px) rotate(0deg);
                     }
                     50% {
-                        transform: translate3d(10px, 16px, 0px) rotate(16deg) scale(0.94);
+                        transform: translate3d(10px, 16px, 0px) rotate(16deg);
                     }
                     100% {
-                        transform: translate3d(-14px, -16px, 0px) rotate(-14deg) scale(1.05);
+                        transform: translate3d(-14px, -16px, 0px) rotate(-14deg);
                     }
                 }
 
                 @keyframes celestialFloatD {
                     0% {
-                        transform: translate3d(0px, 0px, 0px) rotate(0deg) scale(0.98);
+                        transform: translate3d(0px, 0px, 0px) rotate(0deg);
                     }
                     50% {
-                        transform: translate3d(-12px, 20px, 0px) rotate(-12deg) scale(1.08);
+                        transform: translate3d(-12px, 20px, 0px) rotate(-12deg);
                     }
                     100% {
-                        transform: translate3d(16px, -18px, 0px) rotate(15deg) scale(0.95);
+                        transform: translate3d(16px, -18px, 0px) rotate(15deg);
                     }
                 }
 
                 @keyframes celestialTwinkle {
                     0% {
-                        opacity: 0.2;
-                        filter: drop-shadow(0 0 2px currentColor);
+                        opacity: 0.25;
+                        transform: scale(0.85);
                     }
                     50% {
-                        opacity: 0.85;
-                        filter: drop-shadow(0 0 8px currentColor);
+                        opacity: 0.95;
+                        transform: scale(1.1);
                     }
                     100% {
                         opacity: 0.35;
-                        filter: drop-shadow(0 0 3px currentColor);
+                        transform: scale(0.9);
                     }
                 }
 
@@ -405,7 +424,7 @@ export default function LibraryAmbientParticles({
                         color: p.color,
                         animation: `${p.floatAnim} ${p.floatDuration} ease-in-out infinite alternate`,
                         animationDelay: p.floatDelay,
-                        willChange: "transform",
+                        filter: "drop-shadow(0 0 3px currentColor)",
                     }}
                 >
                     <div
@@ -420,7 +439,7 @@ export default function LibraryAmbientParticles({
                 </div>
             ))}
 
-            {/* High Density Shooting Stars (66 Meteors) - Perfectly straight motion alignment */}
+            {/* High Density Shooting Stars - Perfectly straight vector motion alignment */}
             {shootingStars.map((cfg) => {
                 const theme = meteorThemes[cfg.theme % meteorThemes.length];
                 return (
@@ -433,7 +452,6 @@ export default function LibraryAmbientParticles({
                             animation: `meteorStreak ${cfg.duration} cubic-bezier(0.25, 1, 0.45, 1) infinite`,
                             animationDelay: cfg.delay,
                             opacity: 0,
-                            willChange: "transform, opacity",
                         }}
                     >
                         <div
@@ -452,42 +470,25 @@ export default function LibraryAmbientParticles({
                                     y1="13"
                                     x2="126"
                                     y2="13"
-                                    stroke={`url(#meteor-grad-${cfg.id})`}
+                                    stroke={`url(#meteor-shared-grad-${cfg.theme % meteorThemes.length})`}
                                     strokeWidth={isDarkMode ? "2.6" : "3.2"}
                                     strokeLinecap="round"
                                 />
+                                {/* Luminous Halo Glow (Hardware-accelerated vector halo) */}
                                 <circle
                                     cx="128"
                                     cy="13"
-                                    r={isDarkMode ? "3.8" : "4.2"}
-                                    fill={theme.head}
-                                    filter={`drop-shadow(0 0 ${isDarkMode ? "12px" : "8px"} ${theme.glow})`}
+                                    r={isDarkMode ? "7.5" : "6.5"}
+                                    fill={theme.glow}
+                                    opacity="0.45"
                                 />
-                                <defs>
-                                    <linearGradient
-                                        id={`meteor-grad-${cfg.id}`}
-                                        x1="0"
-                                        y1="0"
-                                        x2="1"
-                                        y2="0"
-                                    >
-                                        <stop
-                                            offset="0%"
-                                            stopColor={theme.from}
-                                            stopOpacity="0"
-                                        />
-                                        <stop
-                                            offset="50%"
-                                            stopColor={theme.mid}
-                                            stopOpacity="0.85"
-                                        />
-                                        <stop
-                                            offset="100%"
-                                            stopColor={theme.head}
-                                            stopOpacity="1"
-                                        />
-                                    </linearGradient>
-                                </defs>
+                                {/* Brilliant Core Star Head */}
+                                <circle
+                                    cx="128"
+                                    cy="13"
+                                    r={isDarkMode ? "3.6" : "4.0"}
+                                    fill={theme.head}
+                                />
                             </svg>
                         </div>
                     </div>

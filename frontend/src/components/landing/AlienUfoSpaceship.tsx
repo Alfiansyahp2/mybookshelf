@@ -348,7 +348,7 @@ export default function AlienUfoSpaceship({
                             r="2.0"
                             fill="#4ade80"
                             filter="drop-shadow(0 0 5px #4ade80)"
-                            className="animate-ping opacity-75"
+                            className="animate-pulse opacity-85"
                         />
                         <circle cx="13" cy="21.5" r="2.0" fill="#4ade80" />
                         <circle cx="26" cy="23.5" r="2.2" fill="#38bdf8" filter="drop-shadow(0 0 6px #38bdf8)" />

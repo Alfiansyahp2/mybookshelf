@@ -126,7 +126,7 @@ export default function RareCelestialComets({
     const comet2Glow = isDarkMode ? "#ffd166" : "rgba(2, 132, 199, 0.55)";
 
     return (
-        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden [transform:translateZ(0)]">
             {/* ── COMET 1: Left to Right (Laser-Straight 28° Flight Vector) ── */}
             <motion.div
                 animate={comet1Controls}

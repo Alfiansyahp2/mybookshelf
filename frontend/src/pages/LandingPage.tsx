@@ -36,7 +36,7 @@ export default function LandingPage() {
     return (
         <div className="h-full w-full overflow-hidden hide-scrollbar bg-[#f0f4f8] dark:bg-[#0a0e1a] text-[#0f172a] dark:text-[#f8fafc] font-sans flex flex-col justify-between p-4 pb-3 sm:p-6 md:p-10 selection:bg-indigo-600 selection:text-white relative transition-colors duration-700 ease-in-out">
             {/* ── CELESTIAL COSMIC NEBULA GLOWS (DARK MODE ONLY) ── */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 hidden dark:block transition-opacity duration-1000">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 hidden dark:block transition-opacity duration-1000 [transform:translateZ(0)]">
                 {/* Deep Cosmic Starlight Radial Glow at the Top / Center */}
                 <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[700px] sm:w-[950px] h-[480px] bg-gradient-to-b from-indigo-500/12 via-purple-600/8 to-transparent rounded-full blur-[90px]" />
                 {/* Soft Violet Nebula Whispers at the Top-Right */}
