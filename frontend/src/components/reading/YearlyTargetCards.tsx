@@ -83,13 +83,21 @@ export default function YearlyTargetCards({
 
     return (
         <div className="mb-6">
-            {/* Scrollable Cards Container */}
+            {/* Cards Container (Responsive Grid on Tablet/Desktop, Smooth Scroll on Mobile) */}
             <div
                 ref={scrollContainerRef}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 onScroll={handleScroll}
-                className="flex flex-row gap-3.5 sm:gap-4 overflow-x-auto pb-3 pt-1 snap-x snap-mandatory scroll-smooth hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0"
+                className={`flex flex-row md:grid gap-3 sm:gap-3.5 overflow-x-auto md:overflow-x-visible pb-3 md:pb-1 snap-x snap-mandatory scroll-smooth hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 ${
+                    yearlyStats.length === 1
+                        ? "md:grid-cols-1 md:max-w-md"
+                        : yearlyStats.length === 2
+                        ? "md:grid-cols-2"
+                        : yearlyStats.length === 3
+                        ? "md:grid-cols-3"
+                        : "sm:grid-cols-2 lg:grid-cols-4"
+                }`}
             >
                 {yearlyStats.map((stat, idx) => {
                     const isSelected = selectedYear === stat.year;
@@ -102,29 +110,25 @@ export default function YearlyTargetCards({
                             onClick={() =>
                                 setSelectedYear(isSelected ? null : stat.year)
                             }
-                            className={`w-[85vw] max-w-[340px] shrink-0 sm:shrink sm:w-auto ${
-                                yearlyStats.length <= 2
-                                    ? "sm:flex-1 sm:max-w-[420px]"
-                                    : "sm:w-[320px] sm:shrink-0"
-                            } snap-start cursor-pointer transition-all duration-200 ${
+                            className={`w-[85vw] max-w-[340px] shrink-0 sm:shrink md:w-auto md:max-w-none snap-start cursor-pointer transition-all duration-200 ${
                                 isSelected
-                                    ? "scale-[1.01] ring-2 ring-indigo-500 dark:ring-[#ffd166] ring-offset-2 ring-offset-cream dark:ring-offset-[#0a0e1a] shadow-md"
+                                    ? "scale-[1.01] ring-2 ring-walnut dark:ring-gold ring-offset-2 ring-offset-cream dark:ring-offset-[#1a1612] shadow-md"
                                     : "hover:scale-[1.005]"
                             }`}
                         >
-                            <div className="bg-white/90 dark:bg-[#131b2e]/95 rounded-2xl border border-slate-200 dark:border-indigo-500/25 shadow-sm overflow-hidden h-full backdrop-blur-sm">
-                                {/* Card Header (Cosmic Deep Space & Starlight Accent) */}
+                            <div className="bg-[#fcfaf7]/95 dark:bg-[#201a14]/95 rounded-2xl border border-walnut/20 dark:border-walnut/30 shadow-sm overflow-hidden h-full backdrop-blur-sm">
+                                {/* Card Header (Rich Mahogany & Warm Amber Wood Accent) */}
                                 <div
                                     style={{
-                                        padding: "16px 18px",
+                                        padding: "13px 15px",
                                         background:
-                                            "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+                                            "linear-gradient(135deg, #2b1810 0%, #3e2417 50%, #2b1810 100%)",
                                     }}
-                                    className="border-b border-indigo-400/30 relative overflow-hidden"
+                                    className="border-b border-[#ffd166]/20 relative overflow-hidden"
                                 >
-                                    <div className="flex items-center justify-between gap-3 mb-2.5">
-                                        <h3 className="m-0 text-sm sm:text-base font-bold text-white font-serif flex items-center gap-2 tracking-wide whitespace-nowrap">
-                                            <Target size={16} className="text-[#ffd166] shrink-0" />
+                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                        <h3 className="m-0 text-xs sm:text-sm md:text-base font-bold text-white font-serif flex items-center gap-1.5 tracking-wide whitespace-nowrap">
+                                            <Target size={15} className="text-[#ffd166] shrink-0" />
                                             <span>
                                                 {t(
                                                     "reading.target",
@@ -134,16 +138,16 @@ export default function YearlyTargetCards({
                                             </span>
                                         </h3>
                                         <div className="flex items-baseline gap-1 shrink-0 whitespace-nowrap">
-                                            <span className="text-lg sm:text-xl font-serif font-bold text-white tracking-tight">
+                                            <span className="text-base sm:text-lg md:text-xl font-serif font-bold text-white tracking-tight">
                                                 {stat.finished}
                                             </span>
-                                            <span className="text-slate-300 text-xs sm:text-sm font-sans font-normal">
+                                            <span className="text-amber-100/70 text-xs font-sans font-normal">
                                                 / 12
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="h-2 rounded-full bg-black/35 border border-white/10 overflow-hidden">
+                                    <div className="h-2 rounded-full bg-black/40 border border-white/10 overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${Math.min(stat.goalPct, 100)}%` }}
@@ -155,12 +159,12 @@ export default function YearlyTargetCards({
                                             className={`h-full rounded-full ${
                                                 stat.goalPct >= 100
                                                     ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
-                                                    : "bg-gradient-to-r from-indigo-500 to-[#ffd166]"
+                                                    : "bg-gradient-to-r from-amber-600 via-[#d4a574] to-[#ffd166]"
                                             }`}
                                         />
                                     </div>
 
-                                    <p className="mt-2 text-[11px] sm:text-xs text-slate-300 m-0 font-medium truncate">
+                                    <p className="mt-2 text-[11px] sm:text-xs text-amber-100/80 m-0 font-medium truncate">
                                         {stat.goalPct >= 100
                                             ? t(
                                                   "reading.target_achieved",
@@ -175,35 +179,35 @@ export default function YearlyTargetCards({
                                 </div>
 
                                 {/* Card Metrics Grid */}
-                                <div className="grid grid-cols-3 divide-x divide-slate-200 dark:divide-indigo-500/15 p-3 sm:p-4 bg-white/70 dark:bg-[#0d1322]/80">
-                                    <div className="text-center px-1">
-                                        <div className="text-base sm:text-xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] truncate">
+                                <div className="grid grid-cols-3 divide-x divide-walnut/15 dark:divide-walnut/20 py-2.5 px-1 sm:py-3 sm:px-1.5 bg-[#fcfaf7]/90 dark:bg-[#1a140e]/90">
+                                    <div className="text-center px-0.5">
+                                        <div className="text-sm sm:text-base lg:text-lg font-serif font-bold text-darkBrown dark:text-cream truncate">
                                             {stat.pagesRead.toLocaleString()}
                                         </div>
-                                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#94a3b8] mt-0.5 font-medium uppercase tracking-wider truncate">
+                                        <div className="text-[9px] sm:text-[10px] text-walnut/80 dark:text-gold mt-0.5 font-medium uppercase tracking-tight truncate">
                                             {t(
                                                 "reading.pages_read",
-                                                "Halaman",
+                                                "Hal. Baca",
                                             )}
                                         </div>
                                     </div>
-                                    <div className="text-center px-1">
-                                        <div className="text-base sm:text-xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] truncate">
+                                    <div className="text-center px-0.5">
+                                        <div className="text-sm sm:text-base lg:text-lg font-serif font-bold text-darkBrown dark:text-cream truncate">
                                             {stat.totalPages.toLocaleString()}
                                         </div>
-                                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#94a3b8] mt-0.5 font-medium uppercase tracking-wider truncate">
+                                        <div className="text-[9px] sm:text-[10px] text-walnut/80 dark:text-gold mt-0.5 font-medium uppercase tracking-tight truncate">
                                             {t(
                                                 "reading.total_pages",
                                                 "Total Hal.",
                                             )}
                                         </div>
                                     </div>
-                                    <div className="text-center px-1">
-                                        <div className="text-base sm:text-xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] truncate">
+                                    <div className="text-center px-0.5">
+                                        <div className="text-sm sm:text-base lg:text-lg font-serif font-bold text-darkBrown dark:text-cream truncate">
                                             {stat.readPct}%
                                         </div>
-                                        <div className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#94a3b8] mt-0.5 font-medium uppercase tracking-wider truncate">
-                                            {t("reading.percent_read", "% Terbaca")}
+                                        <div className="text-[9px] sm:text-[10px] text-walnut/80 dark:text-gold mt-0.5 font-medium uppercase tracking-tight truncate">
+                                            {t("reading.percent_read", "% Target")}
                                         </div>
                                     </div>
                                 </div>
@@ -215,15 +219,15 @@ export default function YearlyTargetCards({
 
             {/* Mobile Pagination Indicator Dots */}
             {yearlyStats.length > 1 && (
-                <div className="flex justify-center items-center gap-1.5 mt-2.5 sm:hidden">
+                <div className="flex justify-center items-center gap-1.5 mt-2.5 md:hidden">
                     {yearlyStats.map((stat, i) => (
                         <button
                             key={stat.year}
                             onClick={() => scrollToCard(i)}
                             className={`h-1.5 rounded-full transition-all duration-300 ${
                                 activeIndex === i
-                                    ? "w-6 bg-indigo-600 dark:bg-[#ffd166]"
-                                    : "w-1.5 bg-slate-300 dark:bg-slate-700"
+                                    ? "w-6 bg-walnut dark:bg-gold"
+                                    : "w-1.5 bg-walnut/30 dark:bg-walnut/40"
                             }`}
                             aria-label={`Slide ${stat.year}`}
                         />

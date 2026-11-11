@@ -266,7 +266,7 @@ export default function NotificationCenter({ isScrolled = false }: { isScrolled?
 
                                                 {/* Unread dot */}
                                                 {!notif.read && (
-                                                    <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-blue-500" />
+                                                    <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-amber-600" />
                                                 )}
 
                                                 {/* Delete single button */}

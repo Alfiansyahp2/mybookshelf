@@ -48,7 +48,7 @@ export default function DashboardHeroSection({
                     to="/library"
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/70 hover:bg-white text-darkBrown border border-walnut/15 text-xs font-semibold shadow-xs shrink-0 transition-all hover:scale-105 active:scale-95"
                 >
-                    <Library className="w-3.5 h-3.5 text-indigo-600" />
+                    <Library className="w-3.5 h-3.5 text-walnut" />
                     <span>{t("dashboard.quick_actions.library", "Rak Buku")}</span>
                 </Link>
 

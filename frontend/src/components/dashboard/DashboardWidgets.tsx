@@ -515,8 +515,8 @@ export function ContributionGraph({
                                             </div>
                                         )}
                                         <div className="flex items-center justify-between mt-2 border-t border-[rgba(139,99,56,0.08)] pt-2">
-                                            <span className="text-[9.5px] px-2 py-[3px] rounded-xl bg-blue-100 text-blue-800 font-semibold flex items-center gap-[5px]">
-                                                <div className="w-[5px] h-[5px] rounded-full bg-blue-500" />{" "}
+                                            <span className="text-[9.5px] px-2 py-[3px] rounded-xl bg-emerald-100/80 text-emerald-900 font-semibold flex items-center gap-[5px]">
+                                                <div className="w-[5px] h-[5px] rounded-full bg-emerald-600" />{" "}
                                                 Selesai
                                             </span>
                                             {book.personalRating &&
