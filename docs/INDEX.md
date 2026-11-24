@@ -1,41 +1,56 @@
-# 📚 Dokumentasi MyBookshelf
+# Dokumentasi Teknis & Spesifikasi Rekayasa MyBookshelf
 
-Selamat datang di pusat panduan dan dokumentasi aplikasi MyBookshelf. Untuk mempermudah pencarian, semua dokumen telah dikategorikan ke dalam 3 folder utama:
+Selamat datang di repositori dokumentasi rekayasa perangkat lunak resmi untuk **MyBookshelf** — platform perpustakaan digital dan pelacak bacaan modern dengan visualisasi rak buku 3D interaktif.
 
----
-
-## 1. 🌟 Panduan Pengguna & Fitur (`features/`)
-Berisi penjelasan tentang cara kerja menu-menu utama aplikasi beserta fungsinya. Sangat cocok bagi pengguna yang ingin mengeksplorasi kemampuan aplikasi.
-
-- 💰 **[Manajemen Keuangan & Anggaran](features/Manajemen_Keuangan.md)**
-  Panduan lengkap menggunakan sistem akuntansi internal (mengatur *Budget*, *Expenses*, *Wishlist*, hingga melacak statistik keuangan buku).
-  
-- ⏱️ **[Sistem Membaca & Timer](features/Sistem_Membaca.md)**
-  Penjelasan tentang cara kerja *Reading Session Timer* dan bagaimana aplikasi mencatat progres membaca Anda setiap harinya.
-
-- 🪴 **[Kustomisasi Rak Buku](features/Kustomisasi_Rak_Buku.md)**
-  Katalog objek 3D (tanaman, kucing *pixel*, jam, kalender) dan panduan memodifikasi tampilan rak fisik secara visual.
+Dokumentasi ini disusun dengan standar spesifikasi rekayasa (*system engineering specification*) berbasis kode nyata, bebas dari teks generik, mencakup arsitektur sistem, skema basis data, spesifikasi API, pemodelan matematis UI/UX, dan keputusan teknis (*Architecture Decision Records*).
 
 ---
 
-## 2. ⚙️ Dokumentasi Developer (`technical/`)
-Dokumen teknis yang membahas cetak biru arsitektur, integrasi API, dan standar *coding* (diperuntukkan bagi *programmer*/pengembang).
+## 1. Arsitektur & Cetak Biru Sistem (`architecture/`)
+Dokumentasi tingkat tinggi mengenai arsitektur sistem, integrasi subsistem, aliran data, dan keputusan desain fundamental.
 
-- 🔗 **[Implementasi API Backend](technical/API_Implementation.md)**
-  Rangkuman integrasi *endpoint* Laravel dan skema *database*.
-- 🖼️ **[Arsitektur Modal System](technical/Modal_System_Architecture.md)**
-  Penjelasan sistem *pop-up* (dialog) aplikasi secara modular.
-- 🔒 **[Log Perbaikan Autentikasi](technical/Authentication_Fix_Log.md)**
-  Rekam jejak perbaikan sistem *login*, *register*, dan proteksi rute halaman.
-- 🗄️ **[Panduan Data Seeder](technical/Book_Seeder_Guide.md)**
-  Panduan tentang cara kerja sistem injeksi data buku statis (*seeding*).
+* 🏛️ **[Spesifikasi Arsitektur Sistem](architecture/SYSTEM_ARCHITECTURE.md)**  
+  *Cetak biru arsitektur Decoupled (Laravel 12 REST API + React 19 SPA), diagram kontainer C4, metrik target latensi P95 (<120ms), dan kebijakan keamanan Sanctum.*
+
+* 📋 **[Rekam Keputusan Arsitektur (ADR)](architecture/DECISION_RECORDS.md)**  
+  *Catatan historis alasan teknis dan trade-off di balik adopsi decoupled architecture, PostgreSQL 16+, dual state management (Zustand + TanStack Query), engine 3D berbasis CSS transforms, dan `@dnd-kit`.*
 
 ---
 
-## 3. 📜 Rekam Jejak Evolusi (`history/`)
-Kumpulan laporan mengenai perkembangan basis kode (*codebase*) seiring berjalannya waktu.
+## 2. Spesifikasi Teknis Inti (`specifications/`)
+Spesifikasi teknis mendalam yang menjadi acuan pengkodean, integrasi data, dan standarisasi antarmuka.
 
-- 🚧 **[Rencana Refactoring (Agustus 2026)](history/Refactoring_Plan_Agustus.md)**
-  Cetak biru perombakan arsitektur *frontend* menjadi modular.
-- 📈 **[Laporan Progres & Arsitektur](history/Progress_Report.md)**
-  Laporan penyelesaian tugas *refactoring* dan daftar fitur yang dioptimalkan.
+* 🌳 **[Susunan & Organisasi Proyek](specifications/PROJECT_STRUCTURE.md)**  
+  *Peta pohon direktori monorepo/decoupled, pembagian tanggung jawab modul backend Laravel (`app/`) dan frontend React (`frontend/src/components`).*
+
+* 🗄️ **[Skema Basis Data & Model Data](specifications/DATABASE_SCHEMA.md)**  
+  *Diagram relasi entitas (ERD), spesifikasi tipe data kolom, nullability, indeks, cascade constraints, dan model Eloquent di PostgreSQL.*
+
+* 🔌 **[Spesifikasi RESTful API v1](specifications/API_SPECIFICATION.md)**  
+  *Katalog lengkap endpoint `/api/v1/` untuk autentikasi, siklus hidup buku, kontrol rak 3D, timer sesi membaca real-time, dan modul akuntansi.*
+
+* 🎨 **[Spesifikasi UI/UX & Design System](specifications/UI_UX_DESIGN_SYSTEM.md)**  
+  *Filosofi "Tactile Reading Sanctuary", sistem token warna (Warm Teak Wood & Ivory Linen vs Cosmic Midnight), pemodelan matematis ketebalan punggung buku 3D, shader tekstur matte, dan grid responsif.*
+
+---
+
+## 3. Panduan Fitur Fungsional (`features/`)
+Dokumentasi cara kerja modul fitur utama dari sudut pandang alur fungsional sistem.
+
+* 📚 **[Kustomisasi Rak Buku 3D](features/Kustomisasi_Rak_Buku.md)**  
+  *Panduan rendering rak fisik, kontrol pencahayaan meja (*table lamp*), dan katalog dekorasi rak (tanaman, lilin, jam digital, kucing pixel).*
+
+* ⏱️ **[Sistem Membaca & Timer Sesi](features/Sistem_Membaca.md)**  
+  *Mekanisme pelacakan durasi membaca waktu-nyata, auto-pause, kalkulasi halaman, dan agregasi statistik tahunan.*
+
+* 💰 **[Manajemen Keuangan & Anggaran](features/Manajemen_Keuangan.md)**  
+  *Sistem pembukuan buku internal untuk logging anggaran belanja (*budget*), pencatatan transaksi (*expenses*), dan konversi multi-mata uang.*
+
+---
+
+## 4. Referensi Teknis Pendukung & Log Evolusi
+
+* 🖼️ **[Arsitektur Sistem Modal Dialog](technical/Modal_System_Architecture.md)** — Pola perancangan dialog pop-up modular di frontend.
+* 🔐 **[Log Perbaikan Autentikasi](technical/Authentication_Fix_Log.md)** — Rekam jejak resolusi rute terproteksi Sanctum.
+* 📦 **[Panduan Data Seeder](technical/Book_Seeder_Guide.md)** — Mekanisme injeksi dataset buku katalog awal.
+* 📈 **[Laporan Refactoring & Evolusi](history/Progress_Report.md)** — Laporan tahapan refactoring modularisasi kode.
