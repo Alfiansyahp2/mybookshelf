@@ -46,7 +46,16 @@ Seluruh dokumen di bawah ini ditulis secara spesifik berdasarkan basis kode aktu
 
 ---
 
-## 4. Referensi Implementasi & Riwayat Evolusi (`technical/` & `history/`)
+## 4. Audit & Rencana Perbaikan (`improvement/`)
+
+* 🔍 **[Ringkasan Audit & Matriks Prioritas](improvement/INDEX.md)** — Ringkasan eksekutif seluruh temuan codebase beserta skala prioritas P0–P3.
+* ⚙️ **[Rencana Perbaikan Backend](improvement/BACKEND_IMPROVEMENTS.md)** — Bug macro error HTTP, celah IDOR validasi FK, `BookObserver`, dan manajemen aset cover.
+* ⚛️ **[Rencana Perbaikan Frontend](improvement/FRONTEND_IMPROVEMENTS.md)** — Endpoint `useRooms`, halaman stub, 193 warning `oxlint`, 59 tipe `any`, 66 `console.*`, dan code-splitting bundle.
+* 🛡️ **[Perbaikan Infrastruktur, DB, & Testing](improvement/INFRA_DB_AND_QUALITY_IMPROVEMENTS.md)** — Sinkronisasi `.env.example` ke PostgreSQL, CORS/Sanctum env, automated tests, dan CI/CD hardening.
+
+---
+
+## 5. Referensi Implementasi & Riwayat Evolusi (`technical/` & `history/`)
 
 * 🔗 **[Ringkasan Implementasi API](technical/API_Implementation.md)** — Status implementasi backend/frontend API v1 terkini.
 * 🖼️ **[Arsitektur Sistem Modal](technical/Modal_System_Architecture.md)** — Spesifikasi implementasi aktual seluruh modal dialog (`BookDetailModal`, `EditBookModal`, `AddBookModal`, `AddShelfModal`, dll.).
