@@ -1,92 +1,97 @@
 # Project Structure & Codebase Organization
 ## MyBookshelf Engineering Blueprint
 
-Dokumen ini memetakan susunan pohon direktori (*directory tree*) dari proyek **MyBookshelf**, menguraikan batasan arsitektur antara backend dan frontend, serta menjelaskan tanggung jawab setiap modul.
+Dokumen ini memetakan susunan pohon direktori aktual proyek **MyBookshelf**, menjelaskan pemisahan backend Laravel 12 dan frontend React 19, serta tanggung jawab spesifik masing-masing modul.
 
 ---
 
-## 1. Ikhtisar Struktur Monorepo
-
-MyBookshelf disusun dalam struktur terisolasi (*Decoupled Repository*), di mana direktori root difungsikan sebagai rumah dari backend Laravel 12 API, sementara aplikasi klien SPA berada mandiri di dalam folder `frontend/`.
+## 1. Struktur Root & Monorepo Terpisah
 
 ```text
 mybookshelf/
-├── app/                      # Backend Core Logic (Laravel 12)
-│   ├── Http/Controllers/Api/V1/ # RESTful API Controllers
-│   └── Models/               # Eloquent Models (Active Record)
-├── bootstrap/                # Application bootstrap & providers
-├── config/                   # Konfigurasi sistem (database, auth, cors)
+├── app/
+│   ├── Console/Commands/
+│   │   └── SyncBookExpensesCommand.php      # CLI: accounting:sync-books
+│   ├── Helpers/
+│   │   └── Response macros.php              # PHPDoc helper untuk Response::success / error
+│   ├── Http/
+│   │   ├── Controllers/Api/V1/              # 13 Controller API versi 1
+│   │   └── Resources/Api/V1/                # BookResource, ShelfResource, RoomResource, CollectionResource, BookCollection
+│   ├── Models/                              # 13 Model Eloquent (UUID PKs + casts + relasi)
+│   ├── Observers/
+│   │   └── BookObserver.php                 # Sinkronisasi otomatis purchase_price ke tabel expenses
+│   ├── Providers/
+│   │   └── AppServiceProvider.php           # Registrasi BookObserver & Response::macro
+│   └── Services/                            # 5 Service bisnis (Book, ReadingSession, Expense, Budget, CurrencyRate)
+├── bootstrap/
+│   └── app.php                              # Konfigurasi routing, Sanctum SPA middleware, & JSON exceptions
+├── config/
+│   ├── cors.php                             # Whitelist origin frontend & supports_credentials: true
+│   └── sanctum.php                          # Stateful domains & guard web
 ├── database/
-│   ├── factories/            # Model factories untuk testing
-│   ├── migrations/           # Skema database version-controlled
-│   └── seeders/              # Seeder data buku awal
-├── docs/                     # Repositori Dokumentasi & Spesifikasi Teknis
-│   ├── architecture/         # Blueprint arsitektur & rekam keputusan (ADRs)
-│   ├── features/             # Panduan fitur pengguna
-│   ├── history/              # Catatan log refactoring & evolusi
-│   ├── specifications/       # Spesifikasi skema database, API, & UI/UX
-│   └── INDEX.md              # Master indeks dokumentasi
-├── frontend/                 # Client Web Application (React 19 + TypeScript)
-│   ├── public/               # Asset statis (favicon, icons, textures)
+│   ├── factories/
+│   ├── migrations/                          # 28 berkas migrasi PostgreSQL (Core + Accounting)
+│   └── seeders/
+├── docs/                                    # Dokumentasi teknis & cetak biru arsitektur
+│   ├── architecture/                        # SYSTEM_ARCHITECTURE.md, DECISION_RECORDS.md
+│   ├── features/                            # Panduan fitur pengguna
+│   ├── history/                             # Catatan evolusi & refactoring
+│   ├── specifications/                      # Spec Backend, Frontend, DB, API, UI/UX, & Struktur
+│   ├── technical/                           # Catatan implementasi teknis & seeder
+│   └── INDEX.md                             # Indeks pusat dokumentasi
+├── frontend/                                # Client SPA (React 19 + TypeScript + Vite 8)
 │   ├── src/
-│   │   ├── components/       # Komponen UI modular
-│   │   │   ├── accounting/   # Widget pembukuan keuangan & anggaran
-│   │   │   ├── assets/       # Kartu katalog & elemen visual
-│   │   │   ├── dashboard/    # Seksi ringkasan analitik beranda
-│   │   │   ├── landing/      # Komponen presentasi visual Landing Page
-│   │   │   ├── layout/       # AppHeader, AppLayout, Navbar, Notifikasi
-│   │   │   ├── modals/       # Dialog pop-up buku, rak, dan kalender
-│   │   │   ├── reading/      # Komponen pelacak sesi & target baca
-│   │   │   ├── shelf/        # Engine visualisasi rak 3D & drag-and-drop
-│   │   │   └── ui/           # Atom komponen generik (jam, kalender, toggle)
-│   │   ├── hooks/            # Custom hooks & TanStack Query integrations
-│   │   ├── lib/              # Client API wrapper (Axios instance)
-│   │   ├── pages/            # Komponen rute halaman utama
-│   │   ├── store/            # State management lokal (Zustand)
-│   │   ├── types/            # TypeScript Interface & Type Definitions
-│   │   ├── App.css           # Styling spesifik aplikasi
-│   │   ├── App.tsx           # Router view & provider tree
-│   │   ├── index.css         # Tailwind directives & CSS custom variables
-│   │   └── main.tsx          # Client entrypoint bootstrapping
-│   ├── package.json          # Dependensi frontend & script build Vite
-│   ├── tailwind.config.js    # Konfigurasi token warna kustom Tailwind
-│   ├── tsconfig.json         # Konfigurasi compiler TypeScript
-│   └── vite.config.ts        # Konfigurasi bundler Vite
+│   │   ├── components/
+│   │   │   ├── accounting/                  # AccountingDashboard, BudgetTracker, CategoryManager, ExpenseList/Modal, Chart
+│   │   │   ├── assets/                      # WishlistCard
+│   │   │   ├── auth/                        # ProtectedRoute, LoginForm, RegisterForm, AuthLeftPage, AuthDecoration
+│   │   │   ├── book-details/                # BookDetailLeftPage, BookDetailRightPage, sub-komponen timer & sesi
+│   │   │   ├── dashboard/                   # DashboardHeroSection, StatCards, Charts, Goals, Authors, Activity, Widgets
+│   │   │   ├── decorations/                 # DecorationPicker, DecorationSystem (15 jenis dekorasi rak)
+│   │   │   ├── landing/                     # InteractiveBookDemo, DesktopBookShelf, MobileBookShelf, AmbientParticles, Comets, UFO
+│   │   │   ├── layout/                      # AppLayout, AppHeader, MobileMenu, SearchBar, NotificationCenter, CatchAll
+│   │   │   ├── modals/                      # AddBookModal, AddWishlistBookModal, BookDetailModal, DemoBookDetailModal, EditBookModal, ReadingCalendarModal
+│   │   │   ├── reading/                     # YearlyTargetCards
+│   │   │   ├── shelf/                       # Bookshelf, SortableShelf, Shelf, Book, LightingControl, Add/EditShelfModal
+│   │   │   │   ├── book-elements/           # BookSpine, BookTooltip, bookConstants, useBookInteraction
+│   │   │   │   ├── lighting-control/        # BrightnessControl, ColorTempSelector, LightingControlPanel, LightingHeader, TableLampButton
+│   │   │   │   └── shelf-elements/          # ShelfWoodFrame, ShelfBooksTrack, ShelfInfoBar, DeleteShelfModal, shelfConstants, useShelfScroll
+│   │   │   ├── ui/                          # BigDigitalClock, FlipCalendar, LayoutPicker, ToastContainer
+│   │   │   └── SEO.tsx                      # Helmet meta & page title wrapper
+│   │   ├── constants/                       # editorialBooks, genres, dll.
+│   │   ├── hooks/                           # useBooks, useShelves, useReadingSessions, useAccounting/*, useLighting, useAchievementTracker, useYearlyStats, dll.
+│   │   ├── lib/
+│   │   │   ├── api/                         # accounting.ts, achievements.ts, auth.ts, books.ts (transformBook), readingSessions.ts, statistics.ts
+│   │   │   ├── apiClient.ts                 # Axios instance + CSRF X-XSRF-TOKEN interceptor
+│   │   │   ├── reactQuery.ts                # Konfigurasi QueryClient global
+│   │   │   └── ReactQueryProvider.tsx
+│   │   ├── locales/                         # en/translation.json & id/translation.json
+│   │   ├── pages/                           # 16 komponen halaman (Landing, Login, Dashboard, Library, Reading, Wishlist, Accounting, dll.)
+│   │   ├── store/                           # Zustand: useBookstore.ts & useThemeStore.ts
+│   │   ├── types/                           # TypeScript interfaces: accounting, app, book, collection, decorations, shelf
+│   │   ├── App.tsx                          # BrowserRouter & konfigurasi rute publik/terproteksi
+│   │   ├── i18n.ts                          # Setup i18next + LanguageDetector
+│   │   └── index.css                        # Tailwind base & variabel warna global (--color-cream, --color-walnut, dll.)
+│   ├── package.json
+│   ├── tailwind.config.js                   # Pemetaan warna kustom (cream, darkBrown, walnut, gold, beige, night.*)
+│   ├── vercel.json                          # Konfigurasi SPA rewrite Vercel untuk folder frontend
+│   └── vite.config.ts
 ├── routes/
-│   ├── api.php               # Rute endpoint RESTful API v1
-│   └── web.php               # Rute dasar web server
-├── tests/                    # Pengujian unit & fitur backend (PHPUnit)
-├── .env                      # Konfigurasi environment lokal
-├── composer.json             # Dependensi PHP backend & script artisan
-└── README.md                 # Ringkasan cepat proyek
+│   ├── api.php                              # Definisi rute /api/health & /api/v1/*
+│   ├── console.php
+│   └── web.php
+├── tests/                                   # PHPUnit 11 Feature & Unit tests
+├── composer.json                            # Script setup, dev (concurrently 4 proses), test
+├── vercel.json                              # Konfigurasi monorepo Vercel pointing ke frontend/dist
+└── README.md
 ```
 
 ---
 
-## 2. Tanggung Jawab Modul Backend (`app/`)
+## 2. Alur Eksekusi & Development Workflow (`composer.json`)
 
-* **`app/Http/Controllers/Api/V1/`**:
-  * Mengonsumsi request HTTP, memvalidasi payload, mengeksekusi logika bisnis, dan mengembalikan respons JSON terstandardisasi.
-  * Bersifat *stateless* dan diproteksi middleware autentikasi Sanctum.
-* **`app/Models/`**:
-  * Mengelola relasi data antar entitas (contoh: `Book.php` memiliki relasi `belongsTo(Shelf::class)` dan `hasMany(ReadingSession::class)`).
-  * Menyediakan casting tipe data atribut (contoh: casting `decorations` menjadi `array` JSON).
-
----
-
-## 3. Tanggung Jawab Modul Frontend (`frontend/src/`)
-
-### 3.1. Pembagian Komponen (`src/components/`)
-1. **`shelf/`**:
-   * Jantung visual aplikasi MyBookshelf. Mengelola rendering rak kayu jati (`ShelfWoodFrame`), track peletakan buku (`ShelfBooksTrack`), punggung buku prosedural (`BookSpine`), panel kendali pencahayaan (`LightingControl`), dan logika drag-and-drop `@dnd-kit`.
-2. **`dashboard/`**:
-   * Menampilkan wawasan analitik komprehensif: kartu ringkasan buku aktif, grafik distribusi genre via Recharts, dan target tahunan.
-3. **`layout/`**:
-   * Kerangka tata letak terpusat (`AppLayout.tsx`) yang membungkus header dinamis (`AppHeader.tsx`), drawer menu mobile, dan sistem notifikasi toast.
-4. **`modals/`**:
-   * Dialog modal terisolasi untuk melihat detail buku fisik, mengedit metadata, menambah rak baru, atau mengatur timer sesi membaca.
-
-### 3.2. Data & State Pipeline
-* **`src/lib/api/`**: Modul komunikasi jaringan berbasis instance Axios yang secara otomatis menyisipkan Bearer token dari storage lokal pada setiap request.
-* **`src/hooks/`**: Membungkus panggilan API ke dalam *query* dan *mutation* TanStack Query, menyediakan data reaktif, indikator loading, penanganan error, dan invalidasi cache otomatis.
-* **`src/store/`**: Mengelola state transient UI (seperti ID buku yang sedang dibuka di modal detail) menggunakan Zustand tanpa overhead rendering yang tidak perlu.
+Skrip `composer dev` menjalankan 4 proses secara paralel via `npx concurrently`:
+1. `php artisan serve` — Backend API Server Laravel.
+2. `php artisan queue:listen --tries=1 --timeout=0` — Worker antrean job background.
+3. `php artisan pail --timeout=0` — Log streaming terminal real-time.
+4. `npm run dev` — Vite asset watcher (atau `cd frontend && npm run dev` untuk SPA frontend port `5173`).

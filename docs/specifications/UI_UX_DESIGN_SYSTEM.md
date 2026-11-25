@@ -1,119 +1,120 @@
 # UI/UX & Design System Specification
 ## MyBookshelf Engineering Blueprint
 
-Dokumen ini mendokumentasikan spesifikasi desain visual, sistem token warna, geometri rak 3D, pemodelan matematis punggung buku (*book spine*), dan tipografi pada antarmuka pengguna **MyBookshelf**.
+Dokumen ini mendokumentasikan sistem desain visual aktual pada **MyBookshelf**, mencakup isolasi tema ganda (*Dual-Theme*), token warna Tailwind & CSS variables, geometri rak 3D, fisika animasi punggung buku, kendali pencahayaan lampu meja, serta katalog dekorasi rak.
 
 ---
 
-## 1. Filosofi Desain: The Tactile Reading Sanctuary
+## 1. Arsitektur Dual-Theme (Isolasi Warna Ketat)
 
-Antarmuka MyBookshelf mengusung konsep **Sanctuary Pembaca Fisik** yang diwujudkan secara digital:
-* **Kehangatan Material Alami:** Menggunakan rona kayu jati (*warm teak*), kenari (*walnut*), dan kertas krem (*warm ivory*) untuk menciptakan ruang baca yang tenang tanpa distraksi cahaya biru dingin.
-* **Taktil & Skeuomorfisme Modern:** Buku dan rak memiliki tekstur serat kain tenun (*canvas weave*), pantulan cahaya lembut, dan bayangan realistis tanpa membebani performa browser.
-* **Pemisahan Suasana (Dual-Theme):**
-  * **Landing Page:** Nuansa *Celestial Midnight* (biru langit malam kosmik) untuk memukau pengunjung pertama kali.
-  * **Aplikasi Utama (Dashboard, Library, Reading, Wishlist):** Nuansa *Warm Wood & Parchment* (100% bebas dari warna biru slate).
+Aplikasi menerapkan dua identitas visual yang dipisahkan secara tegas berdasarkan area halaman:
 
----
-
-## 2. Token Warna & Variabel Desain
-
-### 2.1. Variabel Global Aplikasi Utama (`frontend/src/index.css`)
+### 1.1. Tema Aplikasi Utama: *Warm Wood & Ivory Sanctuary*
+Digunakan di seluruh halaman kerja internal (`/dashboard`, `/library`, `/reading`, `/wishlist`, `/accounting`, dll.) dengan fokus warna cokelat kayu hangat tanpa bias warna biru dingin (`frontend/src/index.css` & `tailwind.config.js`):
 
 ```css
 :root {
-    --color-cream: #F8F5F0;          /* Warm Ivory Linen (Latar belakang utama aplikasi) */
+    --color-cream: #f8f5f0;          /* Warm Ivory Linen — background aplikasi */
     --color-cream-rgb: 248 245 240;
-    
-    --color-dark-brown: #4A3B2F;     /* Deep Espresso (Teks judul & elemen penegas) */
+    --color-dark-brown: #4a3b2f;     /* Deep Espresso — teks utama & heading */
     --color-dark-brown-rgb: 74 59 47;
-    
-    --color-walnut: #7A5C42;         /* Warm Walnut (Border, tombol utama, sub-teks) */
+    --color-walnut: #7a5c42;         /* Warm Walnut — tombol aksi, border, sub-teks */
     --color-walnut-rgb: 122 92 66;
-    
-    --color-gold: #D4A574;           /* Warm Amber Teak (Highlight emas & status bintang) */
+    --color-gold: #d4a574;           /* Warm Amber Teak — highlight & aksen */
     --color-gold-rgb: 212 165 116;
-    
-    --color-beige: #E8E0D5;          /* Warm Paper Beige (Divider & kartu statistik) */
+    --color-beige: #e8e0d5;          /* Warm Paper Beige — divider & border lembut */
     --color-beige-rgb: 232 224 213;
 }
 ```
 
-### 2.2. Mode Gelap Aplikasi Utama (*Mahogany Nightfall*)
-Berbeda dari dark mode biasa yang menggunakan hitam keabuan atau navy, MyBookshelf menggunakan latar kayu mahoni pekat:
-* **Body Background:** `#1A1612` *(Deep Mahogany Wood)*
-* **Surface Cards:** `#201A14` *(Dark Walnut Surface)*
-* **Card Borders:** `rgba(122, 92, 66, 0.25)` *(Subtle Walnut Border)*
-* **Primary Text:** `#F8F5F0` *(Warm Parchment)*
+* **Dark Mode Internal (`html.dark body`):** Latar beralih ke kayu mahoni pekat `#1a1612` dengan permukaan kartu `#201a14` dan teks `#f8f5f0`, serta header kaca gelap `rgba(42, 26, 16, 0.9)`.
+* **Dinding Halaman `/reading` (`Reading.tsx`):** Menggunakan gradien plaster hangat `linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)` bertekstur garis linen halus (`opacity: 0.18`).
+* **Kartu Target Tahunan (`YearlyTargetCards.tsx`):** Header gradien mahoni `linear-gradient(135deg, #2b1810 0%, #3e2417 50%, #2b1810 100%)` dengan grid metrik responsif `sm:grid-cols-2 lg:grid-cols-4`.
 
-### 2.3. Palet Rak Kayu Jati (`shelfConstants.ts`)
+### 1.2. Tema Landing Page: *Celestial Midnight*
+Diisolasi secara eksklusif pada `LandingPage.tsx` dan `components/landing/*` serta token `night` di `tailwind.config.js`:
+* **Light Mode Landing:** `#f0f4f8` dengan teks `#0f172a`.
+* **Dark Mode Landing (`night`):** `base: #0a0e1a`, `surface: #131b2e`, `accent: #1e293b`, `text: #f1f5f9`, `muted: #94a3b8` disertai efek radial glow nebula (`indigo-500`, `purple-600`, `sky-500`) dan partikel `LibraryAmbientParticles`.
+
+---
+
+## 2. Geometri & Material Rak Kayu 3D
+
+Didefinisikan pada `frontend/src/components/shelf/shelf-elements/shelfConstants.ts` dan `Bookshelf.tsx`:
+
+### 2.1. Konstanta Dimensi Rak
+* `BOOK_AREA_H = 200` (px) — Tinggi ruang rongga peletakan buku.
+* `BOARD_H = 14` (px) — Ketebalan papan kayu horizontal rak.
+* `INFO_H = 32` (px) — Tinggi bilah informasi kapasitas & aksi di bawah papan.
+
+### 2.2. Palet Gradien Kayu Jati (`WOOD` & `FRAME`)
+* **Dinding Belakang Rak (`WOOD.back`):** `linear-gradient(180deg, #b8844a 0%, #a87038 50%, #926030 100%)`.
+* **Papan Rak (`WOOD.board`):** `linear-gradient(180deg, #d4a464 0%, #bc8c48 30%, #a07030 65%, #845020 100%)`.
+* **Panel Samping (`WOOD.side` / `sideR`):** `linear-gradient(to right, #6a4018 0%, #8a5a28 45%, #7a4e20 70%, #5a3410 100%)` dengan garis serat kayu pada koordinat `SIDE_GRAIN_Y = [14, 32, 52, 80, 115, 154, 186]`.
+* **Info Strip (`WOOD.info`):** `linear-gradient(180deg, #3a2008 0%, #2c1606 100%)`.
+* **Bingkai Lemari (`Bookshelf.tsx` `FRAME`):** `topRail`, `sideBar`, dan `basePlinth` bernuansa *medium honey-walnut*.
+
+---
+
+## 3. Dimensi Buku & Fisika Interaksi 3D
+
+Didefinisikan pada `frontend/src/components/shelf/book-elements/bookConstants.ts`, `Book.tsx`, dan `BookSpine.tsx`:
+
+### 3.1. Kalkulasi Dimensi Deterministik (`getBookDimensions`)
+Berbeda dari estimasi kontinyu, ukuran fisik punggung buku dipetakan melalui konstanta diskrit agar proporsi visual di rak tetap harmonis:
+
 ```typescript
-export const WOOD = {
-    // Dinding belakang rak: Tekstur kayu jati vertikal
-    back: "linear-gradient(180deg, #b8844a 0%, #a87038 50%, #926030 100%)",
-    backDark: "linear-gradient(180deg, #9a6e3a 0%, #8a5e2c 50%, #7a5025 100%)",
-    
-    // Papan atas rak tempat bertumpunya buku
-    board: "linear-gradient(180deg, #d4a464 0%, #bc8c48 30%, #a07030 65%, #845020 100%)",
-    
-    // Panel samping kiri & kanan rak (memberikan kedalaman 3D)
-    side:  "linear-gradient(to right, #6a4018 0%, #8a5a28 45%, #7a4e20 70%, #5a3410 100%)",
-    sideR: "linear-gradient(to left,  #6a4018 0%, #8a5a28 45%, #7a4e20 70%, #5a3410 100%)",
-    
-    // Jalur informasi di bawah papan rak
-    info: "linear-gradient(180deg, #3a2008 0%, #2c1606 100%)",
-} as const;
+export const HEIGHT_RATIO: Record<string, number> = {
+    short: 0.72,   // 144px jika bookAreaHeight = 200px
+    medium: 0.86,  // 172px
+    tall: 0.96,    // 192px
+};
+
+export const THICKNESS_PX: Record<string, number> = {
+    thin: 18,
+    regular: 26,
+    thick: 38,
+};
+// Default fallback: ratio = 0.86, bookW = 28px
 ```
 
----
-
-## 3. Geometri Rak & Fisika Buku 3D
-
-### 3.1. Dimensi Fisik Rak
-Konstanta baku rendering ruang rak didefinisikan pada `shelfConstants.ts`:
-* `BOOK_AREA_H = 200px`: Tinggi ruang rongga buku (*book cavity*).
-* `BOARD_H = 14px`: Ketebalan papan kayu rak.
-* `INFO_H = 32px`: Tinggi bilah informasi keterisian buku di bawah papan.
-
-### 3.2. Pemodelan Matematis Punggung Buku (*Book Spine*)
-
-Punggung buku dihitung secara prosedural berdasarkan ketebalan halaman fisik:
-
-$$\text{Spine Width (px)} = \text{clamp}(24\text{px},\, \text{pages} \times 0.08\text{px},\, 58\text{px})$$
-
-* **Buku tipis (< 150 halaman):** Dibatasi minimum $24\text{px}$ agar teks judul vertikal tetap terbaca dengan jelas.
-* **Buku tebal (> 700 halaman):** Dibatasi maksimum $58\text{px}$ agar tidak mendominasi ruang rak secara berlebih.
-
-#### Shading & Tekstur Permukaan Matte:
-Punggung buku disimulasikan menggunakan multi-layer CSS:
-1. **Gradien Pembengkokan Binding:**
-   ```css
-   linear-gradient(to right,
-       var(--c2) 0%,
-       rgba(0,0,0,0.14) 9%,
-       var(--c0) 18%,
-       var(--c1) 78%,
-       rgba(0,0,0,0.10) 93%,
-       var(--c2) 100%)
-   ```
-2. **Tekstur Serat Kain (*Canvas Weave*):**
-   Disusun dari dua lapis `repeating-linear-gradient` (0 derajat dan 90 derajat) dengan opasitas `0.14` untuk menciptakan sensasi raba kain jilid buku fisik.
+### 3.2. Tekstur Matte & Animasi Spring 3D
+* **Shader Punggung Buku (`BookSpine.tsx`):**
+  * Gradien 3-warna (`c0`, `c1`, `c2`) dengan penggelapan lipatan penjilidan di tepi kiri `9%` (`rgba(0,0,0,0.14)`) dan kanan `93%` (`rgba(0,0,0,0.10)`).
+  * Lapisan tekstur tenun kanvas (*canvas/cloth weave*) menggunakan dua `repeating-linear-gradient` (0° dan 90°, `opacity: 0.14`).
+* **Fisika Framer Motion (`Book.tsx`):**
+  * Menggunakan `transformStyle: "preserve-3d"`, `transformOrigin: "center bottom"`, dan transisi pegas `{ type: "spring", stiffness: 280, damping: 24 }`.
+  * **Hover State:** Mengangkat buku `y: -(bookAreaHeight * 0.06)` dan `scale: 1.02` (`zIndex: 40`).
+  * **Clicked State:** Menarik buku lebih tinggi `y: -(bookAreaHeight * 0.14)`, memutar `rotateY: 10`, dan `scale: 1.06` (`zIndex: 60`).
 
 ---
 
-## 4. Tipografi
+## 4. Sistem Pencahayaan & Dekorasi Rak
 
-Sistem tipografi MyBookshelf menggabungkan keanggunan literatur klasik dengan keterbacaan data modern:
+### 4.1. Lighting Engine (`frontend/src/hooks/useLighting.ts`)
+Menyediakan 5 preset temperatur warna strip LED di bagian atas rongga rak (persisted ke `mybookshelf_lighting`, default `on: true`, `brightness: 80`, `colorTemp: "warm"`):
 
-| Tipe Font | Family | Penggunaan | Karakteristik |
+| Preset | Strip Hex | Glow RGBA Prefix | Label UI |
 | :--- | :--- | :--- | :--- |
-| **Serif Literer** | `Playfair Display`, `Georgia`, `serif` | Judul Halaman, Nama Buku di Spine, Label Rak, Heading Kartu | Klasik, elegan, berbobot intelektual |
-| **Modern Sans** | `Inter`, `system-ui`, `sans-serif` | Angka Metrik, Deskripsi, Formulir, Tombol Aksi, Navigasi | Bersih, sangat mudah dibaca (*high legibility*) |
-| **Monospace** | `Courier New`, `monospace` | Timestamp sesi baca, kode identifikasi buku | Presisi teknis |
+| `warm` | `#FFB020` | `rgba(255,176,32,` | Warm |
+| `neutral` | `#FFD878` | `rgba(255,216,120,` | Netral |
+| `cool` | `#E8F4FF` | `rgba(220,240,255,` | Sejuk |
+| `rose` | `#FFB0C0` | `rgba(255,176,192,` | Rose |
+| `mint` | `#A0FFD0` | `rgba(160,255,208,` | Mint |
+
+### 4.2. Katalog Dekorasi (`frontend/src/types/decorations.ts`)
+Setiap rak memiliki slot `left` dan `right` yang mendukung **15 jenis dekorasi**:
+`candle`, `candle_pair`, `plant_pot`, `plant_hanging`, `vase_tall`, `vase_round`, `frame_photo`, `bookend_L`, `clock_small`, `clock_digital`, `mug`, `lantern`, `succulent`, `cat_sleep`, `cat_sit`.
 
 ---
 
-## 5. Sistem Grid Responsif
+## 5. Tipografi, Transisi Halaman, & Grid
 
-* **Rak Buku (`SortableShelf`):** Menggunakan sistem 12 kolom responsif (`grid-column: span var(--shelf-span, 12)`). Pada mobile selalu memenuhi 12 kolom, pada desktop dapat diatur 6 kolom (setengah lebar) atau 12 kolom (penuh).
-* **Kartu Target Membaca (`YearlyTargetCards`):** Menggunakan sistem grid dinamis `sm:grid-cols-2 lg:grid-cols-4 gap-3.5` pada tablet/desktop agar seluruh kartu terdistribusi simetris tanpa terpotong di tepi layar.
+* **Font Family (`tailwind.config.js`):**
+  * `serif`: `Playfair Display`, `Georgia`, `serif` (judul, nama buku, heading kartu).
+  * `sans`: `Inter`, `system-ui`, `sans-serif` (teks UI, metrik angka, form).
+  * `mono`: `Courier New`, `monospace`.
+* **Transisi Antar Halaman (`AppLayout.tsx`):** Animasi kubus/membalik halaman 3D dengan `perspective: "1200px"`, `transformOrigin: "50% 50% 50vw"`, dan `rotateY: -90 -> 0 -> 90` selama `0.6s`.
+* **Grid Responsif:**
+  * Rak buku (`SortableShelf`): Mendukung resize lebar kolom (`100%` / span 12, `50%` / span 6, `33%` / span 4, `25%` / span 3, `16%` / span 2) pada layar `md:` ke atas (`.sortable-shelf-grid`).
+  * Indikator okupansi rak (`getShelfCapacity`): Hijau `#34d399` (<70%), Kuning `#fbbf24` (70–89%), Merah `#f87171` (>=90%), mengabaikan buku berstatus `borrowed`.
