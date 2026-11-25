@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\BudgetService;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -81,7 +82,7 @@ class BudgetController extends Controller
             $budget = $this->budgetService->getBudget($id, Auth::id());
 
             return response()->success($budget, 'Budget retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::show failed');
@@ -114,7 +115,7 @@ class BudgetController extends Controller
             return response()->success($budget, 'Budget updated successfully');
         } catch (ValidationException $e) {
             return $this->validationErrorResponse($e);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::update failed');
@@ -130,7 +131,7 @@ class BudgetController extends Controller
             $this->budgetService->deleteBudget($id, Auth::id());
 
             return response()->success(null, 'Budget deleted successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::destroy failed');
@@ -146,7 +147,7 @@ class BudgetController extends Controller
             $progress = $this->budgetService->getBudgetProgress($id, Auth::id());
 
             return response()->success($progress, 'Budget progress retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::getProgress failed');
@@ -170,7 +171,7 @@ class BudgetController extends Controller
             $expenses = $this->budgetService->getExpensesForBudget($id, Auth::id(), $filters);
 
             return response()->success($expenses, 'Budget expenses retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::getExpenses failed');
@@ -186,7 +187,7 @@ class BudgetController extends Controller
             $budget = $this->budgetService->resetBudgetPeriod($id, Auth::id());
 
             return response()->success($budget, 'Budget period reset successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::resetPeriod failed');
@@ -257,7 +258,7 @@ class BudgetController extends Controller
             $trends = $this->budgetService->getBudgetPerformanceTrends($id, Auth::id());
 
             return response()->success($trends, 'Budget performance trends retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::getPerformanceTrends failed');

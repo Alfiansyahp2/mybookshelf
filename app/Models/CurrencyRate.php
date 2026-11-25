@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class CurrencyRate extends Model
 {
@@ -43,11 +43,11 @@ class CurrencyRate extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
-                    ->where('effective_date', '<=', now())
-                    ->where(function ($q) {
-                        $q->where('expires_at', '>', now())
-                          ->orWhereNull('expires_at');
-                    });
+            ->where('effective_date', '<=', now())
+            ->where(function ($q) {
+                $q->where('expires_at', '>', now())
+                    ->orWhereNull('expires_at');
+            });
     }
 
     /**
@@ -56,7 +56,7 @@ class CurrencyRate extends Model
     public function scopeForPair($query, $fromCurrency, $toCurrency = 'IDR')
     {
         return $query->where('from_currency', strtoupper($fromCurrency))
-                    ->where('to_currency', strtoupper($toCurrency));
+            ->where('to_currency', strtoupper($toCurrency));
     }
 
     /**
@@ -65,9 +65,9 @@ class CurrencyRate extends Model
     public static function getLatestRate(string $fromCurrency, string $toCurrency = 'IDR'): ?self
     {
         return static::active()
-                    ->forPair($fromCurrency, $toCurrency)
-                    ->orderBy('effective_date', 'desc')
-                    ->first();
+            ->forPair($fromCurrency, $toCurrency)
+            ->orderBy('effective_date', 'desc')
+            ->first();
     }
 
     /**
@@ -81,7 +81,7 @@ class CurrencyRate extends Model
 
         $rate = static::getLatestRate($fromCurrency, $toCurrency);
 
-        if (!$rate) {
+        if (! $rate) {
             // If no rate found, return 0 or throw exception
             return 0;
         }
@@ -94,7 +94,7 @@ class CurrencyRate extends Model
      */
     public function getFormattedRateAttribute(): string
     {
-        return '1 ' . $this->from_currency . ' = ' . number_format($this->rate, 4, ',', '.') . ' ' . $this->to_currency;
+        return '1 '.$this->from_currency.' = '.number_format($this->rate, 4, ',', '.').' '.$this->to_currency;
     }
 
     /**
@@ -112,6 +112,6 @@ class CurrencyRate extends Model
     {
         return $this->is_active &&
                $this->effective_date->isPast() &&
-               !$this->isExpired();
+               ! $this->isExpired();
     }
 }

@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\CurrencyRateService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class CurrencyController extends Controller
@@ -48,7 +47,7 @@ class CurrencyController extends Controller
                 $validated['to_currency'] ?? 'IDR'
             );
 
-            if (!$rate) {
+            if (! $rate) {
                 return $this->notFoundResponse('Currency rate not found');
             }
 
@@ -211,7 +210,7 @@ class CurrencyController extends Controller
 
             $currencyInfo = $this->currencyRateService->getCurrencyInfo($validated['currency_code']);
 
-            if (!$currencyInfo) {
+            if (! $currencyInfo) {
                 return $this->notFoundResponse('Currency not found');
             }
 

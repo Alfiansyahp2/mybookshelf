@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Book;
 use App\Models\Collection;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -46,7 +47,7 @@ class CollectionSeeder extends Seeder
             // Note: We'll need to attach by UUID after books are created
             if ($coll->name === 'Personal Development') {
                 // Get the books that match Personal Development genre
-                $pdBooks = \App\Models\Book::whereIn('genre', ['Self-Help', 'Finance', 'Productivity', 'Business'])
+                $pdBooks = Book::whereIn('genre', ['Self-Help', 'Finance', 'Productivity', 'Business'])
                     ->get();
 
                 foreach ($pdBooks as $book) {

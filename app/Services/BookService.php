@@ -34,9 +34,9 @@ class BookService
             $searchTerm = $filters['search'];
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'ilike', "%{$searchTerm}%")
-                  ->orWhere('author', 'ilike', "%{$searchTerm}%")
-                  ->orWhere('genre', 'ilike', "%{$searchTerm}%")
-                  ->orWhere('isbn', 'ilike', "%{$searchTerm}%");
+                    ->orWhere('author', 'ilike', "%{$searchTerm}%")
+                    ->orWhere('genre', 'ilike', "%{$searchTerm}%")
+                    ->orWhere('isbn', 'ilike', "%{$searchTerm}%");
             });
         }
 
@@ -76,6 +76,7 @@ class BookService
             $this->createTimelineEvent($book, 'added', 'Book added to library');
 
             DB::commit();
+
             return $book->load(['shelf', 'collections']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -135,6 +136,7 @@ class BookService
     {
         $book = $this->findOwnedBook($id, $userId);
         $book->delete();
+
         return true;
     }
 
@@ -166,7 +168,7 @@ class BookService
 
         $readDates = $book->read_dates ?? [];
         $today = now()->format('Y-m-d');
-        if (!in_array($today, $readDates)) {
+        if (! in_array($today, $readDates)) {
             $readDates[] = $today;
             usort($readDates, function ($a, $b) {
                 return strtotime($b) - strtotime($a);
@@ -210,17 +212,17 @@ class BookService
         if ($progress >= 100 && $book->status !== 'finished') {
             $data['status'] = 'finished';
             $data['finished_date'] = now();
-            
+
             $readDates = $book->read_dates ?? [];
             $today = now()->toDateString();
-            if (!in_array($today, $readDates)) {
+            if (! in_array($today, $readDates)) {
                 $readDates[] = $today;
-                usort($readDates, function($a, $b) {
+                usort($readDates, function ($a, $b) {
                     return strtotime($b) - strtotime($a);
                 });
             }
             $data['read_dates'] = $readDates;
-            
+
             $this->createTimelineEvent($book, 'finished', 'Finished reading');
         }
 
@@ -240,7 +242,7 @@ class BookService
         $book = $this->findOwnedBook($id, $userId);
 
         $book->update([
-            'favorite' => !$book->favorite,
+            'favorite' => ! $book->favorite,
             'last_modified' => now(),
         ]);
 
@@ -440,6 +442,7 @@ class BookService
             $this->createTimelineEvent($book, 'started', 'Started reading again');
 
             DB::commit();
+
             return $book->fresh()->load(['shelf', 'collections']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -471,7 +474,7 @@ class BookService
         if ($progress >= 100 && $book->status !== 'finished') {
             $readDates = $book->read_dates ?? [];
             $today = now()->format('Y-m-d');
-            if (!in_array($today, $readDates)) {
+            if (! in_array($today, $readDates)) {
                 $readDates[] = $today;
                 usort($readDates, function ($a, $b) {
                     return strtotime($b) - strtotime($a);

@@ -22,6 +22,7 @@ class ShelfController extends Controller
             ->orderBy('order')
             ->latest()
             ->get();
+
         return response()->success($shelves, 'Shelves retrieved successfully');
     }
 
@@ -65,6 +66,7 @@ class ShelfController extends Controller
         $shelf = Shelf::with(['room', 'books'])
             ->where('user_id', $request->user()->id)
             ->findOrFail($id);
+
         return response()->success($shelf, 'Shelf retrieved successfully');
     }
 
@@ -157,6 +159,7 @@ class ShelfController extends Controller
 
         return response()->success($occupancy, 'Occupancy retrieved successfully');
     }
+
     /**
      * Batch update shelf layout (span and order).
      */
@@ -177,7 +180,7 @@ class ShelfController extends Controller
                 ->where('user_id', $userId)
                 ->update([
                     'order' => $shelfData['order'],
-                    'span' => $shelfData['span']
+                    'span' => $shelfData['span'],
                 ]);
         }
 

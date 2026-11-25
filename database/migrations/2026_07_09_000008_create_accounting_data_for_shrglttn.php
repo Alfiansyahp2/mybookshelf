@@ -18,7 +18,7 @@ return new class extends Migration
 
         // Check if user exists
         $user = DB::table('users')->where('id', $shrglttnUserId)->first();
-        if (!$user) {
+        if (! $user) {
             return; // User doesn't exist, skip
         }
 

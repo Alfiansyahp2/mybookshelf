@@ -3,8 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Book;
-use App\Models\User;
 use App\Models\Shelf;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -48,7 +48,7 @@ class BookDetailSeeder extends Seeder
                 'progress' => 48.75,
                 'started_date' => '2024-05-15 10:00:00',
                 'personal_rating' => 4.5,
-                'personal_notes' => "Excellent book on building good habits and breaking bad ones. The 1% better every day concept is really powerful. Love the practical actionable advice.
+                'personal_notes' => 'Excellent book on building good habits and breaking bad ones. The 1% better every day concept is really powerful. Love the practical actionable advice.
 
 Key takeaways:
 - Focus on systems rather than goals
@@ -56,7 +56,7 @@ Key takeaways:
 - Environment design matters more than motivation
 - Tracking habits helps maintain consistency
 
-Already implemented the habit stacking technique in my morning routine.",
+Already implemented the habit stacking technique in my morning routine.',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 0,
                 'date_added' => '2024-05-01 00:00:00',
@@ -88,11 +88,11 @@ Already implemented the habit stacking technique in my morning routine.",
                 'progress' => 100.00,
                 'started_date' => '2024-06-01 14:30:00',
                 'personal_rating' => 5.0,
-                'personal_notes' => "Kisah romansa hangat dan menyentuh berlatar belakang sudut kota Yogyakarta di malam hari. Penulisan emosional yang menyentuh hati tentang kesempatan kedua, menyembuhkan luka masa lalu, dan kehangatan hubungan manusia.
+                'personal_notes' => 'Kisah romansa hangat dan menyentuh berlatar belakang sudut kota Yogyakarta di malam hari. Penulisan emosional yang menyentuh hati tentang kesempatan kedua, menyembuhkan luka masa lalu, dan kehangatan hubungan manusia.
 
 Karakter-karakternya terasa sangat nyata dan relatable. Penggambaran suasana Malioboro di malam hari menghadirkan nostalgia yang begitu mendalam.
 
-Sangat direkomendasikan bagi siapa saja yang menyukai novel romansa Indonesia bertema penyembuhan emosional dan suasana kota Jogja.",
+Sangat direkomendasikan bagi siapa saja yang menyukai novel romansa Indonesia bertema penyembuhan emosional dan suasana kota Jogja.',
                 'cover_image' => '/covers/malioboro-at-midnight.jpg',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 1,
@@ -160,9 +160,9 @@ Changing my view on investment strategy - focusing more on long-term sustainabil
                 'started_date' => '2024-01-01 00:00:00',
                 'finished_date' => '2024-01-20 00:00:00',
                 'personal_rating' => 5.0,
-                'personal_notes' => "Kisah psikiater Viktor Frankl selama masa tahanan di kamp konsentrasi Nazi. Dari pengalaman pahit tersebut, Frankl melahirkan Logoterapi: pendorong utama manusia bukanlah kesenangan, melainkan pencarian makna hidup.
+                'personal_notes' => 'Kisah psikiater Viktor Frankl selama masa tahanan di kamp konsentrasi Nazi. Dari pengalaman pahit tersebut, Frankl melahirkan Logoterapi: pendorong utama manusia bukanlah kesenangan, melainkan pencarian makna hidup.
 
-\"He who has a why to live can bear almost any how.\"",
+"He who has a why to live can bear almost any how."',
                 'cover_image' => '/covers/mans-search-for-meaning.jpg',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 3,
@@ -235,9 +235,9 @@ Essential reading for understanding the importance of truth and individual freed
                 'started_date' => '2024-02-01 00:00:00',
                 'finished_date' => '2024-03-15 00:00:00',
                 'personal_rating' => 5.0,
-                'personal_notes' => "Sebuah memoar yang mengharukan tentang hubungan antara Mitch Albom dan mantan profesor sosiologinya, Morrie Schwartz, yang menderita ALS. Pertemuan setiap hari Selasa memberikan pelajaran hidup paling berharga tentang cinta, pekerjaan, penuaan, dan kematian.
+                'personal_notes' => 'Sebuah memoar yang mengharukan tentang hubungan antara Mitch Albom dan mantan profesor sosiologinya, Morrie Schwartz, yang menderita ALS. Pertemuan setiap hari Selasa memberikan pelajaran hidup paling berharga tentang cinta, pekerjaan, penuaan, dan kematian.
 
-\"The most important thing in life is to learn how to give out love, and to let it come in.\"",
+"The most important thing in life is to learn how to give out love, and to let it come in."',
                 'cover_image' => '/covers/tuesdays-with-morrie.jpg',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 4,
@@ -349,9 +349,9 @@ Changed how I think about human progress and the cost of civilization. Some cont
                 'started_date' => '2024-01-01 00:00:00',
                 'finished_date' => '2024-02-01 00:00:00',
                 'personal_rating' => 5.0,
-                'personal_notes' => "Sebuah panduan psikologi dan memoar reflektif tentang duka, kehilangan, serta proses penyembuhan diri melalui tindakan-tindakan sederhana sehari-hari seperti mencuci piring.
+                'personal_notes' => 'Sebuah panduan psikologi dan memoar reflektif tentang duka, kehilangan, serta proses penyembuhan diri melalui tindakan-tindakan sederhana sehari-hari seperti mencuci piring.
 
-Duka tidak harus diselesaikan sekaligus; kadang ia hanya butuh diterima satu piring bersih demi satu piring bersih.",
+Duka tidak harus diselesaikan sekaligus; kadang ia hanya butuh diterima satu piring bersih demi satu piring bersih.',
                 'cover_image' => '/covers/seorang-pria-yang-melalui-duka-dengan-mencuci-piring.jpg',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 2,
@@ -381,11 +381,11 @@ Duka tidak harus diselesaikan sekaligus; kadang ia hanya butuh diterima satu pir
                 'started_date' => '2024-02-01 00:00:00',
                 'finished_date' => '2024-03-01 00:00:00',
                 'personal_rating' => 5.0,
-                'personal_notes' => "Kisah kekejaman dan penghilangan paksa aktivis mahasiswa aktivis masa Orde Baru. Diceritakan dari dua sudut pandang: mereka yang diculik di tempat gelap dan keluarga yang kehilangan.
+                'personal_notes' => 'Kisah kekejaman dan penghilangan paksa aktivis mahasiswa aktivis masa Orde Baru. Diceritakan dari dua sudut pandang: mereka yang diculik di tempat gelap dan keluarga yang kehilangan.
 
 Sebuah novel sejarah yang sangat emosional, puitis, dan penting untuk terus merawat ingatan.
 
-\"Matilah engkau mati, kau akan lahir berkali-kali.\"",
+"Matilah engkau mati, kau akan lahir berkali-kali."',
                 'cover_image' => '/covers/laut-bercerita.jpg',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 3,
@@ -416,9 +416,9 @@ Sebuah novel sejarah yang sangat emosional, puitis, dan penting untuk terus mera
                 'started_date' => '2024-01-10 00:00:00',
                 'finished_date' => '2024-01-15 00:00:00',
                 'personal_rating' => 5.0,
-                'personal_notes' => "Kisah puitis seorang pangeran kecil yang mengembara dari planet ke planet, mengajarkan hakikat cinta, kesepian, persahabatan, dan hubungan manusia.
+                'personal_notes' => 'Kisah puitis seorang pangeran kecil yang mengembara dari planet ke planet, mengajarkan hakikat cinta, kesepian, persahabatan, dan hubungan manusia.
 
-\"It is only with the heart that one can see rightly; what is essential is invisible to the eye.\"",
+"It is only with the heart that one can see rightly; what is essential is invisible to the eye."',
                 'cover_image' => '/covers/the-little-prince.jpg',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 4,
@@ -451,13 +451,13 @@ Sebuah novel sejarah yang sangat emosional, puitis, dan penting untuk terus mera
                 'started_date' => '2023-10-01 00:00:00',
                 'finished_date' => '2023-12-05 00:00:00',
                 'personal_rating' => 4.0,
-                'personal_notes' => "Dense but incredibly insightful. Kahneman breaks down the two systems of thinking - System 1 (fast, intuitive) and System 2 (slow, deliberate).
+                'personal_notes' => 'Dense but incredibly insightful. Kahneman breaks down the two systems of thinking - System 1 (fast, intuitive) and System 2 (slow, deliberate).
 
-The cognitive biases explained are eye-opening: anchoring, availability heuristic, loss aversion, framing effects. \"Losses loom larger than gains\" - so true in decision-making.
+The cognitive biases explained are eye-opening: anchoring, availability heuristic, loss aversion, framing effects. "Losses loom larger than gains" - so true in decision-making.
 
 Prospect theory and how we make judgments under uncertainty. The ending about happiness and experiencing vs remembering self is profound.
 
-Academic in parts but the insights are invaluable for understanding human behavior.",
+Academic in parts but the insights are invaluable for understanding human behavior.',
                 'shelf_id' => $shelves->slice(1, 1)->first()->id,
                 'position' => 1,
                 'date_added' => '2023-09-25 00:00:00',
@@ -516,9 +516,9 @@ Supposedly has great science, humor, and an unlikely friendship. Can\'t wait to 
                 'thickness' => 'thin',
                 'status' => 'wishlist',
                 'favorite' => false,
-                'personal_notes' => "Interesting premise about a library between life and death where you can explore all the lives you could have lived.
+                'personal_notes' => 'Interesting premise about a library between life and death where you can explore all the lives you could have lived.
 
-Themes of regret, choices, and finding meaning. Sounds like a thought-provoking read about the paths not taken.",
+Themes of regret, choices, and finding meaning. Sounds like a thought-provoking read about the paths not taken.',
                 'shelf_id' => $shelves->slice(1, 1)->first()->id,
                 'position' => 3,
                 'date_added' => '2024-05-25 00:00:00',
@@ -576,9 +576,9 @@ Heard it\'s incredibly powerful and inspiring. Story about the importance of edu
                 'thickness' => 'thin',
                 'status' => 'unread',
                 'favorite' => false,
-                'personal_notes' => "Classic philosophical novel about following your dreams and personal legend.
+                'personal_notes' => 'Classic philosophical novel about following your dreams and personal legend.
 
-Short but supposedly very inspiring. \"When you want something, all the universe conspires in helping you to achieve it.\"",
+Short but supposedly very inspiring. "When you want something, all the universe conspires in helping you to achieve it."',
                 'shelf_id' => $shelves->slice(1, 1)->first()->id,
                 'position' => 5,
                 'date_added' => '2024-06-05 00:00:00',
@@ -611,11 +611,11 @@ Short but supposedly very inspiring. \"When you want something, all the universe
                 'started_date' => '2023-10-15 00:00:00',
                 'finished_date' => '2023-11-20 00:00:00',
                 'personal_rating' => 3.5,
-                'personal_notes' => "Simple but powerful concepts about assets vs liabilities, financial literacy, and mindset.
+                'personal_notes' => 'Simple but powerful concepts about assets vs liabilities, financial literacy, and mindset.
 
 The story format makes it accessible. Core message: make your money work for you rather than working for money.
 
-Some criticism for being light on specific advice but great for mindset shift. Good starting point for financial education.",
+Some criticism for being light on specific advice but great for mindset shift. Good starting point for financial education.',
                 'shelf_id' => $shelves->slice(2, 1)->first()->id,
                 'position' => 0,
                 'date_added' => '2023-10-05 00:00:00',
@@ -647,13 +647,13 @@ Some criticism for being light on specific advice but great for mindset shift. G
                 'started_date' => '2023-09-20 00:00:00',
                 'finished_date' => '2023-10-15 00:00:00',
                 'personal_rating' => 3.0,
-                'personal_notes' => "Some useful ideas about lifestyle design and automation, but feels dated and unrealistic for most people.
+                'personal_notes' => 'Some useful ideas about lifestyle design and automation, but feels dated and unrealistic for most people.
 
 The DEAL framework is interesting: Definition, Elimination, Automation, Liberation.
 
 Good sections on outsourcing and mini-retirements. Some of the income generation ideas are sketchy.
 
-Take what works and ignore the hype. Not a 4-hour work week for 99% of people but still has productivity gems.",
+Take what works and ignore the hype. Not a 4-hour work week for 99% of people but still has productivity gems.',
                 'shelf_id' => $shelves->slice(2, 1)->first()->id,
                 'position' => 1,
                 'date_added' => '2023-09-10 00:00:00',
@@ -685,13 +685,13 @@ Take what works and ignore the hype. Not a 4-hour work week for 99% of people bu
                 'started_date' => '2023-08-25 00:00:00',
                 'finished_date' => '2023-09-28 00:00:00',
                 'personal_rating' => 4.5,
-                'personal_notes' => "Excellent book on focused productivity in an age of constant distraction.
+                'personal_notes' => 'Excellent book on focused productivity in an age of constant distraction.
 
-Newport makes a compelling case for deep work: \"Professional activities performed in a state of distraction-free concentration that push your cognitive capabilities to their limit.\"
+Newport makes a compelling case for deep work: "Professional activities performed in a state of distraction-free concentration that push your cognitive capabilities to their limit."
 
 The four rules of deep work are practical: Work Deeply, Embrace Boredom, Quit Social Media, Drain the Shallows.
 
-Already implementing shutdown rituals and deep work blocks. This book actually delivers on its promises.",
+Already implementing shutdown rituals and deep work blocks. This book actually delivers on its promises.',
                 'shelf_id' => $shelves->slice(2, 1)->first()->id,
                 'position' => 2,
                 'date_added' => '2023-08-15 00:00:00',
@@ -724,9 +724,9 @@ Already implementing shutdown rituals and deep work blocks. This book actually d
                 'started_date' => '2023-12-01 00:00:00',
                 'finished_date' => '2024-01-15 00:00:00',
                 'personal_rating' => 5.0,
-                'personal_notes' => "Sebuah panduan psikologi Adlerian yang membuka wawasan tentang pentingnya menerima diri sendiri, membebaskan diri dari ekspektasi orang lain, dan menemukan keberanian untuk mencintai diri apa adanya.
+                'personal_notes' => 'Sebuah panduan psikologi Adlerian yang membuka wawasan tentang pentingnya menerima diri sendiri, membebaskan diri dari ekspektasi orang lain, dan menemukan keberanian untuk mencintai diri apa adanya.
 
-\"Accept yourself and everything changes... The courage to be happy starts with the courage to accept who you are.\"",
+"Accept yourself and everything changes... The courage to be happy starts with the courage to accept who you are."',
                 'cover_image' => '/covers/courage-to-like-yourself.jpg',
                 'shelf_id' => $shelves->slice(2, 1)->first()->id,
                 'position' => 3,
@@ -759,11 +759,11 @@ Already implementing shutdown rituals and deep work blocks. This book actually d
                 'progress' => 17.58,
                 'started_date' => '2024-06-20 10:30:00',
                 'personal_rating' => 3.5,
-                'personal_notes' => "Exploring the concept of starting with \"why\" - the purpose, cause, or belief that drives every organization and individual.
+                'personal_notes' => 'Exploring the concept of starting with "why" - the purpose, cause, or belief that drives every organization and individual.
 
 The Golden Circle: Why (center), How (middle), What (outer). Most companies start from the outside in; inspiring leaders start from the inside out.
 
-Some good examples with Apple, Martin Luther King Jr., and the Wright brothers. A bit repetitive but the core idea is solid.",
+Some good examples with Apple, Martin Luther King Jr., and the Wright brothers. A bit repetitive but the core idea is solid.',
                 'shelf_id' => $shelves->first()->id,
                 'position' => 3,
                 'date_added' => '2024-06-15 00:00:00',
@@ -811,6 +811,6 @@ Want to read for his perspectives on competition, power laws, and building the f
         }
 
         $this->command->info('Book detail seeder completed successfully.');
-        $this->command->info('Seeded ' . count($books) . ' books with detailed information including ratings and notes.');
+        $this->command->info('Seeded '.count($books).' books with detailed information including ratings and notes.');
     }
 }

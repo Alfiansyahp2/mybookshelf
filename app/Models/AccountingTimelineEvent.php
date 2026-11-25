@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Support\Str;
 
 class AccountingTimelineEvent extends Model
@@ -92,7 +92,7 @@ class AccountingTimelineEvent extends Model
     public function scopeRecent($query, $days = 30)
     {
         return $query->where('event_date', '>=', now()->subDays($days))
-                    ->orderBy('event_date', 'desc');
+            ->orderBy('event_date', 'desc');
     }
 
     /**
@@ -130,7 +130,7 @@ class AccountingTimelineEvent extends Model
             'budget_id' => $budgetId,
             'type' => 'budget_exceeded',
             'event_date' => now(),
-            'description' => "Budget '{$budget->name}' exceeded by " . number_format($budget->usage_percentage, 2) . "%",
+            'description' => "Budget '{$budget->name}' exceeded by ".number_format($budget->usage_percentage, 2).'%',
             'metadata' => array_merge($metadata, [
                 'budget_amount' => $budget->amount_base_currency,
                 'spent_amount' => $budget->total_spent,
@@ -152,7 +152,7 @@ class AccountingTimelineEvent extends Model
             'budget_id' => $budgetId,
             'type' => 'budget_alert',
             'event_date' => now(),
-            'description' => "Budget '{$budget->name}' is at " . number_format($budget->usage_percentage, 2) . "% capacity",
+            'description' => "Budget '{$budget->name}' is at ".number_format($budget->usage_percentage, 2).'% capacity',
             'metadata' => array_merge($metadata, [
                 'budget_amount' => $budget->amount_base_currency,
                 'spent_amount' => $budget->total_spent,
@@ -175,7 +175,7 @@ class AccountingTimelineEvent extends Model
             'expense_id' => $expenseId,
             'type' => 'payment_reminder',
             'event_date' => now(),
-            'description' => "Payment reminder for expense '{$expense->title}' due on " . ($expense->reminder_date ? $expense->reminder_date->format('Y-m-d') : 'N/A'),
+            'description' => "Payment reminder for expense '{$expense->title}' due on ".($expense->reminder_date ? $expense->reminder_date->format('Y-m-d') : 'N/A'),
             'metadata' => array_merge($metadata, [
                 'amount' => $expense->amount,
                 'currency' => $expense->currency,

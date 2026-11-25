@@ -7,9 +7,7 @@ use App\Services\ExpenseService;
 
 class BookObserver
 {
-    public function __construct(protected ExpenseService $expenseService)
-    {
-    }
+    public function __construct(protected ExpenseService $expenseService) {}
 
     /**
      * Handle the Book "saved" event (created and updated).

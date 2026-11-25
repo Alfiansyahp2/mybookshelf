@@ -6,6 +6,7 @@ use App\Models\Achievement;
 use App\Models\Book;
 use App\Models\CurrencyRate;
 use App\Models\Expense;
+use App\Models\Room;
 use App\Models\Shelf;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -229,5 +230,79 @@ class BookAndShelfWorkflowTest extends TestCase
         $this->postJson("/api/v1/achievements/{$achievement->id}/unlock")
             ->assertStatus(200)
             ->assertJsonPath('data.current', 5);
+    }
+
+    public function test_book_progress_move_shelf_and_batch_shelf_layout_update(): void
+    {
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $otherShelf = Shelf::create([
+            'id' => Str::uuid()->toString(),
+            'user_id' => $otherUser->id,
+            'room_id' => Room::create([
+                'id' => Str::uuid()->toString(),
+                'user_id' => $otherUser->id,
+                'name' => 'Other Room',
+                'order' => 0,
+                'unlocked' => true,
+            ])->id,
+            'name' => 'Other Shelf',
+            'capacity' => 10,
+            'order' => 5,
+            'span' => 12,
+        ]);
+
+        Sanctum::actingAs($owner);
+
+        $shelfAId = $this->postJson('/api/v1/shelves', [
+            'name' => 'Shelf A',
+            'capacity' => 20,
+            'order' => 0,
+            'span' => 12,
+        ])->assertStatus(201)->json('data.id');
+
+        $shelfBId = $this->postJson('/api/v1/shelves', [
+            'name' => 'Shelf B',
+            'capacity' => 20,
+            'order' => 1,
+            'span' => 12,
+        ])->assertStatus(201)->json('data.id');
+
+        $bookId = $this->postJson('/api/v1/books', [
+            'title' => 'Refactoring',
+            'author' => 'Martin Fowler',
+            'pages' => 200,
+            'shelf_id' => $shelfAId,
+        ])->assertStatus(201)->json('data.id');
+
+        $this->patchJson("/api/v1/books/{$bookId}/progress", [
+            'current_page' => 100,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.current_page', 100)
+            ->assertJsonPath('data.progress', '50.00');
+
+        $this->patchJson("/api/v1/books/{$bookId}/shelf", [
+            'shelf_id' => $shelfBId,
+            'position' => 2,
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas('books', [
+            'id' => $bookId,
+            'shelf_id' => $shelfBId,
+            'position' => 2,
+        ]);
+
+        $this->putJson('/api/v1/shelves/layout', [
+            'shelves' => [
+                ['id' => $shelfAId, 'order' => 2, 'span' => 4],
+                ['id' => $shelfBId, 'order' => 1, 'span' => 8],
+                ['id' => $otherShelf->id, 'order' => 99, 'span' => 2],
+            ],
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas('shelves', ['id' => $shelfAId, 'order' => 2, 'span' => 4]);
+        $this->assertDatabaseHas('shelves', ['id' => $shelfBId, 'order' => 1, 'span' => 8]);
+        $this->assertDatabaseHas('shelves', ['id' => $otherShelf->id, 'order' => 5, 'span' => 12]);
     }
 }

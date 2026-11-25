@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ExpenseService;
+use App\Models\Expense;
 use App\Services\BudgetService;
-use Illuminate\Http\Request;
+use App\Services\ExpenseService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\DB;
 
 class AccountingReportController extends Controller
 {
     protected $expenseService;
+
     protected $budgetService;
 
     public function __construct(
@@ -80,7 +81,7 @@ class AccountingReportController extends Controller
             $expensesByCategory = $this->expenseService->getExpensesByCategory($userId, $startDate, $endDate);
 
             // Get recent expenses
-            $recentExpenses = \App\Models\Expense::forUser($userId)
+            $recentExpenses = Expense::forUser($userId)
                 ->with(['category', 'book'])
                 ->completed()
                 ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
@@ -94,17 +95,17 @@ class AccountingReportController extends Controller
             $topCategories = $this->budgetService->getTopSpendingCategories($userId, $startDate, $endDate, 5);
 
             // Get pending expenses
-            $pendingExpenses = \App\Models\Expense::forUser($userId)
+            $pendingExpenses = Expense::forUser($userId)
                 ->where('status', 'pending')
                 ->count();
 
             // Get this month's expenses vs last month
-            $thisMonthExpenses = \App\Models\Expense::forUser($userId)
+            $thisMonthExpenses = Expense::forUser($userId)
                 ->completed()
                 ->inPeriod(now()->startOfMonth(), now()->endOfMonth())
                 ->sum('amount_base_currency');
 
-            $lastMonthExpenses = \App\Models\Expense::forUser($userId)
+            $lastMonthExpenses = Expense::forUser($userId)
                 ->completed()
                 ->inPeriod(
                     now()->subMonth()->startOfMonth(),
@@ -120,7 +121,7 @@ class AccountingReportController extends Controller
                 ],
                 'summary' => [
                     'total_expenses' => $totalExpenses,
-                    'formatted_total' => 'Rp ' . number_format($totalExpenses, 2, ',', '.'),
+                    'formatted_total' => 'Rp '.number_format($totalExpenses, 2, ',', '.'),
                     'pending_expenses' => $pendingExpenses,
                     'this_month_expenses' => $thisMonthExpenses,
                     'last_month_expenses' => $lastMonthExpenses,
@@ -192,7 +193,7 @@ class AccountingReportController extends Controller
 
             $groupBy = $validated['group_by'] ?? 'day';
 
-            $query = \App\Models\Expense::forUser($userId)
+            $query = Expense::forUser($userId)
                 ->with('category')
                 ->completed()
                 ->whereBetween('expense_date', [$validated['start_date'], $validated['end_date']]);
@@ -269,6 +270,7 @@ class AccountingReportController extends Controller
             // Get detailed progress for each budget
             $budgetTracking = collect($budgets->items())->map(function ($budget) use ($userId) {
                 $progress = $this->budgetService->getBudgetProgress($budget->id, $userId);
+
                 return array_merge($progress, [
                     'budget_details' => $budget,
                 ]);
@@ -297,7 +299,7 @@ class AccountingReportController extends Controller
             $startDate = $validated['start_date'] ?? null;
             $endDate = $validated['end_date'] ?? null;
 
-            $query = \App\Models\Expense::forUser($userId)
+            $query = Expense::forUser($userId)
                 ->completed()
                 ->selectRaw('payment_method, COUNT(*) as expense_count, SUM(amount_base_currency) as total_amount')
                 ->groupBy('payment_method');
@@ -318,7 +320,7 @@ class AccountingReportController extends Controller
                     'label' => ucfirst(str_replace('_', ' ', $method->payment_method)),
                     'expense_count' => $method->expense_count,
                     'total_amount' => $method->total_amount,
-                    'formatted_amount' => 'Rp ' . number_format($method->total_amount, 2, ',', '.'),
+                    'formatted_amount' => 'Rp '.number_format($method->total_amount, 2, ',', '.'),
                     'percentage' => round($percentage, 2),
                 ];
             })->sortByDesc('total_amount')->values()->toArray();
@@ -351,12 +353,12 @@ class AccountingReportController extends Controller
                 $monthStart = $monthDate->copy()->startOfMonth();
                 $monthEnd = $monthDate->copy()->endOfMonth();
 
-                $totalExpenses = \App\Models\Expense::forUser($userId)
+                $totalExpenses = Expense::forUser($userId)
                     ->completed()
                     ->whereBetween('expense_date', [$monthStart, $monthEnd])
                     ->sum('amount_base_currency');
 
-                $expenseCount = \App\Models\Expense::forUser($userId)
+                $expenseCount = Expense::forUser($userId)
                     ->completed()
                     ->whereBetween('expense_date', [$monthStart, $monthEnd])
                     ->count();
@@ -365,7 +367,7 @@ class AccountingReportController extends Controller
                     'month' => $monthDate->format('Y-m'),
                     'month_name' => $monthDate->format('F Y'),
                     'total_expenses' => $totalExpenses,
-                    'formatted_amount' => 'Rp ' . number_format($totalExpenses, 2, ',', '.'),
+                    'formatted_amount' => 'Rp '.number_format($totalExpenses, 2, ',', '.'),
                     'expense_count' => $expenseCount,
                     'average_expense' => $expenseCount > 0 ? $totalExpenses / $expenseCount : 0,
                 ];
@@ -427,7 +429,7 @@ class AccountingReportController extends Controller
             $yearEnd = now()->endOfYear();
 
             // Get YTD expenses
-            $ytdExpenses = \App\Models\Expense::forUser($userId)
+            $ytdExpenses = Expense::forUser($userId)
                 ->completed()
                 ->whereBetween('expense_date', [$yearStart, $yearEnd])
                 ->sum('amount_base_currency');
@@ -443,7 +445,7 @@ class AccountingReportController extends Controller
             $lastYearStart = now()->subYear()->startOfYear();
             $lastYearEnd = now()->subYear()->endOfYear();
 
-            $lastYearYtdExpenses = \App\Models\Expense::forUser($userId)
+            $lastYearYtdExpenses = Expense::forUser($userId)
                 ->completed()
                 ->whereBetween('expense_date', [$lastYearStart, $lastYearEnd])
                 ->sum('amount_base_currency');
@@ -454,13 +456,13 @@ class AccountingReportController extends Controller
             $summary = [
                 'year' => now()->year,
                 'year_to_date_expenses' => $ytdExpenses,
-                'formatted_ytd' => 'Rp ' . number_format($ytdExpenses, 2, ',', '.'),
+                'formatted_ytd' => 'Rp '.number_format($ytdExpenses, 2, ',', '.'),
                 'monthly_average' => $monthlyAverage,
-                'formatted_monthly_average' => 'Rp ' . number_format($monthlyAverage, 2, ',', '.'),
+                'formatted_monthly_average' => 'Rp '.number_format($monthlyAverage, 2, ',', '.'),
                 'projected_yearly_total' => $projectedYearlyTotal,
-                'formatted_projected' => 'Rp ' . number_format($projectedYearlyTotal, 2, ',', '.'),
+                'formatted_projected' => 'Rp '.number_format($projectedYearlyTotal, 2, ',', '.'),
                 'last_year_total' => $lastYearYtdExpenses,
-                'formatted_last_year' => 'Rp ' . number_format($lastYearYtdExpenses, 2, ',', '.'),
+                'formatted_last_year' => 'Rp '.number_format($lastYearYtdExpenses, 2, ',', '.'),
                 'year_over_year_growth' => $yearOverYearGrowth,
                 'months_passed' => $monthsPassed,
                 'remaining_months' => 12 - $monthsPassed,

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
+use App\Models\ReadingSession;
 use App\Services\BookService;
 use App\Services\ReadingSessionService;
-use App\Models\ReadingSession;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 class BookController extends Controller
 {
     protected BookService $bookService;
+
     protected ReadingSessionService $readingSessionService;
 
     public function __construct(BookService $bookService, ReadingSessionService $readingSessionService)
@@ -146,10 +150,10 @@ class BookController extends Controller
         ]);
 
         // Map legacy API field aliases to actual database columns
-        if (array_key_exists('rating', $data) && !array_key_exists('personal_rating', $data)) {
+        if (array_key_exists('rating', $data) && ! array_key_exists('personal_rating', $data)) {
             $data['personal_rating'] = $data['rating'];
         }
-        if (array_key_exists('notes', $data) && !array_key_exists('personal_notes', $data)) {
+        if (array_key_exists('notes', $data) && ! array_key_exists('personal_notes', $data)) {
             $data['personal_notes'] = $data['notes'];
         }
         unset($data['rating'], $data['notes']);
@@ -175,7 +179,7 @@ class BookController extends Controller
         if ($book->cover_image) {
             $filename = basename(parse_url($book->cover_image, PHP_URL_PATH) ?: '');
             if ($filename && $filename !== 'book-covers') {
-                $oldPath = 'book-covers/' . $filename;
+                $oldPath = 'book-covers/'.$filename;
                 if (Storage::disk('public')->exists($oldPath)) {
                     Storage::disk('public')->delete($oldPath);
                 }
@@ -186,10 +190,10 @@ class BookController extends Controller
         $file = $request->file('cover');
         // SECURITY: Use extension() which guesses based on MIME type rather than getClientOriginalExtension()
         $extension = $file->extension() ?: 'jpg';
-        $filename = 'book_' . $book->id . '_' . time() . '.' . $extension;
+        $filename = 'book_'.$book->id.'_'.time().'.'.$extension;
         $file->storeAs('book-covers', $filename, 'public');
 
-        $url = request()->getSchemeAndHttpHost() . '/storage/book-covers/' . $filename;
+        $url = request()->getSchemeAndHttpHost().'/storage/book-covers/'.$filename;
         $book->update(['cover_image' => $url]);
 
         return response()->success(['cover_image' => $url], 'Cover uploaded successfully');
@@ -383,7 +387,7 @@ class BookController extends Controller
             ->findOrFail($sessionId);
 
         $data = $request->validate([
-            'is_paused' => 'required|boolean'
+            'is_paused' => 'required|boolean',
         ]);
 
         $updatedSession = $this->readingSessionService->togglePause(
@@ -459,7 +463,7 @@ class BookController extends Controller
             $expenses = $book->expenses()->with(['category'])->get();
 
             return response()->success($expenses, 'Book expenses retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Book not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BookController::getExpenses failed');
@@ -488,14 +492,14 @@ class BookController extends Controller
                 'expense_count' => $book->expenses->count(),
                 'expenses' => $book->expenses()->with(['category'])->get(),
                 'formatted' => [
-                    'purchase_price' => $book->purchase_price ? 'Rp ' . number_format($book->purchase_price, 2, ',', '.') : 'Not set',
-                    'additional_expenses' => 'Rp ' . number_format($book->getAdditionalExpenses(), 2, ',', '.'),
+                    'purchase_price' => $book->purchase_price ? 'Rp '.number_format($book->purchase_price, 2, ',', '.') : 'Not set',
+                    'additional_expenses' => 'Rp '.number_format($book->getAdditionalExpenses(), 2, ',', '.'),
                     'total_investment' => $book->getFormattedTotalInvestment(),
                 ],
             ];
 
             return response()->success($breakdown, 'Book cost breakdown retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Book not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BookController::getCostBreakdown failed');
@@ -512,7 +516,7 @@ class BookController extends Controller
             $userId = $request->user()->id;
 
             // Get books with purchase data, ordered by date
-            $books = \App\Models\Book::query()->where('user_id', $userId)
+            $books = Book::query()->where('user_id', $userId)
                 ->whereNotNull('purchase_date')
                 ->whereNotNull('purchase_price')
                 ->orderBy('purchase_date', 'desc')
@@ -528,15 +532,15 @@ class BookController extends Controller
                 'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret',
                 'April' => 'April', 'May' => 'Mei', 'June' => 'Juni',
                 'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September',
-                'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'
+                'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember',
             ];
 
             foreach ($books as $book) {
-                $monthKey = \Carbon\Carbon::parse($book->purchase_date)->format('Y-m');
-                $englishMonthName = \Carbon\Carbon::parse($book->purchase_date)->format('F Y');
+                $monthKey = Carbon::parse($book->purchase_date)->format('Y-m');
+                $englishMonthName = Carbon::parse($book->purchase_date)->format('F Y');
                 $monthName = strtr($englishMonthName, $indonesianMonths);
 
-                if (!isset($purchaseHistory[$monthKey])) {
+                if (! isset($purchaseHistory[$monthKey])) {
                     $purchaseHistory[$monthKey] = [
                         'month' => $monthKey,
                         'month_name' => $monthName,
@@ -544,7 +548,7 @@ class BookController extends Controller
                         'formatted_amount' => 'Rp 0',
                         'book_count' => 0,
                         'average_price' => 0,
-                        'books' => []
+                        'books' => [],
                     ];
                 }
 
@@ -570,7 +574,7 @@ class BookController extends Controller
             foreach ($purchaseHistory as &$month) {
                 if ($month['book_count'] > 0) {
                     $month['average_price'] = $month['total_amount'] / $month['book_count'];
-                    $month['formatted_amount'] = 'Rp ' . number_format($month['total_amount'], 0, ',', '.');
+                    $month['formatted_amount'] = 'Rp '.number_format($month['total_amount'], 0, ',', '.');
                 }
             }
 

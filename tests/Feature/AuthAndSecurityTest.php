@@ -192,4 +192,35 @@ class AuthAndSecurityTest extends TestCase
         $this->postJson("/api/v1/books/{$ownerBook->id}/start")->assertStatus(404);
         $this->deleteJson("/api/v1/books/{$ownerBook->id}")->assertStatus(404);
     }
+
+    public function test_sanctum_csrf_cookie_and_login_throttle_rate_limit(): void
+    {
+        $spaHeaders = [
+            'Origin' => 'http://localhost:5173',
+            'Referer' => 'http://localhost:5173/',
+        ];
+
+        $this->withHeaders($spaHeaders)
+            ->get('/sanctum/csrf-cookie')
+            ->assertStatus(204)
+            ->assertCookie('XSRF-TOKEN');
+
+        $throttledHeaders = array_merge($spaHeaders, ['REMOTE_ADDR' => '10.10.10.99']);
+
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->withHeaders($throttledHeaders)
+                ->withServerVariables(['REMOTE_ADDR' => '10.10.10.99'])
+                ->postJson('/api/v1/auth/login', [
+                    'email' => 'throttle@example.com',
+                    'password' => 'wrong-password',
+                ])->assertStatus(422);
+        }
+
+        $this->withHeaders($throttledHeaders)
+            ->withServerVariables(['REMOTE_ADDR' => '10.10.10.99'])
+            ->postJson('/api/v1/auth/login', [
+                'email' => 'throttle@example.com',
+                'password' => 'wrong-password',
+            ])->assertStatus(429);
+    }
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Room;
 use App\Models\Shelf;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -15,9 +16,9 @@ class ShelfSeeder extends Seeder
     public function run(): void
     {
         $room = Room::first();
-        $user = \App\Models\User::first();
+        $user = User::first();
 
-        if (!$room || !$user) {
+        if (! $room || ! $user) {
             return; // Skip if no room or user exists
         }
 
@@ -30,7 +31,7 @@ class ShelfSeeder extends Seeder
         foreach ($shelves as $shelf) {
             Shelf::create(array_merge($shelf, [
                 'room_id' => $room->id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ]));
         }
     }

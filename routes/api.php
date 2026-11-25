@@ -13,7 +13,6 @@ use App\Http\Controllers\Api\V1\ReadingSessionController;
 use App\Http\Controllers\Api\V1\ShelfController;
 use App\Http\Controllers\Api\V1\StatisticsController;
 use App\Http\Controllers\Api\V1\TimelineController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*

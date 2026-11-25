@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExpenseCategory;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +20,7 @@ class ExpenseCategoryController extends Controller
     {
         try {
             $query = ExpenseCategory::forUser(Auth::id())
-                                   ->with('expenses');
+                ->with('expenses');
 
             // Filter by type
             if ($request->has('is_default')) {
@@ -93,8 +94,8 @@ class ExpenseCategoryController extends Controller
     {
         try {
             $category = ExpenseCategory::with(['expenses', 'budgets'])
-                                       ->forUser(Auth::id())
-                                       ->findOrFail($id);
+                ->forUser(Auth::id())
+                ->findOrFail($id);
 
             // Add calculated fields
             $category->total_expenses = $category->getTotalExpensesAttribute();
@@ -104,7 +105,7 @@ class ExpenseCategoryController extends Controller
             $category->formatted_budget = $category->getFormattedBudgetAttribute();
 
             return response()->success($category, 'Expense category retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::show failed');
@@ -138,7 +139,7 @@ class ExpenseCategoryController extends Controller
             return response()->success($category->fresh(), 'Expense category updated successfully');
         } catch (ValidationException $e) {
             return $this->validationErrorResponse($e);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::update failed');
@@ -166,7 +167,7 @@ class ExpenseCategoryController extends Controller
             $category->delete();
 
             return response()->success(null, 'Expense category deleted successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::destroy failed');
@@ -286,14 +287,14 @@ class ExpenseCategoryController extends Controller
                 'budget_usage' => $category->getBudgetUsagePercentageAttribute(),
                 'budget_remaining' => max(0, $category->monthly_budget - $expenses->sum('amount_base_currency')),
                 'recent_expenses' => $category->expenses()
-                                             ->completed()
-                                             ->orderBy('expense_date', 'desc')
-                                             ->limit(5)
-                                             ->get(),
+                    ->completed()
+                    ->orderBy('expense_date', 'desc')
+                    ->limit(5)
+                    ->get(),
             ];
 
             return response()->success($statistics, 'Category statistics retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::getStatistics failed');

@@ -1,7 +1,17 @@
 # Audit Infrastruktur, Database, Testing, & Kebersihan Repositori
 ## MyBookshelf Improvement Specification
 
-Dokumen ini merangkum temuan lintas-sistem (*cross-cutting*) di luar logika halaman individu, meliputi konsistensi basis data, konfigurasi lingkungan, cakupan pengujian otomatis, pipeline CI/CD, dan kebersihan berkas repositori.
+Dokumen ini merinci seluruh temuan lintas-sistem (*cross-cutting*) di luar logika halaman individu, meliputi konsistensi basis data, konfigurasi lingkungan, cakupan pengujian otomatis, pipeline CI/CD, dan kebersihan berkas repositori.
+
+---
+
+## Status Perbaikan Infra, DB, Testing, & Kebersihan Repo
+
+* ✅ **Konsistensi PostgreSQL (`README.md`, `composer.json`, `phpunit.xml`):** Instruksi SQLite dihapus dari [`README.md`](file:///c:/laragon/www/mybookshelf/README.md) dan `post-create-project-cmd` pada [`composer.json`](file:///c:/laragon/www/mybookshelf/composer.json), serta `phpunit.xml` menetapkan `<env name="DB_CONNECTION" value="pgsql"/>`. *Catatan: [`.env.example`](file:///c:/laragon/www/mybookshelf/.env.example) sengaja dipertahankan sesuai preferensi pemilik repo.*
+* ✅ **Konfigurasi Produksi (`cors.php` & `sanctum.php`):** Mendukung `CORS_ALLOWED_ORIGINS` (plus fallback `FRONTEND_URL`) dan `SANCTUM_STATEFUL_DOMAINS`.
+* ✅ **Cakupan Automated Testing (`tests/Feature/`):** Ditambahkan 4 suite pengujian PostgreSQL ([`AuthAndSecurityTest.php`](file:///c:/laragon/www/mybookshelf/tests/Feature/AuthAndSecurityTest.php), [`BookAndShelfWorkflowTest.php`](file:///c:/laragon/www/mybookshelf/tests/Feature/BookAndShelfWorkflowTest.php), [`AccountingErrorHandlingTest.php`](file:///c:/laragon/www/mybookshelf/tests/Feature/AccountingErrorHandlingTest.php), dan [`ReadingSessionAndBudgetTest.php`](file:///c:/laragon/www/mybookshelf/tests/Feature/ReadingSessionAndBudgetTest.php)) mencakup CSRF cookie, rate limit login `throttle:5,1`, IDOR, progress/pindah rak/layout batch, durasi pause-resume, `BookObserver`, dan alert budget.
+* ✅ **Pipeline [`.github/workflows/ci.yml`](file:///c:/laragon/www/mybookshelf/.github/workflows/ci.yml) & Laravel Pint:** Menambahkan [`pint.json`](file:///c:/laragon/www/mybookshelf/pint.json) (mengecualikan berkas IDE helper generated), merapikan style seluruh kode PHP backend agar `./vendor/bin/pint --test` lulus bersih, menghapus `continue-on-error: true` di job backend & frontend, serta menambahkan `npm run typecheck` (`tsc --noEmit`). *Catatan: penyelesaian 193 warning `oxlint` di `frontend/src/` ditangguhkan ke batch perbaikan frontend.*
+* ✅ **Kebersihan Repo, Legacy View, & Encoding:** Menghapus berkas usang ter-track (`library.blade.php` + rute `/library` di [`routes/web.php`](file:///c:/laragon/www/mybookshelf/routes/web.php) dan `frontend/split_decorations.cjs`), membersihkan catatan mojibake pada `docs/`, serta mempertahankan skrip lokal & `backup.sql` yang sudah dikecualikan `.gitignore`.
 
 ---
 

@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\AccountingTimelineEvent;
 use App\Models\Book;
+use App\Models\Budget;
+use App\Models\CurrencyRate;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
-use App\Models\CurrencyRate;
-use App\Models\AccountingTimelineEvent;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Exception;
 
 class ExpenseService
 {
@@ -19,7 +20,7 @@ class ExpenseService
     public function getAllExpenses(array $filters, string $userId)
     {
         $query = Expense::with(['category', 'book'])
-                       ->forUser($userId);
+            ->forUser($userId);
 
         // Apply filters
         if (isset($filters['category_id'])) {
@@ -53,6 +54,7 @@ class ExpenseService
 
         // Pagination
         $perPage = $filters['per_page'] ?? 15;
+
         return $query->paginate($perPage);
     }
 
@@ -62,8 +64,8 @@ class ExpenseService
     public function getExpense(string $expenseId, string $userId): Expense
     {
         return Expense::with(['category', 'book', 'user'])
-                     ->forUser($userId)
-                     ->findOrFail($expenseId);
+            ->forUser($userId)
+            ->findOrFail($expenseId);
     }
 
     /**
@@ -218,7 +220,7 @@ class ExpenseService
     {
         $expense = $this->getExpense($expenseId, $userId);
 
-        if (!$expense->hasReceipt()) {
+        if (! $expense->hasReceipt()) {
             throw new Exception('No receipt found for this expense');
         }
 
@@ -240,7 +242,7 @@ class ExpenseService
 
         $rate = CurrencyRate::getLatestRate($currency, 'IDR');
 
-        if (!$rate) {
+        if (! $rate) {
             // If no rate available, assume 1:1 (should be handled better)
             return $amount;
         }
@@ -271,7 +273,7 @@ class ExpenseService
 
         $newExpense = $originalExpense->replicate();
         $newExpense->id = Str::uuid()->toString();
-        $newExpense->title = $originalExpense->title . ' (Copy)';
+        $newExpense->title = $originalExpense->title.' (Copy)';
         $newExpense->created_at = now();
         $newExpense->updated_at = now();
         $newExpense->save();
@@ -291,9 +293,9 @@ class ExpenseService
 
         // Get parent recurring expenses that need to generate new instances
         $recurringExpenses = Expense::where('is_recurring', true)
-                                   ->where('status', 'completed')
-                                   ->where('reminder_date', '<=', $today)
-                                   ->get();
+            ->where('status', 'completed')
+            ->where('reminder_date', '<=', $today)
+            ->get();
 
         foreach ($recurringExpenses as $parentExpense) {
             $this->generateRecurringExpense($parentExpense);
@@ -346,7 +348,7 @@ class ExpenseService
     {
         $lastDate = $expense->expense_date;
 
-        switch($expense->recurring_period) {
+        switch ($expense->recurring_period) {
             case 'daily':
                 return $lastDate->addDay()->format('Y-m-d');
             case 'weekly':
@@ -367,7 +369,7 @@ class ExpenseService
     {
         $reminderDate = $expense->reminder_date ?? $expense->expense_date;
 
-        switch($expense->recurring_period) {
+        switch ($expense->recurring_period) {
             case 'daily':
                 return $reminderDate->addDay()->format('Y-m-d');
             case 'weekly':
@@ -386,10 +388,10 @@ class ExpenseService
      */
     protected function checkBudgetAlertsAfterExpense(string $userId, $expenseDate): void
     {
-        $budgets = \App\Models\Budget::forUser($userId)
-                                    ->active()
-                                    ->current()
-                                    ->get();
+        $budgets = Budget::forUser($userId)
+            ->active()
+            ->current()
+            ->get();
 
         foreach ($budgets as $budget) {
             $this->checkSingleBudgetAlert($budget);
@@ -399,7 +401,7 @@ class ExpenseService
     /**
      * Check if a budget needs alerts.
      */
-    public function checkSingleBudgetAlert(\App\Models\Budget $budget): void
+    public function checkSingleBudgetAlert(Budget $budget): void
     {
         $usage = $budget->usage_percentage;
 
@@ -458,7 +460,7 @@ class ExpenseService
             }
 
             return (float) $query->sum('amount_base_currency');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Return 0 on any database errors
             return 0;
         }
@@ -474,9 +476,9 @@ class ExpenseService
 
         // Get expenses that need reminders
         $expenses = Expense::where('has_reminder', true)
-                           ->where('reminder_sent', false)
-                           ->where('reminder_date', '<=', $tomorrow)
-                           ->get();
+            ->where('reminder_sent', false)
+            ->where('reminder_date', '<=', $tomorrow)
+            ->get();
 
         foreach ($expenses as $expense) {
             // Create timeline event as reminder
@@ -493,8 +495,9 @@ class ExpenseService
      */
     public function syncFromBook(Book $book, string $defaultDescription = 'Otomatis dicatat dari fitur rak buku.'): ?Expense
     {
-        if ($book->is_gift || !($book->purchase_price > 0)) {
+        if ($book->is_gift || ! ($book->purchase_price > 0)) {
             $this->removeForBook($book);
+
             return null;
         }
 
@@ -524,14 +527,14 @@ class ExpenseService
             'user_id' => $book->user_id,
         ]);
 
-        if (!$expense->exists) {
+        if (! $expense->exists) {
             $expense->id = Str::uuid()->toString();
             $expense->payment_method = 'cash';
-        } elseif (!in_array($expense->payment_method, ['cash', 'transfer', 'e-wallet', 'credit_card'], true)) {
+        } elseif (! in_array($expense->payment_method, ['cash', 'transfer', 'e-wallet', 'credit_card'], true)) {
             $expense->payment_method = 'cash';
         }
 
-        $expense->title = 'Pembelian Buku: ' . $book->title;
+        $expense->title = 'Pembelian Buku: '.$book->title;
         $expense->description = $expense->description ?: $defaultDescription;
         $expense->amount = $amount;
         $expense->currency = $currency;

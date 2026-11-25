@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class ExpenseCategory extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -101,11 +101,11 @@ class ExpenseCategory extends Model
      */
     public function getFormattedBudgetAttribute(): string
     {
-        if (!$this->monthly_budget) {
+        if (! $this->monthly_budget) {
             return 'Not set';
         }
 
-        return number_format($this->monthly_budget, 2, ',', '.') . ' ' . $this->budget_currency;
+        return number_format($this->monthly_budget, 2, ',', '.').' '.$this->budget_currency;
     }
 
     /**
@@ -113,11 +113,12 @@ class ExpenseCategory extends Model
      */
     public function getBudgetUsagePercentageAttribute(): float
     {
-        if (!$this->monthly_budget || $this->monthly_budget <= 0) {
+        if (! $this->monthly_budget || $this->monthly_budget <= 0) {
             return 0;
         }
 
         $totalExpenses = $this->getTotalExpensesAttribute();
+
         return ($totalExpenses / $this->monthly_budget) * 100;
     }
 
@@ -135,6 +136,7 @@ class ExpenseCategory extends Model
     public function isNearThreshold(float $threshold = 80.0): bool
     {
         $usage = $this->getBudgetUsagePercentageAttribute();
+
         return $usage >= $threshold && $usage <= 100;
     }
 }

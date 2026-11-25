@@ -22,9 +22,9 @@ class AchievementController extends Controller
         }])->get();
 
         // Transform to include user progress
-        $achievementsWithProgress = $achievements->map(function ($achievement) use ($user) {
+        $achievementsWithProgress = $achievements->map(function ($achievement) {
             $userAchievement = $achievement->users->first();
-            
+
             $unlockedDate = $userAchievement?->pivot->unlocked_date;
             $unlockedDateStr = null;
             if ($unlockedDate) {

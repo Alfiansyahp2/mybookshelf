@@ -81,7 +81,7 @@ Pada [`BookObserver.php`](file:///c:/laragon/www/mybookshelf/app/Observers/BookO
 1. Jika buku berstatus `is_gift = true`, observer masih mencatatnya sebagai pengeluaran belanja buku.
 2. Kolom `$expense->currency` di-hardcode `'IDR'` dengan `exchange_rate = 1.0`, mengabaikan `$book->purchase_currency` dan `CurrencyRateService`.
 3. `$expense->payment_method` diisi `'other'`, sedangkan validasi di `ExpenseController::store()` dan tipe `PaymentMethod` frontend hanya menerima `cash | transfer | e-wallet | credit_card`.
-4. Terdapat karakter mojibake `'icon' => 'ðŸ“š'`.
+4. Terdapat karakter mojibake pada `'icon'` (konversi encoding UTF-8 tidak valid).
 
 ### 3.3. Penghapusan Rak Meninggalkan Buku Yatim (`ShelfController::destroy`)
 Di [`ShelfController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/ShelfController.php) baris 95 terdapat `// TODO: Relocate books to another shelf or prevent deletion if books exist`. Saat rak dihapus, FK `nullOnDelete` mengubah `books.shelf_id` menjadi `NULL` sehingga buku hilang dari seluruh tampilan rak 3D.
