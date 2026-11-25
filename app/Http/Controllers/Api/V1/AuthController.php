@@ -29,8 +29,10 @@ class AuthController extends Controller
             ]);
         }
 
-        // Regenerate session to prevent session fixation
-        $request->session()->regenerate();
+        // Regenerate session to prevent session fixation when session middleware is active
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         $user = Auth::guard('web')->user();
 
@@ -62,7 +64,9 @@ class AuthController extends Controller
 
         // Log in the user immediately after registration (SPA)
         Auth::guard('web')->login($user);
-        $request->session()->regenerate();
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         return response()->success([
             'user' => [
@@ -96,7 +100,10 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
-        $request->session()->invalidate();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->success(null, 'Logged out successfully');
     }

@@ -99,18 +99,21 @@ class BookService
     }
 
     /**
+     * Find a book optionally scoped to the given user ID.
+     */
+    private function findOwnedBook(string $id, ?string $userId = null): Book
+    {
+        return Book::query()
+            ->when($userId, fn ($q) => $q->where('user_id', $userId))
+            ->findOrFail($id);
+    }
+
+    /**
      * Update book
      */
     public function updateBook($id, array $data, $userId = null)
     {
-        $query = Book::query();
-
-        // SECURITY: Filter by user_id if provided
-        if ($userId) {
-            $query->where('user_id', $userId);
-        }
-
-        $book = $query->findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         // Update last_modified timestamp
         $data['last_modified'] = now();
@@ -128,9 +131,9 @@ class BookService
     /**
      * Delete book (soft delete)
      */
-    public function deleteBook($id)
+    public function deleteBook($id, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
         $book->delete();
         return true;
     }
@@ -138,9 +141,9 @@ class BookService
     /**
      * Start reading a book
      */
-    public function startReading($id)
+    public function startReading($id, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $book->update([
             'status' => 'reading',
@@ -157,9 +160,9 @@ class BookService
     /**
      * Finish reading a book
      */
-    public function finishReading($id)
+    public function finishReading($id, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $readDates = $book->read_dates ?? [];
         $today = now()->format('Y-m-d');
@@ -191,9 +194,9 @@ class BookService
     /**
      * Update reading progress
      */
-    public function updateProgress($id, $currentPage)
+    public function updateProgress($id, $currentPage, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $progress = $this->calculateProgress($currentPage, $book->pages);
 
@@ -232,9 +235,9 @@ class BookService
     /**
      * Toggle favorite status
      */
-    public function toggleFavorite($id)
+    public function toggleFavorite($id, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $book->update([
             'favorite' => !$book->favorite,
@@ -251,9 +254,9 @@ class BookService
     /**
      * Update personal notes
      */
-    public function updateNotes($id, $notes)
+    public function updateNotes($id, $notes, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $book->update([
             'personal_notes' => $notes,
@@ -266,9 +269,9 @@ class BookService
     /**
      * Update personal rating
      */
-    public function updateRating($id, $rating)
+    public function updateRating($id, $rating, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $book->update([
             'personal_rating' => $rating,
@@ -281,9 +284,9 @@ class BookService
     /**
      * Move book to different shelf
      */
-    public function moveToShelf($id, $shelfId, $position = null)
+    public function moveToShelf($id, $shelfId, $position = null, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $data = ['shelf_id' => $shelfId];
 
@@ -299,9 +302,9 @@ class BookService
     /**
      * Borrow book to someone
      */
-    public function borrowBook($id, $borrowedBy, $dueDate)
+    public function borrowBook($id, $borrowedBy, $dueDate, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         $book->update([
             'status' => 'borrowed',
@@ -321,9 +324,9 @@ class BookService
     /**
      * Return borrowed book
      */
-    public function returnBook($id)
+    public function returnBook($id, $userId = null)
     {
-        $book = Book::findOrFail($id);
+        $book = $this->findOwnedBook($id, $userId);
 
         // Store previous status
         $previousStatus = 'unread'; // Default if not reading/finished
@@ -433,8 +436,8 @@ class BookService
                 'last_modified' => now(),
             ]);
 
-            // Create timeline event for restarting
-            $this->createTimelineEvent($book, 'restarted', 'Started reading again');
+            // Create timeline event for restarting ('started' matches timeline_events.type PostgreSQL ENUM)
+            $this->createTimelineEvent($book, 'started', 'Started reading again');
 
             DB::commit();
             return $book->fresh()->load(['shelf', 'collections']);

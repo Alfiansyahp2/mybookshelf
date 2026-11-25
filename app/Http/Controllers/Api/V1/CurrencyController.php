@@ -28,7 +28,7 @@ class CurrencyController extends Controller
 
             return response()->success($rates, 'Currency rates retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::getRates failed');
         }
     }
 
@@ -49,14 +49,14 @@ class CurrencyController extends Controller
             );
 
             if (!$rate) {
-                return response()->error('Currency rate not found', 404);
+                return $this->notFoundResponse('Currency rate not found');
             }
 
             return response()->success($rate, 'Currency rate retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::getRate failed');
         }
     }
 
@@ -88,9 +88,9 @@ class CurrencyController extends Controller
 
             return response()->success($rate, 'Currency rate set successfully', 201);
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::setRate failed');
         }
     }
 
@@ -114,9 +114,9 @@ class CurrencyController extends Controller
 
             return response()->success($conversion, 'Currency converted successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::convert failed');
         }
     }
 
@@ -130,7 +130,7 @@ class CurrencyController extends Controller
 
             return response()->success($syncedRates, 'Currency rates synced successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::syncRates failed');
         }
     }
 
@@ -154,9 +154,9 @@ class CurrencyController extends Controller
 
             return response()->success($rates, 'Historical rates retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::getHistoricalRates failed');
         }
     }
 
@@ -179,9 +179,9 @@ class CurrencyController extends Controller
 
             return response()->success($results, 'Currency rates bulk upserted successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::bulkUpsertRates failed');
         }
     }
 
@@ -195,7 +195,7 @@ class CurrencyController extends Controller
 
             return response()->success($currencies, 'Supported currencies retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::getSupportedCurrencies failed');
         }
     }
 
@@ -212,14 +212,14 @@ class CurrencyController extends Controller
             $currencyInfo = $this->currencyRateService->getCurrencyInfo($validated['currency_code']);
 
             if (!$currencyInfo) {
-                return response()->error('Currency not found', 404);
+                return $this->notFoundResponse('Currency not found');
             }
 
             return response()->success($currencyInfo, 'Currency information retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::getCurrencyInfo failed');
         }
     }
 
@@ -240,9 +240,9 @@ class CurrencyController extends Controller
                 'is_valid' => $isValid,
             ], 'Currency validation completed successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::validateCurrency failed');
         }
     }
 
@@ -264,9 +264,9 @@ class CurrencyController extends Controller
                 'deactivated_count' => $deactivatedCount,
             ], 'Old currency rates deactivated successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'CurrencyController::deactivateOldRates failed');
         }
     }
 }

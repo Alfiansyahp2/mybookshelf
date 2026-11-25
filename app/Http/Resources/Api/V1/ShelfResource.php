@@ -19,6 +19,8 @@ class ShelfResource extends JsonResource
             'name' => $this->name,
             'capacity' => $this->capacity,
             'order' => $this->order,
+            'span' => $this->span,
+            'decorations' => $this->decorations ?? [],
             'room_id' => $this->room_id,
 
             // Timestamps

@@ -1,7 +1,28 @@
 # Audit & Rencana Perbaikan Backend (Laravel 12)
 ## MyBookshelf Improvement Specification
 
-Dokumen ini merinci seluruh temuan bug, celah keamanan (*security gaps*), inkonsistensi logika bisnis, serta rencana perbaikan pada sisi backend (`app/`, `routes/`, `config/`).
+Dokumen ini merinci seluruh temuan bug, celah keamanan (*security gaps*), inkonsistensi logika bisnis, serta status perbaikannya pada sisi backend (`app/`, `routes/`, `config/`, `database/`).
+
+---
+
+## Status Perbaikan Backend (Batch 1 — Terverifikasi via PHPUnit PostgreSQL)
+
+* ✅ **Bug `response()->error()` & Bocor Exception (`Controller.php` + Seluruh V1 Accounting/Book/ReadingSession Controllers):** Teratasi via helper `validationErrorResponse()`, `notFoundResponse()`, dan `serverErrorResponse()` di [`Controller.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Controller.php).
+* ✅ **Celah Cross-Tenant IDOR Foreign Key & Service:** Teratasi via `$this->ownedRule(...)` (`Rule::exists()->where('user_id', ...)`) pada [`BookController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/BookController.php), [`ShelfController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/ShelfController.php), [`ReadingSessionController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/ReadingSessionController.php), [`CollectionController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/CollectionController.php), [`ExpenseController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/ExpenseController.php), [`BudgetController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/BudgetController.php), [`AccountingReportController.php`](file:///c:/laragon/www/mybookshelf/app/Http/Controllers/Api/V1/AccountingReportController.php), serta `findOwnedBook()` di [`BookService.php`](file:///c:/laragon/www/mybookshelf/app/Services/BookService.php).
+* ✅ **Bug PostgreSQL & Kontrak Data:**
+  * Diperbaiki: `BookService::readAgain()` (`'restarted'` -> `'started'` sesuai ENUM PostgreSQL `timeline_events.type`).
+  * Diperbaiki: `ShelfController::store()` menghapus field non-eksisten `'theme'` pada `Room::firstOrCreate()`, `ShelfController::update()` mendukung `span`, `ShelfResource` menyertakan `span` & `decorations`, dan `ShelfController::destroy()` memindahkan buku secara transaksional (`relocate_to` atau rak tersisa).
+  * Diperbaiki: `BookController::update()` memetakan alias `rating`/`notes` ke `personal_rating`/`personal_notes`.
+  * Diperbaiki: `BookController::uploadCover()` menghapus sampul lama pada `Storage::disk('public')`.
+  * Diperbaiki: `AuthController` menambahkan guard `$request->hasSession()` agar permintaan tanpa stateful Referer tidak melempar `500 Session store not set`.
+  * Diperbaiki: `ExpenseService::syncFromBook()` (dipakai bersama oleh [`BookObserver.php`](file:///c:/laragon/www/mybookshelf/app/Observers/BookObserver.php) & [`SyncBookExpensesCommand.php`](file:///c:/laragon/www/mybookshelf/app/Console/Commands/SyncBookExpensesCommand.php)) menghormati `is_gift`, `purchase_currency`, dan memakai `payment_method = 'cash'`, ditambah migrasi [`2026_11_25_000001_widen_exchange_rate_precision_on_expenses_table.php`](file:///c:/laragon/www/mybookshelf/database/migrations/2026_11_25_000001_widen_exchange_rate_precision_on_expenses_table.php) (`DECIMAL(14,6)` untuk mencegah overflow kurs seperti `16000` IDR/USD).
+  * Diperbaiki: `AchievementController::unlock()` memvalidasi pemenuhan `requirement` di sisi server sebelum membuka achievement.
+  * Diperbaiki: `config/cors.php` dan `config/sanctum.php` kini mendukung variabel `env()` (`CORS_ALLOWED_ORIGINS` dan `SANCTUM_STATEFUL_DOMAINS`).
+  * Teruji: 3 suite Feature Test baru (`AuthAndSecurityTest`, `BookAndShelfWorkflowTest`, `AccountingErrorHandlingTest`) — total **13 passed (93 assertions)**.
+
+---
+
+## Sisa Item Backend yang Masih Terbuka (Next Phase)
 
 ---
 

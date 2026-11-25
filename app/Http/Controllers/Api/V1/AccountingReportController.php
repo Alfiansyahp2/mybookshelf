@@ -135,9 +135,9 @@ class AccountingReportController extends Controller
 
             return response()->success($overview, 'Accounting overview retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::overview failed');
         }
     }
 
@@ -147,14 +147,15 @@ class AccountingReportController extends Controller
     public function expensesByCategory(Request $request): JsonResponse
     {
         try {
+            $userId = Auth::id();
             $validated = $request->validate([
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date',
-                'category_id' => 'nullable|uuid|exists:expense_categories,id',
+                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
             ]);
 
             $expenses = $this->expenseService->getExpensesByCategory(
-                Auth::id(),
+                $userId,
                 $validated['start_date'] ?? null,
                 $validated['end_date'] ?? null
             );
@@ -169,9 +170,9 @@ class AccountingReportController extends Controller
 
             return response()->success($expenses, 'Expenses by category retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::expensesByCategory failed');
         }
     }
 
@@ -181,14 +182,14 @@ class AccountingReportController extends Controller
     public function expensesByPeriod(Request $request): JsonResponse
     {
         try {
+            $userId = Auth::id();
             $validated = $request->validate([
                 'start_date' => 'required|date',
                 'end_date' => 'required|date',
                 'group_by' => 'nullable|in:day,week,month,year',
-                'category_id' => 'nullable|uuid|exists:expense_categories,id',
+                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
             ]);
 
-            $userId = Auth::id();
             $groupBy = $validated['group_by'] ?? 'day';
 
             $query = \App\Models\Expense::forUser($userId)
@@ -239,9 +240,9 @@ class AccountingReportController extends Controller
 
             return response()->success($periodData, 'Expenses by period retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::expensesByPeriod failed');
         }
     }
 
@@ -266,7 +267,7 @@ class AccountingReportController extends Controller
             $budgets = $this->budgetService->getAllBudgets($userId, $filters);
 
             // Get detailed progress for each budget
-            $budgetTracking = collect($budgets->items())->map(function ($budget) {
+            $budgetTracking = collect($budgets->items())->map(function ($budget) use ($userId) {
                 $progress = $this->budgetService->getBudgetProgress($budget->id, $userId);
                 return array_merge($progress, [
                     'budget_details' => $budget,
@@ -275,9 +276,9 @@ class AccountingReportController extends Controller
 
             return response()->success($budgetTracking, 'Budget tracking retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::budgetTracking failed');
         }
     }
 
@@ -324,9 +325,9 @@ class AccountingReportController extends Controller
 
             return response()->success($analysis, 'Payment methods analysis retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::paymentMethodsAnalysis failed');
         }
     }
 
@@ -375,9 +376,9 @@ class AccountingReportController extends Controller
 
             return response()->success($monthlyData, 'Monthly comparison retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::monthlyComparison failed');
         }
     }
 
@@ -409,9 +410,9 @@ class AccountingReportController extends Controller
             ], 'Export data prepared successfully');
 
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::export failed');
         }
     }
 
@@ -467,7 +468,7 @@ class AccountingReportController extends Controller
 
             return response()->success($summary, 'Year-to-date summary retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'AccountingReportController::yearToDateSummary failed');
         }
     }
 }

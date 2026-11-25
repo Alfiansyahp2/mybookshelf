@@ -28,8 +28,10 @@ class ReadingSessionController extends Controller
      */
     public function store(Request $request)
     {
+        $userId = $request->user()->id;
+
         $data = $request->validate([
-            'book_id' => 'required|exists:books,id',
+            'book_id' => ['required', $this->ownedRule('books', $userId)],
             'start_time' => 'required|date',
             'start_page' => 'required|integer|min:0',
             'mood' => 'nullable|in:great,good,okay,difficult',
@@ -38,7 +40,7 @@ class ReadingSessionController extends Controller
 
         $session = ReadingSession::create([
             'id' => Str::uuid()->toString(),
-            'user_id' => $request->user()->id,
+            'user_id' => $userId,
             'book_id' => $data['book_id'],
             'start_time' => $data['start_time'],
             'start_page' => $data['start_page'],
@@ -70,7 +72,7 @@ class ReadingSessionController extends Controller
             ->findOrFail($id);
 
         if ($session->end_time) {
-            return response()->error('Cannot pause an already ended session', 400);
+            return response()->error('Cannot pause an already ended session', null, 400);
         }
 
         $data = $request->validate([

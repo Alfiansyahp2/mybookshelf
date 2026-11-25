@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Book;
 use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use App\Models\CurrencyRate;
 use App\Models\AccountingTimelineEvent;
 use Illuminate\Support\Facades\DB;
@@ -482,6 +484,79 @@ class ExpenseService
 
             // Mark reminder as sent
             $expense->update(['reminder_sent' => true]);
+        }
+    }
+
+    /**
+     * Synchronize a book's purchase price into the user's expenses table.
+     * Skips and cleans up existing auto-synced expenses if the book is a gift or has no price.
+     */
+    public function syncFromBook(Book $book, string $defaultDescription = 'Otomatis dicatat dari fitur rak buku.'): ?Expense
+    {
+        if ($book->is_gift || !($book->purchase_price > 0)) {
+            $this->removeForBook($book);
+            return null;
+        }
+
+        $category = ExpenseCategory::firstOrCreate(
+            [
+                'user_id' => $book->user_id,
+                'name' => 'Book Purchases',
+            ],
+            [
+                'description' => 'Pembelian buku baru dan bekas',
+                'icon' => '📚',
+                'color' => '#3B82F6',
+                'monthly_budget' => 500000,
+                'budget_currency' => 'IDR',
+                'is_default' => true,
+            ]
+        );
+
+        $currency = strtoupper($book->purchase_currency ?: 'IDR');
+        $amount = (float) $book->purchase_price;
+        $exchangeRate = $this->getExchangeRate($currency);
+        $baseAmount = $this->convertToBaseCurrency($amount, $currency);
+        $expenseDate = $book->purchase_date ?? $book->date_added ?? $book->created_at ?? now();
+
+        $expense = Expense::firstOrNew([
+            'book_id' => $book->id,
+            'user_id' => $book->user_id,
+        ]);
+
+        if (!$expense->exists) {
+            $expense->id = Str::uuid()->toString();
+            $expense->payment_method = 'cash';
+        } elseif (!in_array($expense->payment_method, ['cash', 'transfer', 'e-wallet', 'credit_card'], true)) {
+            $expense->payment_method = 'cash';
+        }
+
+        $expense->title = 'Pembelian Buku: ' . $book->title;
+        $expense->description = $expense->description ?: $defaultDescription;
+        $expense->amount = $amount;
+        $expense->currency = $currency;
+        $expense->amount_base_currency = $baseAmount;
+        $expense->exchange_rate = $exchangeRate;
+        $expense->category_id = $category->id;
+        $expense->expense_date = $expenseDate;
+        $expense->status = 'completed';
+
+        $expense->save();
+
+        return $expense;
+    }
+
+    /**
+     * Remove auto-synced expenses associated with a book.
+     */
+    public function removeForBook(Book $book, bool $force = false): void
+    {
+        $query = Expense::where('book_id', $book->id);
+
+        if ($force) {
+            $query->forceDelete();
+        } else {
+            $query->delete();
         }
     }
 }
