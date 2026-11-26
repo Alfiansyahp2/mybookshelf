@@ -14,6 +14,7 @@ import MobileMenu from "./MobileMenu";
 import AppHeader from "./AppHeader";
 import { useAchievementTracker } from "../../hooks/useAchievementTracker";
 import { useThemeStore } from "../../store/useThemeStore";
+import { getAppPaletteVars } from "../../constants/appPalettes";
 import type { Shelf } from "../../types";
 
 const navItems = [
@@ -34,8 +35,14 @@ export default function AppLayout() {
     // Get shelves data for edit functionality
     const { data: shelves = [] } = useShelves();
 
-    // Global Dark Mode State from centralized theme store
-    const { isDarkMode, toggleDarkMode } = useThemeStore();
+    // Global Dark Mode & App Palette State from centralized theme store
+    const { isDarkMode, lightPalette, darkPalette, toggleDarkMode } =
+        useThemeStore();
+    const appPaletteVars = getAppPaletteVars(
+        isDarkMode,
+        lightPalette,
+        darkPalette,
+    );
 
     // Handle scroll physics
     const { data: selectedBook } = useBook(selectedBookId || "");
@@ -129,7 +136,10 @@ export default function AppLayout() {
     }, [handleEditShelf, handleDeleteShelf]);
 
     return (
-        <div className="app-layout-bg min-h-screen transition-colors duration-500 flex flex-col">
+        <div
+            className="app-layout-bg min-h-screen transition-colors duration-500 flex flex-col"
+            style={appPaletteVars}
+        >
             {/* Top Navigation */}
             <AppHeader
                 isHeaderVisible={isHeaderVisible}
@@ -154,8 +164,9 @@ export default function AppLayout() {
                         transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
                         id="main-scroll-container"
                         onScroll={handleScroll}
-                        className="w-full h-full absolute inset-0 overflow-auto bg-cream"
+                        className="w-full h-full absolute inset-0 overflow-auto"
                         style={{
+                            backgroundColor: "var(--app-canvas-bg)",
                             transformOrigin: "50% 50% 50vw",
                             transformStyle: "preserve-3d",
                             backfaceVisibility: "hidden",

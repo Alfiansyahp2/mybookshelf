@@ -99,14 +99,14 @@ export default function AccountSettings() {
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
         >
-            <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                    <User className="w-5 h-5" />
+            <div className="bg-surface/95 rounded-2xl p-6 border border-walnut/15 dark:border-walnut/30 shadow-sm backdrop-blur-sm">
+                <h2 className="text-xl font-serif font-semibold text-ink mb-6 flex items-center gap-2">
+                    <User className="w-5 h-5 text-walnut dark:text-gold" />
                     {t("settings.account.profile_info", "Profile Information")}
                 </h2>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-walnut mb-2">
+                        <label className="block text-sm font-medium text-walnut dark:text-gold mb-2">
                             {t("settings.account.display_name", "Display Name")}
                         </label>
                         <input
@@ -115,11 +115,11 @@ export default function AccountSettings() {
                             onChange={(e) =>
                                 setUser({ ...user, name: e.target.value })
                             }
-                            className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                            className="w-full px-4 py-3 bg-surfaceAlt text-ink border border-walnut/20 dark:border-walnut/35 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-walnut mb-2">
+                        <label className="block text-sm font-medium text-walnut dark:text-gold mb-2">
                             {t(
                                 "settings.account.email_address",
                                 "Email Address",
@@ -131,18 +131,18 @@ export default function AccountSettings() {
                             onChange={(e) =>
                                 setUser({ ...user, email: e.target.value })
                             }
-                            className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                            className="w-full px-4 py-3 bg-surfaceAlt text-ink border border-walnut/20 dark:border-walnut/35 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
                         />
                     </div>
-                    <div className="flex items-center gap-3 p-4 bg-cream/30 rounded-xl">
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-walnut font-semibold text-lg">
+                    <div className="flex items-center gap-3 p-4 bg-surfaceAlt/80 border border-walnut/10 dark:border-walnut/25 rounded-xl">
+                        <div className="w-12 h-12 bg-surface border border-walnut/15 rounded-full flex items-center justify-center text-walnut dark:text-gold font-semibold text-lg">
                             {user.avatar}
                         </div>
                         <div>
-                            <p className="text-sm text-walnut/60">
+                            <p className="text-sm text-ink font-medium">
                                 {t("settings.account.avatar", "Avatar")}
                             </p>
-                            <p className="text-xs text-walnut/50">
+                            <p className="text-xs text-walnut/70 dark:text-cream/60">
                                 {t(
                                     "settings.account.avatar_desc",
                                     "First letter of your name",
@@ -168,14 +168,14 @@ export default function AccountSettings() {
                 </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm mt-4">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                    <Key className="w-5 h-5" />
+            <div className="bg-surface/95 rounded-2xl p-6 border border-walnut/15 dark:border-walnut/30 shadow-sm mt-4 backdrop-blur-sm">
+                <h2 className="text-xl font-serif font-semibold text-ink mb-6 flex items-center gap-2">
+                    <Key className="w-5 h-5 text-walnut dark:text-gold" />
                     {t("settings.account.change_password", "Change Password")}
                 </h2>
                 <form onSubmit={handlePasswordSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-walnut mb-2">
+                        <label className="block text-sm font-medium text-walnut dark:text-gold mb-2">
                             {t(
                                 "settings.account.current_password",
                                 "Current Password",
@@ -191,11 +191,11 @@ export default function AccountSettings() {
                                     current_password: e.target.value,
                                 })
                             }
-                            className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                            className="w-full px-4 py-3 bg-surfaceAlt text-ink border border-walnut/20 dark:border-walnut/35 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-walnut mb-2">
+                        <label className="block text-sm font-medium text-walnut dark:text-gold mb-2">
                             {t("settings.account.new_password", "New Password")}
                         </label>
                         <input
@@ -209,11 +209,11 @@ export default function AccountSettings() {
                                     password: e.target.value,
                                 })
                             }
-                            className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                            className="w-full px-4 py-3 bg-surfaceAlt text-ink border border-walnut/20 dark:border-walnut/35 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-walnut mb-2">
+                        <label className="block text-sm font-medium text-walnut dark:text-gold mb-2">
                             {t(
                                 "settings.account.confirm_password",
                                 "Confirm New Password",
@@ -230,14 +230,14 @@ export default function AccountSettings() {
                                     password_confirmation: e.target.value,
                                 })
                             }
-                            className="w-full px-4 py-3 bg-cream border border-walnut/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
+                            className="w-full px-4 py-3 bg-surfaceAlt text-ink border border-walnut/20 dark:border-walnut/35 rounded-xl focus:outline-none focus:ring-2 focus:ring-walnut/30 focus:border-walnut/50"
                         />
                     </div>
                     <div className="pt-2 flex justify-end">
                         <button
                             type="submit"
                             disabled={updatePassword.isPending}
-                            className="flex items-center gap-2 px-6 py-2.5 bg-darkBrown text-white rounded-xl hover:bg-[#2a1a10] transition-colors font-medium disabled:opacity-50"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-walnut text-white rounded-xl hover:bg-darkBrown transition-colors font-medium disabled:opacity-50"
                         >
                             <Save className="w-4 h-4" />
                             {updatePassword.isPending

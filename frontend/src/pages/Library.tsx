@@ -117,10 +117,9 @@ export default function Library() {
 
     return (
         <div
-            className="px-3 md:px-5 pb-3 md:pb-5 pt-14 md:pt-16 flex flex-col min-h-full relative"
+            className="px-3 md:px-5 pb-3 md:pb-5 pt-14 md:pt-16 flex flex-col min-h-full relative transition-colors duration-500"
             style={{
-                background:
-                    "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
+                background: "var(--app-wall-bg)",
             }}
         >
             <SEO title={t("navigation.library", "Library")} description={t("library.seo_description", "Browse and manage your personal book library.")} />

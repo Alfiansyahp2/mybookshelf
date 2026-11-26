@@ -115,13 +115,16 @@ export default function YearlyTargetCards({
                             }
                             className={`w-[84vw] max-w-[330px] shrink-0 sm:shrink md:w-auto md:max-w-none snap-start cursor-pointer transition-all duration-200 rounded-2xl ${
                                 isSelected
-                                    ? "ring-2 ring-walnut dark:ring-gold ring-offset-2 ring-offset-[#cdb07c] dark:ring-offset-[#19120c] shadow-lg -translate-y-0.5"
+                                    ? "ring-2 ring-walnut dark:ring-gold ring-offset-2 ring-offset-[var(--app-canvas-bg)] shadow-lg -translate-y-0.5"
                                     : "hover:-translate-y-0.5 hover:shadow-md"
                             }`}
                         >
-                            <div className="bg-[#fcfaf7]/95 dark:bg-[#231b14]/95 rounded-2xl border border-walnut/20 dark:border-walnut/35 shadow-sm overflow-hidden h-full backdrop-blur-sm flex flex-col">
-                                {/* Warm Walnut & Burnished Gold Card Header */}
-                                <div className="px-3.5 py-3 bg-gradient-to-br from-[#5c3a1e] via-[#4a2e16] to-[#3a2210] dark:from-[#3d2614] dark:via-[#2e1c0e] dark:to-[#221409] border-b border-[#d4a574]/25 relative overflow-hidden">
+                            <div className="bg-surface/95 rounded-2xl border border-walnut/20 dark:border-walnut/35 shadow-sm overflow-hidden h-full backdrop-blur-sm flex flex-col">
+                                {/* Palette Banner Header */}
+                                <div
+                                    className="px-3.5 py-3 border-b border-gold/25 relative overflow-hidden"
+                                    style={{ background: "var(--app-banner-bg)" }}
+                                >
                                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#ffd166]/40 to-transparent pointer-events-none" />
 
                                     <div className="flex items-center justify-between gap-2 mb-2">
@@ -167,8 +170,8 @@ export default function YearlyTargetCards({
                                             }}
                                             className={`h-full rounded-full ${
                                                 isAchieved
-                                                    ? "bg-gradient-to-r from-[#d4a574] via-[#f2ca7e] to-[#ffd166]"
-                                                    : "bg-gradient-to-r from-[#a9713b] via-[#cfa064] to-[#e7bd82]"
+                                                    ? "bg-gradient-to-r from-walnut via-gold to-[#ffd166]"
+                                                    : "bg-gradient-to-r from-walnut to-gold"
                                             }`}
                                         />
                                     </div>
@@ -205,12 +208,12 @@ export default function YearlyTargetCards({
                                 </div>
 
                                 {/* Card Metrics Grid */}
-                                <div className="grid grid-cols-3 divide-x divide-walnut/15 dark:divide-walnut/25 py-2.5 px-1.5 bg-[#fcfaf7]/90 dark:bg-[#1c150f]/95">
+                                <div className="grid grid-cols-3 divide-x divide-walnut/15 dark:divide-walnut/25 py-2.5 px-1.5 bg-surfaceAlt/95">
                                     <div className="text-center px-1 min-w-0">
-                                        <div className="text-sm sm:text-base font-serif font-bold text-darkBrown dark:text-cream tabular-nums">
+                                        <div className="text-sm sm:text-base font-serif font-bold text-ink tabular-nums">
                                             {stat.pagesRead.toLocaleString()}
                                         </div>
-                                        <div className="text-[9px] sm:text-[10px] text-walnut/75 dark:text-gold/85 mt-0.5 font-semibold uppercase tracking-normal whitespace-nowrap">
+                                        <div className="text-[9px] sm:text-[10px] text-walnut/80 dark:text-gold/85 mt-0.5 font-semibold uppercase tracking-normal whitespace-nowrap">
                                             {t(
                                                 "reading.pages_read_short",
                                                 "Hal. Dibaca",
@@ -218,10 +221,10 @@ export default function YearlyTargetCards({
                                         </div>
                                     </div>
                                     <div className="text-center px-1 min-w-0">
-                                        <div className="text-sm sm:text-base font-serif font-bold text-darkBrown dark:text-cream tabular-nums">
+                                        <div className="text-sm sm:text-base font-serif font-bold text-ink tabular-nums">
                                             {stat.totalPages.toLocaleString()}
                                         </div>
-                                        <div className="text-[9px] sm:text-[10px] text-walnut/75 dark:text-gold/85 mt-0.5 font-semibold uppercase tracking-normal whitespace-nowrap">
+                                        <div className="text-[9px] sm:text-[10px] text-walnut/80 dark:text-gold/85 mt-0.5 font-semibold uppercase tracking-normal whitespace-nowrap">
                                             {t(
                                                 "reading.total_pages_short",
                                                 "Total Hal.",
@@ -229,10 +232,10 @@ export default function YearlyTargetCards({
                                         </div>
                                     </div>
                                     <div className="text-center px-1 min-w-0">
-                                        <div className="text-sm sm:text-base font-serif font-bold text-darkBrown dark:text-cream tabular-nums">
+                                        <div className="text-sm sm:text-base font-serif font-bold text-ink tabular-nums">
                                             {stat.readPct}%
                                         </div>
-                                        <div className="text-[9px] sm:text-[10px] text-walnut/75 dark:text-gold/85 mt-0.5 font-semibold uppercase tracking-normal whitespace-nowrap">
+                                        <div className="text-[9px] sm:text-[10px] text-walnut/80 dark:text-gold/85 mt-0.5 font-semibold uppercase tracking-normal whitespace-nowrap">
                                             {t(
                                                 "reading.percent_read",
                                                 "% Terbaca",

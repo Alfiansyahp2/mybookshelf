@@ -86,10 +86,10 @@ export default function ExploreLibrary() {
         <div className="p-8 pt-[88px] md:pt-[100px]">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-serif text-darkBrown mb-2">
+                <h1 className="text-3xl font-serif text-ink mb-2">
                     {t("explore.title", "Explore Library")}
                 </h1>
-                <p className="text-walnut/70 text-lg">
+                <p className="text-walnut/80 dark:text-cream/65 text-lg">
                     {t(
                         "explore.subtitle",
                         "Walk through your personal collection. Use arrow keys or buttons to navigate between shelves.",
@@ -98,7 +98,7 @@ export default function ExploreLibrary() {
             </div>
 
             {/* Room Info */}
-            <div className="bg-white rounded-2xl p-6 mb-8 border border-walnut/10 shadow-sm">
+            <div className="bg-surface/95 rounded-2xl p-6 mb-8 border border-walnut/15 dark:border-walnut/30 shadow-sm">
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-serif text-darkBrown mb-1">

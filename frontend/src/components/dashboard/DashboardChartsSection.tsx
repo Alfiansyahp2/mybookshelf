@@ -51,19 +51,20 @@ export default function DashboardChartsSection({
     }, [stats.genreChart, genreFilter]);
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <motion.div {...fadeUp(0.5)} style={{ height: "100%" }}>
                 <Card
                     style={{
-                        height: 280,
+                        height: 272,
                         display: "flex",
                         flexDirection: "column",
                     }}
                 >
                     <div
                         style={{
-                            padding: "16px 20px 8px",
-                            borderBottom: "1px solid rgba(139,99,56,0.08)",
+                            padding: "14px 18px 10px",
+                            borderBottom:
+                                "1px solid rgb(var(--color-walnut-rgb) / 0.14)",
                         }}
                     >
                         <h3
@@ -80,21 +81,21 @@ export default function DashboardChartsSection({
                     </div>
                     <div
                         style={{
-                            padding: "12px 20px 16px",
+                            padding: "12px 18px 14px",
                             display: "flex",
                             alignItems: "center",
-                            gap: 20,
+                            gap: 18,
                             flex: 1,
                         }}
                     >
-                        <ResponsiveContainer width={140} height={140}>
+                        <ResponsiveContainer width={136} height={136}>
                             <PieChart>
                                 <Pie
                                     data={stats.statusPie}
                                     cx="50%"
                                     cy="50%"
                                     innerRadius={38}
-                                    outerRadius={62}
+                                    outerRadius={60}
                                     dataKey="value"
                                     paddingAngle={2}
                                 >
@@ -111,7 +112,7 @@ export default function DashboardChartsSection({
                                 display: "flex",
                                 flexDirection: "column",
                                 justifyContent: "center",
-                                gap: 6,
+                                gap: 7,
                             }}
                         >
                             {stats.statusPie.map((d) => (
@@ -134,8 +135,8 @@ export default function DashboardChartsSection({
                                     />
                                     <span
                                         style={{
-                                            fontSize: 11,
-                                            color: BRAND.walnut,
+                                            fontSize: 11.5,
+                                            color: "rgb(var(--app-ink-rgb) / 0.78)",
                                             flex: 1,
                                         }}
                                     >
@@ -160,15 +161,16 @@ export default function DashboardChartsSection({
             <motion.div {...fadeUp(0.55)} style={{ height: "100%" }}>
                 <Card
                     style={{
-                        height: 280,
+                        height: 272,
                         display: "flex",
                         flexDirection: "column",
                     }}
                 >
                     <div
                         style={{
-                            padding: "16px 20px 8px",
-                            borderBottom: "1px solid rgba(139,99,56,0.08)",
+                            padding: "14px 18px 8px",
+                            borderBottom:
+                                "1px solid rgb(var(--color-walnut-rgb) / 0.14)",
                         }}
                     >
                         <div
@@ -176,7 +178,7 @@ export default function DashboardChartsSection({
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignItems: "center",
-                                marginBottom: 12,
+                                marginBottom: 8,
                             }}
                         >
                             <h3
@@ -196,7 +198,7 @@ export default function DashboardChartsSection({
                                 display: "flex",
                                 gap: 6,
                                 flexWrap: "wrap",
-                                marginBottom: 4,
+                                marginBottom: 2,
                             }}
                         >
                             <button
@@ -211,17 +213,17 @@ export default function DashboardChartsSection({
                                     background:
                                         genreFilter === "Semua"
                                             ? BRAND.walnut
-                                            : "rgba(139,99,56,0.1)",
+                                            : "rgb(var(--color-walnut-rgb) / 0.16)",
                                     color:
                                         genreFilter === "Semua"
                                             ? "white"
-                                            : BRAND.walnut,
+                                            : "rgb(var(--app-ink-rgb) / 0.78)",
                                     transition: "all 0.2s",
                                 }}
                             >
                                 {t("dashboard.charts.all")}
                             </button>
-                            {BOOK_GENRES.map((g: any) => (
+                            {BOOK_GENRES.map((g) => (
                                 <button
                                     key={g.category}
                                     onClick={() => setGenreFilter(g.category)}
@@ -235,11 +237,11 @@ export default function DashboardChartsSection({
                                         background:
                                             genreFilter === g.category
                                                 ? BRAND.walnut
-                                                : "rgba(139,99,56,0.1)",
+                                                : "rgb(var(--color-walnut-rgb) / 0.16)",
                                         color:
                                             genreFilter === g.category
                                                 ? "white"
-                                                : BRAND.walnut,
+                                                : "rgb(var(--app-ink-rgb) / 0.78)",
                                         transition: "all 0.2s",
                                     }}
                                     title={g.category}
@@ -251,7 +253,7 @@ export default function DashboardChartsSection({
                     </div>
                     <div
                         style={{
-                            padding: "12px 16px 12px",
+                            padding: "10px 14px 12px",
                             flex: 1,
                             display: "flex",
                             flexDirection: "column",
@@ -263,7 +265,7 @@ export default function DashboardChartsSection({
                                 style={{
                                     textAlign: "center",
                                     padding: "20px 0",
-                                    color: "rgba(122,92,66,0.4)",
+                                    color: "rgb(var(--app-ink-rgb) / 0.5)",
                                     fontSize: 12,
                                 }}
                             >
@@ -297,15 +299,15 @@ export default function DashboardChartsSection({
                                             data={displayedGenres}
                                             layout="vertical"
                                             margin={{
-                                                left: 10,
-                                                right: 20,
+                                                left: 4,
+                                                right: 16,
                                                 top: 0,
                                                 bottom: 0,
                                             }}
                                         >
                                             <CartesianGrid
                                                 strokeDasharray="3 3"
-                                                stroke="rgba(139,99,56,0.08)"
+                                                stroke="rgb(var(--color-walnut-rgb) / 0.14)"
                                                 horizontal={false}
                                             />
                                             <XAxis type="number" hide />
@@ -313,17 +315,17 @@ export default function DashboardChartsSection({
                                                 type="category"
                                                 dataKey="displayName"
                                                 tick={{
-                                                    fontSize: 10,
-                                                    fill: BRAND.walnut,
+                                                    fontSize: 10.5,
+                                                    fill: "rgb(var(--app-ink-rgb) / 0.78)",
                                                 }}
                                                 axisLine={false}
                                                 tickLine={false}
-                                                width={80}
+                                                width={88}
                                             />
                                             <Tooltip
                                                 content={<ChartTooltip />}
                                                 cursor={{
-                                                    fill: "rgba(139,99,56,0.05)",
+                                                    fill: "rgb(var(--color-walnut-rgb) / 0.1)",
                                                 }}
                                             />
                                             <Bar

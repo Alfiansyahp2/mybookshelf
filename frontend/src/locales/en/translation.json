@@ -213,6 +213,52 @@
       "title": "Theme",
       "desc": "Choose your preferred appearance"
     },
+    "theme_preview": "Theme Preview",
+    "light_mode": "Light Mode",
+    "dark_mode": "Dark Mode",
+    "palettes": {
+      "title": "App Color Palettes",
+      "subtitle": "Applies only inside the app (does not affect the Landing Page).",
+      "light_heading": "Light Mode Palettes",
+      "dark_heading": "Dark Mode Palettes",
+      "active_mode": "Active Mode",
+      "light": {
+        "parchment": {
+          "name": "Warm Parchment",
+          "desc": "Classic cream, walnut wood, and gold"
+        },
+        "sage": {
+          "name": "Botanical Sage",
+          "desc": "Calming sage paper & antique brass"
+        },
+        "slate": {
+          "name": "Archival Ink",
+          "desc": "Crisp ivory, archival slate, & ochre"
+        },
+        "rosewood": {
+          "name": "Rosewood Linen",
+          "desc": "Soft blush clay & warm copper"
+        }
+      },
+      "dark": {
+        "espresso": {
+          "name": "Cozy Espresso",
+          "desc": "Warm evening wood & amber gold"
+        },
+        "midnight": {
+          "name": "Midnight Ink",
+          "desc": "Deep navy sky & soft brass accents"
+        },
+        "forest": {
+          "name": "Forest Study",
+          "desc": "Deep pine study & muted gold"
+        },
+        "plum": {
+          "name": "Velvet Copper",
+          "desc": "Warm charcoal & copper highlights"
+        }
+      }
+    },
     "notifications": {
       "title": "Notifications",
       "desc": "Enable push notifications"

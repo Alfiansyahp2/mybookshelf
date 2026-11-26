@@ -203,10 +203,9 @@ export default function Collections() {
 
     return (
         <div
-            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative"
+            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative transition-colors duration-500"
             style={{
-                background:
-                    "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
+                background: "var(--app-wall-bg)",
             }}
         >
             <SEO
@@ -249,15 +248,15 @@ export default function Collections() {
                 </div>
 
                 {collections.length === 0 ? (
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-12 text-center">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-12 text-center backdrop-blur-sm">
                         <FolderKanban
                             size={36}
-                            className="mx-auto mb-3 text-walnut/35"
+                            className="mx-auto mb-3 text-walnut/40 dark:text-gold/60"
                         />
-                        <h3 className="font-serif text-lg font-semibold text-darkBrown dark:text-cream mb-1">
+                        <h3 className="font-serif text-lg font-semibold text-ink mb-1">
                             {t("collections.empty_title", "No collections yet")}
                         </h3>
-                        <p className="text-sm text-walnut/70 dark:text-cream/60 mb-5">
+                        <p className="text-sm text-walnut/75 dark:text-cream/65 mb-5">
                             {t(
                                 "collections.empty_desc",
                                 "Create your first thematic collection to organize related books.",
@@ -284,7 +283,7 @@ export default function Collections() {
                                 key={col.id}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-4"
+                                className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-4 backdrop-blur-sm"
                             >
                                 <div>
                                     <div className="flex items-start justify-between gap-3 mb-3">
@@ -299,10 +298,10 @@ export default function Collections() {
                                                 {col.icon || "📚"}
                                             </div>
                                             <div className="min-w-0">
-                                                <h2 className="font-serif font-bold text-lg text-darkBrown dark:text-cream truncate">
+                                                <h2 className="font-serif font-bold text-lg text-ink truncate">
                                                     {col.name}
                                                 </h2>
-                                                <p className="text-xs text-walnut/70">
+                                                <p className="text-xs text-walnut/75 dark:text-cream/65">
                                                     {col.bookIds.length}{" "}
                                                     {t(
                                                         "collections.books_count",

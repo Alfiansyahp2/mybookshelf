@@ -23,9 +23,9 @@ interface ChartTooltipProps {
 export function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
     if (!active || !payload?.length) return null;
     return (
-        <div className="bg-[rgba(255,251,245,0.97)] border border-[rgba(139,99,56,0.15)] rounded-[10px] px-3 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[12px]">
+        <div className="bg-surface/95 border border-walnut/20 rounded-[10px] px-3 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[12px]">
             {label && (
-                <p className="text-walnut font-semibold mb-1">
+                <p className="text-walnut dark:text-gold font-semibold mb-1">
                     {label}
                 </p>
             )}
@@ -54,7 +54,7 @@ export function Card({
 }) {
     return (
         <div
-            className={`bg-white rounded-2xl border border-[rgba(139,99,56,0.1)] shadow-[0_1px_4px_rgba(0,0,0,0.05)] overflow-hidden ${className}`}
+            className={`bg-surface/95 rounded-2xl border border-walnut/15 dark:border-walnut/30 shadow-[0_1px_4px_rgba(0,0,0,0.05)] overflow-hidden ${className}`}
             style={style}
         >
             {children}
@@ -188,12 +188,12 @@ export function ContributionGraph({
     }
 
     const getColor = (pages: number, finished: number) => {
-        if (finished > 0) return "#4A3B2F"; // Dark Brown for finished book
-        if (pages === 0) return "rgba(139,99,56,0.05)";
-        if (pages < 10) return "#d4b797";
-        if (pages < 30) return "#c29b71";
-        if (pages < 60) return "#ab7d4c";
-        return "#8b5a2b";
+        if (finished > 0) return "rgb(var(--color-gold-rgb))";
+        if (pages === 0) return "rgb(var(--color-walnut-rgb) / 0.14)";
+        if (pages < 10) return "rgb(var(--color-gold-rgb) / 0.35)";
+        if (pages < 30) return "rgb(var(--color-gold-rgb) / 0.6)";
+        if (pages < 60) return "rgb(var(--color-gold-rgb) / 0.88)";
+        return "rgb(var(--color-walnut-rgb))";
     };
 
     const startDate = new Date(selectedYear, 0, 1);
@@ -571,7 +571,7 @@ export function ContributionGraph({
                             paddingTop: 20,
                             paddingBottom: 8,
                             fontSize: 10,
-                            color: "rgba(122,92,66,0.8)",
+                            color: "rgb(var(--app-ink-rgb) / 0.65)",
                         }}
                     >
                         <div style={{ height: 12 }}></div>
@@ -634,7 +634,7 @@ export function ContributionGraph({
                                         position: "absolute",
                                         left: label.x,
                                         fontSize: 10,
-                                        color: "rgba(122,92,66,0.8)",
+                                        color: "rgb(var(--app-ink-rgb) / 0.65)",
                                     }}
                                 >
                                     {label.month}
@@ -705,7 +705,7 @@ export function ContributionGraph({
                         alignItems: "center",
                         gap: 4,
                         fontSize: 10,
-                        color: "rgba(139,99,56,0.6)",
+                        color: "rgb(var(--app-ink-rgb) / 0.65)",
                         marginTop: 4,
                         paddingRight: 8,
                     }}
@@ -716,7 +716,7 @@ export function ContributionGraph({
                             width: 12,
                             height: 12,
                             borderRadius: 2,
-                            background: "rgba(139,99,56,0.05)",
+                            background: "rgb(var(--color-walnut-rgb) / 0.14)",
                         }}
                     />
                     <div
@@ -724,7 +724,7 @@ export function ContributionGraph({
                             width: 12,
                             height: 12,
                             borderRadius: 2,
-                            background: "#d4b797",
+                            background: "rgb(var(--color-gold-rgb) / 0.35)",
                         }}
                     />
                     <div
@@ -732,7 +732,7 @@ export function ContributionGraph({
                             width: 12,
                             height: 12,
                             borderRadius: 2,
-                            background: "#c29b71",
+                            background: "rgb(var(--color-gold-rgb) / 0.6)",
                         }}
                     />
                     <div
@@ -740,7 +740,7 @@ export function ContributionGraph({
                             width: 12,
                             height: 12,
                             borderRadius: 2,
-                            background: "#ab7d4c",
+                            background: "rgb(var(--color-gold-rgb) / 0.88)",
                         }}
                     />
                     <div
@@ -748,7 +748,7 @@ export function ContributionGraph({
                             width: 12,
                             height: 12,
                             borderRadius: 2,
-                            background: "#8b5a2b",
+                            background: "rgb(var(--color-walnut-rgb))",
                         }}
                     />
                     <span>{t("dashboard.activity.more")}</span>

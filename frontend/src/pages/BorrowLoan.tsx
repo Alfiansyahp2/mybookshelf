@@ -176,10 +176,9 @@ export default function BorrowLoan() {
 
     return (
         <div
-            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative"
+            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative transition-colors duration-500"
             style={{
-                background:
-                    "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
+                background: "var(--app-wall-bg)",
             }}
         >
             <SEO
@@ -223,26 +222,26 @@ export default function BorrowLoan() {
 
                 {/* Summary KPI Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm backdrop-blur-sm flex items-center gap-3.5">
                         <div className="w-11 h-11 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
                             <BookUp2 size={20} />
                         </div>
                         <div>
-                            <p className="text-xs text-walnut/70 dark:text-cream/60 font-medium">
+                            <p className="text-xs text-walnut/75 dark:text-cream/65 font-medium">
                                 {t("borrow.currently_loaned", "Currently Loaned")}
                             </p>
-                            <p className="text-2xl font-serif font-bold text-darkBrown dark:text-cream">
+                            <p className="text-2xl font-serif font-bold text-ink">
                                 {borrowedBooks.length}
                             </p>
                         </div>
                     </div>
 
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm backdrop-blur-sm flex items-center gap-3.5">
                         <div className="w-11 h-11 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
                             <AlertTriangle size={20} />
                         </div>
                         <div>
-                            <p className="text-xs text-walnut/70 dark:text-cream/60 font-medium">
+                            <p className="text-xs text-walnut/75 dark:text-cream/65 font-medium">
                                 {t("borrow.overdue", "Overdue")}
                             </p>
                             <p className="text-2xl font-serif font-bold text-rose-700 dark:text-rose-400">
@@ -251,18 +250,18 @@ export default function BorrowLoan() {
                         </div>
                     </div>
 
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm backdrop-blur-sm flex items-center gap-3.5">
                         <div className="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                             <BookCheck size={20} />
                         </div>
                         <div>
-                            <p className="text-xs text-walnut/70 dark:text-cream/60 font-medium">
+                            <p className="text-xs text-walnut/75 dark:text-cream/65 font-medium">
                                 {t(
                                     "borrow.available_to_loan",
                                     "Available in Library",
                                 )}
                             </p>
-                            <p className="text-2xl font-serif font-bold text-darkBrown dark:text-cream">
+                            <p className="text-2xl font-serif font-bold text-ink">
                                 {availableBooks.length}
                             </p>
                         </div>
@@ -271,7 +270,7 @@ export default function BorrowLoan() {
 
                 {/* Filter Tabs + Search */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-                    <div className="inline-flex p-1 rounded-xl bg-white/60 dark:bg-black/30 backdrop-blur-sm border border-walnut/15 self-start">
+                    <div className="inline-flex p-1 rounded-xl bg-surface/65 dark:bg-black/30 backdrop-blur-sm border border-walnut/15 dark:border-walnut/30 self-start">
                         {(
                             [
                                 {
@@ -295,7 +294,7 @@ export default function BorrowLoan() {
                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                                     activeTab === tab.key
                                         ? "bg-walnut text-white shadow-xs"
-                                        : "text-darkBrown/75 dark:text-cream/75 hover:text-darkBrown"
+                                        : "text-ink/75 hover:text-ink"
                                 }`}
                             >
                                 {tab.label}
@@ -316,25 +315,25 @@ export default function BorrowLoan() {
                                 "borrow.search_placeholder",
                                 "Search title, author, or borrower...",
                             )}
-                            className="w-full pl-9 pr-3 py-2 bg-white/90 dark:bg-[#1e1712] border border-walnut/20 rounded-xl text-sm text-darkBrown dark:text-cream focus:outline-none focus:ring-2 focus:ring-walnut/30"
+                            className="w-full pl-9 pr-3 py-2 bg-surface/95 border border-walnut/20 dark:border-walnut/35 rounded-xl text-sm text-ink focus:outline-none focus:ring-2 focus:ring-walnut/30"
                         />
                     </div>
                 </div>
 
                 {/* Books List */}
                 {displayedBooks.length === 0 ? (
-                    <div className="bg-white/90 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-12 text-center">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-12 text-center backdrop-blur-sm">
                         <BookUp2
                             size={36}
-                            className="mx-auto mb-3 text-walnut/35"
+                            className="mx-auto mb-3 text-walnut/40 dark:text-gold/60"
                         />
-                        <h3 className="font-serif text-lg font-semibold text-darkBrown dark:text-cream mb-1">
+                        <h3 className="font-serif text-lg font-semibold text-ink mb-1">
                             {t(
                                 "borrow.empty_title",
                                 "No matching books in this view",
                             )}
                         </h3>
-                        <p className="text-sm text-walnut/70 dark:text-cream/60">
+                        <p className="text-sm text-walnut/75 dark:text-cream/65">
                             {activeTab === "borrowed"
                                 ? t(
                                       "borrow.empty_borrowed",
@@ -357,7 +356,7 @@ export default function BorrowLoan() {
                                     key={book.id}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm flex flex-col justify-between gap-4"
+                                    className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm flex flex-col justify-between gap-4 backdrop-blur-sm"
                                 >
                                     <div className="flex gap-3.5">
                                         <button

@@ -80,7 +80,7 @@ export default function AppHeader({
             <div 
                 className={`transition-all duration-500 ease-in-out mx-auto ${
                     isScrolled 
-                        ? "bg-white/95 dark:bg-[#1a1612]/95 backdrop-blur-md rounded-2xl md:rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-walnut/10 dark:border-walnut/20 py-1.5 sm:py-2 px-3 sm:px-6 max-w-6xl" 
+                        ? "app-header-bg bg-surface/95 backdrop-blur-md rounded-2xl md:rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] border border-walnut/15 dark:border-walnut/30 py-1.5 sm:py-2 px-3 sm:px-6 max-w-6xl" 
                         : "bg-transparent py-1.5 sm:py-2 md:py-2.5 px-3 sm:px-4 md:px-8 w-full max-w-none"
                 }`}
             >
@@ -283,7 +283,7 @@ export default function AppHeader({
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 8, scale: 0.95 }}
                                         transition={{ duration: 0.2, ease: "easeOut" }}
-                                        className="absolute right-0 top-full mt-2.5 w-64 sm:w-72 bg-white/95 dark:bg-[#201a14]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-walnut/15 dark:border-walnut/30 p-3 z-50 overflow-hidden flex flex-col text-darkBrown dark:text-cream"
+                                        className="absolute right-0 top-full mt-2.5 w-64 sm:w-72 bg-surface/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-walnut/15 dark:border-walnut/30 p-3 z-50 overflow-hidden flex flex-col text-ink"
                                     >
                                         {/* User Info Header */}
                                         <div className="flex items-center gap-3 p-2 rounded-xl bg-walnut/5 dark:bg-walnut/15 mb-1">

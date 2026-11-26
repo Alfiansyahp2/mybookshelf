@@ -91,10 +91,9 @@ export default function Statistics() {
 
     return (
         <div
-            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative"
+            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative transition-colors duration-500"
             style={{
-                background:
-                    "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
+                background: "var(--app-wall-bg)",
             }}
         >
             <SEO
@@ -124,65 +123,65 @@ export default function Statistics() {
 
                 {/* Overview KPI Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-walnut/70 font-medium">
+                            <span className="text-xs text-walnut/75 dark:text-cream/65 font-medium">
                                 {t("statistics.books_finished", "Books Finished")}
                             </span>
-                            <BookOpen size={16} className="text-walnut" />
+                            <BookOpen size={16} className="text-walnut dark:text-gold" />
                         </div>
-                        <p className="text-2xl font-serif font-bold text-darkBrown dark:text-cream">
+                        <p className="text-2xl font-serif font-bold text-ink">
                             {overview?.finished_books ?? 0}
-                            <span className="text-sm font-sans font-normal text-walnut/60">
+                            <span className="text-sm font-sans font-normal text-walnut/65 dark:text-cream/50">
                                 {" "}
                                 / {overview?.total_books ?? allBooks.length}
                             </span>
                         </p>
                     </div>
 
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-walnut/70 font-medium">
+                            <span className="text-xs text-walnut/75 dark:text-cream/65 font-medium">
                                 {t("statistics.pages_read", "Pages Read")}
                             </span>
-                            <FileText size={16} className="text-walnut" />
+                            <FileText size={16} className="text-walnut dark:text-gold" />
                         </div>
-                        <p className="text-2xl font-serif font-bold text-darkBrown dark:text-cream">
+                        <p className="text-2xl font-serif font-bold text-ink">
                             {(overview?.pages_read ?? 0).toLocaleString()}
-                            <span className="text-sm font-sans font-normal text-walnut/60">
+                            <span className="text-sm font-sans font-normal text-walnut/65 dark:text-cream/50">
                                 {" "}
                                 / {(overview?.total_pages ?? 0).toLocaleString()}
                             </span>
                         </p>
                     </div>
 
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-walnut/70 font-medium">
+                            <span className="text-xs text-walnut/75 dark:text-cream/65 font-medium">
                                 {t("statistics.reading_time", "Reading Time")}
                             </span>
-                            <Clock size={16} className="text-walnut" />
+                            <Clock size={16} className="text-walnut dark:text-gold" />
                         </div>
-                        <p className="text-2xl font-serif font-bold text-darkBrown dark:text-cream">
+                        <p className="text-2xl font-serif font-bold text-ink">
                             {readingTime?.total_hours ?? 0}
-                            <span className="text-sm font-sans font-normal text-walnut/60">
+                            <span className="text-sm font-sans font-normal text-walnut/65 dark:text-cream/50">
                                 {" "}
                                 {t("statistics.hours", "hrs")}
                             </span>
                         </p>
                     </div>
 
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-4 shadow-sm">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-4 shadow-sm backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs text-walnut/70 font-medium">
+                            <span className="text-xs text-walnut/75 dark:text-cream/65 font-medium">
                                 {t(
                                     "statistics.library_investment",
                                     "Total Invested",
                                 )}
                             </span>
-                            <Wallet size={16} className="text-walnut" />
+                            <Wallet size={16} className="text-walnut dark:text-gold" />
                         </div>
-                        <p className="text-2xl font-serif font-bold text-darkBrown dark:text-cream">
+                        <p className="text-2xl font-serif font-bold text-ink">
                             {formatIDR(
                                 Number(purchases?.accounting?.total_invested) ||
                                     Number(purchases?.total_spent) ||
@@ -195,8 +194,8 @@ export default function Statistics() {
                 {/* Charts Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
                     {/* Genre Distribution */}
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-5 shadow-sm">
-                        <h2 className="font-serif font-bold text-lg text-darkBrown dark:text-cream mb-4">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-5 shadow-sm backdrop-blur-sm">
+                        <h2 className="font-serif font-bold text-lg text-ink mb-4">
                             {t("statistics.top_genres", "Top Genres")}
                         </h2>
                         {genreData.length === 0 ? (
@@ -235,12 +234,12 @@ export default function Statistics() {
                     </div>
 
                     {/* Format Distribution */}
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-5 shadow-sm">
-                        <h2 className="font-serif font-bold text-lg text-darkBrown dark:text-cream mb-4">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-5 shadow-sm backdrop-blur-sm">
+                        <h2 className="font-serif font-bold text-lg text-ink mb-4">
                             {t("statistics.formats", "Book Formats")}
                         </h2>
                         {formatData.length === 0 ? (
-                            <p className="text-sm text-walnut/60 py-12 text-center">
+                            <p className="text-sm text-walnut/60 dark:text-cream/55 py-12 text-center">
                                 {t(
                                     "statistics.no_format_data",
                                     "No format data available.",
@@ -281,15 +280,15 @@ export default function Statistics() {
 
                 {/* Monthly Finished + Top Read Books */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-5 shadow-sm">
-                        <h2 className="font-serif font-bold text-lg text-darkBrown dark:text-cream mb-4">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-5 shadow-sm backdrop-blur-sm">
+                        <h2 className="font-serif font-bold text-lg text-ink mb-4">
                             {t(
                                 "statistics.monthly_finished",
                                 "Books Finished This Year",
                             )}
                         </h2>
                         {monthlyData.length === 0 ? (
-                            <p className="text-sm text-walnut/60 py-10 text-center">
+                            <p className="text-sm text-walnut/60 dark:text-cream/55 py-10 text-center">
                                 {t(
                                     "statistics.no_monthly_data",
                                     "Complete a book to see your monthly reading pace.",
@@ -323,15 +322,15 @@ export default function Statistics() {
                         )}
                     </div>
 
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-5 shadow-sm">
-                        <h2 className="font-serif font-bold text-lg text-darkBrown dark:text-cream mb-4">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-5 shadow-sm backdrop-blur-sm">
+                        <h2 className="font-serif font-bold text-lg text-ink mb-4">
                             {t(
                                 "statistics.top_sessions",
                                 "Most Active Reading Sessions",
                             )}
                         </h2>
                         {topReadBooks.length === 0 ? (
-                            <p className="text-sm text-walnut/60 py-10 text-center">
+                            <p className="text-sm text-walnut/60 dark:text-cream/55 py-10 text-center">
                                 {t(
                                     "statistics.no_sessions_data",
                                     "Start a reading session timer on a book to track session activity.",
@@ -342,7 +341,7 @@ export default function Statistics() {
                                 {topReadBooks.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="flex items-center justify-between gap-3 p-3 rounded-xl bg-cream/60 dark:bg-black/20 border border-walnut/10"
+                                        className="flex items-center justify-between gap-3 p-3 rounded-xl bg-surfaceAlt/85 border border-walnut/15 dark:border-walnut/25"
                                     >
                                         <div className="flex items-center gap-2.5 min-w-0">
                                             <span

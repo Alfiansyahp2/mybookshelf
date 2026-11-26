@@ -50,7 +50,7 @@ export default function ActiveReadingCard({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="bg-[#fcfaf7]/95 dark:bg-[#231b14]/95 rounded-2xl p-3.5 sm:p-4 border border-walnut/20 dark:border-walnut/35 shadow-sm hover:shadow-md transition-all backdrop-blur-sm flex gap-3.5 sm:gap-4 items-stretch"
+            className="bg-surface/95 rounded-2xl p-3.5 sm:p-4 border border-walnut/20 dark:border-walnut/35 shadow-sm hover:shadow-md transition-all backdrop-blur-sm flex gap-3.5 sm:gap-4 items-stretch"
         >
             {/* Book Cover / Vintage Spine Preview */}
             <button
@@ -90,11 +90,11 @@ export default function ActiveReadingCard({
                             onClick={() => onOpenBook(book)}
                             className="text-left block w-full group"
                         >
-                            <h3 className="font-serif font-bold text-sm sm:text-base text-darkBrown dark:text-cream leading-snug line-clamp-1 group-hover:text-walnut dark:group-hover:text-gold transition-colors">
+                            <h3 className="font-serif font-bold text-sm sm:text-base text-ink leading-snug line-clamp-1 group-hover:text-walnut dark:group-hover:text-gold transition-colors">
                                 {book.title}
                             </h3>
                         </button>
-                        <p className="text-xs text-walnut/75 dark:text-cream/65 truncate mt-0.5">
+                        <p className="text-xs text-walnut/80 dark:text-cream/65 truncate mt-0.5">
                             {book.author || "-"}
                             {book.genre ? ` · ${book.genre}` : ""}
                         </p>
@@ -108,17 +108,17 @@ export default function ActiveReadingCard({
                 {/* Progress Bar & Counts */}
                 <div>
                     <div className="flex items-center justify-between text-[11px] mb-1 gap-2">
-                        <span className="font-semibold text-darkBrown dark:text-cream/90 tabular-nums">
+                        <span className="font-semibold text-ink tabular-nums">
                             {currentPage.toLocaleString()}
                             {totalPages > 0
                                 ? ` / ${totalPages.toLocaleString()}`
                                 : ""}{" "}
-                            <span className="font-normal text-walnut/65 dark:text-cream/55">
+                            <span className="font-normal text-walnut/70 dark:text-cream/55">
                                 {t("reading.pages_unit", "hal")}
                             </span>
                         </span>
                         {totalPages > 0 && (
-                            <span className="text-walnut/70 dark:text-cream/60 tabular-nums truncate">
+                            <span className="text-walnut/75 dark:text-cream/60 tabular-nums truncate">
                                 {remainingPages === 0
                                     ? t("reading.ready_to_finish", "Siap selesai")
                                     : t(
@@ -132,7 +132,7 @@ export default function ActiveReadingCard({
 
                     <div className="h-2 rounded-full bg-walnut/15 dark:bg-black/40 overflow-hidden">
                         <div
-                            className="h-full rounded-full bg-gradient-to-r from-[#7a5c42] via-[#b8844a] to-[#d4a574] dark:from-[#a9713b] dark:via-[#d4a574] dark:to-[#ffd166] transition-all duration-300"
+                            className="h-full rounded-full bg-gradient-to-r from-walnut to-gold transition-all duration-300"
                             style={{
                                 width: `${Math.min(Math.max(progressPct, 0), 100)}%`,
                             }}
@@ -149,7 +149,7 @@ export default function ActiveReadingCard({
                             onClick={() =>
                                 onUpdatePage(book, clampPage(currentPage - 1))
                             }
-                            className="h-7 px-2 rounded-lg border border-walnut/20 dark:border-walnut/35 bg-white/80 dark:bg-[#1a130d] text-darkBrown dark:text-cream text-[11px] font-semibold flex items-center gap-0.5 hover:bg-walnut/10 dark:hover:bg-walnut/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="h-7 px-2 rounded-lg border border-walnut/20 dark:border-walnut/35 bg-surfaceAlt text-ink text-[11px] font-semibold flex items-center gap-0.5 hover:bg-walnut/10 dark:hover:bg-walnut/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                             title={t("reading.prev_page", "Kurangi 1 halaman")}
                         >
                             <Minus size={11} />
@@ -161,7 +161,7 @@ export default function ActiveReadingCard({
                             onClick={() =>
                                 onUpdatePage(book, clampPage(currentPage + 5))
                             }
-                            className="h-7 px-2 rounded-lg border border-walnut/20 dark:border-walnut/35 bg-white/80 dark:bg-[#1a130d] text-darkBrown dark:text-cream text-[11px] font-semibold flex items-center gap-0.5 hover:bg-walnut/10 dark:hover:bg-walnut/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="h-7 px-2 rounded-lg border border-walnut/20 dark:border-walnut/35 bg-surfaceAlt text-ink text-[11px] font-semibold flex items-center gap-0.5 hover:bg-walnut/10 dark:hover:bg-walnut/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                             title={t("reading.add_5_pages", "Tambah 5 halaman")}
                         >
                             <Plus size={11} />
@@ -173,7 +173,7 @@ export default function ActiveReadingCard({
                             onClick={() =>
                                 onUpdatePage(book, clampPage(currentPage + 10))
                             }
-                            className="h-7 px-2 rounded-lg border border-walnut/20 dark:border-walnut/35 bg-white/80 dark:bg-[#1a130d] text-darkBrown dark:text-cream text-[11px] font-semibold flex items-center gap-0.5 hover:bg-walnut/10 dark:hover:bg-walnut/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="h-7 px-2 rounded-lg border border-walnut/20 dark:border-walnut/35 bg-surfaceAlt text-ink text-[11px] font-semibold flex items-center gap-0.5 hover:bg-walnut/10 dark:hover:bg-walnut/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                             title={t(
                                 "reading.add_10_pages",
                                 "Tambah 10 halaman",
@@ -189,7 +189,7 @@ export default function ActiveReadingCard({
                             type="button"
                             disabled={isUpdating}
                             onClick={() => onFinishBook(book)}
-                            className="h-7 px-2.5 rounded-lg bg-walnut/12 hover:bg-walnut/20 dark:bg-gold/15 dark:hover:bg-gold/25 text-darkBrown dark:text-gold text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40 transition-colors"
+                            className="h-7 px-2.5 rounded-lg bg-walnut/12 hover:bg-walnut/20 dark:bg-gold/15 dark:hover:bg-gold/25 text-ink dark:text-gold text-[11px] font-semibold flex items-center gap-1 disabled:opacity-40 transition-colors"
                             title={t(
                                 "reading.mark_finished",
                                 "Tandai selesai",
@@ -203,7 +203,7 @@ export default function ActiveReadingCard({
                         <button
                             type="button"
                             onClick={() => onOpenBook(book)}
-                            className="h-7 px-2.5 rounded-lg bg-walnut hover:bg-darkBrown dark:bg-[#8a5a28] dark:hover:bg-[#a06b35] text-white text-[11px] font-semibold flex items-center gap-0.5 transition-colors"
+                            className="h-7 px-2.5 rounded-lg bg-walnut hover:bg-darkBrown text-white text-[11px] font-semibold flex items-center gap-0.5 transition-colors"
                         >
                             <span>{t("reading.detail_short", "Detail")}</span>
                             <ChevronRight size={12} />

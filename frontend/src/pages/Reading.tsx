@@ -242,7 +242,10 @@ export default function Reading() {
 
     if (isLoading) {
         return (
-            <div className="min-h-full px-4 pt-[70px] pb-16 flex items-center justify-center bg-[linear-gradient(150deg,#e2c99a_0%,#cdb07c_45%,#b89860_100%)] dark:bg-[linear-gradient(150deg,#211810_0%,#19120c_48%,#120c08_100%)]">
+            <div
+                className="min-h-full px-4 pt-[70px] pb-16 flex items-center justify-center transition-colors duration-500"
+                style={{ background: "var(--app-wall-bg)" }}
+            >
                 <SEO title={t("navigation.reading", "Reading")} />
                 <div className="text-sm font-medium text-walnut dark:text-gold">
                     {t("reading.loading", "Loading reading progress...")}
@@ -252,7 +255,10 @@ export default function Reading() {
     }
 
     return (
-        <div className="px-3.5 sm:px-6 md:px-8 pb-10 md:pb-14 pt-[58px] sm:pt-[62px] md:pt-[70px] flex flex-col min-h-full relative bg-[linear-gradient(150deg,#e2c99a_0%,#cdb07c_45%,#b89860_100%)] dark:bg-[linear-gradient(150deg,#211810_0%,#19120c_48%,#120c08_100%)] transition-colors duration-500">
+        <div
+            className="px-3.5 sm:px-6 md:px-8 pb-10 md:pb-14 pt-[58px] sm:pt-[62px] md:pt-[70px] flex flex-col min-h-full relative transition-colors duration-500"
+            style={{ background: "var(--app-wall-bg)" }}
+        >
             <SEO
                 title={t("navigation.reading", "Reading")}
                 description={t(
@@ -285,7 +291,7 @@ export default function Reading() {
                             </span>
                         </div>
                         <div className="flex items-center gap-2.5 mb-1">
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-darkBrown dark:text-cream tracking-tight">
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-ink tracking-tight">
                                 {t(
                                     "reading.currently_reading",
                                     "Currently Reading",
@@ -297,7 +303,7 @@ export default function Reading() {
                                 </span>
                             )}
                         </div>
-                        <p className="text-xs sm:text-sm text-walnut/80 dark:text-cream/65">
+                        <p className="text-xs sm:text-sm text-walnut/85 dark:text-cream/65">
                             {t(
                                 "reading.track_progress",
                                 "Track your progress on {{count}} book{{s}}",
@@ -314,7 +320,7 @@ export default function Reading() {
                         <button
                             type="button"
                             onClick={() => navigate("/library")}
-                            className="px-3 py-2 rounded-xl bg-[#fcfaf7]/80 hover:bg-[#fcfaf7] dark:bg-[#231b14]/85 dark:hover:bg-[#2d2219] border border-walnut/20 dark:border-walnut/35 text-darkBrown dark:text-cream text-xs sm:text-sm font-medium flex items-center gap-1.5 shadow-xs transition-all backdrop-blur-sm"
+                            className="px-3 py-2 rounded-xl bg-surface/85 hover:bg-surface border border-walnut/20 dark:border-walnut/35 text-ink text-xs sm:text-sm font-medium flex items-center gap-1.5 shadow-xs transition-all backdrop-blur-sm"
                         >
                             <Library size={15} className="text-walnut dark:text-gold" />
                             <span>
@@ -329,7 +335,7 @@ export default function Reading() {
                                     t("reading.reading_shelf", "Sedang Dibaca"),
                                 )
                             }
-                            className="px-3.5 py-2 rounded-xl bg-walnut hover:bg-darkBrown dark:bg-[#8a5a28] dark:hover:bg-[#a06b35] text-white text-xs sm:text-sm font-medium flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all"
+                            className="px-3.5 py-2 rounded-xl bg-walnut hover:bg-darkBrown text-white text-xs sm:text-sm font-medium flex items-center gap-1.5 shadow-sm hover:shadow-md transition-all"
                         >
                             <Plus size={16} />
                             <span>{t("reading.add_book", "Tambah Buku")}</span>
@@ -354,7 +360,7 @@ export default function Reading() {
                         <div className="flex items-center justify-between gap-3 mb-3 px-0.5">
                             <div className="flex items-center gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-walnut dark:bg-gold shadow-xs" />
-                                <h2 className="font-serif font-bold text-base sm:text-lg text-darkBrown dark:text-cream tracking-wide">
+                                <h2 className="font-serif font-bold text-base sm:text-lg text-ink tracking-wide">
                                     {t(
                                         "reading.books_read_in_year",
                                         "Buku yang Dibaca Tahun {{year}}",
@@ -365,7 +371,7 @@ export default function Reading() {
                             <button
                                 type="button"
                                 onClick={() => setSelectedYear(null)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#fcfaf7]/80 dark:bg-[#231b14]/90 border border-walnut/20 dark:border-walnut/35 text-[11px] font-semibold text-walnut dark:text-gold hover:bg-[#fcfaf7] dark:hover:bg-[#2d2219] transition-colors"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface/85 border border-walnut/20 dark:border-walnut/35 text-[11px] font-semibold text-walnut dark:text-gold hover:bg-surface transition-colors"
                             >
                                 <X size={12} />
                                 <span>
@@ -420,21 +426,21 @@ export default function Reading() {
                         <motion.div
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-[#fcfaf7]/95 dark:bg-[#231b14]/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
+                            className="bg-surface/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
                         >
                             <div className="w-9 h-9 rounded-xl bg-walnut/15 dark:bg-gold/15 text-walnut dark:text-gold flex items-center justify-center shrink-0">
                                 <BookOpen size={17} />
                             </div>
                             <div className="min-w-0">
-                                <div className="text-[11px] font-semibold text-walnut/75 dark:text-cream/60 truncate">
+                                <div className="text-[11px] font-semibold text-walnut/80 dark:text-cream/65 truncate">
                                     {t(
                                         "reading.reading_status",
                                         "Sedang Dibaca",
                                     )}
                                 </div>
-                                <div className="text-lg sm:text-xl font-serif font-bold text-darkBrown dark:text-cream leading-tight tabular-nums">
+                                <div className="text-lg sm:text-xl font-serif font-bold text-ink leading-tight tabular-nums">
                                     {totalReadingBooks}{" "}
-                                    <span className="text-xs font-sans font-normal text-walnut/60 dark:text-cream/45">
+                                    <span className="text-xs font-sans font-normal text-walnut/65 dark:text-cream/50">
                                         {t("reading.books_unit", "buku")}
                                     </span>
                                 </div>
@@ -446,21 +452,21 @@ export default function Reading() {
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.04 }}
-                            className="bg-[#fcfaf7]/95 dark:bg-[#231b14]/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
+                            className="bg-surface/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-[#9a5b25]/12 dark:bg-amber-400/15 text-[#8a4d19] dark:text-amber-300 flex items-center justify-center shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-walnut/12 dark:bg-gold/15 text-walnut dark:text-gold flex items-center justify-center shrink-0">
                                 <Bookmark size={17} />
                             </div>
                             <div className="min-w-0">
-                                <div className="text-[11px] font-semibold text-walnut/75 dark:text-cream/60 truncate">
+                                <div className="text-[11px] font-semibold text-walnut/80 dark:text-cream/65 truncate">
                                     {t(
                                         "reading.unread_queue",
                                         "Belum Dibaca",
                                     )}
                                 </div>
-                                <div className="text-lg sm:text-xl font-serif font-bold text-darkBrown dark:text-cream leading-tight tabular-nums">
+                                <div className="text-lg sm:text-xl font-serif font-bold text-ink leading-tight tabular-nums">
                                     {totalUnreadBooks}{" "}
-                                    <span className="text-xs font-sans font-normal text-walnut/60 dark:text-cream/45">
+                                    <span className="text-xs font-sans font-normal text-walnut/65 dark:text-cream/50">
                                         {t("reading.books_unit", "buku")}
                                     </span>
                                 </div>
@@ -472,18 +478,18 @@ export default function Reading() {
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.08 }}
-                            className="bg-[#fcfaf7]/95 dark:bg-[#231b14]/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
+                            className="bg-surface/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-amber-500/15 dark:bg-amber-400/15 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-gold/20 dark:bg-gold/15 text-walnut dark:text-gold flex items-center justify-center shrink-0">
                                 <FileText size={17} />
                             </div>
                             <div className="min-w-0">
-                                <div className="text-[11px] font-semibold text-walnut/75 dark:text-cream/60 truncate">
+                                <div className="text-[11px] font-semibold text-walnut/80 dark:text-cream/65 truncate">
                                     {t("reading.pages_read", "Halaman Dibaca")}
                                 </div>
-                                <div className="text-lg sm:text-xl font-serif font-bold text-darkBrown dark:text-cream leading-tight tabular-nums truncate">
+                                <div className="text-lg sm:text-xl font-serif font-bold text-ink leading-tight tabular-nums truncate">
                                     {totalPagesRead.toLocaleString()}{" "}
-                                    <span className="text-[11px] font-sans font-normal text-walnut/60 dark:text-cream/45">
+                                    <span className="text-[11px] font-sans font-normal text-walnut/65 dark:text-cream/50">
                                         {totalPages > 0
                                             ? `/ ${totalPages.toLocaleString()}`
                                             : t("reading.pages_unit", "hal")}
@@ -497,32 +503,32 @@ export default function Reading() {
                             initial={{ opacity: 0, y: 12 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.12 }}
-                            className="bg-[#fcfaf7]/95 dark:bg-[#231b14]/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
+                            className="bg-surface/95 rounded-2xl p-3 sm:p-3.5 border border-walnut/20 dark:border-walnut/35 shadow-xs hover:shadow-md transition-all backdrop-blur-sm flex items-center gap-3"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-[#5c3a1e]/12 dark:bg-[#d4a574]/18 text-[#5c3a1e] dark:text-[#f2d0a4] flex items-center justify-center shrink-0">
+                            <div className="w-9 h-9 rounded-xl bg-walnut/15 dark:bg-gold/18 text-walnut dark:text-gold flex items-center justify-center shrink-0">
                                 <TrendingUp size={17} />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-1">
-                                    <span className="text-[11px] font-semibold text-walnut/75 dark:text-cream/60 truncate">
+                                    <span className="text-[11px] font-semibold text-walnut/80 dark:text-cream/65 truncate">
                                         {t(
                                             "reading.total_progress",
                                             "Total Progres",
                                         )}
                                     </span>
                                     {totalPages > 0 && (
-                                        <span className="text-[10px] text-walnut/60 dark:text-cream/45 tabular-nums shrink-0">
+                                        <span className="text-[10px] text-walnut/65 dark:text-cream/50 tabular-nums shrink-0">
                                             -{remainingPages.toLocaleString()} {t("reading.pages_unit", "hal")}
                                         </span>
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-lg sm:text-xl font-serif font-bold text-darkBrown dark:text-cream leading-tight tabular-nums">
+                                    <span className="text-lg sm:text-xl font-serif font-bold text-ink leading-tight tabular-nums">
                                         {overallProgress}%
                                     </span>
                                     <div className="flex-1 h-1.5 rounded-full bg-walnut/15 dark:bg-black/40 overflow-hidden">
                                         <div
-                                            className="h-full rounded-full bg-gradient-to-r from-[#8a5a28] via-[#cfa064] to-[#e7bd82]"
+                                            className="h-full rounded-full bg-gradient-to-r from-walnut to-gold"
                                             style={{
                                                 width: `${Math.min(overallProgress, 100)}%`,
                                             }}
@@ -540,7 +546,7 @@ export default function Reading() {
                         <div className="flex items-center justify-between gap-3 mb-3 px-0.5">
                             <div className="flex items-center gap-2">
                                 <span className="w-2.5 h-2.5 rounded-full bg-walnut dark:bg-gold shadow-xs" />
-                                <h2 className="font-serif font-bold text-base sm:text-lg text-darkBrown dark:text-cream tracking-wide">
+                                <h2 className="font-serif font-bold text-base sm:text-lg text-ink tracking-wide">
                                     {t(
                                         "reading.active_focus_title",
                                         "Fokus Bacaan Saat Ini",
@@ -601,7 +607,7 @@ export default function Reading() {
                                 className="flex items-center gap-2 group py-1 pr-2 rounded-xl hover:bg-white/25 dark:hover:bg-white/5 transition-colors"
                             >
                                 <span className="w-2.5 h-2.5 rounded-full bg-walnut dark:bg-gold shadow-xs" />
-                                <h2 className="font-serif font-bold text-base sm:text-lg text-darkBrown dark:text-cream tracking-wide">
+                                <h2 className="font-serif font-bold text-base sm:text-lg text-ink tracking-wide">
                                     {t(
                                         "reading.shelf_title",
                                         "Koleksi Bacaan",
@@ -610,7 +616,7 @@ export default function Reading() {
                                 <span className="text-[11px] font-serif font-bold px-2 py-0.5 rounded-full bg-walnut/15 dark:bg-gold/15 text-walnut dark:text-gold border border-walnut/15 dark:border-gold/20">
                                     {displayedShelfBooks.length}
                                 </span>
-                                <span className="w-6 h-6 rounded-lg bg-white/45 dark:bg-black/30 border border-white/50 dark:border-white/10 flex items-center justify-center text-walnut dark:text-gold group-hover:bg-white/75 dark:group-hover:bg-black/45 transition-colors">
+                                <span className="w-6 h-6 rounded-lg bg-surface/65 dark:bg-black/30 border border-white/50 dark:border-white/10 flex items-center justify-center text-walnut dark:text-gold group-hover:bg-surface/90 dark:group-hover:bg-black/45 transition-colors">
                                     <ChevronDown
                                         size={14}
                                         className={`transition-transform duration-200 ${
@@ -636,7 +642,7 @@ export default function Reading() {
                                         onClick={() =>
                                             setIsFilterMenuOpen((prev) => !prev)
                                         }
-                                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/55 hover:bg-white/75 dark:bg-black/35 dark:hover:bg-black/50 backdrop-blur-md border border-white/60 dark:border-white/15 text-darkBrown dark:text-cream text-[11px] sm:text-xs font-semibold shadow-xs transition-all"
+                                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface/65 hover:bg-surface/90 dark:bg-black/35 dark:hover:bg-black/50 backdrop-blur-md border border-white/60 dark:border-white/15 text-ink text-[11px] sm:text-xs font-semibold shadow-xs transition-all"
                                     >
                                         <Filter
                                             size={13}
@@ -691,7 +697,7 @@ export default function Reading() {
                                                 }}
                                                 transition={{ duration: 0.15 }}
                                                 role="listbox"
-                                                className="absolute right-0 mt-1.5 w-48 rounded-xl bg-[#fcfaf7] dark:bg-[#231b14] border border-walnut/20 dark:border-walnut/40 shadow-lg py-1.5 z-40"
+                                                className="absolute right-0 mt-1.5 w-48 rounded-xl bg-surface border border-walnut/20 dark:border-walnut/40 shadow-lg py-1.5 z-40"
                                             >
                                                 {(
                                                     [
@@ -746,7 +752,7 @@ export default function Reading() {
                                                             }}
                                                             className={`w-full px-3 py-2 text-left text-xs font-semibold flex items-center justify-between gap-2 transition-colors ${
                                                                 isSelected
-                                                                    ? "bg-walnut/10 dark:bg-gold/15 text-darkBrown dark:text-gold"
+                                                                    ? "bg-walnut/10 dark:bg-gold/15 text-ink dark:text-gold"
                                                                     : "text-walnut/85 dark:text-cream/80 hover:bg-walnut/5 dark:hover:bg-white/5"
                                                             }`}
                                                         >
@@ -784,8 +790,8 @@ export default function Reading() {
                                         }}
                                         className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all ${
                                             viewMode === "shelf"
-                                                ? "bg-white dark:bg-[#2b2017] text-darkBrown dark:text-cream shadow-xs"
-                                                : "text-walnut/75 dark:text-cream/65 hover:text-darkBrown dark:hover:text-cream"
+                                                ? "bg-surface text-ink shadow-xs"
+                                                : "text-walnut/75 dark:text-cream/65 hover:text-ink"
                                         }`}
                                         title={t(
                                             "library.view_shelf",
@@ -808,8 +814,8 @@ export default function Reading() {
                                         }}
                                         className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all ${
                                             viewMode === "grid"
-                                                ? "bg-white dark:bg-[#2b2017] text-darkBrown dark:text-cream shadow-xs"
-                                                : "text-walnut/75 dark:text-cream/65 hover:text-darkBrown dark:hover:text-cream"
+                                                ? "bg-surface text-ink shadow-xs"
+                                                : "text-walnut/75 dark:text-cream/65 hover:text-ink"
                                         }`}
                                         title={t(
                                             "library.view_grid",
@@ -850,14 +856,14 @@ export default function Reading() {
                                     style={{ overflow: "hidden" }}
                                 >
                                     {shelfGroups.length === 0 ? (
-                                        <div className="bg-[#fcfaf7]/85 dark:bg-[#231b14]/90 rounded-2xl border border-walnut/20 dark:border-walnut/30 p-8 text-center">
-                                            <p className="text-sm font-medium text-darkBrown dark:text-cream mb-1">
+                                        <div className="bg-surface/90 rounded-2xl border border-walnut/20 dark:border-walnut/30 p-8 text-center">
+                                            <p className="text-sm font-medium text-ink mb-1">
                                                 {t(
                                                     "reading.empty_filtered_title",
                                                     "Belum ada buku pada kategori ini",
                                                 )}
                                             </p>
-                                            <p className="text-xs text-walnut/70 dark:text-cream/60">
+                                            <p className="text-xs text-walnut/75 dark:text-cream/60">
                                                 {t(
                                                     "reading.empty_filtered_desc",
                                                     "Tambahkan buku atau pilih kategori lain dari dropdown untuk melihat koleksi.",
@@ -892,15 +898,15 @@ export default function Reading() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-center py-14 sm:py-16 bg-[#fcfaf7]/85 dark:bg-[#231b14]/90 rounded-2xl border border-walnut/20 dark:border-walnut/30 p-6 sm:p-10 backdrop-blur-sm shadow-sm"
+                        className="text-center py-14 sm:py-16 bg-surface/90 rounded-2xl border border-walnut/20 dark:border-walnut/30 p-6 sm:p-10 backdrop-blur-sm shadow-sm"
                     >
                         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-walnut/10 dark:bg-gold/15 rounded-full flex items-center justify-center mx-auto mb-4">
                             <BookOpen className="w-8 h-8 sm:w-10 sm:h-10 text-walnut/50 dark:text-gold/70" />
                         </div>
-                        <h3 className="text-xl font-serif font-bold text-darkBrown dark:text-cream mb-2">
+                        <h3 className="text-xl font-serif font-bold text-ink mb-2">
                             {t("reading.no_books", "Belum ada buku")}
                         </h3>
-                        <p className="text-sm text-walnut/75 dark:text-cream/65 mb-6 max-w-md mx-auto">
+                        <p className="text-sm text-walnut/80 dark:text-cream/65 mb-6 max-w-md mx-auto">
                             {t(
                                 "reading.start_journey",
                                 "Mulai perjalanan membaca dari perpustakaan kamu",
@@ -910,7 +916,7 @@ export default function Reading() {
                             <button
                                 type="button"
                                 onClick={() => navigate("/library")}
-                                className="px-5 py-2.5 bg-white/90 hover:bg-white dark:bg-[#1b140e] dark:hover:bg-[#281e15] text-darkBrown dark:text-cream border border-walnut/25 dark:border-walnut/35 rounded-xl font-medium transition-colors flex items-center gap-2 text-sm"
+                                className="px-5 py-2.5 bg-surfaceAlt hover:bg-surface text-ink border border-walnut/25 dark:border-walnut/35 rounded-xl font-medium transition-colors flex items-center gap-2 text-sm"
                             >
                                 <Library size={16} />
                                 {t(
@@ -929,7 +935,7 @@ export default function Reading() {
                                         ),
                                     )
                                 }
-                                className="px-5 py-2.5 bg-walnut hover:bg-darkBrown dark:bg-[#8a5a28] dark:hover:bg-[#a06b35] text-white rounded-xl font-medium transition-colors flex items-center gap-2 text-sm"
+                                className="px-5 py-2.5 bg-walnut hover:bg-darkBrown text-white rounded-xl font-medium transition-colors flex items-center gap-2 text-sm"
                             >
                                 <Plus size={16} />
                                 {t("reading.add_book", "Tambah Buku")}

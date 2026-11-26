@@ -119,34 +119,39 @@ export default function Settings() {
     };
 
     return (
-        <div className="p-4 md:p-8 pt-[88px] md:pt-[100px] max-w-7xl mx-auto">
+        <div className="p-4 md:p-8 pt-[76px] md:pt-[88px] max-w-7xl mx-auto">
             <SEO title={t("navigation.settings", "Settings")} />
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl md:text-4xl font-serif font-semibold text-darkBrown mb-2">
+                <h1 className="text-3xl md:text-4xl font-serif font-semibold text-ink mb-2">
                     {t("settings.title")}
                 </h1>
-                <p className="text-walnut/70">{t("settings.subtitle")}</p>
+                <p className="text-walnut/80 dark:text-cream/65">
+                    {t("settings.subtitle")}
+                </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
                 {/* Sidebar Navigation */}
                 <div className="md:col-span-1">
-                    <div className="bg-white rounded-2xl border border-walnut/10 shadow-sm overflow-hidden">
+                    <div className="bg-surface/95 rounded-2xl border border-walnut/15 dark:border-walnut/30 shadow-sm overflow-hidden backdrop-blur-sm">
                         {/* User Profile Card */}
-                        <div className="p-6 border-b border-walnut/10 bg-gradient-to-br from-walnut to-darkBrown">
+                        <div
+                            className="p-6 border-b border-walnut/15 dark:border-walnut/30"
+                            style={{ background: "var(--app-banner-bg)" }}
+                        >
                             <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                                <div className="w-16 h-16 bg-white/15 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-2xl font-bold border border-white/20">
                                     {user.avatar}
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="text-lg font-semibold text-white">
+                                <div className="flex-1 min-w-0">
+                                    <h3 className="text-lg font-semibold text-white truncate">
                                         {user.name}
                                     </h3>
-                                    <p className="text-sm text-walnut/70">
+                                    <p className="text-sm text-white/80 truncate">
                                         {user.email}
                                     </p>
-                                    <p className="text-xs text-walnut/60 mt-1">
+                                    <p className="text-xs text-white/65 mt-1">
                                         {t("settings.member_since", {
                                             year: user.memberSince,
                                         })}
@@ -168,7 +173,7 @@ export default function Settings() {
                                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                                             isActive
                                                 ? "bg-walnut text-white shadow-md"
-                                                : "text-walnut/70 hover:bg-walnut/10"
+                                                : "text-walnut/80 dark:text-cream/75 hover:bg-walnut/10 dark:hover:bg-walnut/20"
                                         }`}
                                     >
                                         <Icon className="w-5 h-5" />
@@ -185,7 +190,7 @@ export default function Settings() {
                     <div className="mt-4 space-y-3">
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
+                            className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-950/60 border border-red-200/60 dark:border-red-900/40 transition-colors"
                         >
                             <LogOut className="w-5 h-5" />
                             <span className="font-medium">

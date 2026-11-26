@@ -98,10 +98,9 @@ export default function Wishlist() {
 
     return (
         <div
-            className="px-3.5 sm:px-6 md:px-8 pb-16 md:pb-20 pt-[84px] sm:pt-[92px] md:pt-[104px] flex flex-col min-h-full relative"
+            className="px-3.5 sm:px-6 md:px-8 pb-16 md:pb-20 pt-[84px] sm:pt-[92px] md:pt-[104px] flex flex-col min-h-full relative transition-colors duration-500"
             style={{
-                background:
-                    "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
+                background: "var(--app-wall-bg)",
             }}
         >
             <SEO
@@ -142,8 +141,8 @@ export default function Wishlist() {
                                         onClick={() => setViewMode("list")}
                                         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                                             viewMode === "list"
-                                                ? "bg-white dark:bg-[#1e293b] text-darkBrown dark:text-cream shadow-xs"
-                                                : "text-walnut/70 hover:text-darkBrown dark:text-stone-300"
+                                                ? "bg-surface text-ink shadow-xs"
+                                                : "text-walnut/75 dark:text-cream/70 hover:text-ink"
                                         }`}
                                         title={t("wishlist.view_list", "Daftar")}
                                     >
@@ -156,8 +155,8 @@ export default function Wishlist() {
                                         onClick={() => setViewMode("grid")}
                                         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
                                             viewMode === "grid"
-                                                ? "bg-white dark:bg-[#1e293b] text-darkBrown dark:text-cream shadow-xs"
-                                                : "text-walnut/70 hover:text-darkBrown dark:text-stone-300"
+                                                ? "bg-surface text-ink shadow-xs"
+                                                : "text-walnut/75 dark:text-cream/70 hover:text-ink"
                                         }`}
                                         title={t("wishlist.view_grid", "Grid")}
                                     >
@@ -208,29 +207,29 @@ export default function Wishlist() {
                     <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-6 grid grid-cols-3 divide-x divide-walnut/15 dark:divide-walnut/20 bg-white/80 dark:bg-[#201a14]/90 rounded-2xl p-3 border border-walnut/15 dark:border-walnut/20 shadow-xs backdrop-blur-xs text-center"
+                        className="mb-6 grid grid-cols-3 divide-x divide-walnut/15 dark:divide-walnut/25 bg-surface/90 rounded-2xl p-3 border border-walnut/15 dark:border-walnut/30 shadow-xs backdrop-blur-xs text-center"
                     >
                         <div className="px-1">
-                            <div className="text-base sm:text-lg font-serif font-bold text-darkBrown dark:text-cream">
+                            <div className="text-base sm:text-lg font-serif font-bold text-ink">
                                 {totalWishlist}
                             </div>
-                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/70 dark:text-cream/60 font-medium truncate">
+                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/75 dark:text-cream/65 font-medium truncate">
                                 {t("wishlist.total_wished", "Total Ingin")}
                             </div>
                         </div>
                         <div className="px-1">
-                            <div className="text-base sm:text-lg font-serif font-bold text-darkBrown dark:text-cream truncate">
+                            <div className="text-base sm:text-lg font-serif font-bold text-ink truncate">
                                 {topGenre}
                             </div>
-                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/70 dark:text-cream/60 font-medium truncate">
+                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/75 dark:text-cream/65 font-medium truncate">
                                 {t("wishlist.top_genre", "Genre Favorit")}
                             </div>
                         </div>
                         <div className="px-1">
-                            <div className="text-base sm:text-lg font-serif font-bold text-darkBrown dark:text-cream truncate">
+                            <div className="text-base sm:text-lg font-serif font-bold text-ink truncate">
                                 {topAuthor}
                             </div>
-                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/70 dark:text-cream/60 font-medium truncate">
+                            <div className="text-[10px] sm:text-[11px] uppercase tracking-wider text-walnut/75 dark:text-cream/65 font-medium truncate">
                                 {t("wishlist.top_author", "Penulis Populer")}
                             </div>
                         </div>
@@ -274,12 +273,12 @@ export default function Wishlist() {
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-center py-16 bg-white/80 dark:bg-[#201a14]/90 rounded-2xl border border-walnut/15 dark:border-walnut/20 p-8 backdrop-blur-sm"
+                        className="text-center py-16 bg-surface/90 rounded-2xl border border-walnut/15 dark:border-walnut/30 p-8 backdrop-blur-sm"
                     >
                         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-walnut/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <BookmarkHeart className="w-8 h-8 sm:w-10 sm:h-10 text-walnut fill-rose-500/20" />
+                            <BookmarkHeart className="w-8 h-8 sm:w-10 sm:h-10 text-walnut dark:text-gold fill-rose-500/20" />
                         </div>
-                        <h3 className="text-xl font-serif font-bold text-darkBrown dark:text-cream mb-2">
+                        <h3 className="text-xl font-serif font-bold text-ink mb-2">
                             {t("wishlist.empty", "Wishlist masih kosong")}
                         </h3>
                         <p className="text-sm text-walnut/70 dark:text-cream/60 mb-6 max-w-sm mx-auto">

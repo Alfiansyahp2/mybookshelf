@@ -21,57 +21,55 @@ export default function DashboardAuthorsSection({
     stats,
 }: DashboardAuthorsSectionProps) {
     const { t } = useTranslation();
+    const authorData = stats.authorChart.map((a) => ({
+        ...a,
+        displayName:
+            a.name.length > 14 ? `${a.name.slice(0, 14)}…` : a.name,
+    }));
+
     return (
         <motion.div {...fadeUp(0.58)}>
             <Card
                 style={{
-                    height: 280,
+                    height: 272,
                     display: "flex",
                     flexDirection: "column",
                 }}
             >
                 <div
                     style={{
-                        padding: "16px 20px 8px",
-                        borderBottom: "1px solid rgba(139,99,56,0.08)",
+                        padding: "14px 18px 10px",
+                        borderBottom:
+                            "1px solid rgb(var(--color-walnut-rgb) / 0.14)",
                     }}
                 >
-                    <div
+                    <h3
                         style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            marginBottom: 12,
+                            margin: 0,
+                            fontSize: 14,
+                            fontFamily: "'Georgia',serif",
+                            fontWeight: 700,
+                            color: BRAND.darkBrown,
                         }}
                     >
-                        <h3
-                            style={{
-                                margin: 0,
-                                fontSize: 14,
-                                fontFamily: "'Georgia',serif",
-                                fontWeight: 700,
-                                color: BRAND.darkBrown,
-                            }}
-                        >
-                            {t("dashboard.authors.title")}
-                        </h3>
-                    </div>
+                        {t("dashboard.authors.title")}
+                    </h3>
                 </div>
                 <div
                     style={{
-                        padding: "12px 16px 12px",
+                        padding: "10px 14px 12px",
                         flex: 1,
                         display: "flex",
                         flexDirection: "column",
                         minHeight: 0,
                     }}
                 >
-                    {stats.authorChart.length === 0 ? (
+                    {authorData.length === 0 ? (
                         <div
                             style={{
                                 textAlign: "center",
                                 padding: "20px 0",
-                                color: "rgba(122,92,66,0.4)",
+                                color: "rgb(var(--app-ink-rgb) / 0.5)",
                                 fontSize: 12,
                             }}
                         >
@@ -92,49 +90,49 @@ export default function DashboardAuthorsSection({
                                 style={{
                                     minHeight: Math.max(
                                         150,
-                                        stats.authorChart.length * 28,
+                                        authorData.length * 28,
                                     ),
                                     flex: 1,
                                 }}
                             >
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
-                                        data={stats.authorChart}
+                                        data={authorData}
                                         layout="vertical"
                                         margin={{
-                                            left: 10,
-                                            right: 20,
-                                            top: 0,
-                                            bottom: 0,
+                                            left: 4,
+                                            right: 16,
+                                            top: 2,
+                                            bottom: 2,
                                         }}
                                     >
                                         <CartesianGrid
                                             strokeDasharray="3 3"
-                                            stroke="rgba(139,99,56,0.08)"
+                                            stroke="rgb(var(--color-walnut-rgb) / 0.14)"
                                             horizontal={false}
                                         />
                                         <XAxis type="number" hide />
                                         <YAxis
                                             type="category"
-                                            dataKey="name"
+                                            dataKey="displayName"
                                             tick={{
-                                                fontSize: 10,
-                                                fill: BRAND.walnut,
+                                                fontSize: 10.5,
+                                                fill: "rgb(var(--app-ink-rgb) / 0.78)",
                                             }}
                                             axisLine={false}
                                             tickLine={false}
-                                            width={80}
+                                            width={92}
                                         />
                                         <Tooltip
                                             content={<ChartTooltip />}
                                             cursor={{
-                                                fill: "rgba(139,99,56,0.05)",
+                                                fill: "rgb(var(--color-walnut-rgb) / 0.1)",
                                             }}
                                         />
                                         <Bar
                                             dataKey="count"
                                             name={t("dashboard.authors.books")}
-                                            fill={"#8b5cf6"}
+                                            fill={BRAND.gold}
                                             radius={[0, 4, 4, 0]}
                                             barSize={14}
                                         />

@@ -112,10 +112,9 @@ export default function Notes() {
 
     return (
         <div
-            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative"
+            className="px-3.5 sm:px-6 md:px-8 pb-16 pt-[88px] sm:pt-[96px] md:pt-[104px] flex flex-col min-h-full relative transition-colors duration-500"
             style={{
-                background:
-                    "linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%)",
+                background: "var(--app-wall-bg)",
             }}
         >
             <SEO
@@ -193,21 +192,21 @@ export default function Notes() {
                                 "notes.search_placeholder",
                                 "Search notes or book titles...",
                             )}
-                            className="w-full pl-9 pr-3 py-2 bg-white/90 dark:bg-[#1e1712] border border-walnut/20 rounded-xl text-sm text-darkBrown dark:text-cream focus:outline-none focus:ring-2 focus:ring-walnut/30"
+                            className="w-full pl-9 pr-3 py-2 bg-surface/95 border border-walnut/20 dark:border-walnut/35 rounded-xl text-sm text-ink focus:outline-none focus:ring-2 focus:ring-walnut/30"
                         />
                     </div>
                 </div>
 
                 {displayedBooks.length === 0 ? (
-                    <div className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-12 text-center">
+                    <div className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-12 text-center backdrop-blur-sm">
                         <StickyNote
                             size={36}
-                            className="mx-auto mb-3 text-walnut/35"
+                            className="mx-auto mb-3 text-walnut/40 dark:text-gold/60"
                         />
-                        <h3 className="font-serif text-lg font-semibold text-darkBrown dark:text-cream mb-1">
+                        <h3 className="font-serif text-lg font-semibold text-ink mb-1">
                             {t("notes.empty_title", "No notes found")}
                         </h3>
-                        <p className="text-sm text-walnut/70 dark:text-cream/60">
+                        <p className="text-sm text-walnut/75 dark:text-cream/65">
                             {t(
                                 "notes.empty_desc",
                                 "Switch to another tab or click any book to add your thoughts.",
@@ -221,15 +220,15 @@ export default function Notes() {
                                 key={book.id}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="bg-white/95 dark:bg-[#1e1712] border border-walnut/15 rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-4"
+                                className="bg-surface/95 border border-walnut/15 dark:border-walnut/30 rounded-2xl p-5 shadow-sm flex flex-col justify-between gap-4 backdrop-blur-sm"
                             >
                                 <div>
                                     <div className="flex items-start justify-between gap-3 mb-3">
                                         <div className="min-w-0">
-                                            <h2 className="font-serif font-bold text-lg text-darkBrown dark:text-cream truncate">
+                                            <h2 className="font-serif font-bold text-lg text-ink truncate">
                                                 {book.title}
                                             </h2>
-                                            <p className="text-xs text-walnut/70">
+                                            <p className="text-xs text-walnut/75 dark:text-cream/65">
                                                 {book.author}
                                             </p>
                                         </div>
@@ -245,11 +244,11 @@ export default function Notes() {
                                     </div>
 
                                     {book.personalNotes ? (
-                                        <p className="text-sm text-darkBrown/85 dark:text-cream/85 whitespace-pre-line bg-cream/60 dark:bg-black/20 p-3.5 rounded-xl border border-walnut/10 line-clamp-5">
+                                        <p className="text-sm text-ink/85 whitespace-pre-line bg-surfaceAlt/85 p-3.5 rounded-xl border border-walnut/15 dark:border-walnut/25 line-clamp-5">
                                             {book.personalNotes}
                                         </p>
                                     ) : (
-                                        <p className="text-xs italic text-walnut/50 py-3">
+                                        <p className="text-xs italic text-walnut/60 dark:text-cream/50 py-3">
                                             {t(
                                                 "notes.no_note_yet",
                                                 "No personal notes recorded yet.",

@@ -83,7 +83,7 @@ export default function MobileCoverGrid({
                 return (
                     <div
                         key={shelf.id}
-                        className="rounded-2xl bg-[#fcfaf7]/90 dark:bg-[#231b14]/95 border border-walnut/20 dark:border-walnut/35 shadow-lg overflow-hidden backdrop-blur-sm"
+                        className="rounded-2xl bg-surface/95 border border-walnut/20 dark:border-walnut/35 shadow-lg overflow-hidden backdrop-blur-sm"
                     >
                         {/* Warm teak wood shelf top rail */}
                         <div
@@ -228,7 +228,7 @@ export default function MobileCoverGrid({
                                                         </div>
                                                         <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
                                                             <div
-                                                                className="h-full bg-gradient-to-r from-[#d4a574] to-[#ffd166] rounded-full"
+                                                                className="h-full bg-gradient-to-r from-walnut to-gold rounded-full"
                                                                 style={{
                                                                     width: `${Math.min(100, Math.max(0, progressPct))}%`,
                                                                 }}
@@ -240,10 +240,10 @@ export default function MobileCoverGrid({
 
                                             {/* Book Metadata Under Cover */}
                                             <div className="pt-1.5 px-0.5 flex-1 flex flex-col justify-between">
-                                                <h3 className="font-serif font-bold text-[11px] sm:text-xs text-darkBrown dark:text-cream line-clamp-1 leading-snug group-hover:text-walnut dark:group-hover:text-gold transition-colors" title={book.title}>
+                                                <h3 className="font-serif font-bold text-[11px] sm:text-xs text-ink line-clamp-1 leading-snug group-hover:text-walnut dark:group-hover:text-gold transition-colors" title={book.title}>
                                                     {book.title}
                                                 </h3>
-                                                <p className="text-[10px] text-walnut/75 dark:text-cream/65 truncate mt-0.5" title={book.author}>
+                                                <p className="text-[10px] text-walnut/80 dark:text-cream/65 truncate mt-0.5" title={book.author}>
                                                     {book.author}
                                                 </p>
                                                 {book.pages && (

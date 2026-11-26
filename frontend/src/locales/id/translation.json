@@ -213,6 +213,52 @@
       "title": "Tema",
       "desc": "Pilih tampilan yang Anda inginkan"
     },
+    "theme_preview": "Pratinjau Tema",
+    "light_mode": "Mode Terang",
+    "dark_mode": "Mode Gelap",
+    "palettes": {
+      "title": "Palet Warna Aplikasi",
+      "subtitle": "Berlaku khusus di dalam aplikasi (tidak mengubah Landing Page).",
+      "light_heading": "Palet Light Mode",
+      "dark_heading": "Palet Dark Mode",
+      "active_mode": "Mode Aktif",
+      "light": {
+        "parchment": {
+          "name": "Perkamen Hangat",
+          "desc": "Krem klasik, kayu walnut, dan emas"
+        },
+        "sage": {
+          "name": "Zaitun Botani",
+          "desc": "Kertas sage menenangkan & kuningan"
+        },
+        "slate": {
+          "name": "Arsip Tinta",
+          "desc": "Ivory bersih, biru arsip, & oker"
+        },
+        "rosewood": {
+          "name": "Terakota Linen",
+          "desc": "Nuansa mawar lembut & tembaga"
+        }
+      },
+      "dark": {
+        "espresso": {
+          "name": "Espresso Kayu",
+          "desc": "Cokelat malam hangat & emas amber"
+        },
+        "midnight": {
+          "name": "Biru Larut Malam",
+          "desc": "Navy dalam & aksen emas lembut"
+        },
+        "forest": {
+          "name": "Hutan Pinus",
+          "desc": "Ruang baca hijau gelap & kuningan"
+        },
+        "plum": {
+          "name": "Velvet Tembaga",
+          "desc": "Arang hangat & sentuhan tembaga"
+        }
+      }
+    },
     "notifications": {
       "title": "Notifikasi",
       "desc": "Aktifkan notifikasi push"

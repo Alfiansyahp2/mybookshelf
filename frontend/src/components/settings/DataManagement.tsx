@@ -18,9 +18,9 @@ export default function DataManagement({
             animate={{ opacity: 1, x: 0 }}
             className="space-y-4"
         >
-            <div className="bg-white rounded-2xl p-6 border border-walnut/10 shadow-sm">
-                <h2 className="text-xl font-serif font-semibold text-darkBrown mb-6 flex items-center gap-2">
-                    <Database className="w-5 h-5" />
+            <div className="bg-surface/95 rounded-2xl p-6 border border-walnut/15 dark:border-walnut/30 shadow-sm backdrop-blur-sm">
+                <h2 className="text-xl font-serif font-semibold text-ink mb-6 flex items-center gap-2">
+                    <Database className="w-5 h-5 text-walnut dark:text-gold" />
                     {t("settings.data.data_management", "Data Management")}
                 </h2>
                 <div className="space-y-3">
@@ -34,14 +34,14 @@ export default function DataManagement({
                         </span>
                     </button>
 
-                    <div className="bg-cream/30 rounded-xl p-4">
-                        <p className="text-sm text-walnut/80 mb-2">
+                    <div className="bg-surfaceAlt/80 rounded-xl p-4 border border-walnut/10 dark:border-walnut/25">
+                        <p className="text-sm text-walnut/85 dark:text-cream/75 mb-2">
                             {t(
                                 "settings.data.export_desc",
                                 "This will download all your books, settings, and reading progress as a JSON file that you can import later.",
                             )}
                         </p>
-                        <div className="flex items-center gap-2 text-xs text-walnut/60">
+                        <div className="flex items-center gap-2 text-xs text-walnut/65 dark:text-cream/55">
                             <Database className="w-4 h-4" />
                             <span>
                                 {t(
@@ -54,7 +54,7 @@ export default function DataManagement({
 
                     <button
                         onClick={handleClearData}
-                        className="w-full flex items-center gap-3 px-4 py-4 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors border-2 border-red-200"
+                        className="w-full flex items-center gap-3 px-4 py-4 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-950/60 transition-colors border-2 border-red-200 dark:border-red-900/50"
                     >
                         <Trash2 className="w-5 h-5" />
                         <span className="font-medium">
@@ -62,8 +62,8 @@ export default function DataManagement({
                         </span>
                     </button>
 
-                    <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
-                        <p className="text-sm text-red-800">
+                    <div className="bg-red-50 dark:bg-red-950/35 rounded-xl p-4 border-2 border-red-200 dark:border-red-900/45">
+                        <p className="text-sm text-red-800 dark:text-red-300">
                             <strong>
                                 {t("settings.data.warning", "Warning")}:
                             </strong>{" "}

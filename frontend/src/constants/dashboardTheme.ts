@@ -1,9 +1,9 @@
 export const BRAND = {
-    cream: "#F8F5F0",
-    walnut: "#7A5C42",
-    darkBrown: "#4A3B2F",
-    gold: "#D4A574",
-    beige: "#E8E0D5",
+    cream: "rgb(var(--color-cream-rgb))",
+    walnut: "rgb(var(--color-walnut-rgb))",
+    darkBrown: "rgb(var(--app-ink-rgb))",
+    gold: "rgb(var(--color-gold-rgb))",
+    beige: "rgb(var(--color-beige-rgb))",
 } as const;
 
 export const STATUS_CFG = {
