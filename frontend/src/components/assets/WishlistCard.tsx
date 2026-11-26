@@ -104,7 +104,7 @@ export default function WishlistCard({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.04 }}
             onClick={() => onClick(book)}
-            className="group bg-white/90 dark:bg-[#201a14]/95 rounded-2xl p-3 sm:p-4 border border-walnut/15 dark:border-walnut/20 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-3 sm:gap-4 backdrop-blur-sm relative overflow-hidden"
+            className="group bg-surface/95 rounded-2xl p-3 sm:p-4 border border-walnut/15 dark:border-walnut/30 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-row gap-3 sm:gap-4 backdrop-blur-sm relative overflow-hidden"
         >
             {/* Left: Realistic 2:3 Book Cover */}
             <div className="w-20 xs:w-24 sm:w-28 aspect-[2/3] shrink-0 rounded-xl overflow-hidden shadow-sm group-hover:shadow-md relative border border-black/15 dark:border-white/10 transition-shadow">

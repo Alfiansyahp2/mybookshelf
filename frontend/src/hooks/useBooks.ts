@@ -1,17 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosError } from "axios";
 import { booksApi } from "../lib/api/books";
 import { useNotifications } from "./useNotifications";
+import { useAuthUser } from "./useAuth";
 import type { Book, BookStatus } from "../types";
 
+interface ApiErrorBody {
+    message?: string;
+}
+
 /**
- * Hook to fetch all books with optional filters
+ * Hook to fetch all books with optional filters.
  */
 export function useBooks(filters?: {
     status?: BookStatus;
     favorite?: boolean;
     search?: string;
 }) {
-    const isAuthenticated = !!localStorage.getItem("user");
+    const { data: authData } = useAuthUser();
+    const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: ["books", filters],
         queryFn: () => booksApi.getBooks(filters),
@@ -20,50 +27,52 @@ export function useBooks(filters?: {
 }
 
 /**
- * Hook to fetch a single book
+ * Hook to fetch a single book.
  */
 export function useBook(id: string) {
     const isDemoBook = !id || id.startsWith("b");
-    const isAuthenticated = !!localStorage.getItem("user");
+    const { data: authData } = useAuthUser();
+    const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: ["books", id],
         queryFn: () => booksApi.getBook(id),
         enabled: !!id && !isDemoBook && isAuthenticated,
-        select: (response) => response.data, // Extract the actual book data from API response
+        select: (response) => response.data,
     });
 }
 
 /**
- * Hook to create a new book
+ * Hook to create a new book.
  */
 export function useCreateBook() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (bookData: Partial<Book>) => booksApi.createBook(bookData),
-
         onSuccess: () => {
-            // Invalidate books queries to refetch
             queryClient.invalidateQueries({ queryKey: ["books"] });
+            queryClient.invalidateQueries({ queryKey: ["shelves"] });
             useNotifications.getState().addNotification({
                 title: "Success",
                 message: "Book added successfully",
-                type: "success"
+                type: "success",
             });
         },
-        onError: (error: any) => {
-            const message = error.response?.data?.message || "Failed to create book. Please check your inputs.";
+        onError: (error: AxiosError<ApiErrorBody>) => {
+            const message =
+                error.response?.data?.message ||
+                "Failed to create book. Please check your inputs.";
             useNotifications.getState().addNotification({
                 title: "Validation Error",
                 message,
-                type: "warning"
+                type: "warning",
             });
-        }
+        },
     });
 }
 
 /**
- * Hook to update a book
+ * Hook to update a book.
  */
 export function useUpdateBook() {
     const queryClient = useQueryClient();
@@ -71,52 +80,51 @@ export function useUpdateBook() {
     return useMutation({
         mutationFn: ({ id, updates }: { id: string; updates: Partial<Book> }) =>
             booksApi.updateBook(id, updates),
-
         onSuccess: (_, { id }) => {
-            // Invalidate both the specific book and the books list
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({ queryKey: ["books", id] });
             useNotifications.getState().addNotification({
                 title: "Success",
                 message: "Book updated successfully",
-                type: "success"
+                type: "success",
             });
         },
-        onError: (error: any) => {
-            const message = error.response?.data?.message || "Failed to update book. Please check your inputs.";
+        onError: (error: AxiosError<ApiErrorBody>) => {
+            const message =
+                error.response?.data?.message ||
+                "Failed to update book. Please check your inputs.";
             useNotifications.getState().addNotification({
                 title: "Validation Error",
                 message,
-                type: "warning"
+                type: "warning",
             });
-        }
+        },
     });
 }
 
 /**
- * Hook to delete a book
+ * Hook to delete a book.
  */
 export function useDeleteBook() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (id: string) => booksApi.deleteBook(id),
-
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
+            queryClient.invalidateQueries({ queryKey: ["shelves"] });
         },
     });
 }
 
 /**
- * Hook to start reading a book
+ * Hook to start reading a book.
  */
 export function useStartReading() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (id: string) => booksApi.startReading(id),
-
         onSuccess: (_, bookId) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({ queryKey: ["books", bookId] });
@@ -125,14 +133,13 @@ export function useStartReading() {
 }
 
 /**
- * Hook to finish reading a book
+ * Hook to finish reading a book.
  */
 export function useFinishReading() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (id: string) => booksApi.finishReading(id),
-
         onSuccess: (_, bookId) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({ queryKey: ["books", bookId] });
@@ -141,7 +148,7 @@ export function useFinishReading() {
 }
 
 /**
- * Hook to upload a book cover image
+ * Hook to upload a book cover image.
  */
 export function useUploadCover() {
     const queryClient = useQueryClient();
@@ -149,7 +156,6 @@ export function useUploadCover() {
     return useMutation({
         mutationFn: ({ id, file }: { id: string; file: File }) =>
             booksApi.uploadCover(id, file),
-
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
@@ -160,7 +166,7 @@ export function useUploadCover() {
 }
 
 /**
- * Hook to update reading progress
+ * Hook to update reading progress.
  */
 export function useUpdateProgress() {
     const queryClient = useQueryClient();
@@ -173,7 +179,6 @@ export function useUpdateProgress() {
             id: string;
             currentPage: number;
         }) => booksApi.updateProgress(id, currentPage),
-
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
@@ -184,18 +189,17 @@ export function useUpdateProgress() {
 }
 
 /**
- * Hook to toggle favorite status
+ * Hook to toggle favorite status.
  */
 export function useToggleFavorite() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (id: string) => booksApi.toggleFavorite(id),
-
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
-                queryKey: ["books", variables.id],
+                queryKey: ["books", variables],
             });
             queryClient.invalidateQueries({
                 queryKey: ["books", { favorite: true }],
@@ -205,7 +209,7 @@ export function useToggleFavorite() {
 }
 
 /**
- * Hook to update personal notes
+ * Hook to update personal notes.
  */
 export function useUpdateNotes() {
     const queryClient = useQueryClient();
@@ -213,8 +217,8 @@ export function useUpdateNotes() {
     return useMutation({
         mutationFn: ({ id, notes }: { id: string; notes: string }) =>
             booksApi.updateNotes(id, notes),
-
         onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
                 queryKey: ["books", variables.id],
             });
@@ -223,7 +227,7 @@ export function useUpdateNotes() {
 }
 
 /**
- * Hook to update personal rating
+ * Hook to update personal rating.
  */
 export function useUpdateRating() {
     const queryClient = useQueryClient();
@@ -231,8 +235,8 @@ export function useUpdateRating() {
     return useMutation({
         mutationFn: ({ id, rating }: { id: string; rating: number }) =>
             booksApi.updateRating(id, rating),
-
         onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
                 queryKey: ["books", variables.id],
             });
@@ -241,7 +245,7 @@ export function useUpdateRating() {
 }
 
 /**
- * Hook to move book to different shelf
+ * Hook to move book to different shelf.
  */
 export function useMoveToShelf() {
     const queryClient = useQueryClient();
@@ -256,7 +260,6 @@ export function useMoveToShelf() {
             shelfId: string;
             position?: number;
         }) => booksApi.moveToShelf(id, shelfId, position),
-
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
@@ -268,7 +271,7 @@ export function useMoveToShelf() {
 }
 
 /**
- * Hook to borrow book
+ * Hook to borrow book to someone.
  */
 export function useBorrowBook() {
     const queryClient = useQueryClient();
@@ -283,7 +286,6 @@ export function useBorrowBook() {
             borrowedBy: string;
             dueDate: string;
         }) => booksApi.borrowBook(id, borrowedBy, dueDate),
-
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
@@ -294,30 +296,31 @@ export function useBorrowBook() {
 }
 
 /**
- * Hook to return borrowed book
+ * Hook to return borrowed book.
  */
 export function useReturnBook() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (id: string) => booksApi.returnBook(id),
-
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
-                queryKey: ["books", variables.id],
+                queryKey: ["books", variables],
             });
         },
     });
 }
 
 /**
- * Hook to get book timeline
+ * Hook to get book timeline.
  */
 export function useBookTimeline(id: string) {
+    const { data: authData } = useAuthUser();
+    const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: ["books", id, "timeline"],
         queryFn: () => booksApi.getBookTimeline(id),
-        enabled: !!id,
+        enabled: !!id && isAuthenticated,
     });
 }

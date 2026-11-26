@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { expenseCategoriesApi } from "../../lib/api/accounting";
-import type { ExpenseCategory } from "../../types/accounting";
 
 // Get all categories
 export function useExpenseCategories() {

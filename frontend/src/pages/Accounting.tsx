@@ -1,19 +1,14 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
     DollarSign,
-    TrendingUp,
     Wallet,
-    AlertCircle,
     Plus,
     Filter,
-    Calendar,
     PieChart,
     BarChart3,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useAccountingOverview } from "../hooks/accounting/useAccountingReports";
-import { useBudgetSummary } from "../hooks/accounting/useBudgets";
+import type { Expense } from "../types/accounting";
 import AccountingDashboard from "../components/accounting/AccountingDashboard";
 import ExpenseList from "../components/accounting/ExpenseList";
 import ExpenseModal from "../components/accounting/ExpenseModal";
@@ -27,11 +22,8 @@ export default function Accounting() {
         "overview" | "expenses" | "budgets" | "categories"
     >("overview");
     const [showExpenseModal, setShowExpenseModal] = useState(false);
-    const [expenseToEdit, setExpenseToEdit] = useState<any>(null);
+    const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
     const [showFilters, setShowFilters] = useState(false);
-
-    const { data: overview } = useAccountingOverview({ period: "month" });
-    const { data: budgetSummary } = useBudgetSummary();
 
     const tabs = [
         {
@@ -147,7 +139,15 @@ export default function Accounting() {
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id as any)}
+                                onClick={() =>
+                                    setActiveTab(
+                                        tab.id as
+                                            | "overview"
+                                            | "expenses"
+                                            | "budgets"
+                                            | "categories",
+                                    )
+                                }
                                 className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition ${
                                     activeTab === tab.id
                                         ? "border-gold text-darkBrown"

@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { budgetsApi } from "../../lib/api/accounting";
 import type {
-    Budget,
     BudgetFormData,
     BudgetFilters,
 } from "../../types/accounting";

@@ -1,18 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
     Edit,
     Trash2,
-    Plus,
     Filter,
-    ArrowDownAZ,
-    ArrowUpZA,
     Receipt,
     BookOpen,
     Search,
 } from "lucide-react";
+import { devError } from "../../lib/logger";
 import {
     useExpenses,
     useDeleteExpense,
@@ -47,7 +44,6 @@ interface ExpenseListProps {
 }
 
 export default function ExpenseList({
-    userId,
     onExpenseClick,
     onEditExpense,
 }: ExpenseListProps) {
@@ -87,8 +83,10 @@ export default function ExpenseList({
             await deleteExpense.mutateAsync(expenseToDelete);
             setExpenseToDelete(null);
         } catch (error) {
-            console.error("Error deleting expense:", error);
-            alert("Gagal menghapus pengeluaran. " + (error as any)?.message);
+            devError("Error deleting expense:", error);
+            const message =
+                error instanceof Error ? error.message : String(error);
+            alert("Gagal menghapus pengeluaran. " + message);
         } finally {
             setExpenseToDelete(null);
         }

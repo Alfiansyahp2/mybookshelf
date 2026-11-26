@@ -1,10 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { achievementsApi } from "../lib/api/achievements";
+import { useAuthUser } from "./useAuth";
 
 export function useAchievements() {
+    const { data: authData } = useAuthUser();
+    const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: ["achievements"],
         queryFn: () => achievementsApi.getAchievements(),
+        enabled: isAuthenticated,
     });
 }
 

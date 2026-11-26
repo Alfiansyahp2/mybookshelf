@@ -14,6 +14,9 @@ module.exports = {
         walnut: 'rgb(var(--color-walnut-rgb) / <alpha-value>)',
         gold: 'rgb(var(--color-gold-rgb) / <alpha-value>)',
         beige: 'rgb(var(--color-beige-rgb) / <alpha-value>)',
+        surface: 'rgb(var(--app-surface-rgb) / <alpha-value>)',
+        surfaceAlt: 'rgb(var(--app-surface-alt-rgb) / <alpha-value>)',
+        ink: 'rgb(var(--app-ink-rgb) / <alpha-value>)',
         
         // Cosmic Night Sky Colors
         night: {

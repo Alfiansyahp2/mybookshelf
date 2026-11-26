@@ -13,7 +13,6 @@ export default function BookProgressLeft({
     book,
     progress,
     c0,
-    c2,
 }: BookProgressLeftProps) {
     const { t } = useTranslation();
 

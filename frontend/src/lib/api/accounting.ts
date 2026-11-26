@@ -1,22 +1,9 @@
 import { apiClient } from "../apiClient";
 import type {
-    Expense,
-    ExpenseCategory,
-    Budget,
-    CurrencyRate,
-    AccountingTimelineEvent,
-    AccountingOverview,
-    ExpenseByCategory,
-    BudgetProgress,
     ExpenseFormData,
     BudgetFormData,
     ExpenseFilters,
     BudgetFilters,
-    CurrencyConversion,
-    MonthlyComparison,
-    YearToDateSummary,
-    PaginatedResponse,
-    ApiResponse,
 } from "../../types/accounting";
 
 // Expenses API

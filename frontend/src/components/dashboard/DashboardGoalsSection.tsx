@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { Target, Award } from "lucide-react";
-import { BRAND, Card, fadeUp } from "./DashboardWidgets";
+import { Card } from "./DashboardWidgets";
+import { BRAND, fadeUp } from "../../constants/dashboardTheme";
+import type { DashboardStats } from "../../hooks/useDashboardStats";
 import { useTranslation } from "react-i18next";
 
 interface DashboardGoalsSectionProps {
-    stats: any;
+    stats: DashboardStats;
     shelvesLength: number;
 }
 
@@ -25,7 +27,7 @@ export default function DashboardGoalsSection({
                     <div
                         style={{
                             padding: "16px 18px",
-                            background: `linear-gradient(135deg,${BRAND.darkBrown} 0%,#6b4528 100%)`,
+                            background: "var(--app-banner-bg)",
                             borderRadius: "16px 16px 0 0",
                         }}
                     >
@@ -93,17 +95,17 @@ export default function DashboardGoalsSection({
                     </div>
                     <div
                         style={{
-                            padding: "12px 18px",
+                            padding: "11px 16px",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            background: "rgba(139,99,56,0.03)",
+                            background: "rgb(var(--color-walnut-rgb) / 0.06)",
                         }}
                     >
                         <div>
                             <span
                                 style={{
-                                    fontSize: 24,
+                                    fontSize: 22,
                                     fontWeight: 800,
                                     color: BRAND.darkBrown,
                                     lineHeight: 1,
@@ -114,7 +116,7 @@ export default function DashboardGoalsSection({
                             <span
                                 style={{
                                     fontSize: 11,
-                                    color: BRAND.walnut,
+                                    color: "rgb(var(--app-ink-rgb) / 0.72)",
                                     marginLeft: 6,
                                     fontWeight: 600,
                                 }}
@@ -124,9 +126,8 @@ export default function DashboardGoalsSection({
                         </div>
                         <div
                             style={{
-                                fontSize: 10,
-                                color: BRAND.walnut,
-                                opacity: 0.7,
+                                fontSize: 10.5,
+                                color: "rgb(var(--app-ink-rgb) / 0.65)",
                                 textAlign: "right",
                                 lineHeight: 1.3,
                             }}
@@ -143,10 +144,10 @@ export default function DashboardGoalsSection({
             </motion.div>
 
             <motion.div {...fadeUp(0.45)}>
-                <Card style={{ padding: "16px 18px" }}>
+                <Card style={{ padding: "14px 16px" }}>
                     <h3
                         style={{
-                            margin: "0 0 12px",
+                            margin: "0 0 10px",
                             fontSize: 13,
                             fontWeight: 700,
                             color: BRAND.darkBrown,
@@ -156,21 +157,20 @@ export default function DashboardGoalsSection({
                             gap: 6,
                         }}
                     >
-                        <Award size={14} color={BRAND.walnut} />{" "}
+                        <Award size={14} color={BRAND.gold} />{" "}
                         {t("dashboard.goals.quick_stats")}
                     </h3>
                     <div
                         style={{
                             display: "flex",
                             flexDirection: "column",
-                            gap: 8,
+                            gap: 4,
                         }}
                     >
                         {[
                             {
                                 label: t("dashboard.goals.fav_genre"),
                                 val: stats.topGenre,
-                                icon: "📚",
                             },
                             {
                                 label: t("dashboard.goals.avg_rating"),
@@ -178,35 +178,33 @@ export default function DashboardGoalsSection({
                                     stats.avgRating > 0
                                         ? `⭐ ${stats.avgRating}`
                                         : "—",
-                                icon: "⭐",
                             },
                             {
                                 label: t("dashboard.goals.total_shelves"),
                                 val: `${shelvesLength} ${t("dashboard.goals.shelves")}`,
-                                icon: "🪵",
                             },
                             {
                                 label: t("dashboard.goals.wishlist"),
                                 val: `${stats.wishlist} ${t("dashboard.goals.books")}`,
-                                icon: "🛒",
                             },
-                        ].map((s) => (
+                        ].map((s, idx, arr) => (
                             <div
                                 key={s.label}
                                 style={{
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "space-between",
-                                    padding: "6px 0",
+                                    padding: "5px 0",
                                     borderBottom:
-                                        "1px solid rgba(139,99,56,0.07)",
+                                        idx < arr.length - 1
+                                            ? "1px solid rgb(var(--color-walnut-rgb) / 0.14)"
+                                            : "none",
                                 }}
                             >
                                 <span
                                     style={{
-                                        fontSize: 11,
-                                        color: BRAND.walnut,
-                                        opacity: 0.7,
+                                        fontSize: 11.5,
+                                        color: "rgb(var(--app-ink-rgb) / 0.72)",
                                     }}
                                 >
                                     {s.label}

@@ -1,12 +1,13 @@
 import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Trash2, Upload } from "lucide-react";
-import {
-    DECORATION_CATALOGUE,
-    renderDecoration,
-    type DecorationKind,
-    type ShelfDecoration,
-} from "./DecorationSystem";
+import { motion } from "framer-motion";
+import { Trash2, Upload } from "lucide-react";
+import { DecorationItem } from "./DecorationSystem";
+import { DECORATION_CATALOGUE } from "../../constants/decorations";
+import type {
+    DecorationCustomData,
+    DecorationKind,
+    ShelfDecoration,
+} from "../../types/decorations";
 import Modal from "../ui/Modal";
 import { useTranslation } from "react-i18next";
 
@@ -15,7 +16,10 @@ interface DecorationPickerProps {
     onClose: () => void;
     slot: "left" | "right";
     current?: ShelfDecoration;
-    onSelect: (kind: DecorationKind, customData?: any) => void;
+    onSelect: (
+        kind: DecorationKind,
+        customData?: DecorationCustomData,
+    ) => void;
     onRemove: () => void;
 }
 
@@ -97,10 +101,10 @@ export default function DecorationPicker({
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                         >
-                            {renderDecoration(preview)}
+                            <DecorationItem item={preview} />
                         </motion.div>
                     ) : current ? (
-                        renderDecoration(current)
+                        <DecorationItem item={current} />
                     ) : (
                         <p className="text-sm text-walnut/40">
                             Arahkan kursor untuk melihat pratinjau

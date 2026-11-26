@@ -1,6 +1,3 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-
 export default function VaseRound() {
     return (
         <div

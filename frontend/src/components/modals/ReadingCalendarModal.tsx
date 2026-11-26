@@ -11,7 +11,6 @@ interface ReadingCalendarModalProps {
     books: Book[];
 }
 
-const DAYS_OF_WEEK = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const MONTHS = [
     "January",
     "February",

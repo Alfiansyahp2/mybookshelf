@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { expensesApi } from "../../lib/api/accounting";
 import type {
-    Expense,
     ExpenseFormData,
     ExpenseFilters,
 } from "../../types/accounting";

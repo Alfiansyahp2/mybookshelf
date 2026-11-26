@@ -21,8 +21,9 @@ import {
     Flame,
     Shield,
     Map,
-    Icon,
+    type LucideIcon,
 } from "lucide-react";
+import type { Book } from "../types";
 
 const BRAND = {
     cream: "#F8F5F0",
@@ -32,7 +33,7 @@ const BRAND = {
     beige: "#E8E0D5",
 };
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, LucideIcon> = {
     BookOpen,
     CheckCircle,
     Trophy,
@@ -61,23 +62,26 @@ export default function Achievements() {
 
     // API Fetch
     const { data: apiAchievements = [], isLoading } = useAchievements();
-    const unlockMutation = useUnlockAchievement();
+    const { mutate: unlockAchievement } = useUnlockAchievement();
 
-    const books = booksResponse?.data?.data || [];
+    const books = useMemo<Book[]>(
+        () => booksResponse?.data?.data || [],
+        [booksResponse],
+    );
 
     // Compute stats for progress
     const stats = useMemo(() => {
-        const finished = books.filter((b: any) => b.status === "finished");
-        const wishlist = books.filter((b: any) => b.status === "wishlist");
-        const favs = books.filter((b: any) => b.favorite || b.isFavorite);
-        const rated = books.filter((b: any) => b.personalRating > 0);
-        const fiveStar = books.filter((b: any) => b.personalRating === 5);
+        const finished = books.filter((b) => b.status === "finished");
+        const wishlist = books.filter((b) => b.status === "wishlist");
+        const favs = books.filter((b) => b.favorite || b.isFavorite);
+        const rated = books.filter((b) => (b.personalRating || 0) > 0);
+        const fiveStar = books.filter((b) => b.personalRating === 5);
         const pages = finished.reduce(
-            (sum: number, b: any) => sum + (b.pages || b.totalPages || 0),
+            (sum, b) => sum + (b.pages || 0),
             0,
         );
         const genres = new Set(
-            books.filter((b: any) => b.genre).map((b: any) => b.genre),
+            books.filter((b) => b.genre).map((b) => b.genre),
         );
 
         return {
@@ -150,16 +154,16 @@ export default function Achievements() {
                 color: colorMap[ach.rarity] || colorMap.common,
             };
         });
-    }, [apiAchievements, stats]);
+    }, [apiAchievements, stats, t]);
 
     // Optional: Auto-unlock achievements if progress >= target
     useEffect(() => {
         achievementsList.forEach((ach) => {
             if (!ach.unlocked && ach.progress >= ach.target) {
-                unlockMutation.mutate(ach.id);
+                unlockAchievement(ach.id);
             }
         });
-    }, [achievementsList]);
+    }, [achievementsList, unlockAchievement]);
 
     if (isLoading) {
         return (

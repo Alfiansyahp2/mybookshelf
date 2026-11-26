@@ -5,6 +5,21 @@ Dokumen ini mencatat hasil audit teknis pada seluruh lapisan antarmuka klien di 
 
 ---
 
+## Status Perbaikan Frontend (Selesai & Terverifikasi)
+
+* ✅ **Broken API & Utilitas Debug:** Menghapus `useRooms.ts` yang memanggil endpoint non-eksisten `/v1/rooms`, serta membersihkan skrip debug manual (`authTest.ts`, `debugBooks.ts`, `debugModal.js`) dari `src/lib/`.
+* ✅ **4 Halaman Stub + Handler `Reading.tsx`:**
+  * [`BorrowLoan.tsx`](file:///c:/laragon/www/mybookshelf/frontend/src/pages/BorrowLoan.tsx): Tracker peminjaman buku lengkap (KPI dipinjam/terlambat/tersedia, filter, pencarian, modal pinjamkan buku via `/v1/books/{id}/borrow`, dan pengembalian via `/v1/books/{id}/return`).
+  * [`Collections.tsx`](file:///c:/laragon/www/mybookshelf/frontend/src/pages/Collections.tsx): Manajemen koleksi kurasi lengkap (`/v1/collections`, tambah/ubah/hapus koleksi, serta kelola buku di dalam koleksi via [`useCollections.ts`](file:///c:/laragon/www/mybookshelf/frontend/src/hooks/useCollections.ts)).
+  * [`Notes.tsx`](file:///c:/laragon/www/mybookshelf/frontend/src/pages/Notes.tsx): Pusat catatan membaca pribadi dengan filter, pencarian, dan editor catatan langsung via `/v1/books/{id}/notes`.
+  * [`Statistics.tsx`](file:///c:/laragon/www/mybookshelf/frontend/src/pages/Statistics.tsx): Analitik membaca berbasis `/v1/statistics` dan grafik Recharts (genre, format, bulanan, sesi teratas, investasi).
+  * [`Reading.tsx`](file:///c:/laragon/www/mybookshelf/frontend/src/pages/Reading.tsx): Menghubungkan `handleAddBook` ke `AddBookModal` dengan status awal & rak dari [`useShelves.ts`](file:///c:/laragon/www/mybookshelf/frontend/src/hooks/useShelves.ts).
+* ✅ **Linter `oxlint` & Type Safety:** Menyelesaikan seluruh **193 warning `oxlint`** (`0 warnings, 0 errors`), mengaktifkan `oxlint --deny-warnings` di [`frontend/package.json`](file:///c:/laragon/www/mybookshelf/frontend/package.json), menyertakan `tsc --noEmit` dalam skrip `build`, dan mengganti tipe `any` di model inti, API client, hooks, dashboard, serta halaman baru dengan tipe eksplisit (`RawBook`, `DashboardStats`, `StatisticsData`, `AxiosError`). *Catatan: sebagian tipe `any` pada subkomponen form/detail sekunder tetap dirapikan bertahap saat sentuhan fitur terkait.*
+* ✅ **Logging & Sinkronisasi Sesi Auth:** Menghapus debug `console.*` di kode produksi (hanya menyisakan [`devError`](file:///c:/laragon/www/mybookshelf/frontend/src/lib/logger.ts) berpenjaga `import.meta.env.DEV`), menormalkan `A?Bookshelf` di [`frontend/index.html`](file:///c:/laragon/www/mybookshelf/frontend/index.html), serta menjadikan `useAuthUser()` sebagai *single source of truth* pada [`ProtectedRoute.tsx`](file:///c:/laragon/www/mybookshelf/frontend/src/components/auth/ProtectedRoute.tsx) dan query hooks.
+* ✅ **Optimasi Bundle Vite:** Menerapkan `React.lazy()` + `<Suspense>` di [`App.tsx`](file:///c:/laragon/www/mybookshelf/frontend/src/App.tsx) dan konfigurasi `build.rolldownOptions.output.codeSplitting.groups` di [`vite.config.ts`](file:///c:/laragon/www/mybookshelf/frontend/vite.config.ts); chunk entri `index-*.js` turun dari **`1,607.84 kB`** menjadi **`209.13 kB`** (`53.03 kB` gzip) tanpa peringatan chunk > 500 kB.
+
+---
+
 ## 1. Integrasi API Putus & Fitur Belum Selesai
 
 ### 1.1. Endpoint `rooms` Tidak Tersedia di Backend

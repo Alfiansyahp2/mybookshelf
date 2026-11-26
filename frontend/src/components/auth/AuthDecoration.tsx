@@ -5,7 +5,7 @@ interface AuthDecorationProps {
     isLogin?: boolean;
 }
 
-export default function AuthDecoration({ isLogin }: AuthDecorationProps) {
+export default function AuthDecoration(_props: AuthDecorationProps) {
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
             {/* Ambient Cosmic Sparkles & Floating Celestial Stardust */}
