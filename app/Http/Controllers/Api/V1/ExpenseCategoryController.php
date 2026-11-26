@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ExpenseCategory;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +20,7 @@ class ExpenseCategoryController extends Controller
     {
         try {
             $query = ExpenseCategory::forUser(Auth::id())
-                                   ->with('expenses');
+                ->with('expenses');
 
             // Filter by type
             if ($request->has('is_default')) {
@@ -47,7 +48,7 @@ class ExpenseCategoryController extends Controller
 
             return response()->success($categories, 'Expense categories retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::index failed');
         }
     }
 
@@ -80,9 +81,9 @@ class ExpenseCategoryController extends Controller
 
             return response()->success($category, 'Expense category created successfully', 201);
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::store failed');
         }
     }
 
@@ -93,8 +94,8 @@ class ExpenseCategoryController extends Controller
     {
         try {
             $category = ExpenseCategory::with(['expenses', 'budgets'])
-                                       ->forUser(Auth::id())
-                                       ->findOrFail($id);
+                ->forUser(Auth::id())
+                ->findOrFail($id);
 
             // Add calculated fields
             $category->total_expenses = $category->getTotalExpensesAttribute();
@@ -104,10 +105,10 @@ class ExpenseCategoryController extends Controller
             $category->formatted_budget = $category->getFormattedBudgetAttribute();
 
             return response()->success($category, 'Expense category retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense category not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::show failed');
         }
     }
 
@@ -137,11 +138,11 @@ class ExpenseCategoryController extends Controller
 
             return response()->success($category->fresh(), 'Expense category updated successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense category not found', 404);
+            return $this->validationErrorResponse($e);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::update failed');
         }
     }
 
@@ -155,22 +156,71 @@ class ExpenseCategoryController extends Controller
 
             // Don't allow deleting default categories
             if ($category->is_default) {
-                return response()->error('Cannot delete default expense categories', 403);
+                return response()->error('Cannot delete default expense categories', null, 403);
             }
 
             // Check if category has expenses
             if ($category->expenses()->count() > 0) {
-                return response()->error('Cannot delete expense category with existing expenses', 422);
+                return response()->error('Cannot delete expense category with existing expenses', null, 422);
             }
 
             $category->delete();
 
             return response()->success(null, 'Expense category deleted successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense category not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::destroy failed');
         }
+    }
+
+    /**
+     * Build the canonical default expense category definitions.
+     */
+    private function defaultCategoryDefinitions(): array
+    {
+        return [
+            [
+                'name' => 'Book Purchases',
+                'description' => 'Pembelian buku baru dan bekas',
+                'icon' => '📚',
+                'color' => '#3B82F6',
+                'monthly_budget' => 500000,
+                'budget_currency' => 'IDR',
+            ],
+            [
+                'name' => 'Shipping & Handling',
+                'description' => 'Biaya pengiriman dan penanganan',
+                'icon' => '📦',
+                'color' => '#F59E0B',
+                'monthly_budget' => 100000,
+                'budget_currency' => 'IDR',
+            ],
+            [
+                'name' => 'Book Maintenance',
+                'description' => 'Perawatan, repair, dan aksesori buku',
+                'icon' => '🔧',
+                'color' => '#10B981',
+                'monthly_budget' => 50000,
+                'budget_currency' => 'IDR',
+            ],
+            [
+                'name' => 'Gifts & Donations',
+                'description' => 'Buku sebagai hadiah atau donasi',
+                'icon' => '🎁',
+                'color' => '#EC4899',
+                'monthly_budget' => 200000,
+                'budget_currency' => 'IDR',
+            ],
+            [
+                'name' => 'Other Expenses',
+                'description' => 'Pengeluaran lain terkait buku',
+                'icon' => '📝',
+                'color' => '#6B7280',
+                'monthly_budget' => 100000,
+                'budget_currency' => 'IDR',
+            ],
+        ];
     }
 
     /**
@@ -179,53 +229,9 @@ class ExpenseCategoryController extends Controller
     public function getDefaultCategories(): JsonResponse
     {
         try {
-            // Get the default categories structure
-            $defaultCategories = [
-                [
-                    'name' => 'Book Purchases',
-                    'description' => 'Pembelian buku baru dan bekas',
-                    'icon' => '📚',
-                    'color' => '#3B82F6',
-                    'monthly_budget' => 500000,
-                    'budget_currency' => 'IDR',
-                ],
-                [
-                    'name' => 'Shipping & Handling',
-                    'description' => 'Biaya pengiriman dan penanganan',
-                    'icon' => '📦',
-                    'color' => '#F59E0B',
-                    'monthly_budget' => 100000,
-                    'budget_currency' => 'IDR',
-                ],
-                [
-                    'name' => 'Book Maintenance',
-                    'description' => 'Perawatan, repair, dan aksesori buku',
-                    'icon' => '🔧',
-                    'color' => '#10B981',
-                    'monthly_budget' => 50000,
-                    'budget_currency' => 'IDR',
-                ],
-                [
-                    'name' => 'Gifts & Donations',
-                    'description' => 'Buku sebagai hadiah atau donasi',
-                    'icon' => '🎁',
-                    'color' => '#EC4899',
-                    'monthly_budget' => 200000,
-                    'budget_currency' => 'IDR',
-                ],
-                [
-                    'name' => 'Other Expenses',
-                    'description' => 'Pengeluaran lain terkait buku',
-                    'icon' => '📝',
-                    'color' => '#6B7280',
-                    'monthly_budget' => 100000,
-                    'budget_currency' => 'IDR',
-                ],
-            ];
-
-            return response()->success($defaultCategories, 'Default expense categories retrieved successfully');
+            return response()->success($this->defaultCategoryDefinitions(), 'Default expense categories retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::getDefaultCategories failed');
         }
     }
 
@@ -240,77 +246,22 @@ class ExpenseCategoryController extends Controller
             // Check if user already has categories
             $existingCategories = ExpenseCategory::forUser($userId)->count();
             if ($existingCategories > 0) {
-                return response()->error('User already has expense categories', 422);
+                return response()->error('User already has expense categories', null, 422);
             }
 
-            // Create default categories for user
-            $defaultCategories = [
-                [
+            foreach ($this->defaultCategoryDefinitions() as $definition) {
+                ExpenseCategory::create(array_merge($definition, [
                     'id' => Str::uuid()->toString(),
                     'user_id' => $userId,
-                    'name' => 'Book Purchases',
-                    'description' => 'Pembelian buku baru dan bekas',
-                    'icon' => '📚',
-                    'color' => '#3B82F6',
-                    'monthly_budget' => 500000,
-                    'budget_currency' => 'IDR',
                     'is_default' => true,
-                ],
-                [
-                    'id' => Str::uuid()->toString(),
-                    'user_id' => $userId,
-                    'name' => 'Shipping & Handling',
-                    'description' => 'Biaya pengiriman dan penanganan',
-                    'icon' => '📦',
-                    'color' => '#F59E0B',
-                    'monthly_budget' => 100000,
-                    'budget_currency' => 'IDR',
-                    'is_default' => true,
-                ],
-                [
-                    'id' => Str::uuid()->toString(),
-                    'user_id' => $userId,
-                    'name' => 'Book Maintenance',
-                    'description' => 'Perawatan, repair, dan aksesori buku',
-                    'icon' => '🔧',
-                    'color' => '#10B981',
-                    'monthly_budget' => 50000,
-                    'budget_currency' => 'IDR',
-                    'is_default' => true,
-                ],
-                [
-                    'id' => Str::uuid()->toString(),
-                    'user_id' => $userId,
-                    'name' => 'Gifts & Donations',
-                    'description' => 'Buku sebagai hadiah atau donasi',
-                    'icon' => '🎁',
-                    'color' => '#EC4899',
-                    'monthly_budget' => 200000,
-                    'budget_currency' => 'IDR',
-                    'is_default' => true,
-                ],
-                [
-                    'id' => Str::uuid()->toString(),
-                    'user_id' => $userId,
-                    'name' => 'Other Expenses',
-                    'description' => 'Pengeluaran lain terkait buku',
-                    'icon' => '📝',
-                    'color' => '#6B7280',
-                    'monthly_budget' => 100000,
-                    'budget_currency' => 'IDR',
-                    'is_default' => true,
-                ],
-            ];
-
-            foreach ($defaultCategories as $category) {
-                ExpenseCategory::create($category);
+                ]));
             }
 
             $categories = ExpenseCategory::forUser($userId)->get();
 
             return response()->success($categories, 'Default expense categories initialized successfully', 201);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::initializeDefaults failed');
         }
     }
 
@@ -336,17 +287,17 @@ class ExpenseCategoryController extends Controller
                 'budget_usage' => $category->getBudgetUsagePercentageAttribute(),
                 'budget_remaining' => max(0, $category->monthly_budget - $expenses->sum('amount_base_currency')),
                 'recent_expenses' => $category->expenses()
-                                             ->completed()
-                                             ->orderBy('expense_date', 'desc')
-                                             ->limit(5)
-                                             ->get(),
+                    ->completed()
+                    ->orderBy('expense_date', 'desc')
+                    ->limit(5)
+                    ->get(),
             ];
 
             return response()->success($statistics, 'Category statistics retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense category not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseCategoryController::getStatistics failed');
         }
     }
 }

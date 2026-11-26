@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Book;
+use App\Observers\BookObserver;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \App\Models\Book::observe(\App\Observers\BookObserver::class);
+        Book::observe(BookObserver::class);
 
         // Register API response macros
         Response::macro('success', function ($data = null, $message = 'Success', $statusCode = 200) {

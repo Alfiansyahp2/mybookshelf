@@ -25,12 +25,24 @@ A modern personal library management application with a beautiful 3D bookshelf v
    git clone https://github.com/yourusername/mybookshelf.git
    cd mybookshelf
    
-   # Backend Setup
+   # Backend Setup (Requires PostgreSQL 15+)
    composer install
    cp .env.example .env
+   # Update .env with your PostgreSQL connection:
+   # DB_CONNECTION=pgsql
+   # DB_HOST=127.0.0.1
+   # DB_PORT=5432
+   # DB_DATABASE=mybookshelf
+   # DB_USERNAME=postgres
+   # DB_PASSWORD=your_password
+   # Optional CORS / Sanctum production domains:
+   # FRONTEND_URL=https://app.example.com
+   # CORS_ALLOWED_ORIGINS=https://app.example.com
+   # SANCTUM_STATEFUL_DOMAINS=app.example.com
    php artisan key:generate
-   touch database/database.sqlite
+   createdb mybookshelf
    php artisan migrate
+   php artisan db:seed
 
    # Frontend Setup
    cd frontend

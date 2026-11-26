@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
+import type { AxiosError } from "axios";
 import Modal from "../ui/Modal";
 import { useUpdateBook, useUploadCover } from "../../hooks/useBooks";
 import type { Book } from "../../types";
-import { Save, Trash2, Edit3, Camera, Upload, X } from "lucide-react";
+import { Save, Trash2, Edit3, Camera, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { BOOK_GENRES } from "../../constants/genres";
+import { devError } from "../../lib/logger";
 import BookBasicInfoInput from "../book-form/BookBasicInfoInput";
 import BookAppearanceInput from "../book-form/BookAppearanceInput";
 import BookPurchaseInput from "../book-form/BookPurchaseInput";
@@ -16,23 +17,6 @@ interface EditBookModalProps {
     onClose: () => void;
     onDelete?: (bookId: string) => void;
 }
-
-const colorPalettes = [
-    { name: "Classic Brown", colors: ["#8B7355", "#6B5344", "#5C4532"] },
-    { name: "Navy Blue", colors: ["#1E3A5F", "#2A4A7F", "#3D5A8F"] },
-    { name: "Forest Green", colors: ["#2D5A3D", "#3A7B4F", "#4A8B5F"] },
-    { name: "Burgundy Red", colors: ["#7A1C1C", "#9B2C2C", "#BF3E3E"] },
-    { name: "Royal Purple", colors: ["#4A2374", "#6B3491", "#8B45AB"] },
-    { name: "Charcoal Gray", colors: ["#2C3E50", "#34495E", "#4A5A6A"] },
-    { name: "Ocean Blue", colors: ["#1A5F7A", "#2E86AB", "#4793AF"] },
-    { name: "Sunset Orange", colors: ["#D4621A", "#E67E22", "#F39C12"] },
-    { name: "Emerald Green", colors: ["#27AE60", "#2ECC71", "#58D68D"] },
-    { name: "Pure White", colors: ["#F5F5F5", "#E0E0E0", "#CCCCCC"] },
-    { name: "Midnight Black", colors: ["#2A2A2A", "#1A1A1A", "#0D0D0D"] },
-    { name: "Vibrant Yellow", colors: ["#F4D03F", "#F1C40F", "#D4AC0D"] },
-    { name: "Soft Pink", colors: ["#FADBD8", "#F5B7B1", "#F1948A"] },
-    { name: "Custom", colors: ["#8B7355", "#6B5344", "#5C4532"] },
-];
 
 export default function EditBookModal({
     book,
@@ -172,10 +156,13 @@ export default function EditBookModal({
                     setCoverPreview(data.cover_image);
                     setIsUploading(false);
                 },
-                onError: (err: any) => {
-                    console.error("Upload error:", err);
+                onError: (err) => {
+                    devError("Upload error:", err);
+                    const axiosErr = err as AxiosError<{ message?: string }>;
                     const backendMsg =
-                        err.response?.data?.message || err.message || "";
+                        axiosErr.response?.data?.message ||
+                        axiosErr.message ||
+                        "";
                     alert(
                         t(
                             "modals.editBook.upload_error",

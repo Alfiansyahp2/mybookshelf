@@ -63,7 +63,6 @@ jobs:
 
     - name: Check Code Style (Pint)
       run: ./vendor/bin/pint --test
-      continue-on-error: true
 
     - name: Generate key
       run: php artisan key:generate
@@ -107,7 +106,9 @@ jobs:
 
     - name: Run linter
       run: npm run lint
-      continue-on-error: true
+
+    - name: Run TypeScript typecheck
+      run: npm run typecheck
 
     - name: Build frontend
       run: npm run build

@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { currencyApi } from "../../lib/api/accounting";
-import type { CurrencyRate, CurrencyConversion } from "../../types/accounting";
 
 // Get all currency rates
 export function useCurrencyRates() {

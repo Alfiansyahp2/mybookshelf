@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Layers, Package, FileText, Save } from "lucide-react";
+import { X, Layers, Package, Save } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useUpdateShelf } from "../../hooks/useShelves";
 import type { Shelf } from "../../types";

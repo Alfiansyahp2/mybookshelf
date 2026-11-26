@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\CurrencyRate;
-use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Support\Str;
 
 class CurrencyRateService
 {
@@ -28,9 +28,9 @@ class CurrencyRateService
         }
 
         return CurrencyRate::active()
-                          ->forPair($fromCurrency, $toCurrency)
-                          ->orderBy('effective_date', 'desc')
-                          ->first();
+            ->forPair($fromCurrency, $toCurrency)
+            ->orderBy('effective_date', 'desc')
+            ->first();
     }
 
     /**
@@ -45,7 +45,7 @@ class CurrencyRateService
         // Check if rate already exists
         $existingRate = $this->getRate($fromCurrency, $toCurrency);
 
-        if ($existingRate && !($options['force'] ?? false)) {
+        if ($existingRate && ! ($options['force'] ?? false)) {
             // Update existing rate if it's from today
             if ($existingRate->effective_date->isToday()) {
                 $existingRate->update([
@@ -94,7 +94,7 @@ class CurrencyRateService
         // Get exchange rate
         $rate = $this->getRate($fromCurrency, $toCurrency);
 
-        if (!$rate) {
+        if (! $rate) {
             throw new Exception("No exchange rate found for {$fromCurrency} to {$toCurrency}");
         }
 
@@ -117,10 +117,10 @@ class CurrencyRateService
     public function getAllActiveRates(): array
     {
         $rates = CurrencyRate::active()
-                             ->orderBy('from_currency')
-                             ->orderBy('effective_date', 'desc')
-                             ->get()
-                             ->groupBy('from_currency');
+            ->orderBy('from_currency')
+            ->orderBy('effective_date', 'desc')
+            ->get()
+            ->groupBy('from_currency');
 
         $result = [];
         foreach ($rates as $fromCurrency => $currencyRates) {
@@ -208,8 +208,8 @@ class CurrencyRateService
         }
 
         $rates = $query->orderBy('effective_date', 'desc')
-                      ->limit(30)
-                      ->get();
+            ->limit(30)
+            ->get();
 
         return $rates->map(function ($rate) {
             return [
@@ -228,8 +228,8 @@ class CurrencyRateService
         $cutoffDate = now()->subDays($daysToKeep);
 
         return CurrencyRate::where('effective_date', '<', $cutoffDate)
-                           ->where('is_active', true)
-                           ->update(['is_active' => false]);
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
     }
 
     /**
@@ -252,13 +252,13 @@ class CurrencyRateService
         }
 
         return CurrencyRate::forPair($fromCurrency, $toCurrency)
-                          ->where('effective_date', '<=', $date)
-                          ->where(function ($q) use ($date) {
-                              $q->where('expires_at', '>=', $date)
-                                ->orWhereNull('expires_at');
-                          })
-                          ->orderBy('effective_date', 'desc')
-                          ->first();
+            ->where('effective_date', '<=', $date)
+            ->where(function ($q) use ($date) {
+                $q->where('expires_at', '>=', $date)
+                    ->orWhereNull('expires_at');
+            })
+            ->orderBy('effective_date', 'desc')
+            ->first();
     }
 
     /**
@@ -321,6 +321,7 @@ class CurrencyRateService
     public function isValidCurrency(string $currencyCode): bool
     {
         $supportedCurrencies = collect($this->getSupportedCurrencies())->pluck('code')->toArray();
+
         return in_array(strtoupper($currencyCode), $supportedCurrencies);
     }
 
@@ -330,6 +331,7 @@ class CurrencyRateService
     public function getCurrencyInfo(string $currencyCode): ?array
     {
         $currencies = collect($this->getSupportedCurrencies());
+
         return $currencies->firstWhere('code', strtoupper($currencyCode));
     }
 }

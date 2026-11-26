@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccountingTimelineEvent;
+use App\Services\CurrencyRateService;
 use App\Services\ExpenseService;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -41,7 +44,7 @@ class ExpenseController extends Controller
 
             return response()->success($expenses, 'Expenses retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::index failed');
         }
     }
 
@@ -51,17 +54,19 @@ class ExpenseController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
+            $userId = Auth::id();
+
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'amount' => 'required|numeric|min:0',
                 'currency' => 'nullable|string|size:3',
-                'category_id' => 'nullable|uuid|exists:expense_categories,id',
+                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
                 'payment_method' => 'nullable|in:cash,transfer,e-wallet,credit_card',
                 'expense_date' => 'nullable|date',
                 'is_recurring' => 'nullable|boolean',
                 'recurring_period' => 'nullable|in:daily,weekly,monthly,yearly',
-                'book_id' => 'nullable|uuid|exists:books,id',
+                'book_id' => ['nullable', 'uuid', $this->ownedRule('books', $userId)],
                 'vendor' => 'nullable|string|max:255',
                 'location' => 'nullable|string|max:255',
                 'has_reminder' => 'nullable|boolean',
@@ -70,13 +75,13 @@ class ExpenseController extends Controller
                 'metadata' => 'nullable|array',
             ]);
 
-            $expense = $this->expenseService->createExpense($validated, Auth::id());
+            $expense = $this->expenseService->createExpense($validated, $userId);
 
             return response()->success($expense, 'Expense created successfully', 201);
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::store failed');
         }
     }
 
@@ -89,10 +94,10 @@ class ExpenseController extends Controller
             $expense = $this->expenseService->getExpense($id, Auth::id());
 
             return response()->success($expense, 'Expense retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::show failed');
         }
     }
 
@@ -102,17 +107,19 @@ class ExpenseController extends Controller
     public function update(Request $request, string $id): JsonResponse
     {
         try {
+            $userId = Auth::id();
+
             $validated = $request->validate([
                 'title' => 'sometimes|required|string|max:255',
                 'description' => 'nullable|string',
                 'amount' => 'sometimes|required|numeric|min:0',
                 'currency' => 'nullable|string|size:3',
-                'category_id' => 'nullable|uuid|exists:expense_categories,id',
+                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
                 'payment_method' => 'nullable|in:cash,transfer,e-wallet,credit_card',
                 'expense_date' => 'nullable|date',
                 'is_recurring' => 'nullable|boolean',
                 'recurring_period' => 'nullable|in:daily,weekly,monthly,yearly',
-                'book_id' => 'nullable|uuid|exists:books,id',
+                'book_id' => ['nullable', 'uuid', $this->ownedRule('books', $userId)],
                 'vendor' => 'nullable|string|max:255',
                 'location' => 'nullable|string|max:255',
                 'has_reminder' => 'nullable|boolean',
@@ -121,15 +128,15 @@ class ExpenseController extends Controller
                 'metadata' => 'nullable|array',
             ]);
 
-            $expense = $this->expenseService->updateExpense($id, $validated, Auth::id());
+            $expense = $this->expenseService->updateExpense($id, $validated, $userId);
 
             return response()->success($expense, 'Expense updated successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+            return $this->validationErrorResponse($e);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::update failed');
         }
     }
 
@@ -142,10 +149,10 @@ class ExpenseController extends Controller
             $this->expenseService->deleteExpense($id, Auth::id());
 
             return response()->success(null, 'Expense deleted successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::destroy failed');
         }
     }
 
@@ -165,11 +172,11 @@ class ExpenseController extends Controller
 
             return response()->success($expense, 'Receipt uploaded successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+            return $this->validationErrorResponse($e);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::uploadReceipt failed');
         }
     }
 
@@ -182,10 +189,10 @@ class ExpenseController extends Controller
             $receipt = $this->expenseService->getReceipt($id, Auth::id());
 
             return response()->success($receipt, 'Receipt retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::getReceipt failed');
         }
     }
 
@@ -198,10 +205,10 @@ class ExpenseController extends Controller
             $expense = $this->expenseService->duplicateExpense($id, Auth::id());
 
             return response()->success($expense, 'Expense duplicated successfully', 201);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::duplicate failed');
         }
     }
 
@@ -216,7 +223,7 @@ class ExpenseController extends Controller
             ]);
 
             $expense = $this->expenseService->getExpense($id, Auth::id());
-            $currencyRateService = new \App\Services\CurrencyRateService();
+            $currencyRateService = new CurrencyRateService;
 
             $conversion = $currencyRateService->convertAmount(
                 $expense->amount,
@@ -226,11 +233,11 @@ class ExpenseController extends Controller
 
             return response()->success($conversion, 'Currency converted successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+            return $this->validationErrorResponse($e);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::convertCurrency failed');
         }
     }
 
@@ -253,9 +260,9 @@ class ExpenseController extends Controller
 
             return response()->success($expenses, 'Expenses by category retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::getByCategory failed');
         }
     }
 
@@ -278,16 +285,16 @@ class ExpenseController extends Controller
 
             return response()->success([
                 'total_expenses' => $total,
-                'formatted' => 'Rp ' . number_format($total, 2, ',', '.'),
+                'formatted' => 'Rp '.number_format($total, 2, ',', '.'),
                 'period' => [
                     'start_date' => $validated['start_date'] ?? null,
                     'end_date' => $validated['end_date'] ?? null,
                 ],
             ], 'Total expenses retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::getTotalExpenses failed');
         }
     }
 
@@ -302,10 +309,10 @@ class ExpenseController extends Controller
             ], Auth::id());
 
             return response()->success($expense, 'Expense marked as paid successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::markAsPaid failed');
         }
     }
 
@@ -318,16 +325,16 @@ class ExpenseController extends Controller
             $expense = $this->expenseService->getExpense($id, Auth::id());
 
             // Create timeline event as reminder
-            \App\Models\AccountingTimelineEvent::paymentReminder($id, Auth::id());
+            AccountingTimelineEvent::paymentReminder($id, Auth::id());
 
             // Update reminder sent status
             $expense->update(['reminder_sent' => true]);
 
             return response()->success($expense, 'Payment reminder sent successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Expense not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Expense not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'ExpenseController::sendReminder failed');
         }
     }
 }

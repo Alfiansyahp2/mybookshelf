@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { useTranslation } from "react-i18next";
 
@@ -85,7 +85,7 @@ export default function BigDigitalClock() {
                 timeZone: tzData.tz,
             });
             return new Date(tzString);
-        } catch (e) {
+        } catch {
             return time;
         }
     };

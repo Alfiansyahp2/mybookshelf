@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import type { AxiosError } from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -84,8 +85,7 @@ export default function Login() {
 
     // Redirect to dashboard if already logged in
     useEffect(() => {
-        const userData = localStorage.getItem("user");
-        if (userData && user) {
+        if (user?.user) {
             navigate("/dashboard", { replace: true });
         }
     }, [user, navigate]);
@@ -116,10 +116,11 @@ export default function Login() {
                         navigate("/dashboard", { replace: true });
                     }, 100);
                 },
-                onError: (error: any) => {
+                onError: (error) => {
+                    const axiosErr = error as AxiosError<{ message?: string }>;
                     const errorMessage =
-                        error.response?.data?.message ||
-                        error.message ||
+                        axiosErr.response?.data?.message ||
+                        axiosErr.message ||
                         "Unknown error";
                     addNotification({
                         title: t("login.failed", "Login failed"),

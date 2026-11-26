@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import {
     Wallet,
@@ -13,12 +12,9 @@ import {
 import {
     useBudgets,
     useBudgetProgress,
-    useDeleteBudget,
-    useCreateBudget,
-    useUpdateBudget,
 } from "../../hooks/accounting/useBudgets";
 import { useBudgetSummary } from "../../hooks/accounting/useBudgets";
-import type { Budget, BudgetFormData } from "../../types/accounting";
+import type { Budget } from "../../types/accounting";
 import { useTranslation } from "react-i18next";
 interface BudgetTrackerProps {
     userId?: string;
@@ -26,7 +22,6 @@ interface BudgetTrackerProps {
 }
 
 export default function BudgetTracker({
-    userId,
     period = "monthly",
 }: BudgetTrackerProps) {
     const { t } = useTranslation();
@@ -42,39 +37,6 @@ export default function BudgetTracker({
           ? budgetsResponse.data
           : [];
     const summary = summaryResponse?.data || null;
-
-    const createBudget = useCreateBudget();
-    const updateBudget = useUpdateBudget();
-    const deleteBudget = useDeleteBudget();
-
-    const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
-    const [showCreateModal, setShowCreateModal] = useState(false);
-
-    const getBudgetStatusColor = (status: string) => {
-        switch (status) {
-            case "exceeded":
-                return "bg-red-100 text-red-700 border-red-300";
-            case "warning":
-                return "bg-yellow-100 text-yellow-700 border-yellow-300";
-            case "healthy":
-                return "bg-green-100 text-green-700 border-green-300";
-            default:
-                return "bg-gray-100 text-gray-700 border-gray-300";
-        }
-    };
-
-    const getBudgetStatusIcon = (status: string) => {
-        switch (status) {
-            case "exceeded":
-                return TrendingUp;
-            case "warning":
-                return AlertCircle;
-            case "healthy":
-                return Target;
-            default:
-                return Wallet;
-        }
-    };
 
     if (isLoading) {
         return (

@@ -3,53 +3,43 @@ import { authApi } from "../lib/api/auth";
 import type { LoginCredentials, RegisterCredentials } from "../lib/api/auth";
 
 /**
- * Hook to get current authenticated user
+ * Hook to get current authenticated user (single source of truth via Sanctum session).
  */
 export function useAuthUser() {
     return useQuery({
         queryKey: ["auth", "user"],
-        queryFn: () => authApi.me(),
+        queryFn: async () => {
+            const data = await authApi.me();
+            if (data?.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+            }
+            return data;
+        },
         retry: false,
-        // For SPA auth, let the server determine if user is authenticated
-        // The API will return 401 if not authenticated
+        staleTime: 5 * 60 * 1000,
     });
 }
 
 /**
- * Hook to login user
+ * Hook to login user.
  */
 export function useLogin() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (credentials: LoginCredentials) => {
-            console.log("Login attempt with credentials:", {
-                email: credentials.email,
-            });
-            const result = await authApi.login(credentials);
-            console.log("Login API result:", result);
-            return result;
-        },
-
+        mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),
         onSuccess: (data) => {
-            console.log("Login success:", data);
-            // Session-based auth: no token to store (cookies are managed automatically)
-            localStorage.setItem("user", JSON.stringify(data.user));
-
-            // Invalidate and refetch user queries
+            if (data?.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+                queryClient.setQueryData(["auth", "user"], data);
+            }
             queryClient.invalidateQueries({ queryKey: ["auth"] });
-        },
-
-        onError: (error: any) => {
-            console.error("Login mutation error:", error);
-            console.error("Error response data:", error.response?.data);
-            console.error("Error status:", error.response?.status);
         },
     });
 }
 
 /**
- * Hook to register new user
+ * Hook to register new user.
  */
 export function useRegister() {
     const queryClient = useQueryClient();
@@ -57,38 +47,33 @@ export function useRegister() {
     return useMutation({
         mutationFn: (credentials: RegisterCredentials) =>
             authApi.register(credentials),
-
         onSuccess: (data) => {
-            // Session-based auth: no token to store (cookies are managed automatically)
-            localStorage.setItem("user", JSON.stringify(data.user));
-
-            // Invalidate and refetch user queries
+            if (data?.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+                queryClient.setQueryData(["auth", "user"], data);
+            }
             queryClient.invalidateQueries({ queryKey: ["auth"] });
         },
     });
 }
 
 /**
- * Hook to logout user
+ * Hook to logout user.
  */
 export function useLogout() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: () => authApi.logout(),
-
         onSuccess: () => {
-            // Clear user data from localStorage
             localStorage.removeItem("user");
-
-            // Clear all queries
             queryClient.clear();
         },
     });
 }
 
 /**
- * Hook to update user profile
+ * Hook to update user profile.
  */
 export function useUpdateProfile() {
     const queryClient = useQueryClient();
@@ -96,16 +81,18 @@ export function useUpdateProfile() {
     return useMutation({
         mutationFn: (data: { name: string; email: string }) =>
             authApi.updateProfile(data),
-
         onSuccess: (data) => {
-            localStorage.setItem("user", JSON.stringify(data.user));
+            if (data?.user) {
+                localStorage.setItem("user", JSON.stringify(data.user));
+                queryClient.setQueryData(["auth", "user"], data);
+            }
             queryClient.invalidateQueries({ queryKey: ["auth"] });
         },
     });
 }
 
 /**
- * Hook to update password
+ * Hook to update password.
  */
 export function useUpdatePassword() {
     return useMutation({

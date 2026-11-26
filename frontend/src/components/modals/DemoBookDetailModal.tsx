@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Edit, Clock, Hash, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -87,16 +87,24 @@ export default function DemoBookDetailModal({
         }
     }, [initialBook]);
 
+    const bookId = book?.id;
+    const bookStatus = book?.status;
+    const lastInitKeyRef = useRef<string | null>(null);
+
     useEffect(() => {
-        if (isOpen && book) {
-            setIsEditingNotes(false);
-            if (book.status === "reading" || book.status === "finished") {
-                setActiveTab("progress");
-            } else {
-                setActiveTab("info");
-            }
+        if (!isOpen || !bookId) {
+            lastInitKeyRef.current = null;
+            return;
         }
-    }, [isOpen, book?.id]);
+        if (lastInitKeyRef.current === bookId) return;
+        lastInitKeyRef.current = bookId;
+        setIsEditingNotes(false);
+        if (bookStatus === "reading" || bookStatus === "finished") {
+            setActiveTab("progress");
+        } else {
+            setActiveTab("info");
+        }
+    }, [isOpen, bookId, bookStatus]);
 
     if (!isOpen || !book) return null;
 

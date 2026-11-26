@@ -15,7 +15,7 @@ import DashboardAuthorsSection from "../components/dashboard/DashboardAuthorsSec
 import DashboardActivitySection from "../components/dashboard/DashboardActivitySection";
 import DashboardEmptyState from "../components/dashboard/DashboardEmptyState";
 import ReadingCalendarModal from "../components/modals/ReadingCalendarModal";
-import { fadeUp, BRAND } from "../components/dashboard/DashboardWidgets";
+import { BRAND } from "../constants/dashboardTheme";
 import SEO from "../components/SEO";
 
 /* ══════════════════════════════════════════════
@@ -67,7 +67,7 @@ export default function Dashboard() {
         );
 
     return (
-        <div className="px-4 md:px-5 pt-[88px] md:pt-[100px] pb-10 max-w-[1200px] mx-auto">
+        <div className="px-4 md:px-5 pt-[60px] md:pt-[70px] pb-8 max-w-[1200px] mx-auto">
             <SEO title={t("navigation.dashboard", "Dashboard")} />
             {/* ─── Hero header ──────────────────────────── */}
             <DashboardHeroSection
@@ -79,9 +79,9 @@ export default function Dashboard() {
             <DashboardStatCardsSection stats={stats} />
 
             {/* ─── Main content area: Desktop (lg+) ────── */}
-            <div className="hidden lg:grid lg:grid-cols-[1fr_320px] gap-5 mb-5">
+            <div className="hidden lg:grid lg:grid-cols-[1fr_320px] gap-4 mb-4">
                 {/* LEFT — Currently reading + unread & Charts */}
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-4">
                     <DashboardReadingSection
                         currentlyReading={stats.currentlyReading}
                         topReadBooks={stats.topReadBooks || []}
@@ -105,7 +105,7 @@ export default function Dashboard() {
             </div>
 
             {/* ─── Main content area: Mobile (< lg) ─────── */}
-            <div className="flex flex-col gap-5 mb-5 lg:hidden">
+            <div className="flex flex-col gap-4 mb-4 lg:hidden">
                 {/* 1. Priority #1: Currently reading & Unread */}
                 <DashboardReadingSection
                     currentlyReading={stats.currentlyReading}
@@ -121,18 +121,18 @@ export default function Dashboard() {
                 {/* 3. Priority #3: Analytics & Insights with Segmented Tabs */}
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center justify-between px-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-walnut/70">
+                        <span className="text-xs font-bold uppercase tracking-wider text-ink/70">
                             {t("dashboard.tabs.analytics_title", "Statistik & Wawasan")}
                         </span>
                         {/* Segmented Control */}
-                        <div className="inline-flex p-1 rounded-xl bg-walnut/10 border border-walnut/15 text-xs font-medium">
+                        <div className="inline-flex p-1 rounded-xl bg-walnut/15 border border-walnut/20 text-xs font-medium">
                             <button
                                 type="button"
                                 onClick={() => setMobileAnalyticsTab("charts")}
                                 className={`px-3 py-1 rounded-lg transition-all text-xs font-semibold cursor-pointer ${
                                     mobileAnalyticsTab === "charts"
-                                        ? "bg-white text-darkBrown shadow-xs"
-                                        : "text-walnut/80 hover:text-darkBrown"
+                                        ? "bg-surface text-ink shadow-xs"
+                                        : "text-ink/70 hover:text-ink"
                                 }`}
                             >
                                 {t("dashboard.tabs.charts", "Grafik & Genre")}
@@ -142,8 +142,8 @@ export default function Dashboard() {
                                 onClick={() => setMobileAnalyticsTab("authors")}
                                 className={`px-3 py-1 rounded-lg transition-all text-xs font-semibold cursor-pointer ${
                                     mobileAnalyticsTab === "authors"
-                                        ? "bg-white text-darkBrown shadow-xs"
-                                        : "text-walnut/80 hover:text-darkBrown"
+                                        ? "bg-surface text-ink shadow-xs"
+                                        : "text-ink/70 hover:text-ink"
                                 }`}
                             >
                                 {t("dashboard.tabs.authors", "Penulis")}

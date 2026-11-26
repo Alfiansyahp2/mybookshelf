@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\BudgetService;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
@@ -37,7 +38,7 @@ class BudgetController extends Controller
 
             return response()->success($budgets, 'Budgets retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::index failed');
         }
     }
 
@@ -47,6 +48,8 @@ class BudgetController extends Controller
     public function store(Request $request): JsonResponse
     {
         try {
+            $userId = Auth::id();
+
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
@@ -55,18 +58,18 @@ class BudgetController extends Controller
                 'period' => 'nullable|in:daily,weekly,monthly,yearly',
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date|after:start_date',
-                'category_id' => 'nullable|uuid|exists:expense_categories,id',
+                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
                 'alert_threshold' => 'nullable|numeric|min:1|max:100',
                 'is_active' => 'nullable|boolean',
             ]);
 
-            $budget = $this->budgetService->createBudget($validated, Auth::id());
+            $budget = $this->budgetService->createBudget($validated, $userId);
 
             return response()->success($budget, 'Budget created successfully', 201);
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::store failed');
         }
     }
 
@@ -79,10 +82,10 @@ class BudgetController extends Controller
             $budget = $this->budgetService->getBudget($id, Auth::id());
 
             return response()->success($budget, 'Budget retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Budget not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::show failed');
         }
     }
 
@@ -92,6 +95,8 @@ class BudgetController extends Controller
     public function update(Request $request, string $id): JsonResponse
     {
         try {
+            $userId = Auth::id();
+
             $validated = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
                 'description' => 'nullable|string',
@@ -100,20 +105,20 @@ class BudgetController extends Controller
                 'period' => 'nullable|in:daily,weekly,monthly,yearly',
                 'start_date' => 'nullable|date',
                 'end_date' => 'nullable|date|after:start_date',
-                'category_id' => 'nullable|uuid|exists:expense_categories,id',
+                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
                 'alert_threshold' => 'nullable|numeric|min:1|max:100',
                 'is_active' => 'nullable|boolean',
             ]);
 
-            $budget = $this->budgetService->updateBudget($id, $validated, Auth::id());
+            $budget = $this->budgetService->updateBudget($id, $validated, $userId);
 
             return response()->success($budget, 'Budget updated successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Budget not found', 404);
+            return $this->validationErrorResponse($e);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::update failed');
         }
     }
 
@@ -126,10 +131,10 @@ class BudgetController extends Controller
             $this->budgetService->deleteBudget($id, Auth::id());
 
             return response()->success(null, 'Budget deleted successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Budget not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::destroy failed');
         }
     }
 
@@ -142,10 +147,10 @@ class BudgetController extends Controller
             $progress = $this->budgetService->getBudgetProgress($id, Auth::id());
 
             return response()->success($progress, 'Budget progress retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Budget not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::getProgress failed');
         }
     }
 
@@ -166,10 +171,10 @@ class BudgetController extends Controller
             $expenses = $this->budgetService->getExpensesForBudget($id, Auth::id(), $filters);
 
             return response()->success($expenses, 'Budget expenses retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Budget not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::getExpenses failed');
         }
     }
 
@@ -182,10 +187,10 @@ class BudgetController extends Controller
             $budget = $this->budgetService->resetBudgetPeriod($id, Auth::id());
 
             return response()->success($budget, 'Budget period reset successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Budget not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::resetPeriod failed');
         }
     }
 
@@ -199,7 +204,7 @@ class BudgetController extends Controller
 
             return response()->success($alerts, 'Budget alerts checked successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::checkAlerts failed');
         }
     }
 
@@ -213,7 +218,7 @@ class BudgetController extends Controller
 
             return response()->success($summary, 'Budget summary retrieved successfully');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::getSummary failed');
         }
     }
 
@@ -238,9 +243,9 @@ class BudgetController extends Controller
 
             return response()->success($topCategories, 'Top spending categories retrieved successfully');
         } catch (ValidationException $e) {
-            return response()->error($e->errors(), 422);
+            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::getTopSpendingCategories failed');
         }
     }
 
@@ -253,10 +258,10 @@ class BudgetController extends Controller
             $trends = $this->budgetService->getBudgetPerformanceTrends($id, Auth::id());
 
             return response()->success($trends, 'Budget performance trends retrieved successfully');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->error('Budget not found', 404);
+        } catch (ModelNotFoundException $e) {
+            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
-            return response()->error($e->getMessage(), 500);
+            return $this->serverErrorResponse($e, 'BudgetController::getPerformanceTrends failed');
         }
     }
 }

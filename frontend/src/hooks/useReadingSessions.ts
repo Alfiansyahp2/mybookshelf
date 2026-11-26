@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { readingSessionsApi } from "../lib/api/readingSessions";
+import { useAuthUser } from "./useAuth";
 import type {
     StartSessionData,
     EndSessionData,
 } from "../lib/api/readingSessions";
 
 /**
- * Hook to start a reading session
+ * Hook to start a reading session.
  */
 export function useStartReadingSession() {
     const queryClient = useQueryClient();
@@ -19,11 +20,7 @@ export function useStartReadingSession() {
             bookId: string;
             data: StartSessionData;
         }) => readingSessionsApi.startSession(bookId, data),
-
-        onSuccess: (data, variables) => {
-            console.log("Reading session started successfully:", data);
-
-            // Invalidate and refetch books and reading sessions queries
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
                 queryKey: ["books", variables.bookId],
@@ -32,16 +29,11 @@ export function useStartReadingSession() {
                 queryKey: ["reading-sessions", variables.bookId],
             });
         },
-
-        onError: (error: any) => {
-            console.error("Failed to start reading session:", error);
-            console.error("Error response:", error.response?.data);
-        },
     });
 }
 
 /**
- * Hook to end a reading session
+ * Hook to end a reading session.
  */
 export function useEndReadingSession() {
     const queryClient = useQueryClient();
@@ -56,11 +48,7 @@ export function useEndReadingSession() {
             sessionId: string;
             data: EndSessionData;
         }) => readingSessionsApi.endSession(bookId, sessionId, data),
-
-        onSuccess: (data, variables) => {
-            console.log("Reading session ended successfully:", data);
-
-            // Invalidate and refetch books and reading sessions queries
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({
                 queryKey: ["books", variables.bookId],
@@ -69,16 +57,11 @@ export function useEndReadingSession() {
                 queryKey: ["reading-sessions", variables.bookId],
             });
         },
-
-        onError: (error: any) => {
-            console.error("Failed to end reading session:", error);
-            console.error("Error response:", error.response?.data);
-        },
     });
 }
 
 /**
- * Hook to pause or resume a reading session
+ * Hook to pause or resume a reading session.
  */
 export function usePauseReadingSession() {
     const queryClient = useQueryClient();
@@ -93,29 +76,21 @@ export function usePauseReadingSession() {
             sessionId: string;
             isPaused: boolean;
         }) => readingSessionsApi.pauseSession(bookId, sessionId, isPaused),
-
-        onSuccess: (data, variables) => {
-            console.log("Reading session pause toggled successfully:", data);
-
-            // Invalidate and refetch reading sessions queries
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({
                 queryKey: ["reading-sessions", variables.bookId],
             });
-        },
-
-        onError: (error: any) => {
-            console.error("Failed to toggle pause for reading session:", error);
-            console.error("Error response:", error.response?.data);
         },
     });
 }
 
 /**
- * Hook to get reading sessions for a book
+ * Hook to get reading sessions for a book.
  */
 export function useBookReadingSessions(bookId: string) {
     const isDemoBook = !bookId || bookId.startsWith("b");
-    const isAuthenticated = !!localStorage.getItem("user");
+    const { data: authData } = useAuthUser();
+    const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: ["reading-sessions", bookId],
         queryFn: () => readingSessionsApi.getBookSessions(bookId),
@@ -124,25 +99,16 @@ export function useBookReadingSessions(bookId: string) {
 }
 
 /**
- * Hook to read again (restart finished book)
+ * Hook to read again (restart finished book).
  */
 export function useReadAgain() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (bookId: string) => readingSessionsApi.readAgain(bookId),
-
-        onSuccess: (data, variables) => {
-            console.log("Book restarted successfully:", data);
-
-            // Invalidate and refetch books queries
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["books"] });
             queryClient.invalidateQueries({ queryKey: ["books", variables] });
-        },
-
-        onError: (error: any) => {
-            console.error("Failed to restart book:", error);
-            console.error("Error response:", error.response?.data);
         },
     });
 }

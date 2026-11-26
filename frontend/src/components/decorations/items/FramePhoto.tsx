@@ -1,7 +1,8 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-
-export default function FramePhoto({ customData }: { customData?: any }) {
+export default function FramePhoto({
+    customData,
+}: {
+    customData?: { imageUrl?: string };
+}) {
     return (
         <div
             style={{

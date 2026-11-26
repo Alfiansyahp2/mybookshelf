@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Expense extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -148,7 +148,7 @@ class Expense extends Model
      */
     public function hasReceipt(): bool
     {
-        return !empty($this->receipt_data);
+        return ! empty($this->receipt_data);
     }
 
     /**
@@ -156,7 +156,7 @@ class Expense extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount, 2, ',', '.') . ' ' . $this->currency;
+        return number_format($this->amount, 2, ',', '.').' '.$this->currency;
     }
 
     /**
@@ -164,6 +164,6 @@ class Expense extends Model
      */
     public function getFormattedBaseAmountAttribute(): string
     {
-        return number_format($this->amount_base_currency, 2, ',', '.') . ' IDR';
+        return number_format($this->amount_base_currency, 2, ',', '.').' IDR';
     }
 }

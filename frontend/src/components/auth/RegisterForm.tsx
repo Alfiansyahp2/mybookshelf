@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+interface RegisterFormState {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}
+
 interface RegisterFormProps {
-    formData: any;
-    setFormData: (data: any) => void;
+    formData: RegisterFormState;
+    setFormData: (data: RegisterFormState) => void;
     onSubmit: (e: React.FormEvent) => void;
     isLoading?: boolean;
 }

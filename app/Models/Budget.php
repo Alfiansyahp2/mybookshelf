@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Budget extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -94,11 +93,12 @@ class Budget extends Model
     public function scopeCurrent($query)
     {
         $now = now();
+
         return $query->where('start_date', '<=', $now)
-                    ->where(function ($q) use ($now) {
-                        $q->where('end_date', '>=', $now)
-                          ->orWhereNull('end_date');
-                    });
+            ->where(function ($q) use ($now) {
+                $q->where('end_date', '>=', $now)
+                    ->orWhereNull('end_date');
+            });
     }
 
     /**
@@ -156,6 +156,7 @@ class Budget extends Model
     public function isAtAlertThreshold(): bool
     {
         $usage = $this->getUsagePercentageAttribute();
+
         return $usage >= $this->alert_threshold && $usage <= 100;
     }
 
@@ -164,7 +165,7 @@ class Budget extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount_base_currency, 2, ',', '.') . ' IDR';
+        return number_format($this->amount_base_currency, 2, ',', '.').' IDR';
     }
 
     /**
@@ -172,7 +173,7 @@ class Budget extends Model
      */
     public function getFormattedSpentAttribute(): string
     {
-        return number_format($this->getTotalSpentAttribute(), 2, ',', '.') . ' IDR';
+        return number_format($this->getTotalSpentAttribute(), 2, ',', '.').' IDR';
     }
 
     /**
@@ -180,7 +181,7 @@ class Budget extends Model
      */
     public function getFormattedRemainingAttribute(): string
     {
-        return number_format($this->getRemainingAmountAttribute(), 2, ',', '.') . ' IDR';
+        return number_format($this->getRemainingAmountAttribute(), 2, ',', '.').' IDR';
     }
 
     /**
@@ -188,7 +189,7 @@ class Budget extends Model
      */
     public function getStatusAttribute(): string
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return 'inactive';
         }
 

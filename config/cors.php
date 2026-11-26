@@ -19,7 +19,15 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5177'],
+    'allowed_origins' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', env('CORS_ALLOWED_ORIGINS', implode(',', array_filter([
+            env('FRONTEND_URL'),
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://localhost:5177',
+        ]))))
+    ))),
 
     'allowed_origins_patterns' => [],
 

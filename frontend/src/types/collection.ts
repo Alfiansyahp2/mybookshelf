@@ -1,9 +1,12 @@
+import type { Book } from "./book";
+
 // Collection Types
 export interface Collection {
     id: string;
     name: string;
     description: string;
     bookIds: string[];
+    books?: Book[];
     color: string;
     icon?: string;
     createdAt: string;

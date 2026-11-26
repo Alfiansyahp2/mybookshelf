@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 /** @noinspection PhpUndefinedMethodInspection */
-
 class AuthController extends Controller
 {
     /**
@@ -23,14 +23,16 @@ class AuthController extends Controller
         ]);
 
         // Attempt SPA authentication with session
-        if (!Auth::guard('web')->attempt($request->only('email', 'password'), $request->filled('remember'))) {
+        if (! Auth::guard('web')->attempt($request->only('email', 'password'), $request->filled('remember'))) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        // Regenerate session to prevent session fixation
-        $request->session()->regenerate();
+        // Regenerate session to prevent session fixation when session middleware is active
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         $user = Auth::guard('web')->user();
 
@@ -54,7 +56,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -62,7 +64,9 @@ class AuthController extends Controller
 
         // Log in the user immediately after registration (SPA)
         Auth::guard('web')->login($user);
-        $request->session()->regenerate();
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         return response()->success([
             'user' => [
@@ -96,7 +100,10 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
-        $request->session()->invalidate();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->success(null, 'Logged out successfully');
     }
@@ -110,7 +117,7 @@ class AuthController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
         ]);
 
         $user->update([
@@ -140,7 +147,7 @@ class AuthController extends Controller
 
         $user = $request->user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['The provided password does not match your current password.'],
             ]);

@@ -33,7 +33,7 @@ export function RealisticBook({
         handleBookClick,
     } = useBookInteraction({ isDrawerOpen, onClick });
 
-    const colors = useMemo(() => getSpineColors(book), [book.spineColors]);
+    const colors = useMemo(() => getSpineColors(book), [book]);
     const { bookH, bookW } = useMemo(
         () => getBookDimensions(book.height, book.thickness, bookAreaHeight),
         [book.height, book.thickness, bookAreaHeight]

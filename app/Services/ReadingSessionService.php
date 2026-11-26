@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Models\Book;
 use App\Models\ReadingSession;
-use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 class ReadingSessionService
 {
@@ -15,7 +16,7 @@ class ReadingSessionService
     public function startSession(Book $book, string $userId, int $startPage, ?string $mood = null, ?string $location = null): ReadingSession
     {
         return ReadingSession::create([
-            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'id' => Str::uuid()->toString(),
             'user_id' => $userId,
             'book_id' => $book->id,
             'start_time' => now(),
@@ -35,7 +36,7 @@ class ReadingSessionService
         }
 
         if ($isPaused) {
-            if (!$session->is_paused) {
+            if (! $session->is_paused) {
                 $session->is_paused = true;
                 $session->last_paused_at = now();
             }
@@ -50,6 +51,7 @@ class ReadingSessionService
         }
 
         $session->save();
+
         return $session->fresh();
     }
 
@@ -88,7 +90,7 @@ class ReadingSessionService
     /**
      * Get all reading sessions for a specific book.
      */
-    public function getBookSessions(Book $book, string $userId): \Illuminate\Database\Eloquent\Collection
+    public function getBookSessions(Book $book, string $userId): Collection
     {
         return ReadingSession::where('user_id', $userId)
             ->where('book_id', $book->id)
@@ -175,9 +177,9 @@ class ReadingSessionService
         if ($progress >= 100 && $book->status !== 'finished') {
             $readDates = $book->read_dates ?? [];
             $today = now()->toDateString();
-            if (!in_array($today, $readDates)) {
+            if (! in_array($today, $readDates)) {
                 $readDates[] = $today;
-                usort($readDates, function($a, $b) {
+                usort($readDates, function ($a, $b) {
                     return strtotime($b) - strtotime($a);
                 });
             }
@@ -210,13 +212,13 @@ class ReadingSessionService
 
         $parts = [];
         if ($hours > 0) {
-            $parts[] = $hours . 'h';
+            $parts[] = $hours.'h';
         }
         if ($minutes > 0 || $hours > 0) {
-            $parts[] = $minutes . 'm';
+            $parts[] = $minutes.'m';
         }
         if ($secs > 0 || empty($parts)) {
-            $parts[] = $secs . 's';
+            $parts[] = $secs.'s';
         }
 
         return implode(' ', $parts);

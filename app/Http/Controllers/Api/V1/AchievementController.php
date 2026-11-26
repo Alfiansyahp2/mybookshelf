@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Achievement;
+use App\Models\Book;
+use App\Models\Shelf;
 use Illuminate\Http\Request;
 
 class AchievementController extends Controller
@@ -20,9 +22,9 @@ class AchievementController extends Controller
         }])->get();
 
         // Transform to include user progress
-        $achievementsWithProgress = $achievements->map(function ($achievement) use ($user) {
+        $achievementsWithProgress = $achievements->map(function ($achievement) {
             $userAchievement = $achievement->users->first();
-            
+
             $unlockedDate = $userAchievement?->pivot->unlocked_date;
             $unlockedDateStr = null;
             if ($unlockedDate) {
@@ -86,7 +88,7 @@ class AchievementController extends Controller
     }
 
     /**
-     * Unlock an achievement (if requirements are met).
+     * Unlock an achievement (only if requirements are verified server-side).
      */
     public function unlock(Request $request, $id)
     {
@@ -100,14 +102,61 @@ class AchievementController extends Controller
             return response()->error('Achievement already unlocked', null, 400);
         }
 
-        // In a real implementation, this would check if requirements are met
-        // For now, we'll just unlock it
+        $current = $this->calculateProgressForAchievement($achievement, $user->id);
+
+        if ($current < $achievement->requirement) {
+            return response()->error('Achievement requirement not yet met', [
+                'current' => $current,
+                'requirement' => $achievement->requirement,
+            ], 422);
+        }
+
         $user->achievements()->syncWithoutDetaching([$id => [
-            'current' => $achievement->requirement,
+            'current' => $current,
             'unlocked' => true,
             'unlocked_date' => now(),
         ]]);
 
-        return response()->success(null, 'Achievement unlocked successfully');
+        return response()->success([
+            'current' => $current,
+            'requirement' => $achievement->requirement,
+        ], 'Achievement unlocked successfully');
+    }
+
+    /**
+     * Compute the user's current progress toward an achievement requirement.
+     */
+    private function calculateProgressForAchievement(Achievement $achievement, string $userId): int
+    {
+        $title = $achievement->title;
+
+        return match (true) {
+            $achievement->category === 'reading' && str_contains($title, 'Marathon') => (int) Book::where('user_id', $userId)
+                ->where('status', 'finished')
+                ->sum('pages'),
+            $achievement->category === 'reading' => Book::where('user_id', $userId)
+                ->where('status', 'finished')
+                ->count(),
+            $achievement->category === 'collections' && str_contains($title, 'Rak') => Shelf::where('user_id', $userId)
+                ->count(),
+            str_contains($title, 'Genre') => Book::where('user_id', $userId)
+                ->whereNotNull('genre')
+                ->where('genre', '!=', '')
+                ->distinct('genre')
+                ->count('genre'),
+            str_contains($title, 'Bintang') || str_contains($title, 'Sempurna') => Book::where('user_id', $userId)
+                ->where('personal_rating', 5)
+                ->count(),
+            str_contains($title, 'Kritikus') => Book::where('user_id', $userId)
+                ->where('personal_rating', '>', 0)
+                ->count(),
+            str_contains($title, 'Favorit') || str_contains($title, 'Setia') => Book::where('user_id', $userId)
+                ->where('favorite', true)
+                ->count(),
+            str_contains($title, 'Wishlist') || str_contains($title, 'Pemimpi') => Book::where('user_id', $userId)
+                ->where('status', 'wishlist')
+                ->count(),
+            default => Book::where('user_id', $userId)->count(),
+        };
     }
 }

@@ -16,6 +16,13 @@
     --color-gold-rgb: 212 165 116;
     --color-beige: #e8e0d5;
     --color-beige-rgb: 232 224 213;
+    --app-surface-rgb: 252 250 247;
+    --app-surface-alt-rgb: 248 245 240;
+    --app-ink-rgb: 74 59 47;
+    --app-canvas-bg: #f8f5f0;
+    --app-wall-bg: linear-gradient(150deg, #e2c99a 0%, #cdb07c 45%, #b89860 100%);
+    --app-banner-bg: linear-gradient(135deg, #5c3a1e 0%, #4a2e16 50%, #3a2210 100%);
+    --app-header-scrolled-bg: rgba(255, 255, 255, 0.95);
 }
 
 html, body {
@@ -71,11 +78,11 @@ html, body {
    DARK MODE FALLBACKS (Murni CSS)
    ========================================================================== */
 .app-layout-bg {
-    background-color: var(--color-cream);
+    background-color: var(--app-canvas-bg);
 }
 
 html.dark .app-layout-bg {
-    background-color: transparent !important;
+    background-color: var(--app-canvas-bg);
 }
 
 html.dark body {
@@ -88,17 +95,17 @@ html.dark .night-overlay {
 }
 
 html.dark .app-header-bg {
-    background-color: rgba(42, 26, 16, 0.9) !important;
-    border-color: rgba(61, 37, 22, 0.5) !important;
+    background-color: var(--app-header-scrolled-bg) !important;
+    border-color: rgb(var(--color-walnut-rgb) / 0.3) !important;
 }
 
 html.dark .header-icon-btn {
-    background-color: rgba(61, 37, 22, 0.5) !important;
-    color: #f2e8d9 !important;
+    background-color: rgb(var(--color-walnut-rgb) / 0.25) !important;
+    color: rgb(var(--color-cream-rgb)) !important;
 }
 
 html.dark .header-icon-btn:hover {
-    background-color: rgba(61, 37, 22, 0.8) !important;
+    background-color: rgb(var(--color-walnut-rgb) / 0.4) !important;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: var(--color-dark-brown);

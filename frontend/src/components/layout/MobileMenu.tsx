@@ -50,7 +50,7 @@ export default function MobileMenu({ navItems }: MobileMenuProps) {
                             damping: 25,
                             stiffness: 300,
                         }}
-                        className="absolute bottom-16 right-0 mb-4 bg-cream/95 backdrop-blur-md rounded-full shadow-2xl border border-walnut/20 p-1.5 flex flex-col gap-1.5"
+                        className="absolute bottom-16 right-0 mb-4 bg-surface/95 backdrop-blur-md rounded-full shadow-2xl border border-walnut/20 p-1.5 flex flex-col gap-1.5"
                     >
                         {navItems.map((item) => {
                             const Icon = item.icon;
@@ -62,8 +62,8 @@ export default function MobileMenu({ navItems }: MobileMenuProps) {
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className={`flex items-center justify-center w-12 h-12 rounded-full transition-all ${
                                         isActive
-                                            ? "bg-walnut/10 text-walnut"
-                                            : "text-walnut/70 hover:bg-walnut/5 hover:text-walnut"
+                                            ? "bg-walnut/15 text-walnut dark:text-gold"
+                                            : "text-walnut/75 dark:text-cream/75 hover:bg-walnut/10 hover:text-walnut dark:hover:text-gold"
                                     }`}
                                 >
                                     <Icon

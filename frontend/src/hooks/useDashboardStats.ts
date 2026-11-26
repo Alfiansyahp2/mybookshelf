@@ -1,21 +1,21 @@
 import { useMemo } from "react";
-import { BRAND, STATUS_CFG } from "../components/dashboard/DashboardWidgets";
-import { BOOK_GENRES } from "../constants/genres";
+import type { Book } from "../types";
+import { BRAND, STATUS_CFG } from "../constants/dashboardTheme";
 
-export function useDashboardStats(books: any[]) {
+export function useDashboardStats(books: Book[]) {
     return useMemo(() => {
         const byStatus = (s: string) =>
-            books.filter((b: any) => b.status === s);
+            books.filter((b) => b.status === s);
         const reading = byStatus("reading");
         const finished = byStatus("finished");
         const unread = byStatus("unread");
         const wishlist = byStatus("wishlist");
         const borrowed = byStatus("borrowed");
-        const favs = books.filter((b: any) => b.isFavorite || b.favorite);
+        const favs = books.filter((b) => b.isFavorite || b.favorite);
 
         const now = new Date();
 
-        const booksReadThisYear = books.filter((b: any) => {
+        const booksReadThisYear = books.filter((b) => {
             let isThisYear = false;
             if (b.finishedDate)
                 isThisYear =
@@ -26,11 +26,9 @@ export function useDashboardStats(books: any[]) {
                     new Date(b.startedDate).getFullYear() === now.getFullYear();
             if (!isThisYear && b.readDates && Array.isArray(b.readDates)) {
                 isThisYear = b.readDates.some(
-                    (d: string) =>
-                        new Date(d).getFullYear() === now.getFullYear(),
+                    (d) => new Date(d).getFullYear() === now.getFullYear(),
                 );
             }
-            // Include books that are actively being read and don't have explicit dates but were updated this year
             if (!isThisYear && b.status === "reading") {
                 isThisYear =
                     new Date(b.lastModified || b.dateAdded).getFullYear() ===
@@ -40,16 +38,15 @@ export function useDashboardStats(books: any[]) {
         });
 
         const totalPages = booksReadThisYear.reduce(
-            (s: number, b: any) => s + (b.pages || b.totalPages || 0),
+            (s, b) => s + (b.pages || 0),
             0,
         );
-        const pagesRead = booksReadThisYear.reduce((s: number, b: any) => {
-            if (b.status === "finished")
-                return s + (b.pages || b.totalPages || 0);
+        const pagesRead = booksReadThisYear.reduce((s, b) => {
+            if (b.status === "finished") return s + (b.pages || 0);
             return s + (b.currentPage || 0);
         }, 0);
 
-        const addedThisMonth = books.filter((b: any) => {
+        const addedThisMonth = books.filter((b) => {
             const d = new Date(b.dateAdded);
             return (
                 d.getMonth() === now.getMonth() &&
@@ -57,7 +54,7 @@ export function useDashboardStats(books: any[]) {
             );
         }).length;
 
-        const finishedThisYear = finished.filter((b: any) => {
+        const finishedThisYear = finished.filter((b) => {
             let isThisYear = false;
             if (b.finishedDate) {
                 isThisYear =
@@ -66,21 +63,20 @@ export function useDashboardStats(books: any[]) {
             }
             if (!isThisYear && b.readDates && Array.isArray(b.readDates)) {
                 isThisYear = b.readDates.some(
-                    (d: string) =>
-                        new Date(d).getFullYear() === now.getFullYear(),
+                    (d) => new Date(d).getFullYear() === now.getFullYear(),
                 );
             }
             return isThisYear;
         }).length;
 
         const genreCounts: Record<string, number> = {};
-        books.forEach((b: any) => {
+        books.forEach((b) => {
             if (b.genre) {
                 const genres = b.genre
                     .split(",")
-                    .map((g: string) => g.trim())
+                    .map((g) => g.trim())
                     .filter(Boolean);
-                genres.forEach((g: string) => {
+                genres.forEach((g) => {
                     genreCounts[g] = (genreCounts[g] || 0) + 1;
                 });
             }
@@ -89,29 +85,27 @@ export function useDashboardStats(books: any[]) {
             Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ||
             "—";
 
-        const rated = books.filter((b: any) => Number(b.personalRating) > 0);
+        const rated = books.filter((b) => Number(b.personalRating) > 0);
         const avgRating = rated.length
-            ? rated.reduce(
-                  (s: number, b: any) => s + Number(b.personalRating),
-                  0,
-              ) / rated.length
+            ? rated.reduce((s, b) => s + Number(b.personalRating || 0), 0) /
+              rated.length
             : 0;
 
         const currentlyReading = [
-            ...reading.map((b: any) => ({
+            ...reading.map((b) => ({
                 id: b.id,
                 title: b.title,
                 author: b.author,
-                pages: b.pages || b.totalPages || 1,
+                pages: b.pages || 1,
                 currentPage: b.currentPage || 0,
                 color: b.spineColors?.[0] || BRAND.walnut,
                 status: "reading" as const,
             })),
-            ...unread.map((b: any) => ({
+            ...unread.map((b) => ({
                 id: b.id,
                 title: b.title,
                 author: b.author,
-                pages: b.pages || b.totalPages || 0,
+                pages: b.pages || 0,
                 currentPage: 0,
                 color: b.spineColors?.[0] || BRAND.walnut,
                 status: "unread" as const,
@@ -120,22 +114,22 @@ export function useDashboardStats(books: any[]) {
 
         const recentBooks = [...books]
             .sort(
-                (a: any, b: any) =>
+                (a, b) =>
                     new Date(b.dateAdded).getTime() -
                     new Date(a.dateAdded).getTime(),
             )
             .slice(0, 3);
 
-        const recentlyFinished = finished
+        const recentlyFinished = [...finished]
             .sort(
-                (a: any, b: any) =>
+                (a, b) =>
                     new Date(b.finishedDate || 0).getTime() -
                     new Date(a.finishedDate || 0).getTime(),
             )
             .slice(0, 4);
 
         const authorCounts: Record<string, number> = {};
-        books.forEach((b: any) => {
+        books.forEach((b) => {
             if (b.author)
                 authorCounts[b.author] = (authorCounts[b.author] || 0) + 1;
         });
@@ -155,7 +149,7 @@ export function useDashboardStats(books: any[]) {
             avgRating: Math.round(avgRating * 10) / 10,
             finishedThisYear,
             currentYear: now.getFullYear(),
-            target: 12, // Annual reading target
+            target: 12,
             currentlyReading,
             recentBooks,
             recentlyFinished,
@@ -176,13 +170,13 @@ export function useDashboardStats(books: any[]) {
                 }))
                 .filter((d) => d.value > 0),
             topReadBooks: books
-                .map((b: any) => {
+                .map((b) => {
                     const count =
                         b.readDates && Array.isArray(b.readDates)
                             ? b.readDates.length
                             : b.status === "finished"
-                            ? 1
-                            : 0;
+                              ? 1
+                              : 0;
                     return {
                         id: b.id,
                         name: b.title || "Unknown Book",
@@ -194,12 +188,14 @@ export function useDashboardStats(books: any[]) {
                         color: b.spineColors?.[0] || BRAND.walnut,
                     };
                 })
-                .filter((b: any) => b.value > 0)
-                .sort((a: any, b: any) => b.value - a.value)
+                .filter((b) => b.value > 0)
+                .sort((a, b) => b.value - a.value)
                 .slice(0, 5),
             bookColors: books
                 .slice(0, 12)
-                .map((b: any) => b.spineColors?.[0] || "#8B7355"),
+                .map((b) => b.spineColors?.[0] || "#8B7355"),
         };
     }, [books]);
 }
+
+export type DashboardStats = ReturnType<typeof useDashboardStats>;

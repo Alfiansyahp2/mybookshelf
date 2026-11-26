@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import LibraryShelf from "./Shelf";
 import { useState, useEffect } from "react";
 import {
     DndContext,
@@ -116,17 +115,6 @@ export default function Bookshelf({
             setLocalShelves(shelves);
         }
     }, [isEditMode, shelves]);
-
-    useEffect(() => {
-        if (!isEditMode && onSaveLayout && localShelves !== shelves) {
-            // It was saved via Library.tsx, but Library.tsx needs the layout data.
-            // Wait, Library.tsx doesn't have the data, it triggers onSaveLayout!
-            // I should call onSaveLayout from a useEffect when isEditMode turns false?
-            // No, Library.tsx triggers it. We should pass the local state UP.
-            // Since Library.tsx calls updateLayout, it's better if Library.tsx holds the state, OR Bookshelf manages the save button itself.
-            // Actually, if we use useEffect:
-        }
-    }, [isEditMode]);
 
     // Fix: pass data up to Library via a ref or just call onSaveLayout here when isEditMode goes false
     const [prevEditMode, setPrevEditMode] = useState(isEditMode);

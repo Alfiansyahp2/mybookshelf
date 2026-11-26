@@ -213,6 +213,52 @@
       "title": "Tema",
       "desc": "Pilih tampilan yang Anda inginkan"
     },
+    "theme_preview": "Pratinjau Tema",
+    "light_mode": "Mode Terang",
+    "dark_mode": "Mode Gelap",
+    "palettes": {
+      "title": "Palet Warna Aplikasi",
+      "subtitle": "Berlaku khusus di dalam aplikasi (tidak mengubah Landing Page).",
+      "light_heading": "Palet Light Mode",
+      "dark_heading": "Palet Dark Mode",
+      "active_mode": "Mode Aktif",
+      "light": {
+        "parchment": {
+          "name": "Perkamen Hangat",
+          "desc": "Krem klasik, kayu walnut, dan emas"
+        },
+        "sage": {
+          "name": "Zaitun Botani",
+          "desc": "Kertas sage menenangkan & kuningan"
+        },
+        "slate": {
+          "name": "Arsip Tinta",
+          "desc": "Ivory bersih, biru arsip, & oker"
+        },
+        "rosewood": {
+          "name": "Terakota Linen",
+          "desc": "Nuansa mawar lembut & tembaga"
+        }
+      },
+      "dark": {
+        "espresso": {
+          "name": "Espresso Kayu",
+          "desc": "Cokelat malam hangat & emas amber"
+        },
+        "midnight": {
+          "name": "Biru Larut Malam",
+          "desc": "Navy dalam & aksen emas lembut"
+        },
+        "forest": {
+          "name": "Hutan Pinus",
+          "desc": "Ruang baca hijau gelap & kuningan"
+        },
+        "plum": {
+          "name": "Velvet Tembaga",
+          "desc": "Arang hangat & sentuhan tembaga"
+        }
+      }
+    },
     "notifications": {
       "title": "Notifikasi",
       "desc": "Aktifkan notifikasi push"
@@ -576,23 +622,52 @@
   },
   "reading": {
     "loading": "Memuat progres membaca...",
+    "badge": "Progres Membaca",
     "currently_reading": "Sedang Dibaca",
     "track_progress": "Lacak progres pada {{count}} buku",
     "books_read_in_year": "Buku yang Dibaca Tahun {{year}}",
     "reading_status": "Sedang Dibaca",
+    "unread_queue": "Belum Dibaca",
     "avg_progress": "Rata-rata Progres",
     "pages_read": "Halaman Dibaca",
+    "pages_read_short": "Hal. Dibaca",
     "total_progress": "Total Progres",
     "reading_shelf": "Sedang Dibaca",
     "unread_shelf": "Belum Dibaca",
+    "shelf_title": "Koleksi Bacaan",
+    "expand_shelf": "Tampilkan rak",
+    "collapse_shelf": "Lipat rak",
+    "filter_label": "Filter Status",
+    "active_focus_title": "Fokus Bacaan Saat Ini",
+    "quick_update_hint": "Klik tombol untuk update cepat",
     "browse_library": "Jelajahi Perpustakaan",
+    "add_book": "Tambah Buku",
     "no_books": "Belum ada buku",
     "start_journey": "Mulai perjalanan membaca dari perpustakaan kamu",
     "target": "Target {{year}}",
-    "target_achieved": "🎉 Target tercapai!",
+    "target_achieved": "Target tercapai!",
     "books_left_for_target": "{{count}} buku lagi untuk target tahun ini",
     "total_pages": "Total Halaman",
-    "percent_read": "% Terbaca"
+    "total_pages_short": "Total Hal.",
+    "percent_read": "% Terbaca",
+    "books_unit": "buku",
+    "pages_unit": "hal",
+    "remaining_pages": "{{count}} hal tersisa",
+    "ready_to_finish": "Siap selesai",
+    "prev_page": "Kurangi 1 halaman",
+    "add_5_pages": "Tambah 5 halaman",
+    "add_10_pages": "Tambah 10 halaman",
+    "mark_finished": "Tandai selesai",
+    "finish_short": "Selesai",
+    "detail_short": "Detail",
+    "open_detail": "Buka detail buku",
+    "clear_filter": "Tutup",
+    "progress_updated": "Progres diperbarui ke halaman {{page}}",
+    "progress_update_failed": "Gagal memperbarui progres halaman",
+    "book_finished": "\"{{title}}\" ditandai selesai!",
+    "finish_failed": "Gagal menandai buku selesai",
+    "empty_filtered_title": "Belum ada buku pada kategori ini",
+    "empty_filtered_desc": "Tambahkan buku atau pilih kategori lain dari dropdown untuk melihat koleksi."
   },
   "statistics": {
     "title": "Statistik",

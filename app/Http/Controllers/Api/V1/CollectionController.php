@@ -96,11 +96,12 @@ class CollectionController extends Controller
      */
     public function addBook(Request $request, $id)
     {
-        $collection = Collection::where('user_id', $request->user()->id)
+        $userId = $request->user()->id;
+        $collection = Collection::where('user_id', $userId)
             ->findOrFail($id);
 
         $data = $request->validate([
-            'book_id' => 'required|exists:books,id',
+            'book_id' => ['required', $this->ownedRule('books', $userId)],
             'order' => 'nullable|integer|min:0',
         ]);
 
@@ -128,6 +129,7 @@ class CollectionController extends Controller
         $collection = Collection::where('user_id', $request->user()->id)
             ->findOrFail($id);
 
+        $collection->books()->findOrFail($book);
         $collection->books()->detach($book);
 
         // Update collection progress
@@ -143,6 +145,8 @@ class CollectionController extends Controller
     {
         $collection = Collection::where('user_id', $request->user()->id)
             ->findOrFail($id);
+
+        $collection->books()->findOrFail($book);
 
         $data = $request->validate([
             'order' => 'required|integer|min:0',

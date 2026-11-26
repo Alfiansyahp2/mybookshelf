@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Achievement;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class AchievementSeeder extends Seeder
 {
@@ -157,7 +156,7 @@ class AchievementSeeder extends Seeder
                 'requirement' => 1,
                 'category' => 'special',
                 'rarity' => 'common',
-            ]
+            ],
         ];
 
         foreach ($achievements as $achievement) {

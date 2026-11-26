@@ -1,41 +1,21 @@
-import {
-    Outlet,
-    Link,
-    useLocation,
-    useNavigate,
-    useOutlet,
-} from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useLocation, useOutlet } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslation } from "react-i18next";
-import {
-    BookOpen,
-    Library,
-    ShoppingCart,
-    Settings,
-    Search,
-    Bell,
-    Layers,
-    LogOut,
-    Award,
-    LayoutDashboard,
-    DollarSign,
-    Menu,
-    X,
-} from "lucide-react";
+import { BookOpen, Library, DollarSign } from "lucide-react";
 import BookDetailModal from "../modals/BookDetailModal";
 import EditBookModal from "../modals/EditBookModal";
 import EditShelfModal from "../shelf/EditShelfModal";
 import AddShelfModal from "../shelf/AddShelfModal";
 import { useBookstore } from "../../store/useBookstore";
-import { useBook, useDeleteBook, useBooks } from "../../hooks/useBooks";
+import { useBook, useDeleteBook } from "../../hooks/useBooks";
 import { useDeleteShelf, useShelves } from "../../hooks/useShelves";
 import BookmarkHeart from "../icons/BookmarkHeart";
-import { Toaster } from "react-hot-toast";
 import MobileMenu from "./MobileMenu";
 import AppHeader from "./AppHeader";
 import { useAchievementTracker } from "../../hooks/useAchievementTracker";
 import { useThemeStore } from "../../store/useThemeStore";
+import { getAppPaletteVars } from "../../constants/appPalettes";
+import type { Shelf } from "../../types";
 
 const navItems = [
     { path: "/library", icon: Library, labelKey: "nav.library" },
@@ -45,9 +25,7 @@ const navItems = [
 ];
 
 export default function AppLayout() {
-    const { t, i18n } = useTranslation();
     const location = useLocation();
-    const navigate = useNavigate();
     const currentOutlet = useOutlet();
     const { selectedBookId, isBookDetailOpen, closeBookDetail } =
         useBookstore();
@@ -56,9 +34,15 @@ export default function AppLayout() {
 
     // Get shelves data for edit functionality
     const { data: shelves = [] } = useShelves();
-    
-    // Global Dark Mode State from centralized theme store
-    const { isDarkMode, toggleDarkMode } = useThemeStore();
+
+    // Global Dark Mode & App Palette State from centralized theme store
+    const { isDarkMode, lightPalette, darkPalette, toggleDarkMode } =
+        useThemeStore();
+    const appPaletteVars = getAppPaletteVars(
+        isDarkMode,
+        lightPalette,
+        darkPalette,
+    );
 
     // Handle scroll physics
     const { data: selectedBook } = useBook(selectedBookId || "");
@@ -69,7 +53,8 @@ export default function AppLayout() {
     // Modal states
     const [isEditBookModalOpen, setIsEditBookModalOpen] = useState(false);
     const [isEditShelfModalOpen, setIsEditShelfModalOpen] = useState(false);
-    const [selectedShelfForEdit, setSelectedShelfForEdit] = useState<any>(null);
+    const [selectedShelfForEdit, setSelectedShelfForEdit] =
+        useState<Shelf | null>(null);
 
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -93,7 +78,6 @@ export default function AppLayout() {
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const currentScrollY = e.currentTarget.scrollTop;
 
-        // Hide header when scrolling down, show when scrolling up
         if (currentScrollY > lastScrollY && currentScrollY > 80) {
             setIsHeaderVisible(false);
         } else {
@@ -104,31 +88,42 @@ export default function AppLayout() {
         setLastScrollY(currentScrollY);
     };
 
-    const handleAddShelf = (shelf: any) => {
-        console.log("New shelf added:", shelf);
+    const handleAddShelf = (_shelf: Shelf) => {
         setIsAddShelfModalOpen(false);
     };
 
-    const handleEditShelf = (shelfId: string) => {
-        const shelf = shelves?.find((s) => s.id === shelfId);
-        if (shelf) {
-            setSelectedShelfForEdit(shelf);
-            setIsEditShelfModalOpen(true);
-        }
-    };
+    const handleEditShelf = useCallback(
+        (shelfId: string) => {
+            const shelf = shelves?.find((s) => s.id === shelfId);
+            if (shelf) {
+                setSelectedShelfForEdit(shelf);
+                setIsEditShelfModalOpen(true);
+            }
+        },
+        [shelves],
+    );
 
-    const handleDeleteShelf = (shelfId: string) => {
-        deleteShelf.mutate(shelfId);
-    };
+    const handleDeleteShelf = useCallback(
+        (shelfId: string) => {
+            deleteShelf.mutate(shelfId);
+        },
+        [deleteShelf],
+    );
 
     // Listen for custom edit shelf event from child components
     useEffect(() => {
-        const handleEditShelfEvent = (event: any) => {
-            handleEditShelf(event.detail.shelfId);
+        const handleEditShelfEvent = (event: Event) => {
+            const customEvent = event as CustomEvent<{ shelfId: string }>;
+            if (customEvent.detail?.shelfId) {
+                handleEditShelf(customEvent.detail.shelfId);
+            }
         };
 
-        const handleDeleteShelfEvent = (event: any) => {
-            handleDeleteShelf(event.detail.shelfId);
+        const handleDeleteShelfEvent = (event: Event) => {
+            const customEvent = event as CustomEvent<{ shelfId: string }>;
+            if (customEvent.detail?.shelfId) {
+                handleDeleteShelf(customEvent.detail.shelfId);
+            }
         };
 
         window.addEventListener("editShelf", handleEditShelfEvent);
@@ -141,7 +136,10 @@ export default function AppLayout() {
     }, [handleEditShelf, handleDeleteShelf]);
 
     return (
-        <div className="app-layout-bg min-h-screen transition-colors duration-500 flex flex-col">
+        <div
+            className="app-layout-bg min-h-screen transition-colors duration-500 flex flex-col"
+            style={appPaletteVars}
+        >
             {/* Top Navigation */}
             <AppHeader
                 isHeaderVisible={isHeaderVisible}
@@ -166,8 +164,9 @@ export default function AppLayout() {
                         transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
                         id="main-scroll-container"
                         onScroll={handleScroll}
-                        className="w-full h-full absolute inset-0 overflow-auto bg-cream"
+                        className="w-full h-full absolute inset-0 overflow-auto"
                         style={{
+                            backgroundColor: "var(--app-canvas-bg)",
                             transformOrigin: "50% 50% 50vw",
                             transformStyle: "preserve-3d",
                             backfaceVisibility: "hidden",

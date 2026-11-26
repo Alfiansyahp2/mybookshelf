@@ -19,7 +19,7 @@ interface LayoutPickerProps {
 const layouts = [
     {
         id: "single",
-        render: (active: boolean) => (
+        render: () => (
             <div className="w-full h-full bg-white/20 rounded-[3px]" />
         ),
     },

@@ -1,6 +1,3 @@
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-
 export default function Succulent() {
     const petals = [0, 45, 90, 135, 180, 225, 270, 315];
     return (

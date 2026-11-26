@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ReadingSession;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -28,8 +29,10 @@ class ReadingSessionController extends Controller
      */
     public function store(Request $request)
     {
+        $userId = $request->user()->id;
+
         $data = $request->validate([
-            'book_id' => 'required|exists:books,id',
+            'book_id' => ['required', $this->ownedRule('books', $userId)],
             'start_time' => 'required|date',
             'start_page' => 'required|integer|min:0',
             'mood' => 'nullable|in:great,good,okay,difficult',
@@ -38,7 +41,7 @@ class ReadingSessionController extends Controller
 
         $session = ReadingSession::create([
             'id' => Str::uuid()->toString(),
-            'user_id' => $request->user()->id,
+            'user_id' => $userId,
             'book_id' => $data['book_id'],
             'start_time' => $data['start_time'],
             'start_page' => $data['start_page'],
@@ -70,15 +73,15 @@ class ReadingSessionController extends Controller
             ->findOrFail($id);
 
         if ($session->end_time) {
-            return response()->error('Cannot pause an already ended session', 400);
+            return response()->error('Cannot pause an already ended session', null, 400);
         }
 
         $data = $request->validate([
-            'is_paused' => 'required|boolean'
+            'is_paused' => 'required|boolean',
         ]);
 
         if ($data['is_paused']) {
-            if (!$session->is_paused) {
+            if (! $session->is_paused) {
                 // We are pausing
                 $session->is_paused = true;
                 $session->last_paused_at = now();
@@ -88,12 +91,12 @@ class ReadingSessionController extends Controller
                 // We are resuming
                 $session->is_paused = false;
                 if ($session->last_paused_at) {
-                    $pausedDuration = \Carbon\Carbon::parse($session->last_paused_at)->diffInSeconds(now());
+                    $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds(now());
                     $session->paused_seconds += $pausedDuration;
                 }
             }
         }
-        
+
         $session->save();
 
         return response()->success($session->load('book'), 'Reading session pause status updated');
@@ -114,18 +117,18 @@ class ReadingSessionController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $endTime = \Carbon\Carbon::parse($data['end_time']);
+        $endTime = Carbon::parse($data['end_time']);
 
         // Calculate any unrecorded paused time if it was paused when ending
         if ($session->is_paused && $session->last_paused_at) {
-            $pausedDuration = \Carbon\Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
+            $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
             $session->paused_seconds += $pausedDuration;
             $session->is_paused = false;
         }
 
         // Calculate duration using actual end_time from request minus total paused_seconds
-        $startTime = \Carbon\Carbon::parse($session->start_time);
-        
+        $startTime = Carbon::parse($session->start_time);
+
         $duration = max(0, (int) $startTime->diffInSeconds($endTime) - $session->paused_seconds);
 
         $session->update([

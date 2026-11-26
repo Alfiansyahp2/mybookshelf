@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
+use App\Models\Room;
 use App\Models\Shelf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ShelfController extends Controller
 {
@@ -19,6 +22,7 @@ class ShelfController extends Controller
             ->orderBy('order')
             ->latest()
             ->get();
+
         return response()->success($shelves, 'Shelves retrieved successfully');
     }
 
@@ -27,21 +31,23 @@ class ShelfController extends Controller
      */
     public function store(Request $request)
     {
+        $user = $request->user();
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'capacity' => 'required|integer|min:1',
             'order' => 'nullable|integer|min:0',
-            'room_id' => 'nullable|exists:rooms,id',
+            'span' => 'nullable|integer|min:2|max:12',
+            'room_id' => ['nullable', $this->ownedRule('rooms', $user->id)],
         ]);
 
         // SECURITY: Set user_id to authenticated user
-        $user = $request->user();
         $data['user_id'] = $user->id;
 
         if (empty($data['room_id'])) {
-            $room = \App\Models\Room::firstOrCreate(
+            $room = Room::firstOrCreate(
                 ['user_id' => $user->id],
-                ['name' => 'Main Room', 'theme' => 'classic']
+                ['name' => 'Main Room', 'order' => 0, 'unlocked' => true]
             );
             $data['room_id'] = $room->id;
         }
@@ -60,6 +66,7 @@ class ShelfController extends Controller
         $shelf = Shelf::with(['room', 'books'])
             ->where('user_id', $request->user()->id)
             ->findOrFail($id);
+
         return response()->success($shelf, 'Shelf retrieved successfully');
     }
 
@@ -68,14 +75,17 @@ class ShelfController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $userId = $request->user()->id;
+
         // SECURITY: Only allow user to update their own shelves
-        $shelf = Shelf::where('user_id', $request->user()->id)->findOrFail($id);
+        $shelf = Shelf::where('user_id', $userId)->findOrFail($id);
 
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
             'capacity' => 'sometimes|integer|min:1',
             'order' => 'sometimes|integer|min:0',
-            'room_id' => 'sometimes|exists:rooms,id',
+            'span' => 'sometimes|integer|min:2|max:12',
+            'room_id' => ['sometimes', $this->ownedRule('rooms', $userId)],
             'decorations' => 'sometimes|array|nullable',
         ]);
 
@@ -85,18 +95,45 @@ class ShelfController extends Controller
     }
 
     /**
-     * Remove the specified shelf.
+     * Remove the specified shelf and safely relocate its books if another shelf exists.
      */
     public function destroy(Request $request, $id)
     {
+        $userId = $request->user()->id;
+
         // SECURITY: Only allow user to delete their own shelves
-        $shelf = Shelf::where('user_id', $request->user()->id)->findOrFail($id);
+        $shelf = Shelf::where('user_id', $userId)->findOrFail($id);
 
-        // TODO: Relocate books to another shelf or prevent deletion if books exist
+        $validated = $request->validate([
+            'relocate_to' => ['nullable', $this->ownedRule('shelves', $userId)],
+        ]);
 
-        $shelf->delete();
+        $targetShelfId = $validated['relocate_to'] ?? null;
+        if ($targetShelfId === $shelf->id) {
+            return response()->error('Cannot relocate books to the shelf being deleted', null, 422);
+        }
 
-        return response()->success(null, 'Shelf deleted successfully');
+        $relocatedCount = DB::transaction(function () use ($shelf, $userId, $targetShelfId) {
+            $fallbackShelfId = $targetShelfId ?? Shelf::where('user_id', $userId)
+                ->where('id', '!=', $shelf->id)
+                ->orderBy('order')
+                ->value('id');
+
+            $affected = 0;
+            if ($fallbackShelfId) {
+                $affected = Book::where('shelf_id', $shelf->id)
+                    ->where('user_id', $userId)
+                    ->update(['shelf_id' => $fallbackShelfId]);
+            }
+
+            $shelf->delete();
+
+            return $affected;
+        });
+
+        return response()->success([
+            'relocated_books' => $relocatedCount,
+        ], 'Shelf deleted successfully');
     }
 
     /**
@@ -122,6 +159,7 @@ class ShelfController extends Controller
 
         return response()->success($occupancy, 'Occupancy retrieved successfully');
     }
+
     /**
      * Batch update shelf layout (span and order).
      */
@@ -142,7 +180,7 @@ class ShelfController extends Controller
                 ->where('user_id', $userId)
                 ->update([
                     'order' => $shelfData['order'],
-                    'span' => $shelfData['span']
+                    'span' => $shelfData['span'],
                 ]);
         }
 

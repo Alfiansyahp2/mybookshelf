@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
-use App\Models\ReadingSession;
-use App\Models\Expense;
 use App\Models\Budget;
+use App\Models\Expense;
+use App\Models\ReadingSession;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
@@ -33,6 +35,7 @@ class StatisticsController extends Controller
             if ($book->status === 'finished') {
                 return $book->pages;
             }
+
             return $book->current_page ?? 0;
         });
 
@@ -67,34 +70,34 @@ class StatisticsController extends Controller
         // Daily reading activity (for Github-style heatmap)
         // Get all reading sessions for the last 365 days
         $lastYear = now()->subDays(365);
-        
+
         $allSessions = ReadingSession::where('user_id', $user->id)
             ->whereNotNull('end_time')
             ->where('start_time', '>=', $lastYear)
             ->get();
-            
+
         $sessionsByDate = $allSessions->groupBy(function ($session) {
-            return \Carbon\Carbon::parse($session->start_time)->format('Y-m-d');
+            return Carbon::parse($session->start_time)->format('Y-m-d');
         });
-        
+
         $booksFinishedLastYear = Book::where('user_id', $user->id)
             ->whereNotNull('finished_date')
             ->where('finished_date', '>=', $lastYear)
             ->get();
-            
+
         $finishedByDate = $booksFinishedLastYear->groupBy(function ($book) {
-            return \Carbon\Carbon::parse($book->finished_date)->format('Y-m-d');
+            return Carbon::parse($book->finished_date)->format('Y-m-d');
         });
-        
+
         $allDates = collect(array_keys($sessionsByDate->toArray()))
             ->merge(array_keys($finishedByDate->toArray()))
             ->unique();
-            
+
         $dailyActivity = $allDates->map(function ($date) use ($sessionsByDate, $finishedByDate) {
             $sessions = $sessionsByDate->get($date, collect());
             $finished = $finishedByDate->get($date, collect());
-            
-            $booksRead = $sessions->map(function($session) {
+
+            $booksRead = $sessions->map(function ($session) {
                 return $session->book ? $session->book->title : null;
             })->filter()->unique()->values();
 
@@ -141,7 +144,7 @@ class StatisticsController extends Controller
             ],
             'top_read_books' => ReadingSession::where('user_id', $user->id)
                 ->whereNotNull('end_time')
-                ->select('book_id', \Illuminate\Support\Facades\DB::raw('count(*) as session_count'), \Illuminate\Support\Facades\DB::raw('sum(duration) as total_duration'))
+                ->select('book_id', DB::raw('count(*) as session_count'), DB::raw('sum(duration) as total_duration'))
                 ->groupBy('book_id')
                 ->orderByDesc('session_count')
                 ->take(5)
@@ -153,7 +156,7 @@ class StatisticsController extends Controller
                         'name' => $session->book ? $session->book->title : 'Unknown Book',
                         'value' => $session->session_count, // for the pie chart or bar chart
                         'duration' => $session->total_duration,
-                        'color' => $session->book && $session->book->spine_color_light ? $session->book->spine_color_light : '#8B7355'
+                        'color' => $session->book && $session->book->spine_color_light ? $session->book->spine_color_light : '#8B7355',
                     ];
                 }),
             'generated_at' => now()->toIso8601String(),

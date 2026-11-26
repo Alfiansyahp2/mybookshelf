@@ -25,7 +25,7 @@ return new class extends Migration
                 'budget_exceeded',
                 'budget_alert',
                 'payment_reminder',
-                'currency_rate_updated'
+                'currency_rate_updated',
             ]);
             $table->timestamp('event_date');
             $table->string('description', 500);

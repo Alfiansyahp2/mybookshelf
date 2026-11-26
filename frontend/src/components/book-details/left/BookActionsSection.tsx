@@ -21,7 +21,6 @@ interface BookActionsSectionProps {
 export default function BookActionsSection({
     book,
     c0,
-    c2,
     handleFav,
     toggleFavoritePending,
     handleStart,

@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\AccountingTimelineEvent;
 use App\Models\Budget;
 use App\Models\Expense;
-use App\Models\AccountingTimelineEvent;
+use App\Models\ExpenseCategory;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Exception;
 
 class BudgetService
 {
@@ -17,7 +19,7 @@ class BudgetService
     public function getAllBudgets(string $userId, array $filters = [])
     {
         $query = Budget::with(['category', 'user'])
-                      ->forUser($userId);
+            ->forUser($userId);
 
         // Apply filters
         if (isset($filters['is_active'])) {
@@ -39,6 +41,7 @@ class BudgetService
 
         // Pagination
         $perPage = $filters['per_page'] ?? 15;
+
         return $query->paginate($perPage);
     }
 
@@ -48,8 +51,8 @@ class BudgetService
     public function getBudget(string $budgetId, string $userId): Budget
     {
         return Budget::with(['category', 'user'])
-                    ->forUser($userId)
-                    ->findOrFail($budgetId);
+            ->forUser($userId)
+            ->findOrFail($budgetId);
     }
 
     /**
@@ -190,9 +193,9 @@ class BudgetService
         $budget = $this->getBudget($budgetId, $userId);
 
         $query = Expense::with(['category', 'book'])
-                       ->forUser($userId)
-                       ->completed()
-                       ->whereBetween('expense_date', [$budget->start_date, $budget->end_date ?? now()]);
+            ->forUser($userId)
+            ->completed()
+            ->whereBetween('expense_date', [$budget->start_date, $budget->end_date ?? now()]);
 
         // If budget is for a specific category, filter by it
         if ($budget->category_id) {
@@ -211,6 +214,7 @@ class BudgetService
 
         // Pagination
         $perPage = $filters['per_page'] ?? 15;
+
         return $query->paginate($perPage);
     }
 
@@ -220,9 +224,9 @@ class BudgetService
     public function checkBudgetAlerts(string $userId): array
     {
         $budgets = Budget::forUser($userId)
-                        ->active()
-                        ->current()
-                        ->get();
+            ->active()
+            ->current()
+            ->get();
 
         $alerts = [];
 
@@ -247,11 +251,11 @@ class BudgetService
         if ($usage > 100) {
             // Check if we haven't already created an exceeded event recently
             $recentExceededEvent = AccountingTimelineEvent::where('budget_id', $budget->id)
-                                                          ->where('type', 'budget_exceeded')
-                                                          ->where('event_date', '>=', now()->subDay())
-                                                          ->exists();
+                ->where('type', 'budget_exceeded')
+                ->where('event_date', '>=', now()->subDay())
+                ->exists();
 
-            if (!$recentExceededEvent) {
+            if (! $recentExceededEvent) {
                 AccountingTimelineEvent::budgetExceeded($budget->id, $budget->user_id);
 
                 return [
@@ -261,7 +265,7 @@ class BudgetService
                     'usage_percentage' => round($usage, 2),
                     'amount' => $budget->formatted_amount,
                     'spent' => $budget->formatted_spent,
-                    'message' => "Budget '{$budget->name}' has been exceeded by " . round($usage - 100, 2) . "%",
+                    'message' => "Budget '{$budget->name}' has been exceeded by ".round($usage - 100, 2).'%',
                 ];
             }
         }
@@ -270,11 +274,11 @@ class BudgetService
         elseif ($usage >= $budget->alert_threshold && $usage <= 100) {
             // Check if we haven't already created an alert event recently
             $recentAlertEvent = AccountingTimelineEvent::where('budget_id', $budget->id)
-                                                      ->where('type', 'budget_alert')
-                                                      ->where('event_date', '>=', now()->subDay())
-                                                      ->exists();
+                ->where('type', 'budget_alert')
+                ->where('event_date', '>=', now()->subDay())
+                ->exists();
 
-            if (!$recentAlertEvent) {
+            if (! $recentAlertEvent) {
                 AccountingTimelineEvent::budgetAlert($budget->id, $budget->user_id);
 
                 return [
@@ -285,7 +289,7 @@ class BudgetService
                     'amount' => $budget->formatted_amount,
                     'spent' => $budget->formatted_spent,
                     'threshold' => $budget->alert_threshold,
-                    'message' => "Budget '{$budget->name}' is at " . round($usage, 2) . "% capacity (threshold: {$budget->alert_threshold}%)",
+                    'message' => "Budget '{$budget->name}' is at ".round($usage, 2)."% capacity (threshold: {$budget->alert_threshold}%)",
                 ];
             }
         }
@@ -328,7 +332,7 @@ class BudgetService
     {
         $currentStart = $budget->start_date;
 
-        switch($budget->period) {
+        switch ($budget->period) {
             case 'daily':
                 return $currentStart->addDay()->format('Y-m-d');
             case 'weekly':
@@ -347,11 +351,11 @@ class BudgetService
      */
     protected function calculateNextPeriodEndDate(Budget $budget, string $startDate): ?string
     {
-        if (!$budget->end_date) {
+        if (! $budget->end_date) {
             return null;
         }
 
-        $start = \Carbon\Carbon::parse($startDate);
+        $start = Carbon::parse($startDate);
         $duration = $budget->end_date->diffInDays($budget->start_date);
 
         return $start->addDays($duration)->format('Y-m-d');
@@ -366,7 +370,8 @@ class BudgetService
             return $amount;
         }
 
-        $currencyRateService = new CurrencyRateService();
+        $currencyRateService = new CurrencyRateService;
+
         return $currencyRateService->convertAmount($amount, $currency)['converted_amount'];
     }
 
@@ -382,9 +387,9 @@ class BudgetService
 
         try {
             $activeBudgets = Budget::forUser($userId)
-                                  ->active()
-                                  ->current()
-                                  ->get();
+                ->active()
+                ->current()
+                ->get();
 
             $totalBudget = $activeBudgets->sum('amount_base_currency');
             $totalSpent = 0;
@@ -411,7 +416,7 @@ class BudgetService
                 'warning_count' => $warningCount,
                 'healthy_count' => $activeBudgets->count() - $exceededCount - $warningCount,
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Return empty summary on any database errors
             return $this->getEmptyBudgetSummary();
         }
@@ -440,14 +445,14 @@ class BudgetService
     public function getTopSpendingCategories(string $userId, ?string $startDate = null, ?string $endDate = null, int $limit = 5): array
     {
         $query = Expense::select('category_id')
-                       ->selectRaw('SUM(amount_base_currency) as total_amount')
-                       ->selectRaw('COUNT(*) as expense_count')
-                       ->where('user_id', $userId)
-                       ->completed()
-                       ->whereNotNull('category_id')
-                       ->groupBy('category_id')
-                       ->orderBy('total_amount', 'desc')
-                       ->limit($limit);
+            ->selectRaw('SUM(amount_base_currency) as total_amount')
+            ->selectRaw('COUNT(*) as expense_count')
+            ->where('user_id', $userId)
+            ->completed()
+            ->whereNotNull('category_id')
+            ->groupBy('category_id')
+            ->orderBy('total_amount', 'desc')
+            ->limit($limit);
 
         if ($startDate && $endDate) {
             $query->whereBetween('expense_date', [$startDate, $endDate]);
@@ -456,7 +461,7 @@ class BudgetService
         $results = $query->get();
 
         return $results->map(function ($result) {
-            $category = \App\Models\ExpenseCategory::find($result->category_id);
+            $category = ExpenseCategory::find($result->category_id);
 
             return [
                 'category_id' => $result->category_id,
@@ -475,8 +480,8 @@ class BudgetService
     public function deactivateExpiredBudgets(): int
     {
         return Budget::where('end_date', '<', now())
-                    ->where('is_active', true)
-                    ->update(['is_active' => false]);
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
     }
 
     /**
@@ -488,13 +493,13 @@ class BudgetService
 
         // Get expenses grouped by date
         $expenses = Expense::where('user_id', $userId)
-                           ->where('category_id', $budget->category_id)
-                           ->whereBetween('expense_date', [$budget->start_date, $budget->end_date ?? now()])
-                           ->completed()
-                           ->selectRaw('DATE(expense_date) as date, SUM(amount_base_currency) as daily_total')
-                           ->groupBy('date')
-                           ->orderBy('date')
-                           ->get();
+            ->where('category_id', $budget->category_id)
+            ->whereBetween('expense_date', [$budget->start_date, $budget->end_date ?? now()])
+            ->completed()
+            ->selectRaw('DATE(expense_date) as date, SUM(amount_base_currency) as daily_total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
 
         return [
             'budget_id' => $budget->id,

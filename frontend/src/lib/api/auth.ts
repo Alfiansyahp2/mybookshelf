@@ -29,72 +29,39 @@ export interface AuthResponse {
     user: User;
 }
 
-// Auth API
 export const authApi = {
     /**
-     * Get CSRF cookie for Sanctum SPA authentication
-     * IMPORTANT: This must be called directly to Laravel, not through /api prefix
+     * Get CSRF cookie for Sanctum SPA authentication.
      */
     async getCsrfCookie(): Promise<void> {
-        console.log(
-            "Getting CSRF cookie from:",
-            `${LARAVEL_BASE_URL}/sanctum/csrf-cookie`,
-        );
-        // Use axios directly to avoid the /api prefix
         await axios.get(`${LARAVEL_BASE_URL}/sanctum/csrf-cookie`, {
             withCredentials: true,
             headers: {
                 Accept: "application/json",
             },
         });
-        console.log("CSRF cookie received");
     },
 
     /**
-     * Login user (SPA session-based)
+     * Login user (SPA session-based).
      */
     async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        console.log("authApi.login called with:", credentials);
-
-        // First, get CSRF cookie
         await this.getCsrfCookie();
-
-        // Then login
         const response = await apiClient.post("/v1/auth/login", credentials);
-        console.log("authApi.login received response:", response);
-        console.log("response.data:", response.data);
-        console.log("response.data.data:", response.data?.data);
-
-        // The apiClient.post() returns response.data, which is our API response
-        // So response is: { success: true, message: "...", data: { user } }
-        const authData = response.data || response;
-        console.log("authApi.login returning:", authData);
-
-        return authData;
+        return response.data || response;
     },
 
     /**
-     * Register new user (SPA session-based)
+     * Register new user (SPA session-based).
      */
     async register(credentials: RegisterCredentials): Promise<AuthResponse> {
-        console.log("authApi.register called with:", credentials);
-
-        // First, get CSRF cookie
         await this.getCsrfCookie();
-
-        // Then register
         const response = await apiClient.post("/v1/auth/register", credentials);
-        console.log("authApi.register received response:", response);
-
-        // Same logic as login
-        const authData = response.data || response;
-        console.log("authApi.register returning:", authData);
-
-        return authData;
+        return response.data || response;
     },
 
     /**
-     * Get current authenticated user
+     * Get current authenticated user.
      */
     async me(): Promise<{ user: User }> {
         const response = await apiClient.get("/v1/auth/me");
@@ -102,14 +69,14 @@ export const authApi = {
     },
 
     /**
-     * Logout and end session
+     * Logout and end session.
      */
     async logout(): Promise<void> {
         await apiClient.post("/v1/auth/logout");
     },
 
     /**
-     * Update user profile
+     * Update user profile.
      */
     async updateProfile(data: {
         name: string;
@@ -120,7 +87,7 @@ export const authApi = {
     },
 
     /**
-     * Update password
+     * Update password.
      */
     async updatePassword(data: {
         current_password: string;

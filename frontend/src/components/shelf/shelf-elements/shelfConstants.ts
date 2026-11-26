@@ -32,7 +32,7 @@ export function getShelfCapacity(books: BookType[], capacity: number) {
     const safeCapacity = capacity > 0 ? capacity : 1;
     const percentage = Math.min((occupied / safeCapacity) * 100, 100);
     const pctColor =
-        percentage >= 90 ? "#f87171" : percentage >= 70 ? "#fbbf24" : "#34d399";
+        percentage >= 90 ? "#f87171" : percentage >= 70 ? "#fbbf24" : "#d4a574";
 
     return { occupied, percentage, pctColor };
 }

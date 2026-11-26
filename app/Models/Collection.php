@@ -4,16 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Collection extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $primaryKey = 'id';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -38,8 +40,8 @@ class Collection extends Model
     public function books(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'collection_book')
-                    ->withPivot('order', 'added_at')
-                    ->orderBy('collection_book.order');
+            ->withPivot('order', 'added_at')
+            ->orderBy('collection_book.order');
     }
 
     /**
@@ -50,6 +52,7 @@ class Collection extends Model
         $totalBooks = $this->books()->count();
         if ($totalBooks === 0) {
             $this->update(['progress' => 0]);
+
             return;
         }
 

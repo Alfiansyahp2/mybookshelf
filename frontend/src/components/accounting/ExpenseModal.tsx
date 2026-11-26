@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import Modal from "../ui/Modal";
 import {
-    X,
     DollarSign,
     Receipt,
-    Upload,
-    Calendar,
     CreditCard,
     Wallet,
     Repeat,
@@ -16,8 +13,8 @@ import {
     useCreateExpense,
     useUpdateExpense,
     useDeleteExpense,
-    useUploadReceipt,
 } from "../../hooks/accounting/useExpenses";
+import { devError } from "../../lib/logger";
 import { useExpenseCategories } from "../../hooks/accounting/useExpenseCategories";
 import { useBooks } from "../../hooks/useBooks";
 import type {
@@ -50,7 +47,6 @@ export default function ExpenseModal({
     const createExpense = useCreateExpense();
     const updateExpense = useUpdateExpense();
     const deleteExpense = useDeleteExpense();
-    const uploadReceipt = useUploadReceipt();
     const { data: categoriesResponse } = useExpenseCategories();
     const categories = categoriesResponse?.data || [];
     const { data: booksResponse } = useBooks();
@@ -151,7 +147,7 @@ export default function ExpenseModal({
                 submitExpense(dataToSubmit);
             }
         } catch (error) {
-            console.error("Error submitting expense:", error);
+            devError("Error submitting expense:", error);
             setIsSubmitting(false);
         }
     };
@@ -165,7 +161,7 @@ export default function ExpenseModal({
             }
             onClose();
         } catch (error) {
-            console.error("Error submitting expense:", error);
+            devError("Error submitting expense:", error);
         } finally {
             setIsSubmitting(false);
         }
@@ -190,8 +186,10 @@ export default function ExpenseModal({
             await deleteExpense.mutateAsync(expense.id);
             onClose();
         } catch (error) {
-            console.error("Error deleting expense:", error);
-            alert("Gagal menghapus pengeluaran. " + (error as any)?.message);
+            devError("Error deleting expense:", error);
+            const message =
+                error instanceof Error ? error.message : String(error);
+            alert("Gagal menghapus pengeluaran. " + message);
         }
     };
 

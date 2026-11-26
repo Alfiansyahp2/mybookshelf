@@ -2,27 +2,29 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Book extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $primaryKey = 'id';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     /**
      * Disable automatic timestamps since we use custom column names
      */
     const CREATED_AT = 'date_added';
+
     const UPDATED_AT = 'last_modified';
 
     /**
@@ -118,7 +120,7 @@ class Book extends Model
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(Collection::class, 'collection_book')
-                    ->withPivot('order', 'added_at');
+            ->withPivot('order', 'added_at');
     }
 
     /**
@@ -174,7 +176,7 @@ class Book extends Model
      */
     public function getFormattedTotalInvestment(): string
     {
-        return 'Rp ' . number_format($this->getTotalInvestment(), 2, ',', '.');
+        return 'Rp '.number_format($this->getTotalInvestment(), 2, ',', '.');
     }
 
     /**

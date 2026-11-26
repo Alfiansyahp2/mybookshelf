@@ -8,6 +8,7 @@ import {
 } from "../../../../hooks/useReadingSessions";
 import { formatHHMMSS } from "./sessionUtils";
 import type { SessionStats } from "./SessionStatsSummary";
+import { devError } from "../../../../lib/logger";
 
 interface UseReadingSessionTimerProps {
     book: Book;
@@ -191,7 +192,7 @@ export function useReadingSessionTimer({
             setNotes("");
             setTargetMinutes(null);
         } catch (err) {
-            console.error("Failed to end session:", err);
+            devError("Failed to end session:", err);
         }
     };
 

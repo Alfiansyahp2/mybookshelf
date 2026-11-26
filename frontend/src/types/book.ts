@@ -90,5 +90,5 @@ export interface TimelineEvent {
         | "returned";
     date: string;
     description: string;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 }
