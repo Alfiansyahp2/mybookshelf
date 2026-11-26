@@ -7,8 +7,8 @@ import {
     Trash2,
     FolderOpen,
     DollarSign,
-    Settings,
 } from "lucide-react";
+import { devError } from "../../lib/logger";
 import {
     useExpenseCategories,
     useCreateExpenseCategory,
@@ -59,7 +59,7 @@ export default function CategoryManager({
             setEditingCategory(null);
             resetForm();
         } catch (error) {
-            console.error("Error saving category:", error);
+            devError("Error saving category:", error);
         }
     };
 
@@ -75,7 +75,7 @@ export default function CategoryManager({
             try {
                 await deleteCategory.mutateAsync(categoryId);
             } catch (error) {
-                console.error("Error deleting category:", error);
+                devError("Error deleting category:", error);
             }
         }
     };

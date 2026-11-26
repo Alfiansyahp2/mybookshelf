@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
 import { useBookstore } from "../store/useBookstore";
-import type { Book } from "../types";
+import type { Book, BookStatus } from "../types";
 import Bookshelf from "../components/shelf/Bookshelf";
 import MobileCoverGrid from "../components/shelf/MobileCoverGrid";
 import AddBookModal from "../components/modals/AddBookModal";
@@ -43,11 +43,11 @@ export default function Library() {
             if (!useBookstore.getState().isBookDetailOpen) {
                 toggleBookDetail(bookId);
             }
-            // Clear the param after handling to avoid re-opening on reload
-            searchParams.delete("book_id");
-            setSearchParams(searchParams);
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.delete("book_id");
+            setSearchParams(nextParams, { replace: true });
         }
-    }, [searchParams]);
+    }, [searchParams, setSearchParams, setSelectedBookId, toggleBookDetail]);
 
     const [activeFilter, setActiveFilter] = useState<string>("all");
     const [viewMode, setViewMode] = useState<"shelf" | "grid">("shelf");
@@ -63,7 +63,7 @@ export default function Library() {
     const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
     const filterParams =
-        activeFilter === "all" ? {} : { status: activeFilter as any };
+        activeFilter === "all" ? {} : { status: activeFilter as BookStatus };
     const { data: booksResponse, isLoading, error } = useBooks(filterParams);
     const { data: shelves = [], isLoading: shelvesLoading } = useShelves();
 
@@ -110,7 +110,7 @@ export default function Library() {
         setIsAddBookModalOpen(true);
     };
 
-    const handleBookClick = (book: any) => {
+    const handleBookClick = (book: Book) => {
         setSelectedBookId(book.id);
         toggleBookDetail(book.id);
     };
@@ -141,19 +141,19 @@ export default function Library() {
             {/* Filter tabs + Widgets on top of shelf */}
             <div className="relative z-50 flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-0 pt-0 px-1 md:px-0">
                 {/* Left Side (Filters, View Switcher & Layout) */}
-                <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto hide-scrollbar mb-1 md:mb-1.5">
+                <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto hide-scrollbar mb-1 md:mb-1.5">
                     {/* View Mode Switcher (Shelf vs Grid) */}
-                    <div className="flex items-center bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/50 dark:border-white/10 p-1 rounded-2xl shadow-xs shrink-0">
+                    <div className="flex items-center bg-white/40 dark:bg-black/30 backdrop-blur-md border border-white/50 dark:border-white/10 p-0.5 sm:p-1 rounded-xl shadow-xs shrink-0">
                         <button
                             onClick={() => setViewMode("shelf")}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold transition-all ${
+                            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all ${
                                 viewMode === "shelf"
-                                    ? "bg-white text-darkBrown shadow-sm"
+                                    ? "bg-white text-darkBrown shadow-xs"
                                     : "text-walnut/70 hover:text-darkBrown"
                             }`}
                             title={t("library.view_shelf", "Tampilan Rak")}
                         >
-                            <BookOpen size={16} />
+                            <BookOpen size={14} />
                             <span className="hidden xs:inline">{t("library.view_shelf_short", "Rak")}</span>
                         </button>
                         <button
@@ -161,64 +161,64 @@ export default function Library() {
                                 setViewMode("grid");
                                 setIsEditMode(false);
                             }}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold transition-all ${
+                            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] sm:text-xs font-semibold transition-all ${
                                 viewMode === "grid"
-                                    ? "bg-white text-darkBrown shadow-sm"
+                                    ? "bg-white text-darkBrown shadow-xs"
                                     : "text-walnut/70 hover:text-darkBrown"
                             }`}
                             title={t("library.view_grid", "Tampilan Grid Sampul")}
                         >
-                            <LayoutGrid size={16} />
+                            <LayoutGrid size={14} />
                             <span className="hidden xs:inline">{t("library.view_grid_short", "Grid")}</span>
                         </button>
                     </div>
 
                     {/* Edit Layout Button (Only available in Shelf view) */}
                     {viewMode === "shelf" && (
-                        <div className="flex gap-2 shrink-0">
+                        <div className="flex gap-1.5 shrink-0">
                             {isEditMode ? (
                                 <button
                                     onClick={() => setIsEditMode(false)}
-                                    className="h-9 md:h-12 px-3 md:px-5 rounded-xl bg-green-600/90 text-white backdrop-blur-sm border border-white/20 flex items-center gap-2 hover:bg-green-500 shadow-xl transition-all"
+                                    className="h-7 sm:h-8 px-2.5 sm:px-3 rounded-xl bg-green-600/90 text-white backdrop-blur-sm border border-white/20 flex items-center gap-1.5 hover:bg-green-500 shadow-md transition-all"
                                 >
-                                    <Save size={16} />
-                                    <span className="text-xs md:text-sm font-bold">
+                                    <Save size={13} />
+                                    <span className="text-[11px] sm:text-xs font-semibold">
                                         {t("library.done")}
                                     </span>
                                 </button>
                             ) : (
                                 <motion.button
                                     onClick={() => setIsEditMode(true)}
-                                    className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-white/40 backdrop-blur-md border border-white/40 shadow-sm md:shadow-lg flex items-center justify-center text-[#5a3410] transition-all hover:bg-white/60"
+                                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/40 backdrop-blur-md border border-white/40 shadow-xs sm:shadow-sm flex items-center justify-center text-[#5a3410] transition-all hover:bg-white/60"
                                     title={t("library.edit_layout")}
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
+                                    whileHover={{ scale: 1.08 }}
+                                    whileTap={{ scale: 0.92 }}
                                     transition={{ duration: 0.2 }}
                                 >
-                                    <Layers size={18} />
+                                    <Layers size={14} />
                                 </motion.button>
                             )}
                         </div>
                     )}
 
                     {/* Filter Tabs (Animated Expandable Sliding Pill) */}
-                    <motion.div 
+                    <motion.div
                         layout
                         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex items-center bg-white/30 backdrop-blur-md border border-white/50 p-1 md:p-1.5 rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.05)] shrink-0"
+                        className="flex items-center bg-white/30 backdrop-blur-md border border-white/50 p-0.5 sm:p-1 rounded-xl shadow-[0_4px_16px_rgb(0,0,0,0.04)] shrink-0"
                     >
                         {/* Toggle Button */}
                         <motion.button
                             layout
                             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                             onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                            className={`flex items-center justify-center h-8 md:h-10 px-2.5 md:px-3.5 rounded-xl shrink-0 ${
-                                isFilterExpanded 
-                                    ? "bg-white/40 text-darkBrown hover:bg-white/60" 
+                            className={`flex items-center justify-center h-6 sm:h-7 px-2 sm:px-2.5 rounded-lg shrink-0 ${
+                                isFilterExpanded
+                                    ? "bg-white/40 text-darkBrown hover:bg-white/60"
                                     : "bg-white text-darkBrown shadow-xs hover:bg-white/90"
                             }`}
                         >
-                            <div className="w-4 h-4 relative flex items-center justify-center shrink-0">
+                            <div className="w-3.5 h-3.5 relative flex items-center justify-center shrink-0">
                                 <AnimatePresence mode="wait" initial={false}>
                                     <motion.div
                                         key={isFilterExpanded ? "close" : "open"}
@@ -228,23 +228,23 @@ export default function Library() {
                                         transition={{ duration: 0.2, ease: "easeOut" }}
                                         className="absolute inset-0 flex items-center justify-center"
                                     >
-                                        {isFilterExpanded ? <X size={16} /> : <Filter size={16} />}
+                                        {isFilterExpanded ? <X size={13} /> : <Filter size={13} />}
                                     </motion.div>
                                 </AnimatePresence>
                             </div>
                             <AnimatePresence initial={false}>
                                 {!isFilterExpanded && (
-                                    <motion.div 
+                                    <motion.div
                                         initial={{ opacity: 0, width: 0, x: -6 }}
                                         animate={{ opacity: 1, width: "auto", x: 0 }}
                                         exit={{ opacity: 0, width: 0, x: -6 }}
                                         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                                        className="ml-1.5 md:ml-2 flex items-center gap-1.5 overflow-hidden whitespace-nowrap"
+                                        className="ml-1.5 flex items-center gap-1 overflow-hidden whitespace-nowrap"
                                     >
-                                        <span className="text-xs md:text-sm font-bold">
-                                            {t(FILTER_TABS.find(t => t.key === activeFilter)?.labelKey as any)}
+                                        <span className="text-[11px] font-semibold">
+                                            {t(FILTER_TABS.find((tab) => tab.key === activeFilter)?.labelKey || "library.filters.all")}
                                         </span>
-                                        <span className="text-[10px] md:text-[11px] px-1.5 bg-walnut/10 text-darkBrown font-bold rounded-full">
+                                        <span className="text-[9px] sm:text-[10px] px-1.5 bg-walnut/10 text-darkBrown font-semibold rounded-full">
                                             {counts[activeFilter as keyof typeof counts]}
                                         </span>
                                     </motion.div>
@@ -267,12 +267,12 @@ export default function Library() {
                                         animate={{ x: 0, opacity: 1 }}
                                         exit={{ x: -10, opacity: 0 }}
                                         transition={{ duration: 0.25, ease: "easeOut" }}
-                                        className="flex items-center pl-1.5 md:pl-2 gap-1 w-max"
+                                        className="flex items-center pl-1 gap-0.5 w-max"
                                     >
                                         {FILTER_TABS.filter(
-                                            (t) =>
-                                                t.key === "all" ||
-                                                counts[t.key as keyof typeof counts] > 0,
+                                            (tab) =>
+                                                tab.key === "all" ||
+                                                counts[tab.key as keyof typeof counts] > 0,
                                         ).map((tab) => {
                                             const count = counts[tab.key as keyof typeof counts];
                                             const active = activeFilter === tab.key;
@@ -280,7 +280,7 @@ export default function Library() {
                                                 <button
                                                     key={tab.key}
                                                     onClick={() => setActiveFilter(tab.key)}
-                                                    className={`relative flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3.5 py-1.5 md:py-2 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap z-10 select-none ${
+                                                    className={`relative flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap z-10 select-none ${
                                                         active
                                                             ? "text-darkBrown"
                                                             : "text-walnut/70 hover:text-darkBrown hover:bg-white/30"
@@ -290,7 +290,7 @@ export default function Library() {
                                                     {active && (
                                                         <motion.div
                                                             layoutId="activeFilterTab"
-                                                            className="absolute inset-0 bg-white rounded-xl shadow-xs z-[-1]"
+                                                            className="absolute inset-0 bg-white rounded-lg shadow-xs z-[-1]"
                                                             transition={{
                                                                 type: "spring",
                                                                 stiffness: 450,
@@ -298,11 +298,11 @@ export default function Library() {
                                                             }}
                                                         />
                                                     )}
-                                                    <span className="relative z-10">{t(tab.labelKey as any)}</span>
+                                                    <span className="relative z-10">{t(tab.labelKey)}</span>
                                                     <span
-                                                        className={`relative z-10 text-[10px] md:text-[11px] px-1.5 md:px-2 py-0.5 rounded-full transition-colors duration-200 ${
+                                                        className={`relative z-10 text-[9px] sm:text-[10px] px-1.5 py-px rounded-full transition-colors duration-200 ${
                                                             active
-                                                                ? "bg-walnut/10 text-darkBrown font-bold"
+                                                                ? "bg-walnut/10 text-darkBrown font-semibold"
                                                                 : "bg-walnut/10 text-walnut/60 font-medium"
                                                         }`}
                                                     >

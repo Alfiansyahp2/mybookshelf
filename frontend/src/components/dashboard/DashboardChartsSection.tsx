@@ -11,23 +11,23 @@ import {
     YAxis,
     Bar,
 } from "recharts";
-import { BRAND, Card, ChartTooltip, fadeUp } from "./DashboardWidgets";
+import { Card, ChartTooltip } from "./DashboardWidgets";
+import { BRAND, fadeUp } from "../../constants/dashboardTheme";
+import type { DashboardStats } from "../../hooks/useDashboardStats";
 import { BOOK_GENRES } from "../../constants/genres";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 interface DashboardChartsSectionProps {
-    stats: any;
+    stats: DashboardStats;
     genreFilter: string;
     setGenreFilter: (genre: string) => void;
-    topReadBooks?: any[];
 }
 
 export default function DashboardChartsSection({
     stats,
     genreFilter,
     setGenreFilter,
-    topReadBooks = [],
 }: DashboardChartsSectionProps) {
     const { t } = useTranslation();
 
@@ -35,15 +35,15 @@ export default function DashboardChartsSection({
         let filtered = stats.genreChart;
         if (genreFilter !== "Semua") {
             const category = BOOK_GENRES.find(
-                (c: any) => c.category === genreFilter,
+                (c) => c.category === genreFilter,
             );
             if (category) {
-                filtered = filtered.filter((g: any) =>
+                filtered = filtered.filter((g) =>
                     category.genres.includes(g.name),
                 );
             }
         }
-        return filtered.map((g: any) => ({
+        return filtered.map((g) => ({
             ...g,
             displayName:
                 g.name.length > 15 ? g.name.slice(0, 15) + "…" : g.name,
@@ -98,11 +98,9 @@ export default function DashboardChartsSection({
                                     dataKey="value"
                                     paddingAngle={2}
                                 >
-                                    {stats.statusPie.map(
-                                        (e: any, i: number) => (
-                                            <Cell key={i} fill={e.color} />
-                                        ),
-                                    )}
+                                    {stats.statusPie.map((e, i) => (
+                                        <Cell key={i} fill={e.color} />
+                                    ))}
                                 </Pie>
                                 <Tooltip content={<ChartTooltip />} />
                             </PieChart>
@@ -116,7 +114,7 @@ export default function DashboardChartsSection({
                                 gap: 6,
                             }}
                         >
-                            {stats.statusPie.map((d: any) => (
+                            {stats.statusPie.map((d) => (
                                 <div
                                     key={d.name}
                                     style={{

@@ -1,4 +1,5 @@
 import type { Book } from "./book";
+import type { ShelfDecoration } from "./decorations";
 
 // Shelf Types
 export interface Shelf {
@@ -8,7 +9,8 @@ export interface Shelf {
     order: number;
     span?: number;
     roomId?: string;
-    decorations?: any[];
+    decorations?: ShelfDecoration[];
+    books?: Book[];
 }
 
 export interface Room {

@@ -3,10 +3,8 @@ import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import RealisticBook from "../Book";
-import {
-    renderDecoration,
-    type ShelfDecoration,
-} from "../../decorations/DecorationSystem";
+import { DecorationItem } from "../../decorations/DecorationSystem";
+import type { ShelfDecoration } from "../../../types/decorations";
 import type { Book as BookType } from "../../../types";
 import { BOOK_AREA_H, BOARD_H } from "./shelfConstants";
 
@@ -112,7 +110,7 @@ export const ShelfBooksTrack: React.FC<ShelfBooksTrackProps> = React.memo(
                                     leftDeco.kind === "plant_hanging" ? 0 : 2,
                             }}
                         >
-                            {renderDecoration(leftDeco)}
+                            <DecorationItem item={leftDeco} />
                         </motion.div>
                     ) : (
                         <div
@@ -246,7 +244,7 @@ export const ShelfBooksTrack: React.FC<ShelfBooksTrackProps> = React.memo(
                                     rightDeco.kind === "plant_hanging" ? 0 : 2,
                             }}
                         >
-                            {renderDecoration(rightDeco)}
+                            <DecorationItem item={rightDeco} />
                         </motion.div>
                     ) : (
                         <div

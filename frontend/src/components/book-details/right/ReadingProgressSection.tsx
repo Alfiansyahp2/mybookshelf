@@ -26,10 +26,6 @@ export default function ReadingProgressSection({
             ? Math.round(((book.currentPage || 0) / book.pages) * 100)
             : 0;
 
-    // Safe colors
-    const spineColor0 = book.spineColors?.[0] || "#8B7355";
-    const spineColor2 = book.spineColors?.[2] || "#5C4532";
-
     return (
         <div className="p-4 bg-white rounded-xl border border-walnut/10 shadow-sm">
             <h3 className="font-semibold text-darkBrown mb-3 flex items-center gap-2">

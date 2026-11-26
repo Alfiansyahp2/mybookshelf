@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import type { Book } from "../../types";
 import ReadingProgressSection from "./right/ReadingProgressSection";
@@ -125,15 +125,18 @@ export default function BookDetailRightPage({
     const [direction, setDirection] = useState<number>(1);
     const [prevTabIdx, setPrevTabIdx] = useState<number>(tabIdx);
 
-    const handleTabChange = (newTabId: string) => {
-        const newIdx = tabs.findIndex((t) => t.id === newTabId);
-        if (newIdx !== -1 && newIdx !== tabIdx) {
-            setDirection(newIdx > tabIdx ? 1 : -1);
-            setPrevTabIdx(tabIdx);
-        }
-        if (newTabId !== "session") setSelectedReadDate(null);
-        setActiveTab(newTabId);
-    };
+    const handleTabChange = useCallback(
+        (newTabId: string) => {
+            const newIdx = tabs.findIndex((t) => t.id === newTabId);
+            if (newIdx !== -1 && newIdx !== tabIdx) {
+                setDirection(newIdx > tabIdx ? 1 : -1);
+                setPrevTabIdx(tabIdx);
+            }
+            if (newTabId !== "session") setSelectedReadDate(null);
+            setActiveTab(newTabId);
+        },
+        [tabs, tabIdx, setActiveTab],
+    );
 
     // Keep direction updated if tabIdx changes externally
     if (tabIdx !== prevTabIdx) {
@@ -165,7 +168,7 @@ export default function BookDetailRightPage({
         };
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [tabIdx, tabs]);
+    }, [tabIdx, tabs, handleTabChange]);
 
     return (
         <motion.div

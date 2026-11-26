@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Library, BookOpen, DollarSign, Calendar } from "lucide-react";
-import { BRAND, MiniSpines, fadeUp } from "./DashboardWidgets";
+import { MiniSpines } from "./DashboardWidgets";
+import { fadeUp } from "../../constants/dashboardTheme";
 import { useTranslation } from "react-i18next";
 import { useAuthUser } from "../../hooks/useAuth";
 

@@ -42,28 +42,34 @@ export default function Wishlist() {
     // Calculate wishlist statistics
     const totalWishlist = wishlistBooks.length;
 
-    const genresCount = wishlistBooks.reduce((acc: any, book: Book) => {
-        if (book.genre) {
-            book.genre
-                .split(",")
-                .map((g: string) => g.trim())
-                .forEach((g: string) => {
-                    if (g) acc[g] = (acc[g] || 0) + 1;
-                });
-        }
-        return acc;
-    }, {});
+    const genresCount = wishlistBooks.reduce<Record<string, number>>(
+        (acc, book: Book) => {
+            if (book.genre) {
+                book.genre
+                    .split(",")
+                    .map((g: string) => g.trim())
+                    .forEach((g: string) => {
+                        if (g) acc[g] = (acc[g] || 0) + 1;
+                    });
+            }
+            return acc;
+        },
+        {},
+    );
     const topGenre =
         Object.keys(genresCount).sort(
             (a, b) => genresCount[b] - genresCount[a],
         )[0] || "-";
 
-    const authorsCount = wishlistBooks.reduce((acc: any, book: Book) => {
-        if (book.author) {
-            acc[book.author] = (acc[book.author] || 0) + 1;
-        }
-        return acc;
-    }, {});
+    const authorsCount = wishlistBooks.reduce<Record<string, number>>(
+        (acc, book: Book) => {
+            if (book.author) {
+                acc[book.author] = (acc[book.author] || 0) + 1;
+            }
+            return acc;
+        },
+        {},
+    );
     const topAuthor =
         Object.keys(authorsCount).sort(
             (a, b) => authorsCount[b] - authorsCount[a],
@@ -73,7 +79,7 @@ export default function Wishlist() {
         startReadingMutation.mutate(bookId);
     };
 
-    const handleBookClick = (book: any) => {
+    const handleBookClick = (book: Book) => {
         setSelectedBookId(book.id);
         toggleBookDetail(book.id);
     };

@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen } from "lucide-react";
-import { BRAND, Card, ContributionGraph, fadeUp } from "./DashboardWidgets";
+import { Card, ContributionGraph } from "./DashboardWidgets";
+import { BRAND, fadeUp } from "../../constants/dashboardTheme";
+import type { Book } from "../../types";
+import type { StatisticsDailyActivity } from "../../lib/api/statistics";
+import type { DashboardStats } from "../../hooks/useDashboardStats";
 import { useTranslation } from "react-i18next";
 
+type DashboardBookItem = Book & { created_at?: string; totalPages?: number };
+
 interface DashboardActivitySectionProps {
-    dailyActivity: any[];
-    books: any[];
-    stats: any;
+    dailyActivity: StatisticsDailyActivity[];
+    books: DashboardBookItem[];
+    stats: DashboardStats;
     setIsCalendarModalOpen: (val: boolean) => void;
 }
 
@@ -29,22 +35,24 @@ export default function DashboardActivitySection({
         setExpandedMonths((prev) => ({ ...prev, [month]: !prev[month] }));
     };
 
-    const getBookDates = (b: any) => {
+    const getBookDates = (b: DashboardBookItem) => {
         const dates: Date[] = [];
         if (b.status === "finished") {
             if (b.finishedDate) dates.push(new Date(b.finishedDate));
             if (b.readDates && Array.isArray(b.readDates)) {
-                b.readDates.forEach((rd: any) => dates.push(new Date(rd)));
+                b.readDates.forEach((rd) => dates.push(new Date(rd)));
             }
         } else if (b.created_at) {
             dates.push(new Date(b.created_at));
+        } else if (b.dateAdded) {
+            dates.push(new Date(b.dateAdded));
         } else {
             dates.push(new Date());
         }
         return dates.sort((a, b) => a.getTime() - b.getTime());
     };
 
-    const getLatestBookDate = (b: any) => {
+    const getLatestBookDate = (b: DashboardBookItem) => {
         const dates = getBookDates(b);
         return dates[dates.length - 1];
     };
@@ -52,14 +60,17 @@ export default function DashboardActivitySection({
     const booksInYear = books
         .filter((b) => {
             const dates = getBookDates(b);
-            return dates.some(d => d.getFullYear() === selectedYear);
+            return dates.some((d) => d.getFullYear() === selectedYear);
         })
         .sort((a, b) => {
             return getLatestBookDate(b).getTime() - getLatestBookDate(a).getTime();
         });
 
     // Augment dailyActivity with fallback pages for finished books that have no tracking on their finish date
-    const activityMap = new Map();
+    const activityMap = new Map<
+        string,
+        StatisticsDailyActivity & { fallbackPages?: number }
+    >();
     dailyActivity.forEach((d) => {
         activityMap.set(d.date, { ...d });
     });
@@ -72,16 +83,18 @@ export default function DashboardActivitySection({
                 finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
             }
             if (b.readDates && Array.isArray(b.readDates)) {
-                b.readDates.forEach((rd: any) => {
+                b.readDates.forEach((rd) => {
                     const d = new Date(rd);
                     finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
                 });
             }
 
-            finalDateStrs.forEach(finalDateStr => {
+            finalDateStrs.forEach((finalDateStr) => {
                 const existing = activityMap.get(finalDateStr) || {
                     date: finalDateStr,
+                    duration: 0,
                     pages: 0,
+                    books_finished: 0,
                     books_read: [],
                 };
                 if (!existing.pages || existing.pages === 0) {
@@ -104,11 +117,14 @@ export default function DashboardActivitySection({
         .filter((d) => new Date(d.date).getFullYear() === selectedYear)
         .reduce((sum, d) => sum + (d.pages || 0), 0);
 
-    const groupedByMonth = booksInYear.reduce((acc: any, book: any) => {
-        // Group the book in EVERY month it was read/finished during the selected year
-        const dates = getBookDates(book).filter(d => d.getFullYear() === selectedYear);
+    const groupedByMonth = booksInYear.reduce<
+        Record<string, DashboardBookItem[]>
+    >((acc, book) => {
+        const dates = getBookDates(book).filter(
+            (d) => d.getFullYear() === selectedYear,
+        );
         const monthsAdded = new Set<string>();
-        dates.forEach(d => {
+        dates.forEach((d) => {
             const month = d.toLocaleString(locale, { month: "long" });
             if (!monthsAdded.has(month)) {
                 monthsAdded.add(month);
@@ -206,7 +222,7 @@ export default function DashboardActivitySection({
                                                     {t("dashboard.activity.no_books")}
                                                 </div>
                                             ) : (
-                                                Object.entries(groupedByMonth).map(([month, monthBooks]: any) => {
+                                                Object.entries(groupedByMonth).map(([month, monthBooks]) => {
                                                     const isExpanded = expandedMonths[month];
                                                     return (
                                                         <div
@@ -253,7 +269,7 @@ export default function DashboardActivitySection({
                                                                     {/* Mini Covers Preview */}
                                                                     {!isExpanded && (
                                                                         <div style={{ display: "flex", alignItems: "center" }}>
-                                                                            {monthBooks.slice(0, 4).map((b: any, i: number) => (
+                                                                            {monthBooks.slice(0, 4).map((b, i) => (
                                                                                 <div key={b.id || i} style={{ 
                                                                                     width: 20, height: 28, borderRadius: 2, 
                                                                                     marginLeft: i > 0 ? -10 : 0, 
@@ -291,7 +307,7 @@ export default function DashboardActivitySection({
                                                                     >
                                                                         <div style={{ padding: "0 20px 20px 20px" }}>
                                                                             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
-                                                                                {monthBooks.map((b: any, i: number) => {
+                                                                                {monthBooks.map((b, i) => {
                                                                                     const dates = getBookDates(b);
                                                                                     const hasFinishedInSelectedYear = dates.some(d => d.getFullYear() === selectedYear);
                                                                                     const isFinished = b.status === "finished" && hasFinishedInSelectedYear;

@@ -1,4 +1,5 @@
 import { apiClient } from "../apiClient";
+import type { Book } from "../../types";
 
 export interface ReadingSession {
     id: string;
@@ -50,91 +51,52 @@ export interface BookReadingSessionsResponse {
 }
 
 export const readingSessionsApi = {
-    /**
-     * Start a new reading session for a book
-     */
     async startSession(
         bookId: string,
         data: StartSessionData,
     ): Promise<ReadingSession> {
-        console.log("Starting reading session for book:", bookId, data);
-
         const response = await apiClient.post(
             `/v1/books/${bookId}/reading-sessions/start`,
             data,
         );
-        console.log("Reading session started:", response);
-
         return response.data || response;
     },
 
-    /**
-     * End a reading session
-     */
     async endSession(
         bookId: string,
         sessionId: string,
         data: EndSessionData,
     ): Promise<ReadingSession> {
-        console.log("Ending reading session:", sessionId, data);
-
         const response = await apiClient.put(
             `/v1/books/${bookId}/reading-sessions/${sessionId}/end`,
             data,
         );
-        console.log("Reading session ended:", response);
-
         return response.data || response;
     },
 
-    /**
-     * Pause or resume a reading session
-     */
     async pauseSession(
         bookId: string,
         sessionId: string,
         isPaused: boolean,
     ): Promise<ReadingSession> {
-        console.log("Toggling pause for reading session:", sessionId, {
-            is_paused: isPaused,
-        });
-
         const response = await apiClient.patch(
             `/v1/books/${bookId}/reading-sessions/${sessionId}/pause`,
-            {
-                is_paused: isPaused,
-            },
+            { is_paused: isPaused },
         );
-        console.log("Reading session pause toggled:", response);
-
         return response.data || response;
     },
 
-    /**
-     * Get all reading sessions for a book
-     */
     async getBookSessions(
         bookId: string,
     ): Promise<BookReadingSessionsResponse> {
-        console.log("Getting reading sessions for book:", bookId);
-
         const response = await apiClient.get(
             `/v1/books/${bookId}/reading-sessions`,
         );
-        console.log("Reading sessions retrieved:", response);
-
         return response.data || response;
     },
 
-    /**
-     * Read Again - Restart a finished book
-     */
-    async readAgain(bookId: string): Promise<any> {
-        console.log("Restarting book:", bookId);
-
+    async readAgain(bookId: string): Promise<Book> {
         const response = await apiClient.post(`/v1/books/${bookId}/read-again`);
-        console.log("Book restarted:", response);
-
         return response.data || response;
     },
 };

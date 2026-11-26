@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type ComponentType } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import { useLogout, useAuthUser } from "../../hooks/useAuth";
 
 interface NavItem {
     path: string;
-    icon: any;
+    icon: ComponentType<{ className?: string }>;
     labelKey: string;
 }
 
@@ -36,15 +36,13 @@ export default function AppHeader({
 
     const logout = useLogout();
     const { data: authData } = useAuthUser();
-    const authUser = authData?.user || (authData as any)?.data;
+    const authUser = authData?.user;
     const avatarLetter = authUser?.name
         ? authUser.name.charAt(0).toUpperCase()
         : "U";
 
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const profileRef = useRef<HTMLDivElement>(null);
-    
-    console.log("[DarkMode] AppHeader rendered. Current isDarkMode prop:", isDarkMode);
 
     // Close profile dropdown when clicking outside
     useEffect(() => {

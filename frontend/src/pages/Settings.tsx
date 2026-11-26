@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useAuthUser } from "../hooks/useAuth";
+import { useAuthUser, useLogout } from "../hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import {
     User,
@@ -22,7 +22,8 @@ import { useThemeStore } from "../store/useThemeStore";
 export default function Settings() {
     const { t } = useTranslation();
     const { data: authData } = useAuthUser();
-    const authUser = authData?.user || (authData as any)?.data?.user;
+    const authUser = authData?.user;
+    const logout = useLogout();
 
     const queryClient = useQueryClient();
     const { isDarkMode } = useThemeStore();
@@ -65,10 +66,13 @@ export default function Settings() {
     const [activeSection, setActiveSection] = useState("account");
 
     const handleLogout = async () => {
-        console.log(t("settings.logging_out"));
-        localStorage.removeItem("user");
-        queryClient.clear();
-        window.location.href = "/login";
+        try {
+            await logout.mutateAsync();
+        } finally {
+            localStorage.removeItem("user");
+            queryClient.clear();
+            window.location.href = "/login";
+        }
     };
 
     const handleExportData = () => {

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { Book } from "../types";
 
-export const getBookYears = (b: any): number[] => {
+export const getBookYears = (b: Book): number[] => {
     const years = new Set<number>();
     if (b.finishedDate) years.add(new Date(b.finishedDate).getFullYear());
     if (b.startedDate) years.add(new Date(b.startedDate).getFullYear());
@@ -23,7 +23,7 @@ export function useYearlyStats(allBooks: Book[]) {
     return useMemo(() => {
         const activeYears = Array.from(
             new Set(allBooks.flatMap(getBookYears)),
-        ) as number[];
+        );
         activeYears.sort((a, b) => b - a);
 
         const yearlyStats = activeYears.map((year) => {
@@ -50,12 +50,11 @@ export function useYearlyStats(allBooks: Book[]) {
             }).length;
 
             const totalPages = booksThisYear.reduce(
-                (s: number, b: any) => s + (b.pages || b.totalPages || 0),
+                (s: number, b: Book) => s + (b.pages || 0),
                 0,
             );
-            const pagesRead = booksThisYear.reduce((s: number, b: any) => {
-                if (b.status === "finished")
-                    return s + (b.pages || b.totalPages || 0);
+            const pagesRead = booksThisYear.reduce((s: number, b: Book) => {
+                if (b.status === "finished") return s + (b.pages || 0);
                 return s + (b.currentPage || 0);
             }, 0);
             const readPct =

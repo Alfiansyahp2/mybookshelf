@@ -1,23 +1,19 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { BookOpen, ChevronRight, BarChart2 } from "lucide-react";
-import { BRAND, Card, fadeUp, ChartTooltip } from "./DashboardWidgets";
+import { BookOpen, ChevronRight, BarChart2, Star, CheckCircle2 } from "lucide-react";
+import { Card } from "./DashboardWidgets";
+import {
+    BRAND,
+    fadeUp,
+    type DashboardBookSummary,
+    type DashboardTopReadBook,
+} from "../../constants/dashboardTheme";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import {
-    ResponsiveContainer,
-    BarChart,
-    CartesianGrid,
-    XAxis,
-    YAxis,
-    Bar,
-    Tooltip
-} from "recharts";
-import { Star, CheckCircle2 } from "lucide-react";
 
 interface DashboardReadingSectionProps {
-    currentlyReading: any[];
-    topReadBooks?: any[];
+    currentlyReading: DashboardBookSummary[];
+    topReadBooks?: DashboardTopReadBook[];
 }
 
 export default function DashboardReadingSection({

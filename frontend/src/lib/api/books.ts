@@ -1,25 +1,38 @@
 import { apiClient } from "../apiClient";
-import type { Book, BookStatus } from "../../types";
+import type { Book, BookStatus, TimelineEvent } from "../../types";
 
-// API Response types
 interface ApiResponse<T> {
     success: boolean;
     message: string;
     data: T;
 }
 
+export interface BooksListResponse {
+    data: {
+        data: Book[];
+        meta: {
+            total: number;
+            per_page: number;
+            current_page: number;
+            last_page: number;
+            from?: number;
+            to?: number;
+        };
+    };
+}
+
 // Raw API Book type (snake_case from Laravel)
-interface RawBook {
+export interface RawBook {
     id: string;
     user_id: string;
-    shelf_id: string;
+    shelf_id: string | null;
     title: string;
     author: string;
-    isbn: string;
-    genre: string;
-    language: string;
-    publisher: string;
-    publish_year: number;
+    isbn: string | null;
+    genre: string | null;
+    language: string | null;
+    publisher: string | null;
+    publish_year: number | null;
     pages: number;
     format: string;
     height: string;
@@ -32,7 +45,7 @@ interface RawBook {
     position: number;
     favorite: boolean;
     current_page: number | null;
-    progress: string;
+    progress: string | number;
     started_date: string | null;
     finished_date: string | null;
     estimated_start_date: string | null;
@@ -43,30 +56,27 @@ interface RawBook {
     personal_notes: string | null;
     personal_rating: number | null;
     purchase_date: string | null;
-    purchase_price: string | null;
+    purchase_price: string | number | null;
     purchase_currency: string | null;
     is_gift: boolean;
     purchase_location: string | null;
-    read_dates: any[] | null;
+    read_dates: string[] | null;
     date_added: string;
     last_modified: string;
     deleted_at: string | null;
-    shelf: any;
-    collections: any[];
 }
 
-// Transform raw API book to frontend Book type
 export function transformBook(raw: RawBook): Book {
     return {
         id: raw.id,
         title: raw.title,
         author: raw.author,
-        isbn: raw.isbn,
-        genre: raw.genre,
-        language: raw.language,
-        publisher: raw.publisher,
-        publishYear: raw.publish_year,
-        pages: raw.pages,
+        isbn: raw.isbn || "",
+        genre: raw.genre || "",
+        language: raw.language || "",
+        publisher: raw.publisher || "",
+        publishYear: raw.publish_year || 0,
+        pages: raw.pages || 0,
         format: raw.format as Book["format"],
         spineColors: [
             raw.spine_color_light,
@@ -80,7 +90,7 @@ export function transformBook(raw: RawBook): Book {
         favorite: raw.favorite,
         isFavorite: raw.favorite,
         currentPage: raw.current_page || undefined,
-        progress: parseFloat(raw.progress) || 0,
+        progress: Number(raw.progress) || 0,
         startedDate: raw.started_date || undefined,
         finishedDate: raw.finished_date || undefined,
         estimatedStartDate: raw.estimated_start_date || undefined,
@@ -90,31 +100,28 @@ export function transformBook(raw: RawBook): Book {
         dueDate: raw.due_date || undefined,
         isReturned: raw.is_returned,
         personalNotes: raw.personal_notes || undefined,
-        personalRating: raw.personal_rating || undefined,
+        personalRating: raw.personal_rating ? Number(raw.personal_rating) : undefined,
         purchaseDate: raw.purchase_date || undefined,
-        purchasePrice: raw.purchase_price
-            ? parseFloat(raw.purchase_price)
-            : undefined,
+        purchasePrice:
+            raw.purchase_price !== null && raw.purchase_price !== undefined
+                ? Number(raw.purchase_price)
+                : undefined,
         purchaseCurrency: raw.purchase_currency || undefined,
         isGift: raw.is_gift || false,
         purchaseLocation: raw.purchase_location || undefined,
-        shelfId: raw.shelf_id,
+        shelfId: raw.shelf_id || undefined,
         position: raw.position,
         dateAdded: raw.date_added,
         lastModified: raw.last_modified,
     };
 }
 
-// Books API
 export const booksApi = {
-    /**
-     * Get all books with optional filters
-     */
     async getBooks(filters?: {
         status?: BookStatus;
         favorite?: boolean;
         search?: string;
-    }): Promise<any> {
+    }): Promise<BooksListResponse> {
         const params = new URLSearchParams();
         if (filters?.status) params.append("status", filters.status);
         if (filters?.favorite !== undefined)
@@ -123,15 +130,9 @@ export const booksApi = {
 
         const queryString = params.toString();
         const url = `/v1/books${queryString ? `?${queryString}` : ""}`;
-
         const response = await apiClient.get(url);
+        const booksData: RawBook[] = response.data?.data || response.data || [];
 
-        console.log("Books API response:", response);
-
-        // Handle paginated response from Laravel
-        const booksData = response.data?.data || response.data || [];
-
-        // Transform books array
         return {
             data: {
                 data: booksData.map(transformBook),
@@ -152,13 +153,9 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Get a single book by ID
-     */
     async getBook(id: string): Promise<ApiResponse<Book>> {
         const response = await apiClient.get(`/v1/books/${id}`);
-        // Handle Laravel API response structure: { success, message, data }
-        const bookData = response.data?.data || response.data;
+        const bookData: RawBook = response.data?.data || response.data;
         return {
             success: true,
             message: "Book retrieved successfully",
@@ -166,12 +163,8 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Create a new book
-     */
     async createBook(bookData: Partial<Book>): Promise<ApiResponse<Book>> {
-        // Transform to API format (camelCase to snake_case)
-        const apiData: any = {
+        const apiData: Record<string, unknown> = {
             title: bookData.title,
             author: bookData.author,
             shelf_id: bookData.shelfId,
@@ -191,17 +184,17 @@ export const booksApi = {
             favorite: false,
             cover_image: bookData.coverImage,
             position: bookData.position || 0,
-            // Purchase information
             purchase_date: bookData.purchaseDate || null,
             purchase_price: bookData.purchasePrice ?? null,
             purchase_currency: bookData.purchaseCurrency || "IDR",
             is_gift: bookData.isGift || false,
             purchase_location: bookData.purchaseLocation || null,
-            // Reading info
             started_date: bookData.startedDate || null,
             finished_date: bookData.finishedDate || null,
-            // Personal info
             personal_notes: bookData.personalNotes || null,
+            borrowed_by: bookData.borrowedBy || null,
+            borrowed_date: bookData.borrowedDate || null,
+            due_date: bookData.dueDate || null,
         };
 
         const response = await apiClient.post("/v1/books", apiData);
@@ -212,15 +205,11 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Update a book
-     */
     async updateBook(
         id: string,
         updates: Partial<Book>,
     ): Promise<ApiResponse<Book>> {
-        // Transform to API format
-        const apiData: any = {};
+        const apiData: Record<string, unknown> = {};
         if (updates.title) apiData.title = updates.title;
         if (updates.author) apiData.author = updates.author;
         if (updates.isbn) apiData.isbn = updates.isbn;
@@ -254,7 +243,6 @@ export const booksApi = {
             apiData.started_date = updates.startedDate || null;
         if (updates.finishedDate !== undefined)
             apiData.finished_date = updates.finishedDate || null;
-        // Purchase information
         if (updates.purchaseDate !== undefined)
             apiData.purchase_date = updates.purchaseDate || null;
         if (updates.purchasePrice !== undefined)
@@ -264,7 +252,6 @@ export const booksApi = {
         if (updates.isGift !== undefined) apiData.is_gift = updates.isGift;
         if (updates.purchaseLocation !== undefined)
             apiData.purchase_location = updates.purchaseLocation || null;
-        // Spine colors
         if (updates.spineColors) {
             apiData.spine_color_light = updates.spineColors[0];
             apiData.spine_color_medium = updates.spineColors[1];
@@ -279,9 +266,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Delete a book (soft delete)
-     */
     async deleteBook(id: string): Promise<ApiResponse<null>> {
         await apiClient.delete(`/v1/books/${id}`);
         return {
@@ -291,9 +275,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Start reading a book
-     */
     async startReading(id: string): Promise<ApiResponse<Book>> {
         const response = await apiClient.post(`/v1/books/${id}/start`);
         return {
@@ -303,9 +284,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Finish reading a book
-     */
     async finishReading(id: string): Promise<ApiResponse<Book>> {
         const response = await apiClient.post(`/v1/books/${id}/finish`);
         return {
@@ -315,9 +293,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Upload cover image for a book
-     */
     async uploadCover(
         id: string,
         file: File,
@@ -325,7 +300,6 @@ export const booksApi = {
         const formData = new FormData();
         formData.append("cover", file);
 
-        // Get CSRF token
         const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
         const csrfToken = match ? decodeURIComponent(match[1]) : "";
 
@@ -354,9 +328,6 @@ export const booksApi = {
         return data.data || data;
     },
 
-    /**
-     * Update reading progress
-     */
     async updateProgress(
         id: string,
         currentPage: number,
@@ -371,9 +342,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Toggle favorite status
-     */
     async toggleFavorite(id: string): Promise<ApiResponse<Book>> {
         const response = await apiClient.patch(`/v1/books/${id}/favorite`);
         return {
@@ -383,9 +351,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Update personal notes
-     */
     async updateNotes(id: string, notes: string): Promise<ApiResponse<Book>> {
         const response = await apiClient.patch(`/v1/books/${id}/notes`, {
             notes,
@@ -397,9 +362,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Update personal rating
-     */
     async updateRating(id: string, rating: number): Promise<ApiResponse<Book>> {
         const response = await apiClient.patch(`/v1/books/${id}/rating`, {
             rating,
@@ -411,9 +373,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Move book to different shelf
-     */
     async moveToShelf(
         id: string,
         shelfId: string,
@@ -430,9 +389,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Borrow book to someone
-     */
     async borrowBook(
         id: string,
         borrowedBy: string,
@@ -449,9 +405,6 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Return borrowed book
-     */
     async returnBook(id: string): Promise<ApiResponse<Book>> {
         const response = await apiClient.post(`/v1/books/${id}/return`);
         return {
@@ -461,15 +414,12 @@ export const booksApi = {
         };
     },
 
-    /**
-     * Get timeline events for a book
-     */
-    async getBookTimeline(id: string): Promise<ApiResponse<any[]>> {
+    async getBookTimeline(id: string): Promise<ApiResponse<TimelineEvent[]>> {
         const response = await apiClient.get(`/v1/books/${id}/timeline`);
         return {
             success: true,
             message: "Timeline retrieved successfully",
-            data: response.data,
+            data: response.data || [],
         };
     },
 };

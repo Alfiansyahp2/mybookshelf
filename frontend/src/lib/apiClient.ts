@@ -20,13 +20,12 @@ class ApiClient {
                 "Content-Type": "application/json",
                 Accept: "application/json",
             },
-            withCredentials: true, // IMPORTANT: Required for Sanctum SPA authentication
+            withCredentials: true, // Required for Sanctum SPA authentication
         });
 
-        // Request interceptor - add CSRF token and handle session auth
+        // Request interceptor - add CSRF token for mutating requests
         this.client.interceptors.request.use(
             (config) => {
-                // Add CSRF token for POST/PUT/PATCH/DELETE requests
                 if (
                     ["post", "put", "patch", "delete"].includes(
                         config.method?.toLowerCase() || "",
@@ -35,65 +34,41 @@ class ApiClient {
                     const csrfToken = getCsrfToken();
                     if (csrfToken) {
                         config.headers["X-XSRF-TOKEN"] = csrfToken;
-                        console.log(
-                            "CSRF token added to request:",
-                            csrfToken.substring(0, 20) + "...",
-                        );
-                    } else {
-                        console.warn("No CSRF token found in cookies!");
                     }
                 }
                 return config;
             },
-            (error) => {
-                return Promise.reject(error);
-            },
+            (error) => Promise.reject(error),
         );
 
-        // Response interceptor - handle errors
+        // Response interceptor - clear cached user profile on unauthorized responses
         this.client.interceptors.response.use(
-            (response) => {
-                console.log(
-                    "API Response:",
-                    response.config.url,
-                    response.status,
-                    response.data,
-                );
-                return response;
-            },
+            (response) => response,
             (error: AxiosError) => {
-                console.error(
-                    "API Error:",
-                    error.config?.url,
-                    error.message,
-                    error.response?.data,
-                );
                 if (error.response?.status === 401) {
-                    // Session expired - clear user data from localStorage
                     localStorage.removeItem("user");
-                    console.warn("Authentication required. Please login.");
                 }
                 return Promise.reject(error);
             },
         );
     }
 
-    async get(url: string, params?: Record<string, any>) {
+    async get(url: string, params?: Record<string, unknown>) {
         const response = await this.client.get(url, { params });
         return response.data;
     }
 
-    async post(url: string, data?: Record<string, any>) {
+    async post(url: string, data?: unknown) {
         const response = await this.client.post(url, data);
         return response.data;
     }
 
-    async patch(url: string, data?: Record<string, any>) {
+    async patch(url: string, data?: unknown) {
         const response = await this.client.patch(url, data);
         return response.data;
     }
 
-    async put(url: string, data?: Record<string, any>) {
+    async put(url: string, data?: unknown) {
         const response = await this.client.put(url, data);
         return response.data;
     }
@@ -108,8 +83,5 @@ class ApiClient {
     }
 }
 
-// Create and export singleton instance
 export const apiClient = new ApiClient();
-
-// Export axios instance for direct use if needed
 export default apiClient.instance;

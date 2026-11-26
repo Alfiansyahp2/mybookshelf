@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { BookOpen } from "lucide-react";
-import { BRAND } from "./DashboardWidgets";
+import { BRAND } from "../../constants/dashboardTheme";
 import { useTranslation } from "react-i18next";
 
 interface DashboardEmptyStateProps {

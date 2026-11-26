@@ -4,12 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
     ArrowUpRight,
-    X,
     Mail,
-    Globe,
     Copy,
     Check,
-    ExternalLink,
     Menu,
     BookOpen,
     ChevronLeft

@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, Plus, BookOpen, Clock, CheckCircle2, Bookmark, ArrowUpRight } from "lucide-react";
+import { Star, Plus, Clock, CheckCircle2, Bookmark, ArrowUpRight } from "lucide-react";
 import type { Book, Shelf as ShelfType } from "../../types";
 import { useTranslation } from "react-i18next";
 

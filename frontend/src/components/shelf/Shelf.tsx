@@ -4,9 +4,10 @@ import DecorationPicker from "../decorations/DecorationPicker";
 import {
     addDecoration,
     removeDecoration,
+    type DecorationCustomData,
     type DecorationKind,
     type ShelfDecoration,
-} from "../decorations/DecorationSystem";
+} from "../../types/decorations";
 import { useUpdateShelf } from "../../hooks/useShelves";
 import type { Shelf, Book as BookType } from "../../types";
 import {
@@ -50,12 +51,15 @@ export function LibraryShelf({
         useShelfScroll(books);
 
     // Shelf decorations
-    const myDecos: ShelfDecoration[] = shelf.decorations || [];
+    const myDecos = useMemo<ShelfDecoration[]>(
+        () => shelf.decorations || [],
+        [shelf.decorations],
+    );
     const leftDeco = myDecos.find((d) => d.slot === "left");
     const rightDeco = myDecos.find((d) => d.slot === "right");
 
     const handleSelectDeco = useCallback(
-        (kind: DecorationKind, customData?: any) => {
+        (kind: DecorationKind, customData?: DecorationCustomData) => {
             if (!pickerSlot) return;
             const newDecos = addDecoration(myDecos, kind, pickerSlot, customData);
             updateShelf.mutate({

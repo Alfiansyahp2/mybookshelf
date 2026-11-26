@@ -1,93 +1,81 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../lib/apiClient";
-import { transformBook } from "../lib/api/books";
-import type { Shelf } from "../types";
+import { transformBook, type RawBook } from "../lib/api/books";
+import { useAuthUser } from "./useAuth";
+import type { Shelf, ShelfOccupancy } from "../types";
 
-interface PaginatedResponse<T> {
-    data: T[];
-    meta: {
-        total: number;
-        per_page: number;
-        current_page: number;
-        last_page: number;
-        from: number;
-        to: number;
+interface RawShelf extends Omit<Shelf, "books"> {
+    books?: RawBook[];
+}
+
+function transformShelf(raw: RawShelf): Shelf {
+    return {
+        ...raw,
+        books: raw.books ? raw.books.map(transformBook) : [],
     };
 }
 
-// Shelves API
 export const shelvesApi = {
     async getShelves(): Promise<Shelf[]> {
         const response = await apiClient.get("/v1/shelves");
-        console.log("Shelves API response:", response);
-        // Laravel API returns {success: true, message: "...", data: [...]}
-        const shelves = response.data?.data || response.data || [];
-
-        // Transform nested books in each shelf
-        return shelves.map((shelf: any) => ({
-            ...shelf,
-            books: shelf.books
-                ? shelf.books.map((book: any) => transformBook(book))
-                : [],
-        }));
+        const shelves: RawShelf[] = response.data?.data || response.data || [];
+        return shelves.map(transformShelf);
     },
 
-    async getShelf(id: string): Promise<any> {
-        return apiClient.get(`/v1/shelves/${id}`);
+    async getShelf(id: string): Promise<Shelf> {
+        const response = await apiClient.get(`/v1/shelves/${id}`);
+        const raw: RawShelf = response.data?.data || response.data;
+        return transformShelf(raw);
     },
 
-    async createShelf(shelfData: Partial<Shelf>): Promise<any> {
-        return apiClient.post("/v1/shelves", shelfData);
+    async createShelf(shelfData: Partial<Shelf>): Promise<Shelf> {
+        const response = await apiClient.post("/v1/shelves", shelfData);
+        return response.data?.data || response.data;
     },
 
-    async updateShelf(id: string, updates: Partial<Shelf>): Promise<any> {
-        return apiClient.patch(`/v1/shelves/${id}`, updates);
+    async updateShelf(id: string, updates: Partial<Shelf>): Promise<Shelf> {
+        const response = await apiClient.patch(`/v1/shelves/${id}`, updates);
+        return response.data?.data || response.data;
     },
 
     async updateLayout(
         shelves: { id: string; order: number; span: number }[],
-    ): Promise<any> {
-        return apiClient.put(`/v1/shelves/layout`, { shelves });
+    ): Promise<void> {
+        await apiClient.put("/v1/shelves/layout", { shelves });
     },
 
-    async deleteShelf(id: string): Promise<any> {
-        return apiClient.delete(`/v1/shelves/${id}`);
+    async deleteShelf(id: string): Promise<void> {
+        await apiClient.delete(`/v1/shelves/${id}`);
     },
 
-    async getOccupancy(id: string): Promise<any> {
-        return apiClient.get(`/v1/shelves/${id}/occupancy`);
+    async getOccupancy(id: string): Promise<ShelfOccupancy> {
+        const response = await apiClient.get(`/v1/shelves/${id}/occupancy`);
+        return response.data?.data || response.data;
     },
 };
 
-/**
- * Hook to fetch all shelves
- */
 export function useShelves() {
+    const { data: authData } = useAuthUser();
+    const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: ["shelves"],
         queryFn: () => shelvesApi.getShelves(),
+        enabled: isAuthenticated,
     });
 }
 
-/**
- * Hook to create a new shelf
- */
 export function useCreateShelf() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (shelfData: Partial<Shelf>) =>
-            shelvesApi.createShelf(shelfData).then((res) => res.data),
-
+            shelvesApi.createShelf(shelfData),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["shelves"] });
         },
     });
 }
 
-/**
- * Hook to update a shelf
- */
 export function useUpdateShelf() {
     const queryClient = useQueryClient();
 
@@ -98,8 +86,7 @@ export function useUpdateShelf() {
         }: {
             id: string;
             updates: Partial<Shelf>;
-        }) => shelvesApi.updateShelf(id, updates).then((res) => res.data),
-
+        }) => shelvesApi.updateShelf(id, updates),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["shelves"] });
             queryClient.invalidateQueries({
@@ -109,44 +96,35 @@ export function useUpdateShelf() {
     });
 }
 
-/**
- * Hook to update shelf layout in batch
- */
 export function useUpdateShelfLayout() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (shelves: { id: string; order: number; span: number }[]) =>
-            shelvesApi.updateLayout(shelves).then((res) => res.data),
-
+            shelvesApi.updateLayout(shelves),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["shelves"] });
         },
     });
 }
 
-/**
- * Hook to delete a shelf
- */
 export function useDeleteShelf() {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (id: string) => shelvesApi.deleteShelf(id),
-
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["shelves"] });
         },
     });
 }
 
-/**
- * Hook to get shelf occupancy
- */
 export function useShelfOccupancy(id: string) {
+    const { data: authData } = useAuthUser();
+    const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: ["shelves", id, "occupancy"],
         queryFn: () => shelvesApi.getOccupancy(id),
-        enabled: !!id,
+        enabled: !!id && isAuthenticated,
     });
 }

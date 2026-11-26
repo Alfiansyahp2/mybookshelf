@@ -8,12 +8,14 @@ import {
     DollarSign,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { BRAND, Card, fadeUp } from "./DashboardWidgets";
+import { Card } from "./DashboardWidgets";
+import { fadeUp } from "../../constants/dashboardTheme";
 import { useAccountingOverview } from "../../hooks/accounting/useAccountingReports";
+import type { DashboardStats } from "../../hooks/useDashboardStats";
 import { useTranslation } from "react-i18next";
 
 interface DashboardStatCardsSectionProps {
-    stats: any;
+    stats: DashboardStats;
 }
 
 export default function DashboardStatCardsSection({

@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
 
 export default function Candle({ scale = 1 }: { scale?: number }) {
     return (

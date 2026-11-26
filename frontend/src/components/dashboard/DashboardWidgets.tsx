@@ -1,96 +1,26 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
-import { useBooks } from "../../hooks/useBooks";
-import { useShelves } from "../../hooks/useShelves";
-import { useStatistics } from "../../hooks/useStatistics";
-import { BOOK_GENRES } from "../../constants/genres";
-import {
-    BookOpen,
-    Library,
-    Star,
-    Bookmark,
-    Users,
-    TrendingUp,
-    Target,
-    Clock,
-    Heart,
-    Award,
-    ChevronRight,
-    BookMarked,
-    Layers,
-} from "lucide-react";
-import DashboardAccountingSection from "../../components/accounting/DashboardAccountingSection";
-import ReadingCalendarModal from "../../components/modals/ReadingCalendarModal";
+import { BookOpen, Star } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import {
-    PieChart,
-    Pie,
-    Cell,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    AreaChart,
-    Area,
-    CartesianGrid,
-} from "recharts";
+import { BRAND } from "../../constants/dashboardTheme";
+import type { Book } from "../../types";
+import type { StatisticsDailyActivity } from "../../lib/api/statistics";
 
-/* ── colour palette matching the project ─────── */
-export const BRAND = {
-    cream: "#F8F5F0",
-    walnut: "#7A5C42",
-    darkBrown: "#4A3B2F",
-    gold: "#D4A574",
-    beige: "#E8E0D5",
-};
+interface TooltipPayloadEntry {
+    name?: string;
+    value?: number | string;
+    color?: string;
+}
 
-export const STATUS_CFG = {
-    reading: {
-        label: "Dibaca",
-        color: "#10b981",
-        bg: "#d1fae5",
-        dark: "#065f46",
-    },
-    finished: {
-        label: "Selesai",
-        color: "#8b5cf6",
-        bg: "#ede9fe",
-        dark: "#4c1d95",
-    },
-    unread: {
-        label: "Belum Dibaca",
-        color: "#f59e0b",
-        bg: "#fef3c7",
-        dark: "#78350f",
-    },
-    wishlist: {
-        label: "Wishlist",
-        color: "#ec4899",
-        bg: "#fce7f3",
-        dark: "#831843",
-    },
-    borrowed: {
-        label: "Dipinjam",
-        color: "#ef4444",
-        bg: "#fee2e2",
-        dark: "#7f1d1d",
-    },
-};
-
-/* ── fade-up helper ──────────────────────────── */
-export const EASE_OUT_EXPO = [0.22, 1, 0.36, 1] as const;
-export const fadeUp = (delay: number) => ({
-    initial: { opacity: 0, y: 18 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.45, delay, ease: EASE_OUT_EXPO },
-});
+interface ChartTooltipProps {
+    active?: boolean;
+    payload?: TooltipPayloadEntry[];
+    label?: string;
+}
 
 /* ── custom tooltip ──────────────────────────── */
-export const ChartTooltip = ({ active, payload, label }: any) => {
+export function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
     if (!active || !payload?.length) return null;
     return (
         <div className="bg-[rgba(255,251,245,0.97)] border border-[rgba(139,99,56,0.15)] rounded-[10px] px-3 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.12)] text-[12px]">
@@ -99,7 +29,7 @@ export const ChartTooltip = ({ active, payload, label }: any) => {
                     {label}
                 </p>
             )}
-            {payload.map((p: any, i: number) => (
+            {payload.map((p, i) => (
                 <p
                     key={i}
                     style={{ color: p.color ?? BRAND.darkBrown }}
@@ -110,7 +40,7 @@ export const ChartTooltip = ({ active, payload, label }: any) => {
             ))}
         </div>
     );
-};
+}
 
 /* ── section card wrapper ────────────────────── */
 export function Card({
@@ -202,13 +132,21 @@ export function ContributionGraph({
     selectedYear,
     onClick,
 }: {
-    data: any[];
-    books?: any[];
+    data: StatisticsDailyActivity[];
+    books?: Book[];
     selectedYear: number;
     onClick?: () => void;
 }) {
     const { t } = useTranslation();
-    const activityMap = new Map();
+    const activityMap = new Map<
+        string,
+        {
+            pages: number;
+            finished: number;
+            finishedBooks: Book[];
+            booksRead: string[];
+        }
+    >();
     data.forEach((d) => {
         activityMap.set(d.date, {
             pages: d.pages || 0,
@@ -227,17 +165,18 @@ export function ContributionGraph({
                     finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
                 }
                 if (b.readDates && Array.isArray(b.readDates)) {
-                    b.readDates.forEach((rd: any) => {
+                    b.readDates.forEach((rd) => {
                         const d = new Date(rd);
                         finalDateStrs.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
                     });
                 }
 
-                finalDateStrs.forEach(finalDateStr => {
+                finalDateStrs.forEach((finalDateStr) => {
                     const existing = activityMap.get(finalDateStr) || {
                         pages: 0,
                         finished: 0,
                         finishedBooks: [],
+                        booksRead: [],
                     };
                     existing.finished += 1;
                     if (!existing.finishedBooks) existing.finishedBooks = [];
@@ -257,9 +196,6 @@ export function ContributionGraph({
         return "#8b5a2b";
     };
 
-    const today = new Date();
-    const currentYear = today.getFullYear();
-
     const startDate = new Date(selectedYear, 0, 1);
 
     const allSquares = [];
@@ -270,7 +206,6 @@ export function ContributionGraph({
         allSquares.push(null);
     }
 
-    const isCurrentYear = selectedYear === currentYear;
     const isLeapYear =
         (selectedYear % 4 === 0 && selectedYear % 100 !== 0) ||
         selectedYear % 400 === 0;
@@ -407,12 +342,12 @@ export function ContributionGraph({
                                             marginBottom: 8,
                                             borderBottom:
                                                 idx <
-                                                day.finishedBooks.length - 1
+                                                    day.finishedBooks.length - 1
                                                     ? "1px solid rgba(139,99,56,0.1)"
                                                     : "none",
                                             paddingBottom:
                                                 idx <
-                                                day.finishedBooks.length - 1
+                                                    day.finishedBooks.length - 1
                                                     ? 8
                                                     : 0,
                                         }}
@@ -521,7 +456,7 @@ export function ContributionGraph({
                                             </span>
                                             {book.personalRating &&
                                                 Number(book.personalRating) >
-                                                    0 && (
+                                                0 && (
                                                     <span className="text-[11px] font-bold text-amber-800 flex items-center gap-[3px]">
                                                         <Star
                                                             size={11}
@@ -572,20 +507,20 @@ export function ContributionGraph({
                                 style={{
                                     marginTop:
                                         day.finished > 0 ||
-                                        (day.booksRead &&
-                                            day.booksRead.length > 0)
+                                            (day.booksRead &&
+                                                day.booksRead.length > 0)
                                             ? 6
                                             : 0,
                                     paddingTop:
                                         day.finished > 0 ||
-                                        (day.booksRead &&
-                                            day.booksRead.length > 0)
+                                            (day.booksRead &&
+                                                day.booksRead.length > 0)
                                             ? 8
                                             : 0,
                                     borderTop:
                                         day.finished > 0 ||
-                                        (day.booksRead &&
-                                            day.booksRead.length > 0)
+                                            (day.booksRead &&
+                                                day.booksRead.length > 0)
                                             ? "1px dashed rgba(139,99,56,0.2)"
                                             : "none",
                                     fontSize: 11.5,

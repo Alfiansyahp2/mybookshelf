@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Key, Save } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { devError } from "../../lib/logger";
 import {
     useAuthUser,
     useUpdateProfile,
@@ -11,7 +12,7 @@ import {
 export default function AccountSettings() {
     const { t } = useTranslation();
     const { data: authData } = useAuthUser();
-    const authUser = authData?.user || (authData as any)?.data?.user;
+    const authUser = authData?.user;
 
     const updateProfile = useUpdateProfile();
     const updatePassword = useUpdatePassword();
@@ -80,14 +81,14 @@ export default function AccountSettings() {
                     password_confirmation: "",
                 });
             },
-            onError: (err: any) => {
+            onError: (err) => {
                 alert(
                     t(
                         "settings.account.password_error",
                         "Failed to update password. Check your current password.",
                     ),
                 );
-                console.error(err);
+                devError("Failed to update password:", err);
             },
         });
     };

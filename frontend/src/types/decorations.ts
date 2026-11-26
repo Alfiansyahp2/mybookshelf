@@ -15,18 +15,22 @@ export type DecorationKind =
     | "cat_sleep"
     | "cat_sit";
 
+export interface DecorationCustomData {
+    imageUrl?: string;
+}
+
 export interface ShelfDecoration {
     id: string;
     kind: DecorationKind;
     slot: "left" | "right";
-    customData?: any;
+    customData?: DecorationCustomData;
 }
 
 export function addDecoration(
     list: ShelfDecoration[],
     kind: DecorationKind,
     slot: "left" | "right",
-    customData?: any,
+    customData?: DecorationCustomData,
 ): ShelfDecoration[] {
     const filtered = list.filter((d) => d.slot !== slot);
     const next: ShelfDecoration = {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -35,11 +35,20 @@ export default function LandingBookDetail() {
         setCoverImgError(false);
     }, [id]);
 
-    const navigateToBook = (newIndex: number) => {
-        if (newIndex === bookIndex || newIndex < 0 || newIndex >= books.length) return;
-        setDirection(newIndex > bookIndex ? 1 : -1);
-        navigate(`/landing/book/${books[newIndex].id}`);
-    };
+    const navigateToBook = useCallback(
+        (newIndex: number) => {
+            if (
+                newIndex === bookIndex ||
+                newIndex < 0 ||
+                newIndex >= books.length
+            ) {
+                return;
+            }
+            setDirection(newIndex > bookIndex ? 1 : -1);
+            navigate(`/landing/book/${books[newIndex].id}`);
+        },
+        [bookIndex, books, navigate],
+    );
 
     // Handle Keyboard Arrow & Mouse Wheel Scroll Navigation
     useEffect(() => {
@@ -79,7 +88,7 @@ export default function LandingBookDetail() {
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("wheel", handleWheel);
         };
-    }, [bookIndex, books, isReaderModalOpen]);
+    }, [bookIndex, books.length, isReaderModalOpen, navigateToBook]);
 
     if (!currentBook) return null;
 

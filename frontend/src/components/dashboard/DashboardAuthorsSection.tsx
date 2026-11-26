@@ -8,11 +8,13 @@ import {
     Tooltip,
     Bar,
 } from "recharts";
-import { BRAND, Card, ChartTooltip, fadeUp } from "./DashboardWidgets";
+import { Card, ChartTooltip } from "./DashboardWidgets";
+import { BRAND, fadeUp } from "../../constants/dashboardTheme";
+import type { DashboardStats } from "../../hooks/useDashboardStats";
 import { useTranslation } from "react-i18next";
 
 interface DashboardAuthorsSectionProps {
-    stats: any;
+    stats: DashboardStats;
 }
 
 export default function DashboardAuthorsSection({

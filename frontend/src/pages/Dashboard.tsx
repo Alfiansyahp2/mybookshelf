@@ -15,7 +15,7 @@ import DashboardAuthorsSection from "../components/dashboard/DashboardAuthorsSec
 import DashboardActivitySection from "../components/dashboard/DashboardActivitySection";
 import DashboardEmptyState from "../components/dashboard/DashboardEmptyState";
 import ReadingCalendarModal from "../components/modals/ReadingCalendarModal";
-import { fadeUp, BRAND } from "../components/dashboard/DashboardWidgets";
+import { BRAND } from "../constants/dashboardTheme";
 import SEO from "../components/SEO";
 
 /* ══════════════════════════════════════════════

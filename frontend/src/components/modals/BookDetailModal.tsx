@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Edit, Clock, Hash, X, Trash2 } from "lucide-react";
 import {
@@ -105,17 +105,25 @@ export default function BookDetailModal({
         }
     }, [book, isEditingNotes]);
 
+    const bookId = book?.id;
+    const bookStatus = book?.status;
+    const lastInitKeyRef = useRef<string | null>(null);
+
     // Set initial tab ONLY when modal opens for a specific book
     useEffect(() => {
-        if (isOpen && book) {
-            setIsEditingNotes(false);
-            if (book.status === "reading" || book.status === "finished") {
-                setActiveTab("progress");
-            } else {
-                setActiveTab("info");
-            }
+        if (!isOpen || !bookId) {
+            lastInitKeyRef.current = null;
+            return;
         }
-    }, [isOpen, book?.id]);
+        if (lastInitKeyRef.current === bookId) return;
+        lastInitKeyRef.current = bookId;
+        setIsEditingNotes(false);
+        if (bookStatus === "reading" || bookStatus === "finished") {
+            setActiveTab("progress");
+        } else {
+            setActiveTab("info");
+        }
+    }, [isOpen, bookId, bookStatus]);
 
     if (!book) return null;
 

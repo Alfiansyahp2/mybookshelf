@@ -1,15 +1,17 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
 import { useNavigate } from "react-router-dom";
 import { useBookstore } from "../store/useBookstore";
 import Bookshelf from "../components/shelf/Bookshelf";
 import MobileCoverGrid from "../components/shelf/MobileCoverGrid";
+import AddBookModal from "../components/modals/AddBookModal";
 import YearlyTargetCards from "../components/reading/YearlyTargetCards";
-import { useYearlyStats, getBookYears } from "../hooks/useYearlyStats";
+import { useYearlyStats } from "../hooks/useYearlyStats";
 import type { Book } from "../types";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 import {
     BookOpen,
     TrendingUp,
@@ -35,9 +37,15 @@ export default function Reading() {
             ? "grid"
             : "shelf",
     );
+    const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
+    const [addShelfId, setAddShelfId] = useState<string | undefined>();
+    const [addShelfName, setAddShelfName] = useState<string | undefined>();
+    const [addInitialStatus, setAddInitialStatus] =
+        useState<Book["status"]>("reading");
 
-    // Fetch all books from API
+    // Fetch all books & real shelves from API
     const { data: allBooksResponse, isLoading } = useBooks({});
+    const { data: shelves = [] } = useShelves();
 
     const allBooks = allBooksResponse?.data?.data || [];
     const readingBooks = allBooks.filter(
@@ -61,23 +69,41 @@ export default function Reading() {
     const averageProgress =
         totalReadingBooks > 0
             ? Math.round(
-                readingBooks.reduce(
-                    (sum: number, book: Book) => sum + (book.progress || 0),
-                    0,
-                ) / totalReadingBooks,
-            )
+                  readingBooks.reduce(
+                      (sum: number, book: Book) => sum + (book.progress || 0),
+                      0,
+                  ) / totalReadingBooks,
+              )
             : 0;
     // Calculate yearly statistics using custom hook
     const { yearlyStats } = useYearlyStats(allBooks);
 
-    const handleBookClick = (book: any) => {
+    const handleBookClick = (book: Book) => {
         setSelectedBookId(book.id);
         toggleBookDetail(book.id);
     };
 
     const handleAddBook = (shelfId: string, shelfName?: string) => {
-        console.log("Add book to shelf:", shelfId, shelfName);
-        // TODO: Implement add book functionality
+        const matchedShelf = shelves.find((s) => s.id === shelfId);
+        const fallbackShelf = matchedShelf ?? shelves[0];
+
+        if (!fallbackShelf) {
+            toast.error(
+                t(
+                    "reading.no_real_shelf",
+                    "Create a shelf in your library first before adding a book.",
+                ),
+            );
+            navigate("/library");
+            return;
+        }
+
+        setAddShelfId(fallbackShelf.id);
+        setAddShelfName(shelfName || fallbackShelf.name);
+        setAddInitialStatus(
+            shelfId === "unread-shelf" ? "unread" : "reading",
+        );
+        setIsAddBookModalOpen(true);
     };
 
     // Loading state
@@ -491,6 +517,14 @@ export default function Reading() {
                     </motion.div>
                 )}
             </div>
+
+            <AddBookModal
+                isOpen={isAddBookModalOpen}
+                onClose={() => setIsAddBookModalOpen(false)}
+                shelfId={addShelfId}
+                shelfName={addShelfName}
+                initialStatus={addInitialStatus}
+            />
         </div>
     );
 }
