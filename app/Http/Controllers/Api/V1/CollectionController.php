@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Library\AddBookToCollectionRequest;
+use App\Http\Requests\Api\V1\Library\ReorderCollectionBookRequest;
+use App\Http\Requests\Api\V1\Library\StoreCollectionRequest;
+use App\Http\Requests\Api\V1\Library\UpdateCollectionRequest;
+use App\Models\Book;
 use App\Models\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class CollectionController extends Controller
@@ -24,14 +30,11 @@ class CollectionController extends Controller
     /**
      * Store a newly created collection.
      */
-    public function store(Request $request)
+    public function store(StoreCollectionRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'color' => 'nullable|string|max:50',
-            'icon' => 'nullable|string|max:50',
-        ]);
+        Gate::authorize('create', Collection::class);
+
+        $data = $request->validated();
 
         $collection = Collection::create([
             'id' => Str::uuid()->toString(),
@@ -49,31 +52,21 @@ class CollectionController extends Controller
     /**
      * Display the specified collection.
      */
-    public function show(Request $request, $id)
+    public function show(Collection $collection)
     {
-        $collection = Collection::where('user_id', $request->user()->id)
-            ->with('books')
-            ->findOrFail($id);
+        Gate::authorize('view', $collection);
 
-        return response()->success($collection, 'Collection retrieved successfully');
+        return response()->success($collection->load('books'), 'Collection retrieved successfully');
     }
 
     /**
      * Update the specified collection.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCollectionRequest $request, Collection $collection)
     {
-        $collection = Collection::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('update', $collection);
 
-        $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
-            'color' => 'nullable|string|max:50',
-            'icon' => 'nullable|string|max:50',
-        ]);
-
-        $collection->update($data);
+        $collection->update($request->validated());
 
         return response()->success($collection->load('books'), 'Collection updated successfully');
     }
@@ -81,10 +74,9 @@ class CollectionController extends Controller
     /**
      * Remove the specified collection.
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Collection $collection)
     {
-        $collection = Collection::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('delete', $collection);
 
         $collection->delete();
 
@@ -94,18 +86,12 @@ class CollectionController extends Controller
     /**
      * Add book to collection.
      */
-    public function addBook(Request $request, $id)
+    public function addBook(AddBookToCollectionRequest $request, Collection $collection)
     {
-        $userId = $request->user()->id;
-        $collection = Collection::where('user_id', $userId)
-            ->findOrFail($id);
+        Gate::authorize('update', $collection);
 
-        $data = $request->validate([
-            'book_id' => ['required', $this->ownedRule('books', $userId)],
-            'order' => 'nullable|integer|min:0',
-        ]);
+        $data = $request->validated();
 
-        // Check if book already in collection
         if ($collection->books()->where('books.id', $data['book_id'])->exists()) {
             return response()->error('Book already in collection', null, 400);
         }
@@ -115,7 +101,6 @@ class CollectionController extends Controller
             'added_at' => now(),
         ]);
 
-        // Update collection progress
         $collection->updateProgress();
 
         return response()->success($collection->load('books'), 'Book added to collection');
@@ -124,15 +109,14 @@ class CollectionController extends Controller
     /**
      * Remove book from collection.
      */
-    public function removeBook(Request $request, $id, $book)
+    public function removeBook(Collection $collection, Book $book)
     {
-        $collection = Collection::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('update', $collection);
+        Gate::authorize('view', $book);
 
-        $collection->books()->findOrFail($book);
-        $collection->books()->detach($book);
+        abort_unless($collection->books()->where('books.id', $book->id)->exists(), 404);
 
-        // Update collection progress
+        $collection->books()->detach($book->id);
         $collection->updateProgress();
 
         return response()->success($collection->load('books'), 'Book removed from collection');
@@ -141,18 +125,14 @@ class CollectionController extends Controller
     /**
      * Reorder book in collection.
      */
-    public function reorderBook(Request $request, $id, $book)
+    public function reorderBook(ReorderCollectionBookRequest $request, Collection $collection, Book $book)
     {
-        $collection = Collection::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('update', $collection);
+        Gate::authorize('view', $book);
 
-        $collection->books()->findOrFail($book);
+        abort_unless($collection->books()->where('books.id', $book->id)->exists(), 404);
 
-        $data = $request->validate([
-            'order' => 'required|integer|min:0',
-        ]);
-
-        $collection->books()->updateExistingPivot($book, ['order' => $data['order']]);
+        $collection->books()->updateExistingPivot($book->id, ['order' => $request->validated('order')]);
 
         return response()->success($collection->load('books'), 'Book reordered successfully');
     }

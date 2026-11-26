@@ -21,14 +21,12 @@ class ShelfResource extends JsonResource
             'order' => $this->order,
             'span' => $this->span,
             'decorations' => $this->decorations ?? [],
-            'room_id' => $this->room_id,
 
             // Timestamps
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
 
             // Relationships
-            'room' => $this->when($this->room, fn () => new RoomResource($this->room)),
             'books' => BookResource::collection($this->whenLoaded('books')),
 
             // Computed occupancy (if loaded)

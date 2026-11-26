@@ -3,14 +3,26 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Library\BookIndexRequest;
+use App\Http\Requests\Api\V1\Library\BorrowBookRequest;
+use App\Http\Requests\Api\V1\Library\MoveBookToShelfRequest;
+use App\Http\Requests\Api\V1\Library\StoreBookRequest;
+use App\Http\Requests\Api\V1\Library\UpdateBookNotesRequest;
+use App\Http\Requests\Api\V1\Library\UpdateBookRatingRequest;
+use App\Http\Requests\Api\V1\Library\UpdateBookRequest;
+use App\Http\Requests\Api\V1\Library\UploadBookCoverRequest;
+use App\Http\Requests\Api\V1\Reading\EndBookReadingSessionRequest;
+use App\Http\Requests\Api\V1\Reading\PauseReadingSessionRequest;
+use App\Http\Requests\Api\V1\Reading\StartBookReadingSessionRequest;
+use App\Http\Requests\Api\V1\Reading\UpdateBookProgressRequest;
 use App\Models\Book;
 use App\Models\ReadingSession;
 use App\Services\BookService;
 use App\Services\ReadingSessionService;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
@@ -28,23 +40,15 @@ class BookController extends Controller
     /**
      * Display a listing of books.
      */
-    public function index(Request $request)
+    public function index(BookIndexRequest $request)
     {
-        $request->validate([
-            'search' => 'nullable|string|max:50',
-            'status' => 'nullable|string',
-            'favorite' => 'nullable|boolean',
-        ]);
-
         $filters = [
             'status' => $request->query('status'),
             'favorite' => $request->query('favorite'),
             'search' => $request->query('search'),
         ];
 
-        // SECURITY: Pass authenticated user ID to filter their books only
-        $userId = $request->user()->id;
-        $books = $this->bookService->getAllBooks($filters, false, $userId);
+        $books = $this->bookService->getAllBooks($filters, false, $request->user()->id);
 
         return response()->success($books, 'Books retrieved successfully');
     }
@@ -52,43 +56,11 @@ class BookController extends Controller
     /**
      * Store a newly created book.
      */
-    public function store(Request $request)
+    public function store(StoreBookRequest $request)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'isbn' => 'nullable|string|max:50',
-            'genre' => 'nullable|string|max:100',
-            'language' => 'nullable|string|max:50',
-            'publisher' => 'nullable|string|max:255',
-            'publish_year' => 'nullable|integer|min:1000|max:2999',
-            'pages' => 'nullable|integer|min:1',
-            'format' => 'nullable|in:hardcover,paperback,ebook,audiobook',
-            'spine_color_light' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'spine_color_medium' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'spine_color_dark' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'height' => 'nullable|in:short,medium,tall',
-            'thickness' => 'nullable|in:thin,regular,thick',
-            'status' => 'nullable|in:unread,reading,finished,wishlist,borrowed',
-            'favorite' => 'nullable|boolean',
-            'current_page' => 'nullable|integer|min:0',
-            'progress' => 'nullable|numeric|between:0,100',
-            'started_date' => 'nullable|date',
-            'finished_date' => 'nullable|date|after:started_date',
-            'personal_notes' => 'nullable|string',
-            'personal_rating' => 'nullable|numeric|between:0,5',
-            'read_dates' => 'nullable|array',
-            'read_dates.*' => 'date',
-            'purchase_date' => 'nullable|date',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'purchase_currency' => 'nullable|string|size:3',
-            'is_gift' => 'nullable|boolean',
-            'purchase_location' => 'nullable|string|max:255',
-            'shelf_id' => ['nullable', $this->ownedRule('shelves', $request->user()->id)],
-            'position' => 'nullable|integer|min:0',
-        ]);
+        Gate::authorize('create', Book::class);
 
-        $book = $this->bookService->createBook($data, $request->user()->id);
+        $book = $this->bookService->createBook($request->validated(), $request->user()->id);
 
         return response()->success($book, 'Book created successfully', Response::HTTP_CREATED);
     }
@@ -96,84 +68,35 @@ class BookController extends Controller
     /**
      * Display the specified book.
      */
-    public function show(Request $request, $id)
+    public function show(Book $book)
     {
-        // SECURITY: Pass user ID to service for filtering
-        $book = $this->bookService->getBook($id, $request->user()->id);
+        Gate::authorize('view', $book);
 
-        return response()->success($book, 'Book retrieved successfully');
+        return response()->success($book->load(['shelf', 'collections']), 'Book retrieved successfully');
     }
 
     /**
      * Update the specified book.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateBookRequest $request, Book $book)
     {
-        $userId = $request->user()->id;
+        Gate::authorize('update', $book);
 
-        // SECURITY: Pass user ID to service for filtering
-        $this->bookService->getBook($id, $userId);
+        $updatedBook = $this->bookService->updateBook(
+            $book->id,
+            $request->normalizedPayload(),
+            $request->user()->id
+        );
 
-        $data = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'author' => 'sometimes|required|string|max:255',
-            'isbn' => 'nullable|string|max:50',
-            'genre' => 'nullable|string|max:100',
-            'language' => 'nullable|string|max:50',
-            'publisher' => 'nullable|string|max:255',
-            'publish_year' => 'nullable|integer|min:1000|max:2999',
-            'pages' => 'nullable|integer|min:1',
-            'format' => 'nullable|in:hardcover,paperback,ebook,audiobook',
-            'spine_color_light' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'spine_color_medium' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'spine_color_dark' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
-            'height' => 'nullable|in:short,medium,tall',
-            'thickness' => 'nullable|in:thin,regular,thick',
-            'status' => 'nullable|in:unread,reading,finished,wishlist,borrowed',
-            'favorite' => 'nullable|boolean',
-            'current_page' => 'nullable|integer|min:0',
-            'progress' => 'nullable|numeric|between:0,100',
-            'started_date' => 'nullable|date',
-            'finished_date' => 'nullable|date|after:started_date',
-            'purchase_date' => 'nullable|date',
-            'purchase_price' => 'nullable|numeric|min:0',
-            'purchase_currency' => 'nullable|string|size:3',
-            'is_gift' => 'nullable|boolean',
-            'purchase_location' => 'nullable|string|max:255',
-            'personal_notes' => 'nullable|string',
-            'personal_rating' => 'nullable|numeric|between:0,5',
-            'rating' => 'nullable|numeric|between:0,5',
-            'notes' => 'nullable|string',
-            'read_dates' => 'nullable|array',
-            'read_dates.*' => 'date',
-            'shelf_id' => ['nullable', $this->ownedRule('shelves', $userId)],
-        ]);
-
-        // Map legacy API field aliases to actual database columns
-        if (array_key_exists('rating', $data) && ! array_key_exists('personal_rating', $data)) {
-            $data['personal_rating'] = $data['rating'];
-        }
-        if (array_key_exists('notes', $data) && ! array_key_exists('personal_notes', $data)) {
-            $data['personal_notes'] = $data['notes'];
-        }
-        unset($data['rating'], $data['notes']);
-
-        // SECURITY: Pass user ID to service for filtering
-        $book = $this->bookService->updateBook($id, $data, $userId);
-
-        return response()->success($book, 'Book updated successfully');
+        return response()->success($updatedBook, 'Book updated successfully');
     }
 
     /**
      * Upload or replace book cover image.
      */
-    public function uploadCover(Request $request, $id)
+    public function uploadCover(UploadBookCoverRequest $request, Book $book)
     {
-        $book = $this->bookService->getBook($id, $request->user()->id);
-
-        $request->validate([
-            'cover' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120', // max 5MB
-        ]);
+        Gate::authorize('update', $book);
 
         // Delete old cover from public disk if exists
         if ($book->cover_image) {
@@ -202,11 +125,11 @@ class BookController extends Controller
     /**
      * Remove the specified book (soft delete).
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
-        $this->bookService->deleteBook($id, $userId);
+        Gate::authorize('delete', $book);
+
+        $this->bookService->deleteBook($book->id, $request->user()->id);
 
         return response()->success(null, 'Book deleted successfully');
     }
@@ -214,11 +137,11 @@ class BookController extends Controller
     /**
      * Start reading a book.
      */
-    public function start(Request $request, $id)
+    public function start(Request $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
-        $updatedBook = $this->bookService->startReading($id, $userId);
+        Gate::authorize('update', $book);
+
+        $updatedBook = $this->bookService->startReading($book->id, $request->user()->id);
 
         return response()->success($updatedBook, 'Started reading book');
     }
@@ -226,11 +149,11 @@ class BookController extends Controller
     /**
      * Finish reading a book.
      */
-    public function finish(Request $request, $id)
+    public function finish(Request $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
-        $updatedBook = $this->bookService->finishReading($id, $userId);
+        Gate::authorize('update', $book);
+
+        $updatedBook = $this->bookService->finishReading($book->id, $request->user()->id);
 
         return response()->success($updatedBook, 'Finished reading book');
     }
@@ -238,16 +161,15 @@ class BookController extends Controller
     /**
      * Update reading progress.
      */
-    public function updateProgress(Request $request, $id)
+    public function updateProgress(UpdateBookProgressRequest $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
+        Gate::authorize('update', $book);
 
-        $data = $request->validate([
-            'current_page' => 'required|integer|min:0',
-        ]);
-
-        $updatedBook = $this->bookService->updateProgress($id, $data['current_page'], $userId);
+        $updatedBook = $this->bookService->updateProgress(
+            $book->id,
+            $request->validated('current_page'),
+            $request->user()->id
+        );
 
         return response()->success($updatedBook, 'Progress updated successfully');
     }
@@ -255,11 +177,11 @@ class BookController extends Controller
     /**
      * Toggle favorite status.
      */
-    public function toggleFavorite(Request $request, $id)
+    public function toggleFavorite(Request $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
-        $updatedBook = $this->bookService->toggleFavorite($id, $userId);
+        Gate::authorize('update', $book);
+
+        $updatedBook = $this->bookService->toggleFavorite($book->id, $request->user()->id);
 
         return response()->success($updatedBook, 'Favorite status updated');
     }
@@ -267,16 +189,15 @@ class BookController extends Controller
     /**
      * Update personal notes.
      */
-    public function updateNotes(Request $request, $id)
+    public function updateNotes(UpdateBookNotesRequest $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
+        Gate::authorize('update', $book);
 
-        $data = $request->validate([
-            'notes' => 'required|string',
-        ]);
-
-        $updatedBook = $this->bookService->updateNotes($id, $data['notes'], $userId);
+        $updatedBook = $this->bookService->updateNotes(
+            $book->id,
+            $request->validated('notes'),
+            $request->user()->id
+        );
 
         return response()->success($updatedBook, 'Notes updated successfully');
     }
@@ -284,16 +205,15 @@ class BookController extends Controller
     /**
      * Update personal rating.
      */
-    public function updateRating(Request $request, $id)
+    public function updateRating(UpdateBookRatingRequest $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
+        Gate::authorize('update', $book);
 
-        $data = $request->validate([
-            'rating' => 'required|numeric|between:0,5',
-        ]);
-
-        $updatedBook = $this->bookService->updateRating($id, $data['rating'], $userId);
+        $updatedBook = $this->bookService->updateRating(
+            $book->id,
+            $request->validated('rating'),
+            $request->user()->id
+        );
 
         return response()->success($updatedBook, 'Rating updated successfully');
     }
@@ -301,17 +221,17 @@ class BookController extends Controller
     /**
      * Move book to different shelf.
      */
-    public function moveToShelf(Request $request, $id)
+    public function moveToShelf(MoveBookToShelfRequest $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
+        Gate::authorize('update', $book);
 
-        $data = $request->validate([
-            'shelf_id' => ['required', $this->ownedRule('shelves', $userId)],
-            'position' => 'nullable|integer|min:0',
-        ]);
-
-        $updatedBook = $this->bookService->moveToShelf($id, $data['shelf_id'], $data['position'] ?? null, $userId);
+        $data = $request->validated();
+        $updatedBook = $this->bookService->moveToShelf(
+            $book->id,
+            $data['shelf_id'],
+            $data['position'] ?? null,
+            $request->user()->id
+        );
 
         return response()->success($updatedBook, 'Book moved to shelf successfully');
     }
@@ -319,17 +239,17 @@ class BookController extends Controller
     /**
      * Borrow book to someone.
      */
-    public function borrow(Request $request, $id)
+    public function borrow(BorrowBookRequest $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
+        Gate::authorize('update', $book);
 
-        $data = $request->validate([
-            'borrowed_by' => 'required|string|max:255',
-            'due_date' => 'required|date|after:today',
-        ]);
-
-        $updatedBook = $this->bookService->borrowBook($id, $data['borrowed_by'], $data['due_date'], $userId);
+        $data = $request->validated();
+        $updatedBook = $this->bookService->borrowBook(
+            $book->id,
+            $data['borrowed_by'],
+            $data['due_date'],
+            $request->user()->id
+        );
 
         return response()->success($updatedBook, 'Book borrowed successfully');
     }
@@ -337,11 +257,11 @@ class BookController extends Controller
     /**
      * Return borrowed book.
      */
-    public function returnBook(Request $request, $id)
+    public function returnBook(Request $request, Book $book)
     {
-        $userId = $request->user()->id;
-        $this->bookService->getBook($id, $userId);
-        $updatedBook = $this->bookService->returnBook($id, $userId);
+        Gate::authorize('update', $book);
+
+        $updatedBook = $this->bookService->returnBook($book->id, $request->user()->id);
 
         return response()->success($updatedBook, 'Book returned successfully');
     }
@@ -349,24 +269,20 @@ class BookController extends Controller
     /**
      * Start a reading session for a book.
      */
-    public function startReadingSession(Request $request, $id)
+    public function startReadingSession(StartBookReadingSessionRequest $request, Book $book)
     {
-        $book = $this->bookService->getBook($id, $request->user()->id);
+        Gate::authorize('update', $book);
 
-        $data = $request->validate([
-            'start_page' => 'required|integer|min:0',
-            'mood' => 'nullable|in:great,good,okay,difficult',
-            'location' => 'nullable|string|max:255',
-        ]);
+        $userId = $request->user()->id;
+        $data = $request->validated();
 
-        // Check if there's an active session
-        if ($this->readingSessionService->hasActiveSession($book, $request->user()->id)) {
+        if ($this->readingSessionService->hasActiveSession($book, $userId)) {
             return response()->error('You have an active reading session for this book', null, Response::HTTP_CONFLICT);
         }
 
         $session = $this->readingSessionService->startSession(
             $book,
-            $request->user()->id,
+            $userId,
             $data['start_page'],
             $data['mood'] ?? null,
             $data['location'] ?? null
@@ -378,22 +294,21 @@ class BookController extends Controller
     /**
      * Pause or resume the active reading session.
      */
-    public function pauseReadingSession(Request $request, $id, $sessionId)
+    public function pauseReadingSession(PauseReadingSessionRequest $request, Book $book, ReadingSession $session)
     {
-        $book = $this->bookService->getBook($id, $request->user()->id);
+        Gate::authorize('update', $book);
+        Gate::authorize('update', $session);
 
-        $session = ReadingSession::query()->where('user_id', $request->user()->id)
-            ->where('book_id', $book->id)
-            ->findOrFail($sessionId);
+        abort_unless($session->book_id === $book->id, 404);
 
-        $data = $request->validate([
-            'is_paused' => 'required|boolean',
-        ]);
-
-        $updatedSession = $this->readingSessionService->togglePause(
-            $session,
-            $data['is_paused']
-        );
+        try {
+            $updatedSession = $this->readingSessionService->togglePause(
+                $session,
+                $request->validated('is_paused')
+            );
+        } catch (\InvalidArgumentException $e) {
+            return response()->error($e->getMessage(), null, 400);
+        }
 
         return response()->success($updatedSession->load('book'), 'Reading session pause status updated');
     }
@@ -401,26 +316,25 @@ class BookController extends Controller
     /**
      * End a reading session.
      */
-    public function endReadingSession(Request $request, $id, $sessionId)
+    public function endReadingSession(EndBookReadingSessionRequest $request, Book $book, ReadingSession $session)
     {
-        $book = $this->bookService->getBook($id, $request->user()->id);
+        Gate::authorize('update', $book);
+        Gate::authorize('update', $session);
 
-        $data = $request->validate([
-            'end_page' => 'required|integer|min:0',
-            'notes' => 'nullable|string',
-        ]);
+        abort_unless($session->book_id === $book->id, 404);
 
-        $session = ReadingSession::query()->where('user_id', $request->user()->id)
-            ->where('book_id', $book->id)
-            ->findOrFail($sessionId);
+        $data = $request->validated();
 
-        $updatedSession = $this->readingSessionService->endSession(
-            $session,
-            $data['end_page'],
-            $data['notes'] ?? null
-        );
+        try {
+            $updatedSession = $this->readingSessionService->endSession(
+                $session,
+                $data['end_page'],
+                $data['notes'] ?? null
+            );
+        } catch (\InvalidArgumentException $e) {
+            return response()->error($e->getMessage(), null, 400);
+        }
 
-        // Sync book progress with the completed session
         $this->bookService->syncProgressFromSessions($book->id, $request->user()->id);
 
         return response()->success($updatedSession->load('book'), 'Reading session ended successfully');
@@ -429,12 +343,13 @@ class BookController extends Controller
     /**
      * Get reading sessions for a book.
      */
-    public function getBookReadingSessions(Request $request, $id)
+    public function getBookReadingSessions(Request $request, Book $book)
     {
-        $book = $this->bookService->getBook($id, $request->user()->id);
+        Gate::authorize('view', $book);
 
-        $sessions = $this->readingSessionService->getBookSessions($book, $request->user()->id);
-        $statistics = $this->readingSessionService->getBookStatistics($book, $request->user()->id);
+        $userId = $request->user()->id;
+        $sessions = $this->readingSessionService->getBookSessions($book, $userId);
+        $statistics = $this->readingSessionService->getBookStatistics($book, $userId);
 
         return response()->success([
             'sessions' => $sessions,
@@ -445,9 +360,11 @@ class BookController extends Controller
     /**
      * Read Again - Restart a finished book.
      */
-    public function readAgain(Request $request, $id)
+    public function readAgain(Request $request, Book $book)
     {
-        $updatedBook = $this->bookService->readAgain($id, $request->user()->id);
+        Gate::authorize('update', $book);
+
+        $updatedBook = $this->bookService->readAgain($book->id, $request->user()->id);
 
         return response()->success($updatedBook, 'Book restarted successfully');
     }
@@ -455,16 +372,14 @@ class BookController extends Controller
     /**
      * Get expenses for a specific book.
      */
-    public function getExpenses(Request $request, $id)
+    public function getExpenses(Book $book)
     {
-        try {
-            $book = $this->bookService->getBook($id, $request->user()->id);
+        Gate::authorize('view', $book);
 
+        try {
             $expenses = $book->expenses()->with(['category'])->get();
 
             return response()->success($expenses, 'Book expenses retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Book not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BookController::getExpenses failed');
         }
@@ -473,11 +388,11 @@ class BookController extends Controller
     /**
      * Get cost breakdown for a specific book.
      */
-    public function getCostBreakdown(Request $request, $id)
+    public function getCostBreakdown(Book $book)
     {
-        try {
-            $book = $this->bookService->getBook($id, $request->user()->id);
+        Gate::authorize('view', $book);
 
+        try {
             $breakdown = [
                 'book_id' => $book->id,
                 'title' => $book->title,
@@ -499,8 +414,6 @@ class BookController extends Controller
             ];
 
             return response()->success($breakdown, 'Book cost breakdown retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Book not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BookController::getCostBreakdown failed');
         }
@@ -515,7 +428,6 @@ class BookController extends Controller
             $months = $request->query('months', 12);
             $userId = $request->user()->id;
 
-            // Get books with purchase data, ordered by date
             $books = Book::query()->where('user_id', $userId)
                 ->whereNotNull('purchase_date')
                 ->whereNotNull('purchase_price')
@@ -526,7 +438,6 @@ class BookController extends Controller
                 return response()->success([], 'No purchase data available');
             }
 
-            // Group by month
             $purchaseHistory = [];
             $indonesianMonths = [
                 'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret',
@@ -561,7 +472,6 @@ class BookController extends Controller
                     'purchase_date' => $book->purchase_date,
                 ];
 
-                // Convert to IDR if needed (assuming 1 USD = 15000 IDR for now)
                 $amountInIdr = $book->purchase_price;
                 if ($book->purchase_currency === 'USD') {
                     $amountInIdr = $book->purchase_price * 15000;
@@ -570,7 +480,6 @@ class BookController extends Controller
                 $purchaseHistory[$monthKey]['total_amount'] += $amountInIdr;
             }
 
-            // Calculate averages and format amounts
             foreach ($purchaseHistory as &$month) {
                 if ($month['book_count'] > 0) {
                     $month['average_price'] = $month['total_amount'] / $month['book_count'];
@@ -578,10 +487,8 @@ class BookController extends Controller
                 }
             }
 
-            // Sort by month (oldest first for proper line chart display)
-            ksort($purchaseHistory); // Sort keys in ascending order (chronological)
+            ksort($purchaseHistory);
 
-            // Limit to requested months (most recent ones)
             $result = array_slice(array_values($purchaseHistory), -$months, $months);
 
             return response()->success($result, 'Purchase history retrieved successfully');

@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Reading\PauseReadingSessionRequest;
+use App\Http\Requests\Api\V1\Reading\StoreReadingSessionRequest;
+use App\Http\Requests\Api\V1\Reading\UpdateReadingSessionRequest;
 use App\Models\ReadingSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 class ReadingSessionController extends Controller
@@ -27,21 +31,15 @@ class ReadingSessionController extends Controller
     /**
      * Store a newly created reading session.
      */
-    public function store(Request $request)
+    public function store(StoreReadingSessionRequest $request)
     {
-        $userId = $request->user()->id;
+        Gate::authorize('create', ReadingSession::class);
 
-        $data = $request->validate([
-            'book_id' => ['required', $this->ownedRule('books', $userId)],
-            'start_time' => 'required|date',
-            'start_page' => 'required|integer|min:0',
-            'mood' => 'nullable|in:great,good,okay,difficult',
-            'location' => 'nullable|string|max:255',
-        ]);
+        $data = $request->validated();
 
         $session = ReadingSession::create([
             'id' => Str::uuid()->toString(),
-            'user_id' => $userId,
+            'user_id' => $request->user()->id,
             'book_id' => $data['book_id'],
             'start_time' => $data['start_time'],
             'start_page' => $data['start_page'],
@@ -55,89 +53,66 @@ class ReadingSessionController extends Controller
     /**
      * Display the specified reading session.
      */
-    public function show(Request $request, $id)
+    public function show(ReadingSession $readingSession)
     {
-        $session = ReadingSession::where('user_id', $request->user()->id)
-            ->with('book')
-            ->findOrFail($id);
+        Gate::authorize('view', $readingSession);
 
-        return response()->success($session, 'Reading session retrieved successfully');
+        return response()->success($readingSession->load('book'), 'Reading session retrieved successfully');
     }
 
     /**
      * Pause the active reading session.
      */
-    public function pause(Request $request, $id)
+    public function pause(PauseReadingSessionRequest $request, ReadingSession $readingSession)
     {
-        $session = ReadingSession::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('update', $readingSession);
 
-        if ($session->end_time) {
+        if ($readingSession->end_time) {
             return response()->error('Cannot pause an already ended session', null, 400);
         }
 
-        $data = $request->validate([
-            'is_paused' => 'required|boolean',
-        ]);
-
-        if ($data['is_paused']) {
-            if (! $session->is_paused) {
-                // We are pausing
-                $session->is_paused = true;
-                $session->last_paused_at = now();
+        if ($request->validated('is_paused')) {
+            if (! $readingSession->is_paused) {
+                $readingSession->is_paused = true;
+                $readingSession->last_paused_at = now();
             }
-        } else {
-            if ($session->is_paused) {
-                // We are resuming
-                $session->is_paused = false;
-                if ($session->last_paused_at) {
-                    $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds(now());
-                    $session->paused_seconds += $pausedDuration;
-                }
+        } elseif ($readingSession->is_paused) {
+            $readingSession->is_paused = false;
+            if ($readingSession->last_paused_at) {
+                $readingSession->paused_seconds += Carbon::parse($readingSession->last_paused_at)->diffInSeconds(now());
             }
         }
 
-        $session->save();
+        $readingSession->save();
 
-        return response()->success($session->load('book'), 'Reading session pause status updated');
+        return response()->success($readingSession->load('book'), 'Reading session pause status updated');
     }
 
     /**
      * Update the specified reading session (typically to end it).
      */
-    public function update(Request $request, $id)
+    public function update(UpdateReadingSessionRequest $request, ReadingSession $readingSession)
     {
-        // Add ownership check
-        $session = ReadingSession::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('update', $readingSession);
 
-        $data = $request->validate([
-            'end_time' => 'required|date',
-            'end_page' => 'required|integer|min:0',
-            'notes' => 'nullable|string',
-        ]);
-
+        $data = $request->validated();
         $endTime = Carbon::parse($data['end_time']);
 
-        // Calculate any unrecorded paused time if it was paused when ending
-        if ($session->is_paused && $session->last_paused_at) {
-            $pausedDuration = Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
-            $session->paused_seconds += $pausedDuration;
-            $session->is_paused = false;
+        if ($readingSession->is_paused && $readingSession->last_paused_at) {
+            $readingSession->paused_seconds += Carbon::parse($readingSession->last_paused_at)->diffInSeconds($endTime);
+            $readingSession->is_paused = false;
         }
 
-        // Calculate duration using actual end_time from request minus total paused_seconds
-        $startTime = Carbon::parse($session->start_time);
+        $startTime = Carbon::parse($readingSession->start_time);
+        $duration = max(0, (int) $startTime->diffInSeconds($endTime) - $readingSession->paused_seconds);
 
-        $duration = max(0, (int) $startTime->diffInSeconds($endTime) - $session->paused_seconds);
-
-        $session->update([
+        $readingSession->update([
             'end_time' => $data['end_time'],
             'end_page' => $data['end_page'],
             'notes' => $data['notes'] ?? null,
             'duration' => $duration,
         ]);
 
-        return response()->success($session->load('book'), 'Reading session updated successfully');
+        return response()->success($readingSession->load('book'), 'Reading session updated successfully');
     }
 }

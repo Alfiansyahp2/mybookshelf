@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Accounting\StoreBudgetRequest;
+use App\Http\Requests\Api\V1\Accounting\TopSpendingCategoriesRequest;
+use App\Http\Requests\Api\V1\Accounting\UpdateBudgetRequest;
+use App\Models\Budget;
 use App\Services\BudgetService;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Gate;
 
 class BudgetController extends Controller
 {
@@ -45,29 +48,14 @@ class BudgetController extends Controller
     /**
      * Store a newly created budget.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreBudgetRequest $request): JsonResponse
     {
+        Gate::authorize('create', Budget::class);
+
         try {
-            $userId = Auth::id();
-
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'amount' => 'required|numeric|min:0',
-                'currency' => 'nullable|string|size:3',
-                'period' => 'nullable|in:daily,weekly,monthly,yearly',
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date|after:start_date',
-                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
-                'alert_threshold' => 'nullable|numeric|min:1|max:100',
-                'is_active' => 'nullable|boolean',
-            ]);
-
-            $budget = $this->budgetService->createBudget($validated, $userId);
+            $budget = $this->budgetService->createBudget($request->validated(), $request->user()->id);
 
             return response()->success($budget, 'Budget created successfully', 201);
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::store failed');
         }
@@ -76,47 +64,24 @@ class BudgetController extends Controller
     /**
      * Display the specified budget.
      */
-    public function show(string $id): JsonResponse
+    public function show(Budget $budget): JsonResponse
     {
-        try {
-            $budget = $this->budgetService->getBudget($id, Auth::id());
+        Gate::authorize('view', $budget);
 
-            return response()->success($budget, 'Budget retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Budget not found');
-        } catch (\Exception $e) {
-            return $this->serverErrorResponse($e, 'BudgetController::show failed');
-        }
+        return response()->success($budget->load('category'), 'Budget retrieved successfully');
     }
 
     /**
      * Update the specified budget.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateBudgetRequest $request, Budget $budget): JsonResponse
     {
+        Gate::authorize('update', $budget);
+
         try {
-            $userId = Auth::id();
+            $updated = $this->budgetService->updateBudget($budget->id, $request->validated(), $request->user()->id);
 
-            $validated = $request->validate([
-                'name' => 'sometimes|required|string|max:255',
-                'description' => 'nullable|string',
-                'amount' => 'sometimes|required|numeric|min:0',
-                'currency' => 'nullable|string|size:3',
-                'period' => 'nullable|in:daily,weekly,monthly,yearly',
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date|after:start_date',
-                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
-                'alert_threshold' => 'nullable|numeric|min:1|max:100',
-                'is_active' => 'nullable|boolean',
-            ]);
-
-            $budget = $this->budgetService->updateBudget($id, $validated, $userId);
-
-            return response()->success($budget, 'Budget updated successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Budget not found');
+            return response()->success($updated, 'Budget updated successfully');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::update failed');
         }
@@ -125,14 +90,14 @@ class BudgetController extends Controller
     /**
      * Remove the specified budget.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(Budget $budget): JsonResponse
     {
+        Gate::authorize('delete', $budget);
+
         try {
-            $this->budgetService->deleteBudget($id, Auth::id());
+            $this->budgetService->deleteBudget($budget->id, Auth::id());
 
             return response()->success(null, 'Budget deleted successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::destroy failed');
         }
@@ -141,14 +106,14 @@ class BudgetController extends Controller
     /**
      * Get budget progress information.
      */
-    public function getProgress(string $id): JsonResponse
+    public function getProgress(Budget $budget): JsonResponse
     {
+        Gate::authorize('view', $budget);
+
         try {
-            $progress = $this->budgetService->getBudgetProgress($id, Auth::id());
+            $progress = $this->budgetService->getBudgetProgress($budget->id, Auth::id());
 
             return response()->success($progress, 'Budget progress retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::getProgress failed');
         }
@@ -157,8 +122,10 @@ class BudgetController extends Controller
     /**
      * Get expenses for a budget.
      */
-    public function getExpenses(Request $request, string $id): JsonResponse
+    public function getExpenses(Request $request, Budget $budget): JsonResponse
     {
+        Gate::authorize('view', $budget);
+
         try {
             $filters = [
                 'start_date' => $request->input('start_date'),
@@ -168,11 +135,9 @@ class BudgetController extends Controller
                 'per_page' => $request->input('per_page', 15),
             ];
 
-            $expenses = $this->budgetService->getExpensesForBudget($id, Auth::id(), $filters);
+            $expenses = $this->budgetService->getExpensesForBudget($budget->id, Auth::id(), $filters);
 
             return response()->success($expenses, 'Budget expenses retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::getExpenses failed');
         }
@@ -181,14 +146,14 @@ class BudgetController extends Controller
     /**
      * Reset budget period.
      */
-    public function resetPeriod(string $id): JsonResponse
+    public function resetPeriod(Budget $budget): JsonResponse
     {
-        try {
-            $budget = $this->budgetService->resetBudgetPeriod($id, Auth::id());
+        Gate::authorize('update', $budget);
 
-            return response()->success($budget, 'Budget period reset successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Budget not found');
+        try {
+            $resetBudget = $this->budgetService->resetBudgetPeriod($budget->id, Auth::id());
+
+            return response()->success($resetBudget, 'Budget period reset successfully');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::resetPeriod failed');
         }
@@ -225,25 +190,19 @@ class BudgetController extends Controller
     /**
      * Get top spending categories.
      */
-    public function getTopSpendingCategories(Request $request): JsonResponse
+    public function getTopSpendingCategories(TopSpendingCategoriesRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date',
-                'limit' => 'nullable|integer|min:1|max:20',
-            ]);
+            $validated = $request->validated();
 
             $topCategories = $this->budgetService->getTopSpendingCategories(
-                Auth::id(),
+                $request->user()->id,
                 $validated['start_date'] ?? null,
                 $validated['end_date'] ?? null,
                 $validated['limit'] ?? 5
             );
 
             return response()->success($topCategories, 'Top spending categories retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::getTopSpendingCategories failed');
         }
@@ -252,14 +211,14 @@ class BudgetController extends Controller
     /**
      * Get budget performance trends.
      */
-    public function getPerformanceTrends(string $id): JsonResponse
+    public function getPerformanceTrends(Budget $budget): JsonResponse
     {
+        Gate::authorize('view', $budget);
+
         try {
-            $trends = $this->budgetService->getBudgetPerformanceTrends($id, Auth::id());
+            $trends = $this->budgetService->getBudgetPerformanceTrends($budget->id, Auth::id());
 
             return response()->success($trends, 'Budget performance trends retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Budget not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'BudgetController::getPerformanceTrends failed');
         }

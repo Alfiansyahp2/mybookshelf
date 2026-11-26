@@ -4,31 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
-use Illuminate\Validation\ValidationException;
 
 abstract class Controller
 {
-    /**
-     * Build a Rule::exists scoped to the authenticated user's records.
-     */
-    protected function ownedRule(string $table, ?string $userId = null): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            'user_id',
-            $userId ?? auth()->id()
-        );
-    }
-
-    /**
-     * Return a standardized 422 validation error response.
-     */
-    protected function validationErrorResponse(ValidationException $e): JsonResponse
-    {
-        return response()->error('Validation failed', $e->errors(), 422);
-    }
-
     /**
      * Return a standardized 404 not found error response.
      */

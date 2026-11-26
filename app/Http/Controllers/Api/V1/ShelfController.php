@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Library\DeleteShelfRequest;
+use App\Http\Requests\Api\V1\Library\StoreShelfRequest;
+use App\Http\Requests\Api\V1\Library\UpdateShelfLayoutRequest;
+use App\Http\Requests\Api\V1\Library\UpdateShelfRequest;
 use App\Models\Book;
-use App\Models\Room;
 use App\Models\Shelf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ShelfController extends Controller
 {
@@ -16,8 +20,7 @@ class ShelfController extends Controller
      */
     public function index(Request $request)
     {
-        // SECURITY: Only show shelves belonging to authenticated user
-        $shelves = Shelf::with(['room', 'books'])
+        $shelves = Shelf::with('books')
             ->where('user_id', $request->user()->id)
             ->orderBy('order')
             ->latest()
@@ -29,86 +32,50 @@ class ShelfController extends Controller
     /**
      * Store a newly created shelf.
      */
-    public function store(Request $request)
+    public function store(StoreShelfRequest $request)
     {
-        $user = $request->user();
+        Gate::authorize('create', Shelf::class);
 
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'capacity' => 'required|integer|min:1',
-            'order' => 'nullable|integer|min:0',
-            'span' => 'nullable|integer|min:2|max:12',
-            'room_id' => ['nullable', $this->ownedRule('rooms', $user->id)],
-        ]);
-
-        // SECURITY: Set user_id to authenticated user
-        $data['user_id'] = $user->id;
-
-        if (empty($data['room_id'])) {
-            $room = Room::firstOrCreate(
-                ['user_id' => $user->id],
-                ['name' => 'Main Room', 'order' => 0, 'unlocked' => true]
-            );
-            $data['room_id'] = $room->id;
-        }
+        $data = $request->validated();
+        $data['user_id'] = $request->user()->id;
 
         $shelf = Shelf::create($data);
 
-        return response()->success($shelf->load(['room', 'books']), 'Shelf created successfully', 201);
+        return response()->success($shelf->load('books'), 'Shelf created successfully', 201);
     }
 
     /**
      * Display the specified shelf.
      */
-    public function show(Request $request, $id)
+    public function show(Shelf $shelf)
     {
-        // SECURITY: Only allow user to see their own shelves
-        $shelf = Shelf::with(['room', 'books'])
-            ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('view', $shelf);
 
-        return response()->success($shelf, 'Shelf retrieved successfully');
+        return response()->success($shelf->load('books'), 'Shelf retrieved successfully');
     }
 
     /**
      * Update the specified shelf.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateShelfRequest $request, Shelf $shelf)
     {
-        $userId = $request->user()->id;
+        Gate::authorize('update', $shelf);
 
-        // SECURITY: Only allow user to update their own shelves
-        $shelf = Shelf::where('user_id', $userId)->findOrFail($id);
+        $shelf->update($request->validated());
 
-        $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'capacity' => 'sometimes|integer|min:1',
-            'order' => 'sometimes|integer|min:0',
-            'span' => 'sometimes|integer|min:2|max:12',
-            'room_id' => ['sometimes', $this->ownedRule('rooms', $userId)],
-            'decorations' => 'sometimes|array|nullable',
-        ]);
-
-        $shelf->update($data);
-
-        return response()->success($shelf->load(['room', 'books']), 'Shelf updated successfully');
+        return response()->success($shelf->load('books'), 'Shelf updated successfully');
     }
 
     /**
      * Remove the specified shelf and safely relocate its books if another shelf exists.
      */
-    public function destroy(Request $request, $id)
+    public function destroy(DeleteShelfRequest $request, Shelf $shelf)
     {
+        Gate::authorize('delete', $shelf);
+
         $userId = $request->user()->id;
+        $targetShelfId = $request->validated('relocate_to');
 
-        // SECURITY: Only allow user to delete their own shelves
-        $shelf = Shelf::where('user_id', $userId)->findOrFail($id);
-
-        $validated = $request->validate([
-            'relocate_to' => ['nullable', $this->ownedRule('shelves', $userId)],
-        ]);
-
-        $targetShelfId = $validated['relocate_to'] ?? null;
         if ($targetShelfId === $shelf->id) {
             return response()->error('Cannot relocate books to the shelf being deleted', null, 422);
         }
@@ -139,12 +106,11 @@ class ShelfController extends Controller
     /**
      * Get shelf occupancy statistics.
      */
-    public function occupancy(Request $request, $id)
+    public function occupancy(Shelf $shelf)
     {
-        // SECURITY: Only allow user to see their own shelves
-        $shelf = Shelf::with('books')
-            ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        Gate::authorize('view', $shelf);
+
+        $shelf->load('books');
 
         $occupancy = [
             'shelf_id' => $shelf->id,
@@ -163,19 +129,11 @@ class ShelfController extends Controller
     /**
      * Batch update shelf layout (span and order).
      */
-    public function updateLayout(Request $request)
+    public function updateLayout(UpdateShelfLayoutRequest $request)
     {
-        $data = $request->validate([
-            'shelves' => 'required|array',
-            'shelves.*.id' => 'required|uuid',
-            'shelves.*.order' => 'required|integer',
-            'shelves.*.span' => 'required|integer|min:2|max:12',
-        ]);
-
         $userId = $request->user()->id;
 
-        // Perform batch update
-        foreach ($data['shelves'] as $shelfData) {
+        foreach ($request->validated('shelves') as $shelfData) {
             Shelf::where('id', $shelfData['id'])
                 ->where('user_id', $userId)
                 ->update([

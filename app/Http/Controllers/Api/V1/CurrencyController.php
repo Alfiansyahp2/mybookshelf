@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Accounting\BulkUpsertCurrencyRatesRequest;
+use App\Http\Requests\Api\V1\Accounting\ConvertCurrencyRequest;
+use App\Http\Requests\Api\V1\Accounting\CurrencyCodeRequest;
+use App\Http\Requests\Api\V1\Accounting\CurrencyPairRequest;
+use App\Http\Requests\Api\V1\Accounting\DeactivateOldCurrencyRatesRequest;
+use App\Http\Requests\Api\V1\Accounting\HistoricalCurrencyRatesRequest;
+use App\Http\Requests\Api\V1\Accounting\SetCurrencyRateRequest;
 use App\Services\CurrencyRateService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class CurrencyController extends Controller
 {
@@ -34,13 +39,10 @@ class CurrencyController extends Controller
     /**
      * Get rate for specific currency pair.
      */
-    public function getRate(Request $request): JsonResponse
+    public function getRate(CurrencyPairRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'from_currency' => 'required|string|size:3',
-                'to_currency' => 'nullable|string|size:3',
-            ]);
+            $validated = $request->validated();
 
             $rate = $this->currencyRateService->getRate(
                 $validated['from_currency'],
@@ -52,8 +54,6 @@ class CurrencyController extends Controller
             }
 
             return response()->success($rate, 'Currency rate retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::getRate failed');
         }
@@ -62,17 +62,10 @@ class CurrencyController extends Controller
     /**
      * Set or update currency rate.
      */
-    public function setRate(Request $request): JsonResponse
+    public function setRate(SetCurrencyRateRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'from_currency' => 'required|string|size:3',
-                'to_currency' => 'nullable|string|size:3',
-                'rate' => 'required|numeric|min:0',
-                'effective_date' => 'nullable|date',
-                'expires_at' => 'nullable|date',
-                'force' => 'nullable|boolean',
-            ]);
+            $validated = $request->validated();
 
             $rate = $this->currencyRateService->setRate(
                 $validated['from_currency'],
@@ -86,8 +79,6 @@ class CurrencyController extends Controller
             );
 
             return response()->success($rate, 'Currency rate set successfully', 201);
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::setRate failed');
         }
@@ -96,14 +87,10 @@ class CurrencyController extends Controller
     /**
      * Convert amount between currencies.
      */
-    public function convert(Request $request): JsonResponse
+    public function convert(ConvertCurrencyRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'amount' => 'required|numeric|min:0',
-                'from_currency' => 'required|string|size:3',
-                'to_currency' => 'nullable|string|size:3',
-            ]);
+            $validated = $request->validated();
 
             $conversion = $this->currencyRateService->convertAmount(
                 $validated['amount'],
@@ -112,8 +99,6 @@ class CurrencyController extends Controller
             );
 
             return response()->success($conversion, 'Currency converted successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::convert failed');
         }
@@ -136,14 +121,10 @@ class CurrencyController extends Controller
     /**
      * Get historical rates for a currency pair.
      */
-    public function getHistoricalRates(Request $request): JsonResponse
+    public function getHistoricalRates(HistoricalCurrencyRatesRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'from_currency' => 'required|string|size:3',
-                'to_currency' => 'nullable|string|size:3',
-                'date' => 'nullable|date',
-            ]);
+            $validated = $request->validated();
 
             $rates = $this->currencyRateService->getHistoricalRates(
                 $validated['from_currency'],
@@ -152,8 +133,6 @@ class CurrencyController extends Controller
             );
 
             return response()->success($rates, 'Historical rates retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::getHistoricalRates failed');
         }
@@ -162,23 +141,12 @@ class CurrencyController extends Controller
     /**
      * Bulk upsert currency rates.
      */
-    public function bulkUpsertRates(Request $request): JsonResponse
+    public function bulkUpsertRates(BulkUpsertCurrencyRatesRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'rates' => 'required|array|min:1',
-                'rates.*.from_currency' => 'required|string|size:3',
-                'rates.*.to_currency' => 'nullable|string|size:3',
-                'rates.*.rate' => 'required|numeric|min:0',
-                'rates.*.effective_date' => 'nullable|date',
-                'rates.*.expires_at' => 'nullable|date',
-            ]);
-
-            $results = $this->currencyRateService->bulkUpsertRates($validated['rates']);
+            $results = $this->currencyRateService->bulkUpsertRates($request->validated('rates'));
 
             return response()->success($results, 'Currency rates bulk upserted successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::bulkUpsertRates failed');
         }
@@ -201,22 +169,16 @@ class CurrencyController extends Controller
     /**
      * Get currency information by code.
      */
-    public function getCurrencyInfo(Request $request): JsonResponse
+    public function getCurrencyInfo(CurrencyCodeRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'currency_code' => 'required|string|size:3',
-            ]);
-
-            $currencyInfo = $this->currencyRateService->getCurrencyInfo($validated['currency_code']);
+            $currencyInfo = $this->currencyRateService->getCurrencyInfo($request->validated('currency_code'));
 
             if (! $currencyInfo) {
                 return $this->notFoundResponse('Currency not found');
             }
 
             return response()->success($currencyInfo, 'Currency information retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::getCurrencyInfo failed');
         }
@@ -225,21 +187,16 @@ class CurrencyController extends Controller
     /**
      * Validate currency code.
      */
-    public function validateCurrency(Request $request): JsonResponse
+    public function validateCurrency(CurrencyCodeRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'currency_code' => 'required|string|size:3',
-            ]);
-
-            $isValid = $this->currencyRateService->isValidCurrency($validated['currency_code']);
+            $code = $request->validated('currency_code');
+            $isValid = $this->currencyRateService->isValidCurrency($code);
 
             return response()->success([
-                'currency_code' => $validated['currency_code'],
+                'currency_code' => $code,
                 'is_valid' => $isValid,
             ], 'Currency validation completed successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::validateCurrency failed');
         }
@@ -248,22 +205,16 @@ class CurrencyController extends Controller
     /**
      * Deactivate old currency rates.
      */
-    public function deactivateOldRates(Request $request): JsonResponse
+    public function deactivateOldRates(DeactivateOldCurrencyRatesRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'days_to_keep' => 'nullable|integer|min:1|max:365',
-            ]);
-
             $deactivatedCount = $this->currencyRateService->deactivateOldRates(
-                $validated['days_to_keep'] ?? 30
+                $request->validated('days_to_keep') ?? 30
             );
 
             return response()->success([
                 'deactivated_count' => $deactivatedCount,
             ], 'Old currency rates deactivated successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'CurrencyController::deactivateOldRates failed');
         }

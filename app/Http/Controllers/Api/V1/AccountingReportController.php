@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Accounting\AccountingOverviewRequest;
+use App\Http\Requests\Api\V1\Accounting\BudgetTrackingRequest;
+use App\Http\Requests\Api\V1\Accounting\DateRangeRequest;
+use App\Http\Requests\Api\V1\Accounting\ExpensesByPeriodRequest;
+use App\Http\Requests\Api\V1\Accounting\ExportReportRequest;
+use App\Http\Requests\Api\V1\Accounting\MonthlyComparisonRequest;
+use App\Http\Requests\Api\V1\Accounting\ReportCategoryFilterRequest;
 use App\Models\Expense;
 use App\Services\BudgetService;
 use App\Services\ExpenseService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class AccountingReportController extends Controller
 {
@@ -28,26 +33,19 @@ class AccountingReportController extends Controller
     /**
      * Get accounting overview/dashboard data.
      */
-    public function overview(Request $request): JsonResponse
+    public function overview(AccountingOverviewRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date',
-                'period' => 'nullable|in:today,week,month,year,all',
-            ]);
+            $validated = $request->validated();
+            $userId = $request->user()->id;
 
-            $userId = Auth::id();
-
-            // Determine date range based on period
             $startDate = $validated['start_date'] ?? null;
             $endDate = $validated['end_date'] ?? null;
 
             if (isset($validated['period'])) {
-                $period = $validated['period'];
                 $now = now();
 
-                switch ($period) {
+                switch ($validated['period']) {
                     case 'today':
                         $startDate = $now->copy()->startOfDay();
                         $endDate = $now->copy()->endOfDay();
@@ -71,16 +69,10 @@ class AccountingReportController extends Controller
                 }
             }
 
-            // Get expense summary
             $totalExpenses = $this->expenseService->getTotalExpenses($userId, $startDate, $endDate);
-
-            // Get budget summary
             $budgetSummary = $this->budgetService->getBudgetSummary($userId);
-
-            // Get expenses by category
             $expensesByCategory = $this->expenseService->getExpensesByCategory($userId, $startDate, $endDate);
 
-            // Get recent expenses
             $recentExpenses = Expense::forUser($userId)
                 ->with(['category', 'book'])
                 ->completed()
@@ -91,15 +83,9 @@ class AccountingReportController extends Controller
                 ->limit(10)
                 ->get();
 
-            // Get top spending categories
             $topCategories = $this->budgetService->getTopSpendingCategories($userId, $startDate, $endDate, 5);
+            $pendingExpenses = Expense::forUser($userId)->where('status', 'pending')->count();
 
-            // Get pending expenses
-            $pendingExpenses = Expense::forUser($userId)
-                ->where('status', 'pending')
-                ->count();
-
-            // Get this month's expenses vs last month
             $thisMonthExpenses = Expense::forUser($userId)
                 ->completed()
                 ->inPeriod(now()->startOfMonth(), now()->endOfMonth())
@@ -135,8 +121,6 @@ class AccountingReportController extends Controller
             ];
 
             return response()->success($overview, 'Accounting overview retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'AccountingReportController::overview failed');
         }
@@ -145,33 +129,25 @@ class AccountingReportController extends Controller
     /**
      * Get expenses breakdown by category.
      */
-    public function expensesByCategory(Request $request): JsonResponse
+    public function expensesByCategory(ReportCategoryFilterRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id();
-            $validated = $request->validate([
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date',
-                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
-            ]);
+            $validated = $request->validated();
 
             $expenses = $this->expenseService->getExpensesByCategory(
-                $userId,
+                $request->user()->id,
                 $validated['start_date'] ?? null,
                 $validated['end_date'] ?? null
             );
 
-            // Filter by specific category if requested
             if (isset($validated['category_id'])) {
-                $expenses = array_filter($expenses, function ($expense) use ($validated) {
-                    return $expense['category_id'] === $validated['category_id'];
-                });
-                $expenses = array_values($expenses); // Re-index array
+                $expenses = array_values(array_filter(
+                    $expenses,
+                    fn ($expense) => $expense['category_id'] === $validated['category_id']
+                ));
             }
 
             return response()->success($expenses, 'Expenses by category retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'AccountingReportController::expensesByCategory failed');
         }
@@ -180,20 +156,13 @@ class AccountingReportController extends Controller
     /**
      * Get expenses breakdown by period.
      */
-    public function expensesByPeriod(Request $request): JsonResponse
+    public function expensesByPeriod(ExpensesByPeriodRequest $request): JsonResponse
     {
         try {
-            $userId = Auth::id();
-            $validated = $request->validate([
-                'start_date' => 'required|date',
-                'end_date' => 'required|date',
-                'group_by' => 'nullable|in:day,week,month,year',
-                'category_id' => ['nullable', 'uuid', $this->ownedRule('expense_categories', $userId)],
-            ]);
-
+            $validated = $request->validated();
             $groupBy = $validated['group_by'] ?? 'day';
 
-            $query = Expense::forUser($userId)
+            $query = Expense::forUser($request->user()->id)
                 ->with('category')
                 ->completed()
                 ->whereBetween('expense_date', [$validated['start_date'], $validated['end_date']]);
@@ -204,23 +173,15 @@ class AccountingReportController extends Controller
 
             $expenses = $query->get();
 
-            // Group expenses by period
             $groupedExpenses = $expenses->groupBy(function ($expense) use ($groupBy) {
-                switch ($groupBy) {
-                    case 'day':
-                        return $expense->expense_date->format('Y-m-d');
-                    case 'week':
-                        return $expense->expense_date->format('Y-W');
-                    case 'month':
-                        return $expense->expense_date->format('Y-m');
-                    case 'year':
-                        return $expense->expense_date->format('Y');
-                    default:
-                        return $expense->expense_date->format('Y-m-d');
-                }
+                return match ($groupBy) {
+                    'week' => $expense->expense_date->format('Y-W'),
+                    'month' => $expense->expense_date->format('Y-m'),
+                    'year' => $expense->expense_date->format('Y'),
+                    default => $expense->expense_date->format('Y-m-d'),
+                };
             });
 
-            // Calculate totals for each period
             $periodData = $groupedExpenses->map(function ($periodExpenses, $period) {
                 return [
                     'period' => $period,
@@ -240,8 +201,6 @@ class AccountingReportController extends Controller
             })->values()->sortBy('period')->toArray();
 
             return response()->success($periodData, 'Expenses by period retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'AccountingReportController::expensesByPeriod failed');
         }
@@ -250,15 +209,11 @@ class AccountingReportController extends Controller
     /**
      * Get budget tracking information.
      */
-    public function budgetTracking(Request $request): JsonResponse
+    public function budgetTracking(BudgetTrackingRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'is_active' => 'nullable|boolean',
-                'period' => 'nullable|in:daily,weekly,monthly,yearly',
-            ]);
-
-            $userId = Auth::id();
+            $validated = $request->validated();
+            $userId = $request->user()->id;
 
             $filters = [
                 'is_active' => $validated['is_active'] ?? true,
@@ -267,7 +222,6 @@ class AccountingReportController extends Controller
 
             $budgets = $this->budgetService->getAllBudgets($userId, $filters);
 
-            // Get detailed progress for each budget
             $budgetTracking = collect($budgets->items())->map(function ($budget) use ($userId) {
                 $progress = $this->budgetService->getBudgetProgress($budget->id, $userId);
 
@@ -277,8 +231,6 @@ class AccountingReportController extends Controller
             })->toArray();
 
             return response()->success($budgetTracking, 'Budget tracking retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'AccountingReportController::budgetTracking failed');
         }
@@ -287,19 +239,14 @@ class AccountingReportController extends Controller
     /**
      * Get payment methods analysis.
      */
-    public function paymentMethodsAnalysis(Request $request): JsonResponse
+    public function paymentMethodsAnalysis(DateRangeRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date',
-            ]);
-
-            $userId = Auth::id();
+            $validated = $request->validated();
             $startDate = $validated['start_date'] ?? null;
             $endDate = $validated['end_date'] ?? null;
 
-            $query = Expense::forUser($userId)
+            $query = Expense::forUser($request->user()->id)
                 ->completed()
                 ->selectRaw('payment_method, COUNT(*) as expense_count, SUM(amount_base_currency) as total_amount')
                 ->groupBy('payment_method');
@@ -309,7 +256,6 @@ class AccountingReportController extends Controller
             }
 
             $paymentMethods = $query->get();
-
             $totalAmount = $paymentMethods->sum('total_amount');
 
             $analysis = $paymentMethods->map(function ($method) use ($totalAmount) {
@@ -326,8 +272,6 @@ class AccountingReportController extends Controller
             })->sortByDesc('total_amount')->values()->toArray();
 
             return response()->success($analysis, 'Payment methods analysis retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'AccountingReportController::paymentMethodsAnalysis failed');
         }
@@ -336,16 +280,11 @@ class AccountingReportController extends Controller
     /**
      * Get monthly comparison data.
      */
-    public function monthlyComparison(Request $request): JsonResponse
+    public function monthlyComparison(MonthlyComparisonRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'months' => 'nullable|integer|min:1|max:12',
-            ]);
-
-            $userId = Auth::id();
-            $months = $validated['months'] ?? 6;
-
+            $userId = $request->user()->id;
+            $months = $request->validated('months') ?? 6;
             $monthlyData = [];
 
             for ($i = 0; $i < $months; $i++) {
@@ -373,12 +312,7 @@ class AccountingReportController extends Controller
                 ];
             }
 
-            // Reverse to show most recent first
-            $monthlyData = array_reverse($monthlyData);
-
-            return response()->success($monthlyData, 'Monthly comparison retrieved successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
+            return response()->success(array_reverse($monthlyData), 'Monthly comparison retrieved successfully');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'AccountingReportController::monthlyComparison failed');
         }
@@ -387,19 +321,10 @@ class AccountingReportController extends Controller
     /**
      * Export report data (placeholder for PDF/Excel export).
      */
-    public function export(Request $request): JsonResponse
+    public function export(ExportReportRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'report_type' => 'required|in:overview,expenses,budgets,payment_methods',
-                'format' => 'required|in:json,csv,excel,pdf',
-                'start_date' => 'nullable|date',
-                'end_date' => 'nullable|date',
-            ]);
-
-            // This is a placeholder for export functionality
-            // You would implement actual PDF/Excel generation here
-            // using libraries like dompdf, PHPSpreadsheet, etc.
+            $validated = $request->validated();
 
             return response()->success([
                 'message' => 'Export functionality placeholder',
@@ -410,9 +335,6 @@ class AccountingReportController extends Controller
                     'implementation_required' => 'Integrate with dompdf/PHPSpreadsheet libraries',
                 ],
             ], 'Export data prepared successfully');
-
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'AccountingReportController::export failed');
         }
@@ -428,26 +350,21 @@ class AccountingReportController extends Controller
             $yearStart = now()->startOfYear();
             $yearEnd = now()->endOfYear();
 
-            // Get YTD expenses
             $ytdExpenses = Expense::forUser($userId)
                 ->completed()
                 ->whereBetween('expense_date', [$yearStart, $yearEnd])
                 ->sum('amount_base_currency');
 
-            // Get monthly average
             $monthsPassed = now()->diffInMonths($yearStart) + 1;
             $monthlyAverage = $monthsPassed > 0 ? $ytdExpenses / $monthsPassed : 0;
-
-            // Get projected yearly total
             $projectedYearlyTotal = $monthlyAverage * 12;
-
-            // Compare with last year
-            $lastYearStart = now()->subYear()->startOfYear();
-            $lastYearEnd = now()->subYear()->endOfYear();
 
             $lastYearYtdExpenses = Expense::forUser($userId)
                 ->completed()
-                ->whereBetween('expense_date', [$lastYearStart, $lastYearEnd])
+                ->whereBetween('expense_date', [
+                    now()->subYear()->startOfYear(),
+                    now()->subYear()->endOfYear(),
+                ])
                 ->sum('amount_base_currency');
 
             $yearOverYearGrowth = $lastYearYtdExpenses > 0 ?

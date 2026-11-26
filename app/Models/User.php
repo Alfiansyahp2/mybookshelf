@@ -56,11 +56,6 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function rooms()
-    {
-        return $this->hasMany(Room::class);
-    }
-
     public function books()
     {
         return $this->hasMany(Book::class);

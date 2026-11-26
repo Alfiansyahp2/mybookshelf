@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Accounting\StoreExpenseCategoryRequest;
+use App\Http\Requests\Api\V1\Accounting\UpdateExpenseCategoryRequest;
 use App\Models\ExpenseCategory;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class ExpenseCategoryController extends Controller
 {
@@ -22,7 +23,6 @@ class ExpenseCategoryController extends Controller
             $query = ExpenseCategory::forUser(Auth::id())
                 ->with('expenses');
 
-            // Filter by type
             if ($request->has('is_default')) {
                 if ($request->boolean('is_default')) {
                     $query->default();
@@ -31,14 +31,12 @@ class ExpenseCategoryController extends Controller
                 }
             }
 
-            // Sorting
             $sortBy = $request->input('sort_by', 'name');
             $sortOrder = $request->input('sort_order', 'asc');
             $query->orderBy($sortBy, $sortOrder);
 
             $categories = $query->get();
 
-            // Add calculated fields
             $categories->each(function ($category) {
                 $category->total_expenses = $category->getTotalExpensesAttribute();
                 $category->budget_usage_percentage = $category->getBudgetUsagePercentageAttribute();
@@ -55,21 +53,16 @@ class ExpenseCategoryController extends Controller
     /**
      * Store a newly created expense category.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreExpenseCategoryRequest $request): JsonResponse
     {
+        Gate::authorize('create', ExpenseCategory::class);
+
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:100',
-                'description' => 'nullable|string',
-                'color' => 'nullable|string|max:7',
-                'icon' => 'nullable|string|max:50',
-                'monthly_budget' => 'nullable|numeric|min:0',
-                'budget_currency' => 'nullable|string|size:3',
-            ]);
+            $validated = $request->validated();
 
             $category = ExpenseCategory::create([
                 'id' => Str::uuid()->toString(),
-                'user_id' => Auth::id(),
+                'user_id' => $request->user()->id,
                 'name' => $validated['name'],
                 'description' => $validated['description'] ?? null,
                 'color' => $validated['color'] ?? '#3B82F6',
@@ -80,8 +73,6 @@ class ExpenseCategoryController extends Controller
             ]);
 
             return response()->success($category, 'Expense category created successfully', 201);
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::store failed');
         }
@@ -90,14 +81,12 @@ class ExpenseCategoryController extends Controller
     /**
      * Display the specified expense category.
      */
-    public function show(string $id): JsonResponse
+    public function show(ExpenseCategory $category): JsonResponse
     {
-        try {
-            $category = ExpenseCategory::with(['expenses', 'budgets'])
-                ->forUser(Auth::id())
-                ->findOrFail($id);
+        Gate::authorize('view', $category);
 
-            // Add calculated fields
+        try {
+            $category->load(['expenses', 'budgets']);
             $category->total_expenses = $category->getTotalExpensesAttribute();
             $category->budget_usage_percentage = $category->getBudgetUsagePercentageAttribute();
             $category->is_budget_exceeded = $category->isBudgetExceeded();
@@ -105,8 +94,6 @@ class ExpenseCategoryController extends Controller
             $category->formatted_budget = $category->getFormattedBudgetAttribute();
 
             return response()->success($category, 'Expense category retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::show failed');
         }
@@ -115,21 +102,13 @@ class ExpenseCategoryController extends Controller
     /**
      * Update the specified expense category.
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateExpenseCategoryRequest $request, ExpenseCategory $category): JsonResponse
     {
+        Gate::authorize('update', $category);
+
         try {
-            $validated = $request->validate([
-                'name' => 'sometimes|required|string|max:100',
-                'description' => 'nullable|string',
-                'color' => 'nullable|string|max:7',
-                'icon' => 'nullable|string|max:50',
-                'monthly_budget' => 'nullable|numeric|min:0',
-                'budget_currency' => 'nullable|string|size:3',
-            ]);
+            $validated = $request->validated();
 
-            $category = ExpenseCategory::forUser(Auth::id())->findOrFail($id);
-
-            // Don't allow modifying default category name/is_default status
             if ($category->is_default) {
                 $validated['is_default'] = true;
             }
@@ -137,10 +116,6 @@ class ExpenseCategoryController extends Controller
             $category->update($validated);
 
             return response()->success($category->fresh(), 'Expense category updated successfully');
-        } catch (ValidationException $e) {
-            return $this->validationErrorResponse($e);
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::update failed');
         }
@@ -149,17 +124,11 @@ class ExpenseCategoryController extends Controller
     /**
      * Remove the specified expense category.
      */
-    public function destroy(string $id): JsonResponse
+    public function destroy(ExpenseCategory $category): JsonResponse
     {
+        Gate::authorize('delete', $category);
+
         try {
-            $category = ExpenseCategory::forUser(Auth::id())->findOrFail($id);
-
-            // Don't allow deleting default categories
-            if ($category->is_default) {
-                return response()->error('Cannot delete default expense categories', null, 403);
-            }
-
-            // Check if category has expenses
             if ($category->expenses()->count() > 0) {
                 return response()->error('Cannot delete expense category with existing expenses', null, 422);
             }
@@ -167,8 +136,6 @@ class ExpenseCategoryController extends Controller
             $category->delete();
 
             return response()->success(null, 'Expense category deleted successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::destroy failed');
         }
@@ -243,7 +210,6 @@ class ExpenseCategoryController extends Controller
         try {
             $userId = Auth::id();
 
-            // Check if user already has categories
             $existingCategories = ExpenseCategory::forUser($userId)->count();
             if ($existingCategories > 0) {
                 return response()->error('User already has expense categories', null, 422);
@@ -268,11 +234,11 @@ class ExpenseCategoryController extends Controller
     /**
      * Get category statistics.
      */
-    public function getStatistics(string $id): JsonResponse
+    public function getStatistics(ExpenseCategory $category): JsonResponse
     {
-        try {
-            $category = ExpenseCategory::forUser(Auth::id())->findOrFail($id);
+        Gate::authorize('view', $category);
 
+        try {
             $expenses = $category->expenses()->completed()->get();
 
             $statistics = [
@@ -294,8 +260,6 @@ class ExpenseCategoryController extends Controller
             ];
 
             return response()->success($statistics, 'Category statistics retrieved successfully');
-        } catch (ModelNotFoundException $e) {
-            return $this->notFoundResponse('Expense category not found');
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseCategoryController::getStatistics failed');
         }

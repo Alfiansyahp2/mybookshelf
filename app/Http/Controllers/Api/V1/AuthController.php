@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Auth\LoginRequest;
+use App\Http\Requests\Api\V1\Auth\RegisterRequest;
+use App\Http\Requests\Api\V1\Auth\UpdatePasswordRequest;
+use App\Http\Requests\Api\V1\Auth\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,23 +17,16 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Login user and create session (SPA)
+     * Login user and create session (SPA).
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
-        // Attempt SPA authentication with session
         if (! Auth::guard('web')->attempt($request->only('email', 'password'), $request->filled('remember'))) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
-        // Regenerate session to prevent session fixation when session middleware is active
         if ($request->hasSession()) {
             $request->session()->regenerate();
         }
@@ -46,23 +43,18 @@ class AuthController extends Controller
     }
 
     /**
-     * Register new user (SPA)
+     * Register new user (SPA).
      */
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        $data = $request->validated();
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
         ]);
 
-        // Log in the user immediately after registration (SPA)
         Auth::guard('web')->login($user);
         if ($request->hasSession()) {
             $request->session()->regenerate();
@@ -78,7 +70,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Get authenticated user info (SPA)
+     * Get authenticated user info (SPA).
      */
     public function me(Request $request)
     {
@@ -95,7 +87,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout user and end session (SPA)
+     * Logout user and end session (SPA).
      */
     public function logout(Request $request)
     {
@@ -109,21 +101,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Update user profile (name and email)
+     * Update user profile (name and email).
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
         $user = $request->user();
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
-        ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
+        $user->update($request->validated());
 
         return response()->success([
             'user' => [
@@ -136,25 +119,21 @@ class AuthController extends Controller
     }
 
     /**
-     * Update user password
+     * Update user password.
      */
-    public function updatePassword(Request $request)
+    public function updatePassword(UpdatePasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => 'required|string',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
+        $data = $request->validated();
         $user = $request->user();
 
-        if (! Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($data['current_password'], $user->password)) {
             throw ValidationException::withMessages([
                 'current_password' => ['The provided password does not match your current password.'],
             ]);
         }
 
         $user->update([
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($data['password']),
         ]);
 
         return response()->success(null, 'Password updated successfully');
