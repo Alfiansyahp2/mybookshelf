@@ -19,6 +19,15 @@ export const getBookYears = (b: Book): number[] => {
     return Array.from(years);
 };
 
+export interface YearlyStat {
+    year: number;
+    finished: number;
+    totalPages: number;
+    pagesRead: number;
+    readPct: number;
+    goalPct: number;
+}
+
 export function useYearlyStats(allBooks: Book[]) {
     return useMemo(() => {
         const activeYears = Array.from(
@@ -26,7 +35,7 @@ export function useYearlyStats(allBooks: Book[]) {
         );
         activeYears.sort((a, b) => b - a);
 
-        const yearlyStats = activeYears.map((year) => {
+        const yearlyStats: YearlyStat[] = activeYears.map((year) => {
             const booksThisYear = allBooks.filter((b: Book) =>
                 getBookYears(b).includes(year),
             );

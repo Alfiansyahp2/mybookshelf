@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, Plus, Clock, CheckCircle2, Bookmark, ArrowUpRight } from "lucide-react";
+import { Star, Plus, Clock, CheckCircle2, Bookmark, ArrowUpRight, type LucideIcon } from "lucide-react";
 import type { Book, Shelf as ShelfType } from "../../types";
 import { useTranslation } from "react-i18next";
 
@@ -14,30 +14,30 @@ interface MobileCoverGridProps {
 
 const STATUS_BADGES: Record<
     string,
-    { label: string; bg: string; text: string; icon: any }
+    { label: string; bg: string; text: string; icon: LucideIcon }
 > = {
     reading: {
         label: "Sedang Dibaca",
-        bg: "bg-emerald-500/90 text-white",
-        text: "text-emerald-700 dark:text-emerald-400",
+        bg: "bg-[#8a5a28]/90 text-amber-50",
+        text: "text-walnut dark:text-gold",
         icon: Clock,
     },
     finished: {
         label: "Selesai",
-        bg: "bg-blue-600/90 text-white",
-        text: "text-blue-700 dark:text-blue-400",
+        bg: "bg-[#4a3b2f]/90 text-cream",
+        text: "text-darkBrown dark:text-amber-200",
         icon: CheckCircle2,
     },
     unread: {
         label: "Belum Dibaca",
-        bg: "bg-stone-500/90 text-white",
-        text: "text-stone-700 dark:text-stone-400",
+        bg: "bg-stone-600/90 text-stone-50",
+        text: "text-stone-700 dark:text-stone-300",
         icon: Bookmark,
     },
     borrowed: {
         label: "Dipinjam",
-        bg: "bg-amber-600/90 text-white",
-        text: "text-amber-700 dark:text-amber-400",
+        bg: "bg-amber-800/90 text-amber-50",
+        text: "text-amber-800 dark:text-amber-300",
         icon: ArrowUpRight,
     },
 };
@@ -83,16 +83,16 @@ export default function MobileCoverGrid({
                 return (
                     <div
                         key={shelf.id}
-                        className="rounded-2xl bg-white/80 dark:bg-[#131b2e]/90 border border-slate-200 dark:border-indigo-500/25 shadow-lg overflow-hidden backdrop-blur-sm"
+                        className="rounded-2xl bg-[#fcfaf7]/90 dark:bg-[#231b14]/95 border border-walnut/20 dark:border-walnut/35 shadow-lg overflow-hidden backdrop-blur-sm"
                     >
-                        {/* Cosmic titanium & starlight top rail */}
+                        {/* Warm teak wood shelf top rail */}
                         <div
                             className="h-3 sm:h-3.5 w-full relative overflow-hidden"
                             style={{
                                 background:
-                                    "linear-gradient(180deg, #334155 0%, #1e293b 50%, #0f172a 100%)",
+                                    "linear-gradient(180deg, #b88a55 0%, #8a5e2f 50%, #624018 100%)",
                                 boxShadow:
-                                    "inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.4)",
+                                    "inset 0 1px 0 rgba(255,235,200,0.35), inset 0 -2px 4px rgba(0,0,0,0.35)",
                             }}
                         >
                             <div
@@ -102,7 +102,7 @@ export default function MobileCoverGrid({
                                     left: 0,
                                     right: 0,
                                     height: 1,
-                                    background: "rgba(56,189,248,0.5)",
+                                    background: "rgba(255,210,140,0.45)",
                                 }}
                             />
                         </div>
@@ -110,13 +110,13 @@ export default function MobileCoverGrid({
                         {/* Shelf Content */}
                         <div className="p-3 sm:p-5 pt-3 sm:pt-4">
                             {/* Shelf Header Banner */}
-                            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-indigo-500/20">
+                            <div className="flex items-center justify-between pb-3 mb-3 border-b border-walnut/15 dark:border-walnut/25">
                             <div className="flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 dark:bg-[#ffd166] shadow-xs" />
-                                <h2 className="font-serif font-bold text-base sm:text-lg text-[#0f172a] dark:text-[#f8fafc] tracking-wide uppercase">
+                                <span className="w-2.5 h-2.5 rounded-full bg-walnut dark:bg-gold shadow-xs" />
+                                <h2 className="font-serif font-bold text-base sm:text-lg text-darkBrown dark:text-cream tracking-wide uppercase">
                                     {shelf.name}
                                 </h2>
-                                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-700 dark:text-[#ffd166] font-semibold">
+                                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-walnut/10 dark:bg-gold/15 text-walnut dark:text-gold font-semibold">
                                     {shelfBooks.length} / {maxCapacity}
                                 </span>
                             </div>
@@ -124,7 +124,7 @@ export default function MobileCoverGrid({
                             {onAddBook && (
                                 <button
                                     onClick={() => onAddBook(shelf.id, shelf.name)}
-                                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 dark:bg-indigo-500/20 dark:hover:bg-indigo-500/30 text-[#0f172a] dark:text-[#f8fafc] text-xs font-bold transition-colors"
+                                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-walnut/10 hover:bg-walnut/20 dark:bg-gold/15 dark:hover:bg-gold/25 text-darkBrown dark:text-cream text-xs font-bold transition-colors"
                                 >
                                     <Plus size={14} />
                                     <span>{t("shelf.add_book", "Tambah")}</span>
@@ -221,14 +221,14 @@ export default function MobileCoverGrid({
 
                                                 {/* Progress Bar (Bottom of Cover) */}
                                                 {book.status === "reading" && (
-                                                    <div className="relative z-20 w-full bg-black/50 backdrop-blur-xs p-1 rounded-md mt-auto">
+                                                    <div className="relative z-20 w-full bg-black/55 backdrop-blur-xs p-1 rounded-md mt-auto">
                                                         <div className="flex justify-between text-[8px] sm:text-[8.5px] text-white/90 font-mono mb-0.5">
                                                             <span>Progres</span>
                                                             <span>{progressPct}%</span>
                                                         </div>
                                                         <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
                                                             <div
-                                                                className="h-full bg-emerald-400 rounded-full"
+                                                                className="h-full bg-gradient-to-r from-[#d4a574] to-[#ffd166] rounded-full"
                                                                 style={{
                                                                     width: `${Math.min(100, Math.max(0, progressPct))}%`,
                                                                 }}
@@ -240,14 +240,14 @@ export default function MobileCoverGrid({
 
                                             {/* Book Metadata Under Cover */}
                                             <div className="pt-1.5 px-0.5 flex-1 flex flex-col justify-between">
-                                                <h3 className="font-serif font-bold text-[11px] sm:text-xs text-[#0f172a] dark:text-[#f8fafc] line-clamp-1 leading-snug group-hover:text-indigo-600 dark:group-hover:text-[#ffd166] transition-colors" title={book.title}>
+                                                <h3 className="font-serif font-bold text-[11px] sm:text-xs text-darkBrown dark:text-cream line-clamp-1 leading-snug group-hover:text-walnut dark:group-hover:text-gold transition-colors" title={book.title}>
                                                     {book.title}
                                                 </h3>
-                                                <p className="text-[10px] text-slate-500 dark:text-[#94a3b8] truncate mt-0.5" title={book.author}>
+                                                <p className="text-[10px] text-walnut/75 dark:text-cream/65 truncate mt-0.5" title={book.author}>
                                                     {book.author}
                                                 </p>
                                                 {book.pages && (
-                                                    <span className="text-[9px] sm:text-[9.5px] text-walnut/60 dark:text-stone-400 font-mono mt-0.5">
+                                                    <span className="text-[9px] sm:text-[9.5px] text-walnut/65 dark:text-gold/75 font-mono mt-0.5">
                                                         {book.currentPage ? `${book.currentPage} / ` : ""}
                                                         {book.pages} hal
                                                     </span>
