@@ -2,11 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Log;
 
 abstract class Controller
 {
+    /**
+     * Return a standardized paginated response while transforming items through a JsonResource class.
+     *
+     * @param  class-string<JsonResource>  $resourceClass
+     */
+    protected function paginatedSuccess(
+        LengthAwarePaginator $paginator,
+        string $resourceClass,
+        string $message = 'Success',
+        int $statusCode = 200
+    ): JsonResponse {
+        $payload = $paginator->toArray();
+        $payload['data'] = $resourceClass::collection($paginator->getCollection())->resolve(request());
+
+        return response()->success($payload, $message, $statusCode);
+    }
+
     /**
      * Return a standardized 404 not found error response.
      */

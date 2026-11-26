@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Book;
-use App\Services\ExpenseService;
+use App\Services\Accounting\ExpenseService;
 
 class BookObserver
 {

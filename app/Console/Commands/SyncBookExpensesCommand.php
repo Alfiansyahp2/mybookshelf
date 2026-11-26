@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Book;
-use App\Services\ExpenseService;
+use App\Services\Accounting\ExpenseService;
 use Illuminate\Console\Command;
 
 class SyncBookExpensesCommand extends Command

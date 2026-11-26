@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AccountingReportController;
-use App\Http\Controllers\Api\V1\BudgetController;
-use App\Http\Controllers\Api\V1\CurrencyController;
-use App\Http\Controllers\Api\V1\ExpenseCategoryController;
-use App\Http\Controllers\Api\V1\ExpenseController;
+use App\Http\Controllers\Api\V1\Accounting\AccountingReportController;
+use App\Http\Controllers\Api\V1\Accounting\BudgetController;
+use App\Http\Controllers\Api\V1\Accounting\CurrencyController;
+use App\Http\Controllers\Api\V1\Accounting\ExpenseCategoryController;
+use App\Http\Controllers\Api\V1\Accounting\ExpenseController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('v1/accounting')->group(function () {

@@ -1,28 +1,31 @@
 <?php
 
-use App\Http\Controllers\Api\V1\BookController;
-use App\Http\Controllers\Api\V1\CollectionController;
-use App\Http\Controllers\Api\V1\ShelfController;
-use App\Http\Controllers\Api\V1\TimelineController;
+use App\Http\Controllers\Api\V1\Library\BookController;
+use App\Http\Controllers\Api\V1\Library\BookCostController;
+use App\Http\Controllers\Api\V1\Library\BookCoverController;
+use App\Http\Controllers\Api\V1\Library\BookLoanController;
+use App\Http\Controllers\Api\V1\Library\BookTimelineController;
+use App\Http\Controllers\Api\V1\Library\CollectionController;
+use App\Http\Controllers\Api\V1\Library\ShelfController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     // Must stay before apiResource('books') to avoid matching {book}
-    Route::get('books/purchase-history', [BookController::class, 'getPurchaseHistory']);
+    Route::get('books/purchase-history', [BookCostController::class, 'purchaseHistory']);
 
     Route::apiResource('books', BookController::class)->whereUuid('book');
 
     Route::prefix('books/{book}')->whereUuid('book')->group(function () {
-        Route::post('borrow', [BookController::class, 'borrow']);
-        Route::post('return', [BookController::class, 'returnBook']);
+        Route::post('borrow', [BookLoanController::class, 'borrow']);
+        Route::post('return', [BookLoanController::class, 'returnBook']);
         Route::patch('favorite', [BookController::class, 'toggleFavorite']);
         Route::patch('notes', [BookController::class, 'updateNotes']);
         Route::patch('rating', [BookController::class, 'updateRating']);
         Route::patch('shelf', [BookController::class, 'moveToShelf']);
-        Route::post('cover', [BookController::class, 'uploadCover']);
-        Route::get('timeline', [TimelineController::class, 'bookTimeline']);
-        Route::get('expenses', [BookController::class, 'getExpenses']);
-        Route::get('cost-breakdown', [BookController::class, 'getCostBreakdown']);
+        Route::post('cover', BookCoverController::class);
+        Route::get('timeline', BookTimelineController::class);
+        Route::get('expenses', [BookCostController::class, 'expenses']);
+        Route::get('cost-breakdown', [BookCostController::class, 'costBreakdown']);
     });
 
     Route::put('shelves/layout', [ShelfController::class, 'updateLayout']);

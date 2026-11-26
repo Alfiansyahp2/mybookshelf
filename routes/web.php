@@ -1,11 +1,6 @@
 <?php
 
-use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Api\V1\System\ServiceStatusController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function (): JsonResponse {
-    return response()->json([
-        'service' => config('app.name', 'MyBookshelf API'),
-        'status' => 'ok',
-    ]);
-});
+Route::get('/', ServiceStatusController::class);

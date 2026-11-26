@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/auth')->group(function () {
@@ -11,6 +12,6 @@ Route::prefix('v1/auth')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/user')->group(function () {
-    Route::put('/profile', [AuthController::class, 'updateProfile']);
-    Route::put('/password', [AuthController::class, 'updatePassword']);
+    Route::put('/profile', [ProfileController::class, 'updateProfile']);
+    Route::put('/password', [ProfileController::class, 'updatePassword']);
 });

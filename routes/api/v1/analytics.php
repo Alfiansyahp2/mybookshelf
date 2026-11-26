@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\V1\AchievementController;
-use App\Http\Controllers\Api\V1\StatisticsController;
+use App\Http\Controllers\Api\V1\Analytics\AchievementController;
+use App\Http\Controllers\Api\V1\Analytics\StatisticsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
