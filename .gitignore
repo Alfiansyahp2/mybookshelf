@@ -70,7 +70,6 @@ lerna-debug.log*
 # ===================
 
 # Composer
-composer.lock
 composer.phar
 
 # PHP tools
@@ -302,8 +301,8 @@ sessions/
 # Misc
 # ===================
 
-# npm
-package-lock.json
+# npm (root package-lock ignored if generated; keep frontend/package-lock.json tracked)
+/package-lock.json
 
 # Keep these for consistency
 # frontend/package-lock.json

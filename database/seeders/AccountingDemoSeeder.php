@@ -1,44 +1,43 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-return new class extends Migration
+class AccountingDemoSeeder extends Seeder
 {
     /**
-     * Run the migrations.
+     * Seed baseline currency rates and optional demo accounting records.
      */
-    public function up(): void
+    public function run(): void
     {
-        // This migration creates sample accounting data for user shrglttn
-        // to ensure they have data when the frontend makes authenticated API calls
+        $this->seedCurrencyRates();
 
-        $shrglttnUserId = '019f21d5-ef05-731a-98ff-4713b284ea7f';
+        $demoUser = DB::table('users')
+            ->where('email', 'test@example.com')
+            ->first() ?? DB::table('users')->first();
 
-        // Check if user exists
-        $user = DB::table('users')->where('id', $shrglttnUserId)->first();
-        if (! $user) {
-            return; // User doesn't exist, skip
+        if (! $demoUser) {
+            return;
         }
 
-        // Check if data already exists for this user
-        $existingBudgets = DB::table('budgets')->where('user_id', $shrglttnUserId)->count();
-        if ($existingBudgets > 0) {
-            return; // Data already exists, skip
+        if (DB::table('expenses')->where('user_id', $demoUser->id)->exists()) {
+            return;
         }
 
-        // Get existing categories for shrglttn
         $categories = DB::table('expense_categories')
-            ->where('user_id', $shrglttnUserId)
+            ->where('user_id', $demoUser->id)
             ->get()
             ->keyBy('name');
 
-        // Create sample expenses for shrglttn with proper dates within July budget period
-        $sampleExpenses = [
+        $now = now();
+
+        DB::table('expenses')->insert([
             [
                 'id' => Str::uuid()->toString(),
-                'user_id' => $shrglttnUserId,
+                'user_id' => $demoUser->id,
                 'title' => 'Buku "Laskar Pelangi"',
                 'description' => 'Pembelian novel bestseller karya Andrea Hirata',
                 'amount' => 125000,
@@ -47,17 +46,17 @@ return new class extends Migration
                 'exchange_rate' => 1,
                 'category_id' => $categories->get('Book Purchases')?->id,
                 'payment_method' => 'transfer',
-                'expense_date' => now()->startOfMonth()->addDays(4)->format('Y-m-d'), // July 5th
+                'expense_date' => $now->copy()->subDays(15)->format('Y-m-d'),
                 'is_recurring' => false,
                 'vendor' => 'Gramedia Bookstore',
                 'location' => 'Grand Indonesia Mall',
                 'status' => 'completed',
-                'created_at' => now()->startOfMonth()->addDays(4),
-                'updated_at' => now()->startOfMonth()->addDays(4),
+                'created_at' => $now->copy()->subDays(15),
+                'updated_at' => $now->copy()->subDays(15),
             ],
             [
                 'id' => Str::uuid()->toString(),
-                'user_id' => $shrglttnUserId,
+                'user_id' => $demoUser->id,
                 'title' => 'Ongkos Kirim Buku dari Jakarta',
                 'description' => 'Pengiriman 3 buku via JNE',
                 'amount' => 35000,
@@ -66,17 +65,17 @@ return new class extends Migration
                 'exchange_rate' => 1,
                 'category_id' => $categories->get('Shipping & Handling')?->id,
                 'payment_method' => 'e-wallet',
-                'expense_date' => now()->startOfMonth()->addDays(4)->format('Y-m-d'), // July 5th
+                'expense_date' => $now->copy()->subDays(15)->format('Y-m-d'),
                 'is_recurring' => false,
                 'vendor' => 'JNE',
                 'location' => 'Jakarta',
                 'status' => 'completed',
-                'created_at' => now()->startOfMonth()->addDays(4),
-                'updated_at' => now()->startOfMonth()->addDays(4),
+                'created_at' => $now->copy()->subDays(15),
+                'updated_at' => $now->copy()->subDays(15),
             ],
             [
                 'id' => Str::uuid()->toString(),
-                'user_id' => $shrglttnUserId,
+                'user_id' => $demoUser->id,
                 'title' => 'Buku "Atomic Habits" (Hardcover)',
                 'description' => 'Self-help book dari James Clear',
                 'amount' => 450000,
@@ -85,17 +84,17 @@ return new class extends Migration
                 'exchange_rate' => 1,
                 'category_id' => $categories->get('Book Purchases')?->id,
                 'payment_method' => 'cash',
-                'expense_date' => now()->startOfMonth()->addDays(11)->format('Y-m-d'), // July 12th
+                'expense_date' => $now->copy()->subDays(8)->format('Y-m-d'),
                 'is_recurring' => false,
                 'vendor' => 'Kinokuniya Bookstore',
                 'location' => 'Senayan City',
                 'status' => 'completed',
-                'created_at' => now()->startOfMonth()->addDays(11),
-                'updated_at' => now()->startOfMonth()->addDays(11),
+                'created_at' => $now->copy()->subDays(8),
+                'updated_at' => $now->copy()->subDays(8),
             ],
             [
                 'id' => Str::uuid()->toString(),
-                'user_id' => $shrglttnUserId,
+                'user_id' => $demoUser->id,
                 'title' => 'Cleaning Kit Koleksi Buku',
                 'description' => 'Microfiber cloth, bookmark, dan book duster',
                 'amount' => 75000,
@@ -104,17 +103,17 @@ return new class extends Migration
                 'exchange_rate' => 1,
                 'category_id' => $categories->get('Book Maintenance')?->id,
                 'payment_method' => 'transfer',
-                'expense_date' => now()->startOfMonth()->addDays(19)->format('Y-m-d'), // July 20th
+                'expense_date' => $now->copy()->subDays(5)->format('Y-m-d'),
                 'is_recurring' => false,
                 'vendor' => 'Tokopedia',
                 'location' => 'Online Store',
                 'status' => 'completed',
-                'created_at' => now()->startOfMonth()->addDays(19),
-                'updated_at' => now()->startOfMonth()->addDays(19),
+                'created_at' => $now->copy()->subDays(5),
+                'updated_at' => $now->copy()->subDays(5),
             ],
             [
                 'id' => Str::uuid()->toString(),
-                'user_id' => $shrglttnUserId,
+                'user_id' => $demoUser->id,
                 'title' => 'Buku Hadiah untuk Ulang Tahun Teman',
                 'description' => 'Novel grafis "Persepolis"',
                 'amount' => 180000,
@@ -123,38 +122,41 @@ return new class extends Migration
                 'exchange_rate' => 1,
                 'category_id' => $categories->get('Gifts & Donations')?->id,
                 'payment_method' => 'e-wallet',
-                'expense_date' => now()->startOfMonth()->addDays(24)->format('Y-m-d'), // July 25th
+                'expense_date' => $now->copy()->subDays(2)->format('Y-m-d'),
                 'is_recurring' => false,
                 'vendor' => 'Periplus Bookstore',
                 'location' => 'Soehat Hall',
                 'status' => 'completed',
-                'created_at' => now()->startOfMonth()->addDays(24),
-                'updated_at' => now()->startOfMonth()->addDays(24),
+                'created_at' => $now->copy()->subDays(2),
+                'updated_at' => $now->copy()->subDays(2),
             ],
-        ];
+        ]);
 
-        // Create sample budgets for shrglttn
-        $sampleBudgets = [
+        if (DB::table('budgets')->where('user_id', $demoUser->id)->exists()) {
+            return;
+        }
+
+        DB::table('budgets')->insert([
             [
                 'id' => Str::uuid()->toString(),
-                'user_id' => $shrglttnUserId,
+                'user_id' => $demoUser->id,
                 'category_id' => $categories->get('Book Purchases')?->id,
-                'name' => 'Budget Pembelian Buku Bulan Juli',
+                'name' => 'Budget Pembelian Buku Bulanan',
                 'description' => 'Budget untuk pembelian buku baru dan novel',
                 'amount' => 500000,
                 'currency' => 'IDR',
                 'amount_base_currency' => 500000,
                 'period' => 'monthly',
-                'start_date' => now()->startOfMonth()->format('Y-m-d'),
-                'end_date' => now()->endOfMonth()->format('Y-m-d'),
+                'start_date' => $now->copy()->startOfMonth()->format('Y-m-d'),
+                'end_date' => $now->copy()->endOfMonth()->format('Y-m-d'),
                 'alert_threshold' => 80.00,
                 'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
                 'id' => Str::uuid()->toString(),
-                'user_id' => $shrglttnUserId,
+                'user_id' => $demoUser->id,
                 'category_id' => $categories->get('Shipping & Handling')?->id,
                 'name' => 'Budget Shipping & Handling',
                 'description' => 'Budget khusus ongkos kirim buku',
@@ -162,29 +164,46 @@ return new class extends Migration
                 'currency' => 'IDR',
                 'amount_base_currency' => 150000,
                 'period' => 'monthly',
-                'start_date' => now()->startOfMonth()->format('Y-m-d'),
-                'end_date' => now()->endOfMonth()->format('Y-m-d'),
+                'start_date' => $now->copy()->startOfMonth()->format('Y-m-d'),
+                'end_date' => $now->copy()->endOfMonth()->format('Y-m-d'),
                 'alert_threshold' => 75.00,
                 'is_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
+        ]);
+    }
+
+    private function seedCurrencyRates(): void
+    {
+        $rates = [
+            ['from_currency' => 'USD', 'to_currency' => 'IDR', 'rate' => 15000.50],
+            ['from_currency' => 'EUR', 'to_currency' => 'IDR', 'rate' => 16500.00],
+            ['from_currency' => 'SGD', 'to_currency' => 'IDR', 'rate' => 11000.25],
         ];
 
-        // Insert sample data
-        DB::table('expenses')->insert($sampleExpenses);
-        DB::table('budgets')->insert($sampleBudgets);
-    }
+        $now = now();
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        $shrglttnUserId = '019f21d5-ef05-731a-98ff-4713b284ea7f';
+        foreach ($rates as $rate) {
+            $exists = DB::table('currency_rates')
+                ->where('from_currency', $rate['from_currency'])
+                ->where('to_currency', $rate['to_currency'])
+                ->where('is_active', true)
+                ->exists();
 
-        // Remove sample data for shrglttn user
-        DB::table('expenses')->where('user_id', $shrglttnUserId)->delete();
-        DB::table('budgets')->where('user_id', $shrglttnUserId)->delete();
+            if (! $exists) {
+                DB::table('currency_rates')->insert([
+                    'id' => Str::uuid()->toString(),
+                    'from_currency' => $rate['from_currency'],
+                    'to_currency' => $rate['to_currency'],
+                    'rate' => $rate['rate'],
+                    'effective_date' => $now,
+                    'expires_at' => $now->copy()->endOfDay(),
+                    'is_active' => true,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
+        }
     }
-};
+}
