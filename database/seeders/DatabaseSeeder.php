@@ -18,11 +18,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             AchievementSeeder::class,
-            RoomSeeder::class,
             ShelfSeeder::class,
             BookDetailSeeder::class,  // Detailed book seeder with ratings and notes
             CollectionSeeder::class,
             UserAchievementSeeder::class,
+            DefaultExpenseCategorySeeder::class,
+            AccountingDemoSeeder::class,
         ]);
     }
 }

@@ -15,6 +15,10 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    'media_disk' => env('FILESYSTEM_MEDIA_DISK', 'public'),
+
+    'media_cdn_url' => env('MEDIA_CDN_URL'),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
@@ -33,7 +37,7 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            'serve' => (bool) env('FILESYSTEM_LOCAL_SERVE', false),
             'throw' => false,
             'report' => false,
         ],

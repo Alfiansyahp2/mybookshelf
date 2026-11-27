@@ -5,13 +5,23 @@ Direktori ini berisi hasil audit teknis menyeluruh terhadap basis kode aktual **
 
 ---
 
-## 1. Peta Dokumen Perbaikan
+## 1. Peta Dokumen Perencanaan & Audit
+
+### A. Perencanaan Arsitektur & Kesiapan Produksi (*Route-Wide Masterplan — Terbaru*)
+
+| Dokumen | Cakupan | Fokus Utama |
+| :--- | :--- | :--- |
+| **[Stage 1: Architecture & Foldering Audit Plan](ARCHITECTURE_FOLDERING_AUDIT_PLAN.md)** | Seluruh `111` route Laravel, `18` path SPA `App.tsx`, root & CI | Audit lengkap file/folder per route, pemetaan artefak yatim (`Room`, `App.css`, `mockData.ts`, skrip `.py`/`.sql`), dual build Vite/Tailwind, serta arsitektur target *Domain-Grouped Backend* + *Vertical-Slice Feature Frontend* dan urutan migrasi `Fase 1A–1E`. |
+| **[Stage 2: Production Architecture Masterplan](PRODUCTION_ARCHITECTURE_MASTERPLAN.md)** | Evolusi Tahap 1 menuju *Production-Grade System* | Skalabilitas data & paginasi server-side, indeks PostgreSQL `pg_trgm`, abstraksi Object Storage S3/R2, Queue Worker (`ShouldQueue`), hardening Sanctum/CSRF/Policy/OpenAPI, ErrorBoundary & boundary linting Frontend, piramida test (Larastan, Vitest, Playwright), serta topologi deployment & release gate. |
+| **[Implementation Phases Roadmap](IMPLEMENTATION_PHASES_ROADMAP.md)** | Rencana eksekusi **Phase 0 – Phase 6** (PR-sized) | Pemecahan lengkap implementasi Stage 1 + Stage 2 menjadi 7 fase bertahap dengan prasyarat, daftar file konkret, strategi kompatibilitas *Expand-Contract*, dan *Exit Gate* di akhir setiap fase. |
+
+### B. Audit Teknis Baseline (*Riwayat Awal — Sebagian Sudah Teratasi*)
 
 | Dokumen | Cakupan Audit | Fokus Utama |
 | :--- | :--- | :--- |
-| **[Backend Improvements](BACKEND_IMPROVEMENTS.md)** | `app/`, `routes/`, `config/` | Bug macro error HTTP, celah validasi IDOR, inkonsistensi `BookObserver` & `BookController`, orphan files upload cover, stub export. |
-| **[Frontend Improvements](FRONTEND_IMPROVEMENTS.md)** | `frontend/src/` | Broken endpoint `useRooms`, 4 halaman stub, `193` warning `oxlint`, `59` tipe `any`, `66` debug `console.*`, bundle `1.6 MB` tanpa code-splitting. |
-| **[Infra, DB & Quality Improvements](INFRA_DB_AND_QUALITY_IMPROVEMENTS.md)** | `.env.example`, `README.md`, `tests/`, `.github/` | Konflik instruksi SQLite vs query PostgreSQL `ilike`, hardcoded CORS/Sanctum, minimnya automated test, CI `continue-on-error`, mojibake & artefak root. |
+| **[Backend Improvements](BACKEND_IMPROVEMENTS.md)** | `app/`, `routes/`, `config/` | Bug macro error HTTP, celah validasi IDOR (`ownedRule` kini sudah ditambahkan), inkonsistensi `BookObserver` & `BookController`, upload cover, stub export. |
+| **[Frontend Improvements](FRONTEND_IMPROVEMENTS.md)** | `frontend/src/` | Endpoint `useRooms` (sudah dihapus), 4 halaman stub (sudah diimplementasikan), `193` warning `oxlint` (kini `0`), tipe `any` (kini tersisa `42`), code-splitting Vite (kini aktif). |
+| **[Infra, DB & Quality Improvements](INFRA_DB_AND_QUALITY_IMPROVEMENTS.md)** | `.env.example`, `README.md`, `tests/`, `.github/` | Konflik SQLite vs query PostgreSQL `ilike`, konfigurasi CORS/Sanctum, cakupan test (`17` test / `134` assertion berjalan di `php artisan test --compact`), CI & artefak root. |
 
 ---
 

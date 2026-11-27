@@ -2,8 +2,9 @@
 
 namespace App\Observers;
 
+use App\Events\BookSaved;
 use App\Models\Book;
-use App\Services\ExpenseService;
+use App\Services\Accounting\ExpenseService;
 
 class BookObserver
 {
@@ -15,6 +16,7 @@ class BookObserver
     public function saved(Book $book): void
     {
         $this->expenseService->syncFromBook($book);
+        BookSaved::dispatch($book->user_id);
     }
 
     /**
@@ -23,6 +25,7 @@ class BookObserver
     public function deleted(Book $book): void
     {
         $this->expenseService->removeForBook($book);
+        BookSaved::dispatch($book->user_id);
     }
 
     /**
@@ -31,5 +34,6 @@ class BookObserver
     public function forceDeleted(Book $book): void
     {
         $this->expenseService->removeForBook($book, true);
+        BookSaved::dispatch($book->user_id);
     }
 }

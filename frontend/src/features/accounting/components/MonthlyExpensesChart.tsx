@@ -1,0 +1,354 @@
+import { useMemo } from "react";
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+import { BookOpen } from "lucide-react";
+import {
+    usePurchaseHistory,
+    type PurchaseHistoryData,
+} from "../hooks/usePurchaseHistory";
+import { useTranslation } from "react-i18next";
+
+type PurchaseData = PurchaseHistoryData & {
+    shortMonth?: string;
+};
+
+interface ChartTooltipProps {
+    active?: boolean;
+    payload?: Array<{ payload: PurchaseData }>;
+}
+
+interface PurchaseHistoryChartProps {
+    months?: number;
+}
+
+// Format currency for display
+const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(amount);
+};
+
+// Custom tooltip component
+const CustomTooltip = ({ active, payload }: ChartTooltipProps) => {
+    const { t } = useTranslation();
+    if (!active || !payload || !payload.length) return null;
+
+    const data = payload[0].payload;
+    return (
+        <div 
+            className="p-3 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.12)] border"
+            style={{
+                background: "rgba(255,251,245,0.97)", // Cream backdrop
+                borderColor: "rgba(139,99,56,0.15)", // Walnut border
+                backdropFilter: "blur(8px)"
+            }}
+        >
+            <p className="font-bold text-darkBrown mb-1.5 text-sm">
+                {data.month_name}
+            </p>
+            <p className="text-sm font-medium text-walnut mb-1">
+                {t("accounting.purchase_chart.total", "Total:")}{" "}
+                <span className="font-bold text-darkBrown">{data.formatted_amount}</span>
+            </p>
+            <p className="text-xs font-medium text-walnut/80 mb-1">
+                <span className="font-bold text-darkBrown">{data.book_count}</span>{" "}
+                {t(
+                    "accounting.purchase_chart.books_purchased",
+                    "books purchased",
+                )}
+            </p>
+            <p className="text-xs font-medium text-walnut/80">
+                {t("accounting.purchase_chart.avg", "Avg:")}{" "}
+                <span className="font-semibold text-walnut">{formatCurrency(data.average_price)}</span>
+            </p>
+        </div>
+    );
+};
+
+export default function PurchaseHistoryChart({
+    months = 12,
+}: PurchaseHistoryChartProps) {
+    const { t } = useTranslation();
+    const {
+        data: purchaseHistory,
+        isLoading,
+        error,
+    } = usePurchaseHistory(months);
+
+    // Transform data for chart and calculate statistics
+    const chartData = useMemo(() => {
+        if (!purchaseHistory?.data || !Array.isArray(purchaseHistory.data)) {
+            return [];
+        }
+
+        const data = purchaseHistory.data.map((item) => ({
+            ...item,
+            // Use short month name for x-axis
+            shortMonth: new Date(item.month + "-01").toLocaleDateString(
+                "id-ID",
+                { month: "short" },
+            ),
+        }));
+
+        return data;
+    }, [purchaseHistory]);
+
+    const statistics = useMemo(() => {
+        if (!chartData.length) return null;
+
+        const totals = chartData.map((d: PurchaseData) => d.total_amount);
+        const max = Math.max(...totals);
+        const min = Math.min(...totals);
+        const avg =
+            totals.reduce((a: number, b: number) => a + b, 0) / totals.length;
+
+        // Calculate trend (compare last 3 months vs previous 3)
+        let trend = 0;
+        if (chartData.length >= 6) {
+            const recent =
+                chartData
+                    .slice(-3)
+                    .reduce(
+                        (sum: number, d: PurchaseData) => sum + d.total_amount,
+                        0,
+                    ) / 3;
+            const previous =
+                chartData
+                    .slice(-6, -3)
+                    .reduce(
+                        (sum: number, d: PurchaseData) => sum + d.total_amount,
+                        0,
+                    ) / 3;
+            trend = previous > 0 ? ((recent - previous) / previous) * 100 : 0;
+        }
+
+        // Calculate total books purchased
+        const totalBooks = chartData.reduce(
+            (sum: number, d: PurchaseData) => sum + d.book_count,
+            0,
+        );
+
+        return { max, min, avg, trend, totalBooks };
+    }, [chartData]);
+
+    if (isLoading) {
+        return (
+            <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
+                <div className="animate-pulse space-y-4">
+                    <div className="h-6 bg-beige rounded w-1/3"></div>
+                    <div className="h-64 bg-beige rounded"></div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
+                <h3 className="text-xl font-semibold text-darkBrown flex items-center gap-2 mb-4 leading-relaxed">
+                    <BookOpen className="w-5 h-5" />
+                    {t(
+                        "accounting.purchase_chart.purchase_history",
+                        "Purchase History",
+                    )}
+                </h3>
+                <div className="text-center text-walnut/80 py-12 leading-relaxed">
+                    <p className="text-red-600 mb-2 leading-relaxed">
+                        {t(
+                            "accounting.purchase_chart.error_loading",
+                            "Error loading purchase history",
+                        )}
+                    </p>
+                    <p className="text-sm text-walnut/70 leading-relaxed">
+                        {t(
+                            "accounting.purchase_chart.refresh_page",
+                            "Please try refreshing the page",
+                        )}
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!chartData.length) {
+        return (
+            <div className="bg-cream border border-beige rounded-lg shadow-sm p-6">
+                <h3 className="text-xl font-semibold text-darkBrown flex items-center gap-2 mb-4 leading-relaxed">
+                    <BookOpen className="w-5 h-5" />
+                    {t(
+                        "accounting.purchase_chart.purchase_history",
+                        "Purchase History",
+                    )}
+                </h3>
+                <p className="text-center text-walnut/80 py-12 leading-relaxed">
+                    {t(
+                        "accounting.purchase_chart.no_data",
+                        "No purchase data available for the selected period",
+                    )}
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-cream border border-beige rounded-lg shadow-sm">
+            <div className="p-6 border-b border-beige">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold text-darkBrown flex items-center gap-2 leading-relaxed">
+                        <BookOpen className="w-5 h-5" />
+                        {t(
+                            "accounting.purchase_chart.book_purchase_history",
+                            "Book Purchase History",
+                        )}
+                    </h3>
+                    {statistics && (
+                        <div className="flex items-center gap-4 text-sm">
+                            <div className="text-right">
+                                <p className="text-walnut/80 leading-relaxed">
+                                    {t(
+                                        "accounting.purchase_chart.avg_monthly",
+                                        "Avg Monthly",
+                                    )}
+                                </p>
+                                <p className="font-semibold text-darkBrown leading-relaxed">
+                                    {formatCurrency(statistics.avg)}
+                                </p>
+                            </div>
+                            <div
+                                className={`text-right ${
+                                    statistics.trend >= 0
+                                        ? "text-red-600"
+                                        : "text-green-600"
+                                }`}
+                            >
+                                <p className="text-xs text-walnut/80 leading-relaxed">
+                                    {t(
+                                        "accounting.purchase_chart.trend_3_month",
+                                        "3-Month Trend",
+                                    )}
+                                </p>
+                                <p className="font-semibold leading-relaxed">
+                                    {statistics.trend >= 0 ? "+" : ""}
+                                    {statistics.trend.toFixed(1)}%
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <div className="p-6">
+                <ResponsiveContainer width="100%" height={300}>
+                    <LineChart
+                        data={chartData}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                    >
+                        <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="#E8E0D5"
+                            vertical={false}
+                            horizontal={true}
+                        />
+                        <XAxis
+                            dataKey="shortMonth"
+                            stroke="#7A5C42"
+                            style={{ fontSize: "12px" }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={60}
+                            dy={10}
+                        />
+                        <YAxis
+                            stroke="#7A5C42"
+                            style={{ fontSize: "12px" }}
+                            tickFormatter={(value) => {
+                                if (value >= 1000000)
+                                    return `${(value / 1000000).toFixed(1)}M`;
+                                if (value >= 1000)
+                                    return `${(value / 1000).toFixed(0)}K`;
+                                return value;
+                            }}
+                        />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Line
+                            type="monotone"
+                            dataKey="total_amount"
+                            stroke="#D4A574"
+                            strokeWidth={2}
+                            dot={{ fill: "#D4A574", strokeWidth: 2, r: 4 }}
+                            activeDot={{
+                                r: 6,
+                                stroke: "#4A3B2F",
+                                strokeWidth: 2,
+                            }}
+                            name={t(
+                                "accounting.purchase_chart.total_purchases",
+                                "Total Purchases",
+                            )}
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
+
+                {/* Summary Statistics */}
+                {statistics && (
+                    <div className="grid grid-cols-4 gap-4 mt-5 pt-5 border-t border-beige">
+                        <div className="text-center">
+                            <p className="text-xs text-walnut/80 leading-relaxed mb-1">
+                                {t(
+                                    "accounting.purchase_chart.highest",
+                                    "Highest",
+                                )}
+                            </p>
+                            <p className="font-semibold text-darkBrown leading-relaxed">
+                                {formatCurrency(statistics.max)}
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-xs text-walnut/80 leading-relaxed mb-1">
+                                {t(
+                                    "accounting.purchase_chart.lowest",
+                                    "Lowest",
+                                )}
+                            </p>
+                            <p className="font-semibold text-darkBrown leading-relaxed">
+                                {formatCurrency(statistics.min)}
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-xs text-walnut/80 leading-relaxed mb-1">
+                                {t(
+                                    "accounting.purchase_chart.average",
+                                    "Average",
+                                )}
+                            </p>
+                            <p className="font-semibold text-darkBrown leading-relaxed">
+                                {formatCurrency(statistics.avg)}
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-xs text-walnut/80 leading-relaxed mb-1">
+                                {t(
+                                    "accounting.purchase_chart.total_books",
+                                    "Total Books",
+                                )}
+                            </p>
+                            <p className="font-semibold text-darkBrown leading-relaxed">
+                                {statistics.totalBooks}
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}

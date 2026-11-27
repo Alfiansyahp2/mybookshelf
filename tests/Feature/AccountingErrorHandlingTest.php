@@ -2,13 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\Api\V1\ReadingSessionController;
 use App\Models\Book;
 use App\Models\ExpenseCategory;
 use App\Models\ReadingSession;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -101,12 +99,9 @@ class AccountingErrorHandlingTest extends TestCase
             'end_page' => 25,
         ])->assertStatus(200);
 
-        // Direct pause via BookController on ended session or via ReadingSessionController::pause if routed
-        $controller = new ReadingSessionController;
-        $request = Request::create("/api/v1/reading-sessions/{$session->id}/pause", 'PATCH', ['is_paused' => true]);
-        $request->setUserResolver(fn () => $user);
-
-        $res = $controller->pause($request, $session->id);
-        $this->assertEquals(400, $res->getStatusCode());
+        $this->patchJson("/api/v1/books/{$book->id}/reading-sessions/{$session->id}/pause", [
+            'is_paused' => true,
+        ])->assertStatus(400)
+            ->assertJsonPath('success', false);
     }
 }
