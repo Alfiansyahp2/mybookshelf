@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1\Library;
 
+use App\Contracts\Storage\MediaStorageInterface;
 use App\Http\Resources\Api\V1\Concerns\FormatsDates;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -43,7 +44,7 @@ class BookResource extends JsonResource
                 $this->spine_color_dark,
             ],
 
-            'cover_image' => $this->cover_image,
+            'cover_image' => app(MediaStorageInterface::class)->publicUrl($this->cover_image),
             'position' => $this->position,
             'favorite' => (bool) $this->favorite,
             'current_page' => $this->current_page,

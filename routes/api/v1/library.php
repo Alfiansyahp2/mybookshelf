@@ -9,7 +9,7 @@ use App\Http\Controllers\Api\V1\Library\CollectionController;
 use App\Http\Controllers\Api\V1\Library\ShelfController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {
     // Must stay before apiResource('books') to avoid matching {book}
     Route::get('books/purchase-history', [BookCostController::class, 'purchaseHistory']);
 
@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
         Route::patch('notes', [BookController::class, 'updateNotes']);
         Route::patch('rating', [BookController::class, 'updateRating']);
         Route::patch('shelf', [BookController::class, 'moveToShelf']);
-        Route::post('cover', BookCoverController::class);
+        Route::post('cover', BookCoverController::class)->middleware('throttle:uploads');
         Route::get('timeline', BookTimelineController::class);
         Route::get('expenses', [BookCostController::class, 'expenses']);
         Route::get('cost-breakdown', [BookCostController::class, 'costBreakdown']);

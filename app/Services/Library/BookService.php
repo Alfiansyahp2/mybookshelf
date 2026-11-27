@@ -2,15 +2,16 @@
 
 namespace App\Services\Library;
 
+use App\Contracts\Storage\MediaStorageInterface;
 use App\DataTransferObjects\Library\BookFilterData;
 use App\Events\BookFinished;
+use App\Jobs\ProcessBookCoverJob;
 use App\Models\Book;
 use App\Models\TimelineEvent;
 use App\Services\Analytics\AchievementService;
 use App\Services\Reading\ReadingSessionService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BookService
@@ -406,29 +407,38 @@ class BookService
     }
 
     /**
-     * Store or replace a book cover image on the public disk and update cover_image URL.
+     * Store or replace a book cover image on configured media storage and queue WebP optimization.
      */
-    public function uploadCover(Book $book, UploadedFile $file, string $baseUrl): string
+    public function uploadCover(Book $book, UploadedFile $file, ?string $baseUrl = null): string
     {
-        if ($book->cover_image) {
-            $filename = basename(parse_url($book->cover_image, PHP_URL_PATH) ?: '');
-            if ($filename && $filename !== 'book-covers') {
-                $oldPath = 'book-covers/'.$filename;
-                if (Storage::disk('public')->exists($oldPath)) {
-                    Storage::disk('public')->delete($oldPath);
-                }
-            }
+        $realPath = $file->getRealPath();
+        $rawBytes = $realPath ? file_get_contents($realPath) : false;
+        if ($rawBytes === false || $rawBytes === '') {
+            throw new \InvalidArgumentException('Uploaded cover image could not be read.');
         }
 
-        // SECURITY: Use extension() which guesses based on MIME type rather than client filename.
-        $extension = $file->extension() ?: 'jpg';
-        $filename = 'book_'.$book->id.'_'.time().'.'.$extension;
-        $file->storeAs('book-covers', $filename, 'public');
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $detectedMime = (string) $finfo->buffer($rawBytes);
+        $allowedMimes = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
 
-        $url = rtrim($baseUrl, '/').'/storage/book-covers/'.$filename;
-        $book->update(['cover_image' => $url]);
+        if (! array_key_exists($detectedMime, $allowedMimes) || @getimagesizefromstring($rawBytes) === false) {
+            throw new \InvalidArgumentException('Invalid image content. Only valid JPEG, PNG, or WebP images are allowed.');
+        }
 
-        return $url;
+        $mediaStorage = app(MediaStorageInterface::class);
+        $mediaStorage->delete($book->cover_image);
+
+        $extension = $allowedMimes[$detectedMime];
+        $rawKey = "book-covers/raw_{$book->id}_".time().'.'.$extension;
+        $storedKey = $mediaStorage->put($rawKey, $rawBytes, $detectedMime, 'public');
+
+        $book->update(['cover_image' => $storedKey]);
+
+        ProcessBookCoverJob::dispatch($book->id, $storedKey);
+
+        $latestKey = $book->fresh()?->cover_image ?: $storedKey;
+
+        return $mediaStorage->publicUrl($latestKey) ?? $latestKey;
     }
 
     /**

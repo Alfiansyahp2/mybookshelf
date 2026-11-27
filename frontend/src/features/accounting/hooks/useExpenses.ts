@@ -87,11 +87,13 @@ export function useUploadReceipt() {
             receiptData,
         }: {
             id: string;
-            receiptData: {
-                data: string;
-                mime_type?: string;
-                filename?: string;
-            };
+            receiptData:
+                | File
+                | {
+                      data: string;
+                      mime_type?: string;
+                      filename?: string;
+                  };
         }) => expensesApi.uploadReceipt(id, receiptData),
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({

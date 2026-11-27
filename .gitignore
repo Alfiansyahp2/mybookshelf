@@ -223,6 +223,7 @@ temp/
 
 # Generated documentation
 /docs/api/
+/openapi.json
 /coverage/
 
 # Asset optimization

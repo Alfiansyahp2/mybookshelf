@@ -13,7 +13,9 @@ import {
     useCreateExpense,
     useUpdateExpense,
     useDeleteExpense,
+    useUploadReceipt,
 } from "../hooks/useExpenses";
+import { expensesApi } from "../api/accounting.api";
 import { devError } from "@shared/lib/logger";
 import { useExpenseCategories } from "../hooks/useExpenseCategories";
 import { useBooks } from "@features/library";
@@ -49,6 +51,7 @@ export default function ExpenseModal({
     const createExpense = useCreateExpense();
     const updateExpense = useUpdateExpense();
     const deleteExpense = useDeleteExpense();
+    const uploadReceipt = useUploadReceipt();
     const { data: categoriesResponse } = useExpenseCategories();
     const categories: ExpenseCategory[] = categoriesResponse?.data || [];
     const { data: booksResponse } = useBooks(
@@ -130,6 +133,24 @@ export default function ExpenseModal({
             }
             setReceiptFile(null);
             setReceiptPreview(null);
+
+            if (mode === "edit" && expense?.has_receipt) {
+                expensesApi
+                    .getReceipt(expense.id)
+                    .then((res) => {
+                        const url =
+                            res?.data?.temporary_url ||
+                            res?.data?.url ||
+                            res?.data?.data ||
+                            null;
+                        if (url) {
+                            setReceiptPreview(url);
+                        }
+                    })
+                    .catch(() => {
+                        // Receipt unavailable or expired; leave empty preview cleanly
+                    });
+            }
         }
     }, [isOpen, mode, expense]);
 
@@ -138,32 +159,25 @@ export default function ExpenseModal({
         setIsSubmitting(true);
 
         try {
-            const dataToSubmit = { ...formData };
-
-            // Handle receipt upload
-            if (receiptFile) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    dataToSubmit.receipt_data = reader.result as string;
-                    submitExpense(dataToSubmit);
-                };
-                reader.readAsDataURL(receiptFile);
-            } else {
-                submitExpense(dataToSubmit);
-            }
-        } catch (error) {
-            devError("Error submitting expense:", error);
-            setIsSubmitting(false);
-        }
-    };
-
-    const submitExpense = async (data: ExpenseFormData) => {
-        try {
+            let savedExpenseId = expense?.id;
             if (mode === "create") {
-                await createExpense.mutateAsync(data);
+                const created = await createExpense.mutateAsync(formData);
+                savedExpenseId = created?.data?.id || created?.id;
             } else {
-                await updateExpense.mutateAsync({ id: expense!.id, data });
+                const updated = await updateExpense.mutateAsync({
+                    id: expense!.id,
+                    data: formData,
+                });
+                savedExpenseId = updated?.data?.id || expense!.id;
             }
+
+            if (receiptFile && savedExpenseId) {
+                await uploadReceipt.mutateAsync({
+                    id: savedExpenseId,
+                    receiptData: receiptFile,
+                });
+            }
+
             onClose();
         } catch (error) {
             devError("Error submitting expense:", error);

@@ -58,23 +58,23 @@ class ApiClient {
         return response.data;
     }
 
-    async post(url: string, data?: unknown) {
-        const response = await this.client.post(url, data);
+    async post(url: string, data?: unknown, signal?: AbortSignal) {
+        const response = await this.client.post(url, data, { signal });
         return response.data;
     }
 
-    async patch(url: string, data?: unknown) {
-        const response = await this.client.patch(url, data);
+    async patch(url: string, data?: unknown, signal?: AbortSignal) {
+        const response = await this.client.patch(url, data, { signal });
         return response.data;
     }
 
-    async put(url: string, data?: unknown) {
-        const response = await this.client.put(url, data);
+    async put(url: string, data?: unknown, signal?: AbortSignal) {
+        const response = await this.client.put(url, data, { signal });
         return response.data;
     }
 
-    async delete(url: string) {
-        const response = await this.client.delete(url);
+    async delete(url: string, signal?: AbortSignal) {
+        const response = await this.client.delete(url, { signal });
         return response.data;
     }
 

@@ -223,14 +223,97 @@ class AccountingReportService
     public function prepareExport(array $filters): array
     {
         return [
-            'message' => 'Export functionality placeholder',
+            'message' => 'Export queued cleanly via buildExportArtifact',
             'report_type' => $filters['report_type'],
             'format' => $filters['format'],
-            'data' => [
-                'note' => 'This is a placeholder for export functionality',
-                'implementation_required' => 'Integrate with dompdf/PHPSpreadsheet libraries',
-            ],
         ];
+    }
+
+    /**
+     * Render formatted export content and metadata for queued report generation.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array{filename: string, mime_type: string, content: string}
+     */
+    public function buildExportArtifact(string $userId, array $filters): array
+    {
+        $reportType = (string) ($filters['report_type'] ?? 'overview');
+        $format = strtolower((string) ($filters['format'] ?? 'csv'));
+        $startDate = $filters['start_date'] ?? null;
+        $endDate = $filters['end_date'] ?? null;
+
+        $payload = match ($reportType) {
+            'expenses' => $this->getExpensesByCategory($userId, ['start_date' => $startDate, 'end_date' => $endDate]),
+            'budgets' => $this->getBudgetTracking($userId, []),
+            'payment_methods' => $this->getPaymentMethodsAnalysis($userId, $startDate, $endDate),
+            default => $this->getOverview($userId, ['start_date' => $startDate, 'end_date' => $endDate, 'period' => $filters['period'] ?? 'month']),
+        };
+
+        $timestamp = now()->format('Ymd_His');
+
+        if ($format === 'json') {
+            return [
+                'filename' => "accounting_{$reportType}_{$timestamp}.json",
+                'mime_type' => 'application/json',
+                'content' => (string) json_encode([
+                    'report_type' => $reportType,
+                    'generated_at' => now()->toIso8601String(),
+                    'data' => $payload,
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            ];
+        }
+
+        $rows = $this->flattenReportRows($reportType, $payload);
+        $handle = fopen('php://temp', 'r+');
+        fwrite($handle, "\xEF\xBB\xBF");
+        foreach ($rows as $row) {
+            fputcsv($handle, $row);
+        }
+        rewind($handle);
+        $csv = (string) stream_get_contents($handle);
+        fclose($handle);
+
+        $ext = $format === 'excel' ? 'csv' : 'csv';
+
+        return [
+            'filename' => "accounting_{$reportType}_{$timestamp}.{$ext}",
+            'mime_type' => 'text/csv; charset=UTF-8',
+            'content' => $csv,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<int, array<int, string|int|float|null>>
+     */
+    private function flattenReportRows(string $reportType, array $payload): array
+    {
+        $rows = [['report_type', 'key', 'value']];
+
+        if ($reportType === 'overview') {
+            $summary = $payload['summary'] ?? [];
+            foreach ($summary as $key => $value) {
+                $rows[] = ['overview', (string) $key, is_scalar($value) ? $value : json_encode($value)];
+            }
+
+            return $rows;
+        }
+
+        foreach ($payload as $index => $item) {
+            if (is_array($item)) {
+                if ($index === 0) {
+                    $rows = [array_map('strval', array_keys($item))];
+                }
+                $rows[] = array_map(
+                    fn ($v) => is_scalar($v) || $v === null ? $v : json_encode($v),
+                    array_values($item)
+                );
+            } else {
+                $rows[] = [$reportType, (string) $index, is_scalar($item) ? $item : json_encode($item)];
+            }
+        }
+
+        return $rows;
     }
 
     /**

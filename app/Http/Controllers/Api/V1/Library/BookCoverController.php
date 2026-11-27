@@ -22,12 +22,15 @@ class BookCoverController extends Controller
     {
         Gate::authorize('update', $book);
 
-        $url = $this->bookService->uploadCover(
-            $book,
-            $request->file('cover'),
-            $request->getSchemeAndHttpHost()
-        );
+        try {
+            $url = $this->bookService->uploadCover($book, $request->file('cover'));
+        } catch (\InvalidArgumentException $e) {
+            return response()->error($e->getMessage(), ['cover' => [$e->getMessage()]], 422);
+        }
 
-        return response()->success(['cover_image' => $url], 'Cover uploaded successfully');
+        return response()->success([
+            'cover_image' => $url,
+            'cover_key' => $book->fresh()?->cover_image,
+        ], 'Cover uploaded successfully');
     }
 }

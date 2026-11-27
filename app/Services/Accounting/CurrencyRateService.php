@@ -4,6 +4,7 @@ namespace App\Services\Accounting;
 
 use App\Models\CurrencyRate;
 use Exception;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class CurrencyRateService
@@ -150,22 +151,38 @@ class CurrencyRateService
     }
 
     /**
-     * Sync live currency rates from external API (optional).
-     * This is a placeholder for API integration.
+     * Sync live currency rates from external provider or safe fallback rates.
      */
     public function syncLiveRates(): array
     {
-        // Placeholder for external API integration
-        // You can integrate with services like:
-        // - exchangerate-api.com
-        // - fixer.io
-        // - currencyapi.com
+        $liveRates = self::FALLBACK_RATES_TO_IDR;
+        $endpoint = config('services.currency.endpoint');
+
+        if (is_string($endpoint) && $endpoint !== '') {
+            try {
+                $response = Http::timeout(8)->get($endpoint);
+                if ($response->successful()) {
+                    $ratesFromApi = $response->json('rates');
+                    if (is_array($ratesFromApi)) {
+                        foreach (array_keys(self::FALLBACK_RATES_TO_IDR) as $currency) {
+                            if (isset($ratesFromApi[$currency]) && is_numeric($ratesFromApi[$currency]) && (float) $ratesFromApi[$currency] > 0) {
+                                // Handle standard IDR base or foreign->IDR inverse safely
+                                $rawRate = (float) $ratesFromApi[$currency];
+                                $liveRates[$currency] = $rawRate < 1 ? round(1 / $rawRate, 4) : $rawRate;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception) {
+                // Keep fallback rates when external provider is unreachable
+            }
+        }
 
         $syncedRates = [];
 
-        foreach (self::FALLBACK_RATES_TO_IDR as $currency => $placeholderRate) {
+        foreach ($liveRates as $currency => $resolvedRate) {
             try {
-                $rate = $this->setRate($currency, 'IDR', $placeholderRate, [
+                $rate = $this->setRate($currency, 'IDR', (float) $resolvedRate, [
                     'effective_date' => now(),
                     'expires_at' => now()->endOfDay(),
                 ]);

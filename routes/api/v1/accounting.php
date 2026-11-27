@@ -7,12 +7,12 @@ use App\Http\Controllers\Api\V1\Accounting\ExpenseCategoryController;
 use App\Http\Controllers\Api\V1\Accounting\ExpenseController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('v1/accounting')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1/accounting')->group(function () {
     Route::get('expenses/by-category', [ExpenseController::class, 'getByCategory']);
     Route::get('expenses/total', [ExpenseController::class, 'getTotalExpenses']);
     Route::apiResource('expenses', ExpenseController::class)->whereUuid('expense');
     Route::prefix('expenses/{expense}')->whereUuid('expense')->group(function () {
-        Route::post('receipt', [ExpenseController::class, 'uploadReceipt']);
+        Route::post('receipt', [ExpenseController::class, 'uploadReceipt'])->middleware('throttle:uploads');
         Route::get('receipt', [ExpenseController::class, 'getReceipt']);
         Route::post('duplicate', [ExpenseController::class, 'duplicate']);
         Route::post('convert-currency', [ExpenseController::class, 'convertCurrency']);
@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->prefix('v1/accounting')->group(function () {
         Route::get('payment-methods', [AccountingReportController::class, 'paymentMethodsAnalysis']);
         Route::get('monthly-comparison', [AccountingReportController::class, 'monthlyComparison']);
         Route::get('year-to-date', [AccountingReportController::class, 'yearToDateSummary']);
-        Route::post('export', [AccountingReportController::class, 'export']);
+        Route::post('export', [AccountingReportController::class, 'export'])->middleware('throttle:exports');
+        Route::get('exports/{exportId}', [AccountingReportController::class, 'exportStatus'])->whereUuid('exportId');
     });
 });

@@ -19,6 +19,8 @@ export interface Expense {
     parent_expense_id?: string;
     vendor?: string;
     location?: string;
+    has_receipt?: boolean;
+    receipt_path?: string;
     receipt_data?: string;
     receipt_mime_type?: string;
     receipt_filename?: string;

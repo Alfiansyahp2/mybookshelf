@@ -3,10 +3,11 @@ import type { AxiosError } from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useLogin, useAuthUser } from "../hooks/useAuth";
+import { useLogin, useRegister, useAuthUser } from "../hooks/useAuth";
 import { useNotifications } from "@shared/store/useNotificationStore";
-import { BookOpen, Hammer, Sparkles, ArrowLeft, ArrowRight } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import LoginForm from "../components/LoginForm";
+import RegisterForm from "../components/RegisterForm";
 import AuthDecoration from "../components/AuthDecoration";
 import AuthLeftPage from "../components/AuthLeftPage";
 import SEO from "@shared/components/ui/SEO";
@@ -76,6 +77,7 @@ export default function Login() {
     const navigate = useNavigate();
     const location = useLocation();
     const login = useLogin();
+    const register = useRegister();
     const { data: user } = useAuthUser();
     const addNotification = useNotifications((state) => state.addNotification);
 
@@ -94,6 +96,12 @@ export default function Login() {
         email: "",
         password: "",
     });
+    const [registerData, setRegisterData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+    });
 
     const handleTogglePage = (toRegister: boolean) => {
         if (toRegister && !isRegister) {
@@ -101,6 +109,30 @@ export default function Login() {
         } else if (!toRegister && isRegister) {
             navigate("/login");
         }
+    };
+
+    const handleRegisterSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        register.mutate(registerData, {
+            onSuccess: () => {
+                setTimeout(() => {
+                    navigate("/dashboard", { replace: true });
+                }, 100);
+            },
+            onError: (error) => {
+                const axiosErr = error as AxiosError<{ message?: string }>;
+                const errorMessage =
+                    axiosErr.response?.data?.message ||
+                    axiosErr.message ||
+                    "Registration failed";
+                addNotification({
+                    title: t("register.failed", "Registration failed"),
+                    message: errorMessage,
+                    type: "warning",
+                });
+            },
+        });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -251,8 +283,8 @@ export default function Login() {
                                                 }}
                                             />
 
-                                            {/* Content: Registration Coming Soon */}
-                                            <div className="relative z-10 w-full max-w-sm mx-auto text-center flex flex-col items-center justify-center">
+                                            {/* Content: Registration Form */}
+                                            <div className="relative z-10 w-full max-w-sm mx-auto flex flex-col justify-center">
                                                 {/* Mobile Header Brand Icon */}
                                                 <div className="md:hidden flex flex-col items-center text-center mb-3">
                                                     <div className="w-10 h-10 mb-1.5 bg-[#0f172a] dark:bg-[#131b2e] text-[#ffd166] border border-slate-700 dark:border-indigo-400/40 rounded-xl flex items-center justify-center shadow-md">
@@ -263,75 +295,25 @@ export default function Login() {
                                                     </h1>
                                                 </div>
 
-                                                {/* Status Badge */}
-                                                <motion.div
-                                                    initial={{ scale: 0.9, opacity: 0 }}
-                                                    animate={{ scale: 1, opacity: 1 }}
-                                                    transition={{ delay: 0.15, type: "spring", damping: 15 }}
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/15 dark:bg-indigo-500/25 border border-indigo-200 dark:border-indigo-500/40 text-indigo-700 dark:text-[#ffd166] text-xs font-bold uppercase tracking-wider shadow-2xs mb-3.5"
-                                                >
-                                                    <Hammer className="w-3.5 h-3.5" />
-                                                    <span>{t("register_coming_soon.badge", "TAHAP PENGEMBANGAN")}</span>
-                                                    <Sparkles className="w-3.5 h-3.5" />
-                                                </motion.div>
-
-                                                {/* Decorative Centered Icon */}
-                                                <motion.div
-                                                    animate={{ y: [0, -5, 0] }}
-                                                    transition={{
-                                                        duration: 3.5,
-                                                        repeat: Infinity,
-                                                        ease: "easeInOut",
-                                                    }}
-                                                    className="w-16 h-16 sm:w-18 sm:h-18 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] dark:from-[#131b2e] dark:via-[#1c2438] dark:to-[#0a0e1a] text-white flex items-center justify-center shadow-lg border-2 border-indigo-400/40 dark:border-[#38bdf8]/50"
-                                                >
-                                                    <BookOpen className="w-8 h-8 sm:w-9 sm:h-9 text-[#ffd166] dark:text-[#38bdf8]" />
-                                                </motion.div>
-
-                                                {/* Title */}
-                                                <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] mb-2 sm:mb-2.5 text-center tracking-tight leading-snug">
-                                                    {t(
-                                                        "register_coming_soon.headline",
-                                                        "Pendaftaran Masih Dalam Pengembangan",
-                                                    )}
+                                                <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#0f172a] dark:text-[#f8fafc] mb-3.5 text-center tracking-tight">
+                                                    {t("login.register", "Create Account")}
                                                 </h2>
 
-                                                {/* Subheadline / Message */}
-                                                <p className="text-xs sm:text-sm text-slate-600 dark:text-[#94a3b8] leading-relaxed max-w-xs sm:max-w-sm mx-auto mb-5 text-center">
-                                                    {t(
-                                                        "register_coming_soon.subheadline",
-                                                        "Fitur pembuatan akun baru sedang kami persiapkan dan akan hadir pada pembaruan selanjutnya. Untuk saat ini, silakan masuk menggunakan akun yang sudah terdaftar.",
-                                                    )}
-                                                </p>
-
-                                                {/* Action Buttons */}
-                                                <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full max-w-xs mx-auto mb-4">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => navigate("/login")}
-                                                        className="w-full sm:flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 group cursor-pointer"
-                                                    >
-                                                        <span>{t("register_coming_soon.back_to_login", "Masuk ke Akun")}</span>
-                                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => navigate("/")}
-                                                        className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-300 dark:border-indigo-500/30 text-slate-700 dark:text-[#ffd166] hover:bg-slate-100 dark:hover:bg-indigo-500/20 text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer"
-                                                    >
-                                                        <ArrowLeft className="w-4 h-4" />
-                                                        <span>{t("register_coming_soon.back_to_home", "Kembali ke Beranda")}</span>
-                                                    </button>
-                                                </div>
+                                                <RegisterForm
+                                                    formData={registerData}
+                                                    setFormData={setRegisterData}
+                                                    onSubmit={handleRegisterSubmit}
+                                                    isLoading={register.isPending}
+                                                />
 
                                                 {/* Switch Link back to Login */}
-                                                <div className="text-center">
+                                                <div className="mt-4 text-center">
                                                     <button
                                                         type="button"
                                                         onClick={() => navigate("/login")}
                                                         className="text-slate-600 hover:text-slate-800 dark:text-[#94a3b8] dark:hover:text-white text-xs sm:text-sm font-medium transition-colors inline-flex items-center justify-center gap-1 cursor-pointer"
                                                     >
-                                                        <span>{t("login.has_account", "Sudah punya kartu perpustakaan? Masuk")}</span>
+                                                        <span>{t("login.has_account", "Already have a library card? Sign in")}</span>
                                                     </button>
                                                 </div>
                                             </div>
@@ -396,15 +378,12 @@ export default function Login() {
                                                         onClick={() => navigate("/register")}
                                                         className="text-slate-600 hover:text-slate-800 dark:text-[#94a3b8] dark:hover:text-white text-xs sm:text-sm font-medium transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
                                                     >
-                                                        <span>
-                                                            {t(
-                                                                "login.no_account",
-                                                                "Don't have a library card? Create one",
-                                                            )}
-                                                        </span>
-                                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/15 dark:bg-indigo-500/25 text-indigo-700 dark:text-[#ffd166] font-semibold border border-indigo-200 dark:border-indigo-500/40">
-                                                            Coming Soon
-                                                        </span>
+                                                            <span>
+                                                                {t(
+                                                                    "login.no_account",
+                                                                    "Don't have a library card? Create one",
+                                                                )}
+                                                            </span>
                                                     </button>
                                                 </div>
                                             </div>

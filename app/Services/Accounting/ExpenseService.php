@@ -2,6 +2,7 @@
 
 namespace App\Services\Accounting;
 
+use App\Contracts\Storage\MediaStorageInterface;
 use App\Events\ExpenseUpdated;
 use App\Models\AccountingTimelineEvent;
 use App\Models\Book;
@@ -10,6 +11,7 @@ use App\Models\CurrencyRate;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -83,8 +85,20 @@ class ExpenseService
                 $data['currency'] ?? 'IDR'
             );
 
+            $expenseId = Str::uuid()->toString();
+            $receiptFields = [
+                'receipt_path' => null,
+                'receipt_data' => null,
+                'receipt_mime_type' => $data['receipt_mime_type'] ?? null,
+                'receipt_filename' => $data['receipt_filename'] ?? null,
+            ];
+
+            if (! empty($data['receipt_data'])) {
+                $receiptFields = $this->storeReceiptPayload($userId, $expenseId, $data);
+            }
+
             $expense = Expense::create([
-                'id' => Str::uuid()->toString(),
+                'id' => $expenseId,
                 'user_id' => $userId,
                 'book_id' => $data['book_id'] ?? null,
                 'title' => $data['title'],
@@ -101,9 +115,10 @@ class ExpenseService
                 'parent_expense_id' => $data['parent_expense_id'] ?? null,
                 'vendor' => $data['vendor'] ?? null,
                 'location' => $data['location'] ?? null,
-                'receipt_data' => $data['receipt_data'] ?? null,
-                'receipt_mime_type' => $data['receipt_mime_type'] ?? null,
-                'receipt_filename' => $data['receipt_filename'] ?? null,
+                'receipt_path' => $receiptFields['receipt_path'],
+                'receipt_data' => $receiptFields['receipt_data'],
+                'receipt_mime_type' => $receiptFields['receipt_mime_type'],
+                'receipt_filename' => $receiptFields['receipt_filename'],
                 'has_reminder' => $data['has_reminder'] ?? false,
                 'reminder_date' => $data['reminder_date'] ?? null,
                 'status' => $data['status'] ?? 'completed',
@@ -144,6 +159,12 @@ class ExpenseService
 
                 $data['amount_base_currency'] = $this->convertToBaseCurrency($amount, $currency);
                 $data['exchange_rate'] = $this->getExchangeRate($currency);
+            }
+
+            if (! empty($data['receipt_data'])) {
+                $mediaStorage = app(MediaStorageInterface::class);
+                $mediaStorage->delete($expense->receipt_path);
+                $data = array_merge($data, $this->storeReceiptPayload($userId, $expenseId, $data));
             }
 
             $expense->update($data);
@@ -205,23 +226,26 @@ class ExpenseService
     }
 
     /**
-     * Upload or update receipt for an expense.
+     * Upload or update receipt for an expense onto configured media storage.
      */
-    public function uploadReceipt(string $expenseId, array $receiptData, string $userId): Expense
-    {
+    public function uploadReceipt(
+        string $expenseId,
+        array $receiptData,
+        string $userId,
+        ?UploadedFile $file = null
+    ): Expense {
         $expense = $this->getExpense($expenseId, $userId);
+        $mediaStorage = app(MediaStorageInterface::class);
+        $mediaStorage->delete($expense->receipt_path);
 
-        $expense->update([
-            'receipt_data' => $receiptData['data'],
-            'receipt_mime_type' => $receiptData['mime_type'] ?? 'image/jpeg',
-            'receipt_filename' => $receiptData['filename'] ?? 'receipt.jpg',
-        ]);
+        $fields = $this->storeReceiptPayload($userId, $expense->id, $receiptData, $file);
+        $expense->update($fields);
 
-        return $expense->fresh();
+        return $expense->fresh(['category', 'book']);
     }
 
     /**
-     * Get receipt data for an expense.
+     * Get temporary signed receipt URL (5 minutes) or fallback metadata for an expense.
      */
     public function getReceipt(string $expenseId, string $userId): array
     {
@@ -231,10 +255,85 @@ class ExpenseService
             throw new Exception('No receipt found for this expense');
         }
 
+        if ($expense->receipt_path) {
+            $signedUrl = app(MediaStorageInterface::class)->temporarySignedUrl($expense->receipt_path, 5);
+
+            return [
+                'temporary_url' => $signedUrl,
+                'url' => $signedUrl,
+                'expires_in_seconds' => 300,
+                'mime_type' => $expense->receipt_mime_type,
+                'filename' => $expense->receipt_filename,
+            ];
+        }
+
         return [
             'data' => $expense->receipt_data,
             'mime_type' => $expense->receipt_mime_type,
             'filename' => $expense->receipt_filename,
+        ];
+    }
+
+    /**
+     * Persist decoded receipt bytes onto MediaStorageInterface and validate magic bytes.
+     *
+     * @param  array<string, mixed>  $receiptData
+     * @return array{receipt_path: string, receipt_data: null, receipt_mime_type: string, receipt_filename: string}
+     */
+    private function storeReceiptPayload(
+        string $userId,
+        string $expenseId,
+        array $receiptData,
+        ?UploadedFile $file = null
+    ): array {
+        if ($file !== null) {
+            $realPath = $file->getRealPath();
+            $binary = $realPath ? file_get_contents($realPath) : false;
+            $filename = (string) ($receiptData['filename'] ?? $file->getClientOriginalName() ?: "receipt_{$expenseId}");
+            $hintMime = $file->getMimeType();
+        } else {
+            $rawData = (string) ($receiptData['data'] ?? '');
+            $hintMime = $receiptData['mime_type'] ?? null;
+            $filename = (string) ($receiptData['filename'] ?? "receipt_{$expenseId}.jpg");
+
+            if (preg_match('/^data:([^;]+);base64,(.*)$/s', $rawData, $matches)) {
+                $hintMime = $matches[1];
+                $binary = base64_decode($matches[2], true);
+            } else {
+                $binary = base64_decode($rawData, true);
+            }
+        }
+
+        if ($binary === false || $binary === '') {
+            throw new \InvalidArgumentException('Invalid receipt content payload.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $detectedMime = (string) $finfo->buffer($binary);
+        $allowedMimes = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'application/pdf' => 'pdf',
+        ];
+
+        $resolvedMime = array_key_exists($detectedMime, $allowedMimes)
+            ? $detectedMime
+            : ($hintMime && array_key_exists($hintMime, $allowedMimes) ? $hintMime : null);
+
+        if ($resolvedMime === null || ($resolvedMime !== 'application/pdf' && @getimagesizefromstring($binary) === false)) {
+            throw new \InvalidArgumentException('Unsupported receipt file format. Allowed: JPG, PNG, WebP, or PDF.');
+        }
+
+        $ext = $allowedMimes[$resolvedMime];
+        $key = "receipts/{$userId}/{$expenseId}_".now()->timestamp.".{$ext}";
+        $storedKey = app(MediaStorageInterface::class)->put($key, $binary, $resolvedMime, 'private');
+
+        return [
+            'receipt_path' => $storedKey,
+            'receipt_data' => null,
+            'receipt_mime_type' => $resolvedMime,
+            'receipt_filename' => $filename,
         ];
     }
 

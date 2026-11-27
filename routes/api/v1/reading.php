@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\V1\Reading\BookReadingController;
 use App\Http\Controllers\Api\V1\Reading\ReadingSessionController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('v1')->group(function () {
     Route::prefix('books/{book}')->whereUuid('book')->group(function () {
         Route::post('start', [BookReadingController::class, 'start']);
         Route::post('finish', [BookReadingController::class, 'finish']);

@@ -39,6 +39,7 @@ class Expense extends Model
         'receipt_data',
         'receipt_mime_type',
         'receipt_filename',
+        'receipt_path',
         'has_reminder',
         'reminder_date',
         'reminder_sent',
@@ -148,7 +149,7 @@ class Expense extends Model
      */
     public function hasReceipt(): bool
     {
-        return ! empty($this->receipt_data);
+        return ! empty($this->receipt_path) || ! empty($this->receipt_data);
     }
 
     /**

@@ -2,10 +2,16 @@
 
 use App\Http\Controllers\Api\V1\System\FallbackController;
 use App\Http\Controllers\Api\V1\System\HealthController;
+use App\Http\Controllers\Api\V1\System\SignedMediaController;
 use Illuminate\Support\Facades\Route;
 
 // Public health check
 Route::get('/health', HealthController::class);
+
+// Cryptographically signed temporary media endpoint (used when local disk serves private files)
+Route::get('v1/media/signed', SignedMediaController::class)
+    ->middleware('signed')
+    ->name('api.v1.media.signed');
 
 require __DIR__.'/api/v1/auth.php';
 require __DIR__.'/api/v1/library.php';

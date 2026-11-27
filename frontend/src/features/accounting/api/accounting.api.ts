@@ -27,11 +27,28 @@ export const expensesApi = {
     deleteExpense: (id: string) =>
         apiClient.delete(`/v1/accounting/expenses/${id}`),
 
-    // Upload receipt
-    uploadReceipt: (
+    // Upload receipt (supports File multipart upload or base64 payload)
+    uploadReceipt: async (
         id: string,
-        receiptData: { data: string; mime_type?: string; filename?: string },
-    ) => apiClient.post(`/v1/accounting/expenses/${id}/receipt`, receiptData),
+        receiptInput:
+            | File
+            | { data: string; mime_type?: string; filename?: string },
+    ) => {
+        if (receiptInput instanceof File) {
+            const formData = new FormData();
+            formData.append("receipt", receiptInput);
+            const response = await apiClient.instance.post(
+                `/v1/accounting/expenses/${id}/receipt`,
+                formData,
+                { headers: { "Content-Type": undefined } },
+            );
+            return response.data;
+        }
+        return apiClient.post(
+            `/v1/accounting/expenses/${id}/receipt`,
+            receiptInput,
+        );
+    },
 
     // Get receipt
     getReceipt: (id: string) =>
@@ -287,13 +304,21 @@ export const reportsApi = {
     getYearToDateSummary: () =>
         apiClient.get("/v1/accounting/reports/year-to-date"),
 
-    // Export report
+    // Export report (202 Accepted async queue job)
     exportReport: (params: {
         report_type: string;
         format: string;
         start_date?: string;
         end_date?: string;
     }) => apiClient.post("/v1/accounting/reports/export", params),
+
+    // Poll async report export job status & temporary signed download URL
+    getExportStatus: (exportId: string, signal?: AbortSignal) =>
+        apiClient.get(
+            `/v1/accounting/reports/exports/${exportId}`,
+            undefined,
+            signal,
+        ),
 };
 
 // Combined exports

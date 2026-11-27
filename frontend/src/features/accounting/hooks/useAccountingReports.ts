@@ -95,3 +95,16 @@ export function useExportReport() {
         }) => reportsApi.exportReport(params),
     });
 }
+
+// Poll async export status & temporary signed download URL
+export function useExportStatus(exportId: string | null) {
+    return useQuery({
+        queryKey: ["reports", "export-status", exportId],
+        queryFn: ({ signal }) => reportsApi.getExportStatus(exportId!, signal),
+        enabled: !!exportId,
+        refetchInterval: (query) => {
+            const status = query.state.data?.data?.status;
+            return status === "queued" ? 1500 : false;
+        },
+    });
+}

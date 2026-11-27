@@ -12,7 +12,8 @@ class UploadExpenseReceiptRequest extends ApiFormRequest
     public function rules(): array
     {
         return [
-            'data' => 'required|string',
+            'receipt' => 'required_without:data|file|mimes:jpeg,jpg,png,webp,pdf|max:10240',
+            'data' => 'required_without:receipt|string',
             'mime_type' => 'nullable|string|max:100',
             'filename' => 'nullable|string|max:255',
         ];

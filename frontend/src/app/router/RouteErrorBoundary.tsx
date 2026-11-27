@@ -1,7 +1,9 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
 
-interface RouteErrorBoundaryProps {
+interface InnerErrorBoundaryProps {
     children: ReactNode;
+    onResetQueries: () => void;
 }
 
 interface RouteErrorBoundaryState {
@@ -9,8 +11,8 @@ interface RouteErrorBoundaryState {
     message: string;
 }
 
-export class RouteErrorBoundary extends Component<
-    RouteErrorBoundaryProps,
+class InnerErrorBoundary extends Component<
+    InnerErrorBoundaryProps,
     RouteErrorBoundaryState
 > {
     state: RouteErrorBoundaryState = {
@@ -27,6 +29,11 @@ export class RouteErrorBoundary extends Component<
 
     componentDidCatch(_error: Error, _info: ErrorInfo): void {}
 
+    private handleRetry = (): void => {
+        this.props.onResetQueries();
+        this.setState({ hasError: false, message: "" });
+    };
+
     render(): ReactNode {
         if (this.state.hasError) {
             return (
@@ -38,13 +45,22 @@ export class RouteErrorBoundary extends Component<
                         <p className="text-sm text-walnut/80 dark:text-cream/70 mb-5">
                             {this.state.message}
                         </p>
-                        <button
-                            type="button"
-                            onClick={() => window.location.reload()}
-                            className="px-4 py-2 rounded-xl bg-walnut hover:bg-darkBrown text-white text-sm font-semibold transition-colors"
-                        >
-                            Reload page
-                        </button>
+                        <div className="flex items-center justify-center gap-3">
+                            <button
+                                type="button"
+                                onClick={this.handleRetry}
+                                className="px-4 py-2 rounded-xl bg-walnut hover:bg-darkBrown text-white text-sm font-semibold transition-colors cursor-pointer"
+                            >
+                                Try again
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => window.location.reload()}
+                                className="px-4 py-2 rounded-xl border border-walnut/25 text-darkBrown dark:text-cream hover:bg-walnut/10 text-sm font-semibold transition-colors cursor-pointer"
+                            >
+                                Reload page
+                            </button>
+                        </div>
                     </div>
                 </div>
             );
@@ -52,4 +68,16 @@ export class RouteErrorBoundary extends Component<
 
         return this.props.children;
     }
+}
+
+export function RouteErrorBoundary({ children }: { children: ReactNode }) {
+    return (
+        <QueryErrorResetBoundary>
+            {({ reset }) => (
+                <InnerErrorBoundary onResetQueries={reset}>
+                    {children}
+                </InnerErrorBoundary>
+            )}
+        </QueryErrorResetBoundary>
+    );
 }

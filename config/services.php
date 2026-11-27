@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'currency' => [
+        'endpoint' => env('CURRENCY_RATES_API_URL'),
+    ],
+
 ];

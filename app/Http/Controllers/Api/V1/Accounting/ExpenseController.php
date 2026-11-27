@@ -120,9 +120,16 @@ class ExpenseController extends Controller
         Gate::authorize('update', $expense);
 
         try {
-            $updated = $this->expenseService->uploadReceipt($expense->id, $request->validated(), $request->user()->id);
+            $updated = $this->expenseService->uploadReceipt(
+                $expense->id,
+                $request->validated(),
+                $request->user()->id,
+                $request->file('receipt')
+            );
 
             return response()->success(new ExpenseResource($updated), 'Receipt uploaded successfully');
+        } catch (\InvalidArgumentException $e) {
+            return response()->error($e->getMessage(), ['receipt' => [$e->getMessage()]], 422);
         } catch (\Exception $e) {
             return $this->serverErrorResponse($e, 'ExpenseController::uploadReceipt failed');
         }
@@ -140,6 +147,10 @@ class ExpenseController extends Controller
 
             return response()->success($receipt, 'Receipt retrieved successfully');
         } catch (\Exception $e) {
+            if ($e->getMessage() === 'No receipt found for this expense') {
+                return $this->notFoundResponse('No receipt found for this expense');
+            }
+
             return $this->serverErrorResponse($e, 'ExpenseController::getReceipt failed');
         }
     }
