@@ -53,8 +53,8 @@ class ApiClient {
         );
     }
 
-    async get(url: string, params?: Record<string, unknown>) {
-        const response = await this.client.get(url, { params });
+    async get(url: string, params?: Record<string, unknown>, signal?: AbortSignal) {
+        const response = await this.client.get(url, { params, signal });
         return response.data;
     }
 

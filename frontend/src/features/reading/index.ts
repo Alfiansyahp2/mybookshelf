@@ -12,6 +12,6 @@ export {
     usePauseReadingSession,
     useBookReadingSessions,
 } from "./hooks/useReadingSessions";
-export { getBookYears, useYearlyStats, type YearlyStat } from "./hooks/useYearlyStats";
+export { useYearlyStats, type YearlyStat } from "./hooks/useYearlyStats";
 export { default as ReadingSessionTimer } from "./components/session/ReadingSessionTimer";
 export { default as ReadingSessionsModal } from "./components/session/ReadingSessionsModal";

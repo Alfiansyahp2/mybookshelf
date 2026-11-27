@@ -2,6 +2,8 @@
 
 namespace App\Services\Reading;
 
+use App\Events\BookFinished;
+use App\Events\ReadingSessionCompleted;
 use App\Models\Book;
 use App\Models\ReadingSession;
 use App\Services\Library\BookService;
@@ -60,6 +62,8 @@ class ReadingSessionService
             'notes' => $data['notes'] ?? null,
             'duration' => $duration,
         ]);
+
+        ReadingSessionCompleted::dispatch($session);
 
         return $session->load('book');
     }
@@ -138,7 +142,10 @@ class ReadingSessionService
             'notes' => $notes,
         ]);
 
-        return $session->fresh();
+        $freshSession = $session->fresh();
+        ReadingSessionCompleted::dispatch($freshSession);
+
+        return $freshSession;
     }
 
     /**
@@ -252,6 +259,8 @@ class ReadingSessionService
                     'progress' => $progress,
                 ]);
             }
+
+            BookFinished::dispatch($book);
         }
     }
 

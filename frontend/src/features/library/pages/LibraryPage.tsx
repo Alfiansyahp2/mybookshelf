@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import SEO from "@shared/components/ui/SEO";
 import ReadingCalendarModal from "@shared/components/modals/ReadingCalendarModal";
 import type { Book, BookStatus } from "@shared/types";
+import { useDashboardSummary } from "@features/analytics";
 import { useBooks } from "../hooks/useBooks";
 import { useShelves, useUpdateShelfLayout } from "../hooks/useShelves";
 import { useBookstore } from "../store/useBookstore";
@@ -48,10 +49,17 @@ export default function LibraryPage() {
     >();
     const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
-    const filterParams =
-        activeFilter === "all" ? {} : { status: activeFilter as BookStatus };
+    const urlSearch = searchParams.get("search")?.trim() || "";
+    const filterParams = {
+        ...(activeFilter === "all"
+            ? {}
+            : { status: activeFilter as BookStatus }),
+        ...(urlSearch ? { search: urlSearch } : {}),
+        per_page: 500,
+    };
     const { data: booksResponse, isLoading, error } = useBooks(filterParams);
     const { data: shelves = [], isLoading: shelvesLoading } = useShelves();
+    const { data: summary } = useDashboardSummary();
 
     if (isLoading || shelvesLoading) {
         return (
@@ -83,12 +91,14 @@ export default function LibraryPage() {
     }
 
     const books: Book[] = booksResponse?.data?.data || [];
+    const meta = booksResponse?.data?.meta;
+    const overview = summary?.overview;
     const counts = {
-        all: books.length,
-        reading: books.filter((b: Book) => b.status === "reading").length,
-        finished: books.filter((b: Book) => b.status === "finished").length,
-        unread: books.filter((b: Book) => b.status === "unread").length,
-        borrowed: books.filter((b: Book) => b.status === "borrowed").length,
+        all: overview?.total ?? meta?.total ?? books.length,
+        reading: overview?.reading ?? 0,
+        finished: overview?.finished ?? 0,
+        unread: overview?.unread ?? 0,
+        borrowed: overview?.borrowed ?? 0,
     };
 
     const handleAddBook = (shelfId: string, shelfName?: string) => {
@@ -142,6 +152,27 @@ export default function LibraryPage() {
                 onFilterSelect={setActiveFilter}
                 onOpenCalendar={() => setIsCalendarModalOpen(true)}
             />
+
+            {urlSearch && (
+                <div className="relative z-10 mb-3 flex items-center justify-between gap-3 px-4 py-2 rounded-xl bg-surface/90 border border-walnut/15 text-xs text-ink shadow-xs">
+                    <span>
+                        {t("search.results_found", "Search results")}:{" "}
+                        <strong>&ldquo;{urlSearch}&rdquo;</strong>{" "}
+                        {meta ? `(${meta.total})` : ""}
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const nextParams = new URLSearchParams(searchParams);
+                            nextParams.delete("search");
+                            setSearchParams(nextParams, { replace: true });
+                        }}
+                        className="text-walnut hover:text-darkBrown font-semibold underline cursor-pointer"
+                    >
+                        {t("reading.clear_filter", "Clear")}
+                    </button>
+                </div>
+            )}
 
             {/* Main Library View: Bookshelf or Cover Grid */}
             <div
@@ -205,7 +236,7 @@ export default function LibraryPage() {
             <ReadingCalendarModal
                 isOpen={isCalendarModalOpen}
                 onClose={() => setIsCalendarModalOpen(false)}
-                books={books}
+                books={summary?.activity_books ?? books}
             />
         </div>
     );

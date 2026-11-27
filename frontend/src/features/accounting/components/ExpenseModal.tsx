@@ -51,7 +51,10 @@ export default function ExpenseModal({
     const deleteExpense = useDeleteExpense();
     const { data: categoriesResponse } = useExpenseCategories();
     const categories: ExpenseCategory[] = categoriesResponse?.data || [];
-    const { data: booksResponse } = useBooks();
+    const { data: booksResponse } = useBooks(
+        { per_page: 100 },
+        { enabled: isOpen },
+    );
     const books = Array.isArray(booksResponse?.data?.data)
         ? booksResponse.data.data
         : Array.isArray(booksResponse?.data)

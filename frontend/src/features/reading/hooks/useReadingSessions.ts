@@ -26,6 +26,13 @@ export function useStartReadingSession() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.readingSessions.book(variables.bookId),
             });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.analytics.dashboard(),
+            });
+            queryClient.invalidateQueries({ queryKey: queryKeys.statistics.all });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.achievements.all,
+            });
         },
     });
 }
@@ -50,6 +57,13 @@ export function useEndReadingSession() {
             queryClient.invalidateQueries({ queryKey: queryKeys.books.all });
             queryClient.invalidateQueries({
                 queryKey: queryKeys.readingSessions.book(variables.bookId),
+            });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.analytics.dashboard(),
+            });
+            queryClient.invalidateQueries({ queryKey: queryKeys.statistics.all });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.achievements.all,
             });
         },
     });
@@ -102,8 +116,14 @@ export function useReadAgain() {
     return useMutation({
         mutationFn: (bookId: string) => readingSessionsApi.readAgain(bookId),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ["books"] });
-            queryClient.invalidateQueries({ queryKey: ["books", variables] });
+            queryClient.invalidateQueries({ queryKey: queryKeys.books.all });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.books.detail(variables),
+            });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.analytics.dashboard(),
+            });
+            queryClient.invalidateQueries({ queryKey: queryKeys.statistics.all });
         },
     });
 }

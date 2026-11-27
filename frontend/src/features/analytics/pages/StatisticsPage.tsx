@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { BarChart3 } from "lucide-react";
 import SEO from "@shared/components/ui/SEO";
-import { useBooks } from "@features/library";
 import { useStatistics } from "../hooks/useStatistics";
 import StatisticsOverviewCards from "../components/statistics/StatisticsOverviewCards";
 import StatisticsChartsGrid from "../components/statistics/StatisticsChartsGrid";
@@ -11,13 +10,8 @@ import StatisticsMonthlySection from "../components/statistics/StatisticsMonthly
 export default function StatisticsPage() {
     const { t } = useTranslation();
     const { data: statisticsResponse, isLoading } = useStatistics();
-    const { data: booksResponse } = useBooks({});
 
     const stats = statisticsResponse?.data;
-    const allBooks = useMemo(
-        () => booksResponse?.data?.data || [],
-        [booksResponse],
-    );
 
     const genreData = useMemo(() => {
         const dist = stats?.genre_distribution || {};
@@ -78,9 +72,7 @@ export default function StatisticsPage() {
                             "statistics.subtitle",
                             "Insights from {{count}} books in your library.",
                             {
-                                count:
-                                    stats?.overview?.total_books ??
-                                    allBooks.length,
+                                count: stats?.overview?.total_books ?? 0,
                             },
                         )}
                     </p>
@@ -90,7 +82,7 @@ export default function StatisticsPage() {
                     overview={stats?.overview}
                     readingTime={stats?.reading_time}
                     purchases={stats?.purchases}
-                    fallbackTotalBooks={allBooks.length}
+                    fallbackTotalBooks={stats?.overview?.total_books ?? 0}
                 />
 
                 <StatisticsChartsGrid

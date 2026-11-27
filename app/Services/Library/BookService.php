@@ -2,8 +2,11 @@
 
 namespace App\Services\Library;
 
+use App\DataTransferObjects\Library\BookFilterData;
+use App\Events\BookFinished;
 use App\Models\Book;
 use App\Models\TimelineEvent;
+use App\Services\Analytics\AchievementService;
 use App\Services\Reading\ReadingSessionService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -14,9 +17,15 @@ class BookService
 {
     /**
      * Get all books with filtering and pagination
+     *
+     * @param  array<string, mixed>|BookFilterData  $filters
      */
-    public function getAllBooks($filters = [], $withPagination = true, $userId = null)
+    public function getAllBooks(array|BookFilterData $filters = [], bool $withPagination = true, ?string $userId = null)
     {
+        $filterData = $filters instanceof BookFilterData
+            ? $filters
+            : BookFilterData::fromArray($filters);
+
         $query = Book::with(['shelf', 'collections']);
 
         // SECURITY: Filter by user_id - only show books belonging to authenticated user
@@ -24,22 +33,87 @@ class BookService
             $query->where('user_id', $userId);
         }
 
-        // Apply filters
-        if (isset($filters['status'])) {
-            $query->where('status', $filters['status']);
+        if ($filterData->status !== null) {
+            $query->where('status', $filterData->status);
         }
 
-        if (isset($filters['favorite']) && $filters['favorite']) {
-            $query->where('favorite', true);
+        if ($filterData->statuses !== []) {
+            $query->whereIn('status', $filterData->statuses);
         }
 
-        if (isset($filters['search'])) {
-            $searchTerm = $filters['search'];
-            $query->where(function ($q) use ($searchTerm) {
+        if ($filterData->excludeStatuses !== []) {
+            $query->whereNotIn('status', $filterData->excludeStatuses);
+        }
+
+        if ($filterData->shelfId !== null) {
+            $query->where('shelf_id', $filterData->shelfId);
+        }
+
+        if ($filterData->favorite !== null) {
+            $query->where('favorite', $filterData->favorite);
+        }
+
+        if ($filterData->isReturned !== null) {
+            $query->where('is_returned', $filterData->isReturned);
+        }
+
+        if ($filterData->overdue === true) {
+            $query->where('status', 'borrowed')
+                ->where('is_returned', false)
+                ->whereNotNull('due_date')
+                ->where('due_date', '<', now()->startOfDay()->toDateString());
+        } elseif ($filterData->overdue === false) {
+            $query->where(function ($q): void {
+                $q->where('is_returned', true)
+                    ->orWhereNull('due_date')
+                    ->orWhere('due_date', '>=', now()->startOfDay()->toDateString());
+            });
+        }
+
+        if ($filterData->borrowedBy !== null) {
+            $query->where('borrowed_by', 'ilike', "%{$filterData->borrowedBy}%");
+        }
+
+        if ($filterData->hasNotes === true) {
+            $query->whereNotNull('personal_notes')->where('personal_notes', '!=', '');
+        } elseif ($filterData->hasNotes === false) {
+            $query->where(function ($q): void {
+                $q->whereNull('personal_notes')->orWhere('personal_notes', '');
+            });
+        }
+
+        if ($filterData->genre !== null) {
+            $query->where('genre', 'ilike', "%{$filterData->genre}%");
+        }
+
+        if ($filterData->year !== null) {
+            $year = $filterData->year;
+            $query->where(function ($q) use ($year): void {
+                $q->whereRaw('EXTRACT(YEAR FROM finished_date) = ?', [$year])
+                    ->orWhereRaw('EXTRACT(YEAR FROM started_date) = ?', [$year])
+                    ->orWhereRaw(
+                        "EXISTS (SELECT 1 FROM json_array_elements(COALESCE(books.read_dates, '[]'::json)) AS elem WHERE SUBSTRING(elem#>>'{}' FROM 1 FOR 4) ~ '^\\\\d{4}$' AND SUBSTRING(elem#>>'{}' FROM 1 FOR 4)::int = ?)",
+                        [$year]
+                    )
+                    ->orWhere(function ($fallback) use ($year): void {
+                        $fallback->whereNull('finished_date')
+                            ->whereNull('started_date')
+                            ->whereRaw('(read_dates IS NULL OR json_array_length(read_dates) = 0)')
+                            ->whereIn('status', ['reading', 'finished'])
+                            ->whereRaw('EXTRACT(YEAR FROM COALESCE(last_modified, date_added)) = ?', [$year]);
+                    });
+            });
+        }
+
+        if ($filterData->search !== null) {
+            $searchTerm = $filterData->search;
+            $query->where(function ($q) use ($searchTerm): void {
                 $q->where('title', 'ilike', "%{$searchTerm}%")
                     ->orWhere('author', 'ilike', "%{$searchTerm}%")
                     ->orWhere('genre', 'ilike', "%{$searchTerm}%")
-                    ->orWhere('isbn', 'ilike', "%{$searchTerm}%");
+                    ->orWhere('isbn', 'ilike', "%{$searchTerm}%")
+                    ->orWhere('borrowed_by', 'ilike', "%{$searchTerm}%")
+                    ->orWhere('personal_notes', 'ilike', "%{$searchTerm}%");
             });
         }
 
@@ -47,7 +121,7 @@ class BookService
         $query->orderBy('last_modified', 'desc');
 
         if ($withPagination) {
-            return $query->paginate(15);
+            return $query->paginate($filterData->perPage, ['*'], 'page', $filterData->page);
         }
 
         return $query->get();
@@ -80,6 +154,12 @@ class BookService
 
             DB::commit();
 
+            if ($book->status === 'finished') {
+                BookFinished::dispatch($book);
+            } else {
+                app(AchievementService::class)->evaluateForUser($book->user_id);
+            }
+
             return $book->load(['shelf', 'collections']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -92,7 +172,7 @@ class BookService
      */
     public function getBook($id, $userId = null)
     {
-        $query = Book::with(['shelf', 'shelf.room', 'collections', 'readingSessions', 'timelineEvents', 'expenses.category']);
+        $query = Book::with(['shelf', 'collections', 'readingSessions', 'timelineEvents', 'expenses.category']);
 
         // SECURITY: Filter by user_id if provided
         if ($userId) {
@@ -193,7 +273,10 @@ class BookService
         // Update collection progresses
         $this->updateRelatedCollectionProgress($book);
 
-        return $book->fresh();
+        $freshBook = $book->fresh();
+        BookFinished::dispatch($freshBook);
+
+        return $freshBook;
     }
 
     /**
@@ -204,6 +287,7 @@ class BookService
         $book = $this->findOwnedBook($id, $userId);
 
         $progress = $this->calculateProgress($currentPage, $book->pages);
+        $autoFinished = false;
 
         $data = [
             'current_page' => $currentPage,
@@ -213,6 +297,7 @@ class BookService
 
         // Auto-finish if progress reaches 100%
         if ($progress >= 100 && $book->status !== 'finished') {
+            $autoFinished = true;
             $data['status'] = 'finished';
             $data['finished_date'] = now();
 
@@ -234,7 +319,13 @@ class BookService
         // Create milestone timeline events
         $this->checkProgressMilestones($book, $progress);
 
-        return $book->fresh();
+        $freshBook = $book->fresh();
+
+        if ($autoFinished) {
+            BookFinished::dispatch($freshBook);
+        }
+
+        return $freshBook;
     }
 
     /**
@@ -253,7 +344,12 @@ class BookService
             $this->createTimelineEvent($book, 'favorited', 'Marked as favorite');
         }
 
-        return $book->fresh();
+        $freshBook = $book->fresh();
+        if ($freshBook->favorite) {
+            app(AchievementService::class)->evaluateForUser($freshBook->user_id);
+        }
+
+        return $freshBook;
     }
 
     /**
@@ -283,7 +379,12 @@ class BookService
             'last_modified' => now(),
         ]);
 
-        return $book->fresh();
+        $freshBook = $book->fresh();
+        if ($rating !== null) {
+            app(AchievementService::class)->evaluateForUser($freshBook->user_id);
+        }
+
+        return $freshBook;
     }
 
     /**
@@ -448,7 +549,9 @@ class BookService
         ]);
 
         // Auto-finish book if progress reaches 100%
+        $autoFinished = false;
         if ($progress >= 100 && $book->status !== 'finished') {
+            $autoFinished = true;
             $readDates = $book->read_dates ?? [];
             $today = now()->format('Y-m-d');
             if (! in_array($today, $readDates)) {
@@ -468,7 +571,13 @@ class BookService
             $this->createTimelineEvent($book, 'finished', 'Finished reading');
         }
 
-        return $book->fresh();
+        $freshBook = $book->fresh();
+
+        if ($autoFinished) {
+            BookFinished::dispatch($freshBook);
+        }
+
+        return $freshBook;
     }
 
     /**

@@ -7,7 +7,6 @@ import SEO from "@shared/components/ui/SEO";
 import BookmarkHeart from "@shared/components/icons/BookmarkHeart";
 import type { Book } from "@shared/types";
 import { useBooks, useStartReading } from "../hooks/useBooks";
-import { useShelves } from "../hooks/useShelves";
 import { useBookstore } from "../store/useBookstore";
 import AddWishlistBookModal from "../components/modals/AddWishlistBookModal";
 import WishlistCard from "../components/wishlist/WishlistCard";
@@ -19,16 +18,16 @@ export default function WishlistPage() {
     const [viewMode, setViewMode] = useState<"list" | "grid">("list");
     const [isAddBookModalOpen, setIsAddBookModalOpen] = useState(false);
 
-    const { data: allBooksResponse, isLoading } = useBooks({});
-    const { isLoading: shelvesLoading } = useShelves();
+    const { data: wishlistResponse, isLoading } = useBooks({
+        status: "wishlist",
+        per_page: 500,
+    });
     const startReadingMutation = useStartReading();
 
-    const allBooks = allBooksResponse?.data?.data || [];
-    const wishlistBooks = allBooks.filter(
-        (book: Book) => book.status === "wishlist",
-    );
+    const wishlistBooks = wishlistResponse?.data?.data || [];
+    const meta = wishlistResponse?.data?.meta;
 
-    const totalWishlist = wishlistBooks.length;
+    const totalWishlist = meta?.total ?? wishlistBooks.length;
 
     const genresCount = wishlistBooks.reduce<Record<string, number>>(
         (acc, book: Book) => {
@@ -72,7 +71,7 @@ export default function WishlistPage() {
         toggleBookDetail(book.id);
     };
 
-    if (isLoading || shelvesLoading) {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center py-16">
                 <SEO title={t("navigation.wishlist", "Wishlist")} />

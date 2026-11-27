@@ -1,7 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { useBooks, useShelves } from "@features/library";
-import { useStatistics } from "../hooks/useStatistics";
+import { useDashboardSummary } from "../hooks/useDashboardSummary";
 import { useDashboardStats } from "../hooks/useDashboardStats";
 import { useTranslation } from "react-i18next";
 
@@ -22,22 +21,17 @@ import SEO from "@shared/components/ui/SEO";
    ══════════════════════════════════════════════ */
 export default function Dashboard() {
     const { t } = useTranslation();
-    const { data: booksResponse, isLoading } = useBooks();
-    const { data: shelves = [] } = useShelves();
-    const { data: statisticsResponse } = useStatistics();
+    const { data: summary, isLoading } = useDashboardSummary();
 
-    const backendStats = statisticsResponse?.data;
-    const dailyActivity = backendStats?.daily_activity || [];
-    const books = useMemo(
-        () => booksResponse?.data?.data || [],
-        [booksResponse],
-    );
+    const dailyActivity = summary?.daily_activity || [];
+    const activityBooks = summary?.activity_books || [];
+    const shelvesCount = summary?.overview?.shelves_count ?? 0;
 
     const [genreFilter, setGenreFilter] = useState<string>("Semua");
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
     const [mobileAnalyticsTab, setMobileAnalyticsTab] = useState<"charts" | "authors">("charts");
 
-    const stats = useDashboardStats(books);
+    const stats = useDashboardStats(summary);
 
     if (isLoading)
         return (
@@ -97,7 +91,7 @@ export default function Dashboard() {
                 <div className="flex flex-col gap-4 min-h-0">
                     <DashboardGoalsSection
                         stats={stats}
-                        shelvesLength={shelves.length}
+                        shelvesLength={shelvesCount}
                     />
                     <DashboardAuthorsSection stats={stats} />
                 </div>
@@ -114,7 +108,7 @@ export default function Dashboard() {
                 {/* 2. Priority #2: Reading Goals & Shelves */}
                 <DashboardGoalsSection
                     stats={stats}
-                    shelvesLength={shelves.length}
+                    shelvesLength={shelvesCount}
                 />
 
                 {/* 3. Priority #3: Analytics & Insights with Segmented Tabs */}
@@ -165,7 +159,7 @@ export default function Dashboard() {
             {/* ─── Reading progress area chart + recent books ─ */}
             <DashboardActivitySection
                 dailyActivity={dailyActivity}
-                books={books}
+                books={activityBooks}
                 stats={stats}
                 setIsCalendarModalOpen={setIsCalendarModalOpen}
             />
@@ -177,7 +171,7 @@ export default function Dashboard() {
             <ReadingCalendarModal
                 isOpen={isCalendarModalOpen}
                 onClose={() => setIsCalendarModalOpen(false)}
-                books={books}
+                books={activityBooks}
             />
         </div>
     );

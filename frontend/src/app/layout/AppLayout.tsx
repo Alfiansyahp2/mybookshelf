@@ -10,10 +10,8 @@ import {
     useBookstore,
     useBook,
     useDeleteBook,
-    useShelves,
 } from "@features/library";
 import { ReadingSessionTimer } from "@features/reading";
-import { useAchievementTracker } from "@features/analytics";
 import BookmarkHeart from "@shared/components/icons/BookmarkHeart";
 import { useThemeStore } from "@shared/store/useThemeStore";
 import { getAppPaletteVars } from "@shared/constants/appPalettes";
@@ -35,15 +33,10 @@ export default function AppLayout() {
         selectedBookId,
         isBookDetailOpen,
         closeBookDetail,
-        editingShelfId,
+        editingShelf,
         closeEditShelf,
     } = useBookstore();
     const deleteBook = useDeleteBook();
-
-    const { data: shelves = [] } = useShelves();
-    const editingShelf = editingShelfId
-        ? (shelves.find((s) => s.id === editingShelfId) ?? null)
-        : null;
 
     const { isDarkMode, lightPalette, darkPalette, toggleDarkMode } =
         useThemeStore();
@@ -53,11 +46,11 @@ export default function AppLayout() {
         darkPalette,
     );
 
-    const { data: selectedBook } = useBook(selectedBookId || "");
-
-    useAchievementTracker();
-
     const [isEditBookModalOpen, setIsEditBookModalOpen] = useState(false);
+    const { data: selectedBook } = useBook(selectedBookId || "", {
+        enabled: (isBookDetailOpen || isEditBookModalOpen) && !!selectedBookId,
+    });
+
     const [isHeaderVisible, setIsHeaderVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);

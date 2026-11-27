@@ -96,57 +96,22 @@ export function computeLibraryProgressMetrics(
     };
 }
 
-export function mapAchievementsWithProgress(
+export function mapApiAchievementsToItems(
     apiAchievements: ApiAchievement[],
-    stats: LibraryProgressMetrics,
     t: TFunction,
 ): ComputedAchievementItem[] {
     return apiAchievements.map((ach) => {
-        let progress = 0;
-        if (ach.category === "reading" && ach.title.includes("Marathon")) {
-            progress = stats.pages;
-        } else if (ach.category === "reading") {
-            progress = stats.finished;
-        } else if (
-            ach.category === "collections" &&
-            ach.title.includes("Rak")
-        ) {
-            progress = stats.shelves;
-        } else if (ach.category === "collections") {
-            progress = stats.total;
-        } else if (ach.title.includes("Genre")) {
-            progress = stats.genres;
-        } else if (
-            ach.title.includes("Bintang") ||
-            ach.title.includes("Sempurna")
-        ) {
-            progress = stats.fiveStar;
-        } else if (
-            ach.title.includes("Favorit") ||
-            ach.title.includes("Setia")
-        ) {
-            progress = stats.favs;
-        } else if (
-            ach.title.includes("Wishlist") ||
-            ach.title.includes("Pemimpi")
-        ) {
-            progress = stats.wishlist;
-        } else if (ach.title.includes("Kritikus")) {
-            progress = stats.rated;
-        } else if (ach.category === "books") {
-            progress = stats.total;
-        }
-
         const isUnlocked = ach.user_progress?.unlocked || false;
+        const progress = ach.user_progress?.current ?? 0;
 
         return {
             id: ach.id,
             title: t(
-                `achievements.data.${ach.title.replace(/\\./g, "_")}.title`,
+                `achievements.data.${ach.title.replace(/\./g, "_")}.title`,
                 ach.title,
             ),
             description: t(
-                `achievements.data.${ach.description.replace(/\\./g, "_")}`,
+                `achievements.data.${ach.description.replace(/\./g, "_")}`,
                 ach.description,
             ),
             icon: ACHIEVEMENT_ICON_MAP[ach.icon] || Trophy,
@@ -159,7 +124,9 @@ export function mapAchievementsWithProgress(
             target: ach.requirement,
             progress,
             unlocked: isUnlocked,
-            color: ACHIEVEMENT_COLOR_MAP[ach.rarity] || ACHIEVEMENT_COLOR_MAP.common,
+            color:
+                ACHIEVEMENT_COLOR_MAP[ach.rarity] ||
+                ACHIEVEMENT_COLOR_MAP.common,
         };
     });
 }

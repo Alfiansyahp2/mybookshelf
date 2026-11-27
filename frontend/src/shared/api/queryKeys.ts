@@ -2,8 +2,19 @@ import type { BookStatus } from "@shared/types";
 
 export interface BooksFilterKey {
     status?: BookStatus;
+    statuses?: BookStatus[];
+    exclude_statuses?: BookStatus[];
+    shelf_id?: string;
     favorite?: boolean;
+    is_returned?: boolean;
+    overdue?: boolean;
+    borrowed_by?: string;
+    has_notes?: boolean;
+    genre?: string;
+    year?: number;
     search?: string;
+    per_page?: number;
+    page?: number;
 }
 
 export const queryKeys = {
@@ -39,6 +50,10 @@ export const queryKeys = {
     },
     statistics: {
         all: ["statistics"] as const,
+    },
+    analytics: {
+        all: ["analytics"] as const,
+        dashboard: () => [...queryKeys.analytics.all, "dashboard"] as const,
     },
     achievements: {
         all: ["achievements"] as const,

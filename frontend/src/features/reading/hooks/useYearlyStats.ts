@@ -1,23 +1,5 @@
 import { useMemo } from "react";
-import type { Book } from "@shared/types";
-
-export const getBookYears = (b: Book): number[] => {
-    const years = new Set<number>();
-    if (b.finishedDate) years.add(new Date(b.finishedDate).getFullYear());
-    if (b.startedDate) years.add(new Date(b.startedDate).getFullYear());
-    if (b.readDates && Array.isArray(b.readDates)) {
-        b.readDates.forEach((d: string) =>
-            years.add(new Date(d).getFullYear()),
-        );
-    }
-    if (
-        years.size === 0 &&
-        (b.status === "reading" || b.status === "finished")
-    ) {
-        years.add(new Date(b.lastModified || b.dateAdded).getFullYear());
-    }
-    return Array.from(years);
-};
+import { useDashboardSummary } from "@features/analytics";
 
 export interface YearlyStat {
     year: number;
@@ -28,58 +10,21 @@ export interface YearlyStat {
     goalPct: number;
 }
 
-export function useYearlyStats(allBooks: Book[]) {
+export function useYearlyStats() {
+    const { data: summary, isLoading } = useDashboardSummary();
+
     return useMemo(() => {
-        const activeYears = Array.from(
-            new Set(allBooks.flatMap(getBookYears)),
-        );
-        activeYears.sort((a, b) => b - a);
+        const rawStats = summary?.yearly_stats ?? [];
+        const yearlyStats: YearlyStat[] = rawStats.map((item) => ({
+            year: item.year,
+            finished: item.finished,
+            totalPages: item.total_pages,
+            pagesRead: item.pages_read,
+            readPct: item.read_pct,
+            goalPct: item.goal_pct,
+        }));
+        const activeYears = yearlyStats.map((item) => item.year);
 
-        const yearlyStats: YearlyStat[] = activeYears.map((year) => {
-            const booksThisYear = allBooks.filter((b: Book) =>
-                getBookYears(b).includes(year),
-            );
-            const finishedThisYear = booksThisYear.filter((b: Book) => {
-                if (b.status === "finished" && b.finishedDate) {
-                    return new Date(b.finishedDate).getFullYear() === year;
-                }
-                if (b.status === "finished" && !b.finishedDate) {
-                    if (b.readDates && Array.isArray(b.readDates)) {
-                        return b.readDates.some(
-                            (d: string) => new Date(d).getFullYear() === year,
-                        );
-                    }
-                    return (
-                        new Date(
-                            b.lastModified || b.dateAdded,
-                        ).getFullYear() === year
-                    );
-                }
-                return false;
-            }).length;
-
-            const totalPages = booksThisYear.reduce(
-                (s: number, b: Book) => s + (b.pages || 0),
-                0,
-            );
-            const pagesRead = booksThisYear.reduce((s: number, b: Book) => {
-                if (b.status === "finished") return s + (b.pages || 0);
-                return s + (b.currentPage || 0);
-            }, 0);
-            const readPct =
-                totalPages > 0 ? Math.round((pagesRead / totalPages) * 100) : 0;
-            const goalPct = Math.min((finishedThisYear / 12) * 100, 100);
-
-            return {
-                year,
-                finished: finishedThisYear,
-                totalPages,
-                pagesRead,
-                readPct,
-                goalPct,
-            };
-        });
-
-        return { activeYears, yearlyStats };
-    }, [allBooks]);
+        return { activeYears, yearlyStats, isLoading };
+    }, [summary, isLoading]);
 }

@@ -28,7 +28,7 @@ class AchievementResource extends JsonResource
             'category' => $this->category,
             'rarity' => $this->rarity,
             'user_progress' => [
-                'current' => (int) ($userAchievement?->pivot->current ?? 0),
+                'current' => (int) ($this->getAttribute('computed_current') ?? $userAchievement?->pivot->current ?? 0),
                 'unlocked' => (bool) ($userAchievement?->pivot->unlocked ?? false),
                 'unlocked_date' => $this->toIso8601($userAchievement?->pivot->unlocked_date),
             ],

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEO from "@shared/components/ui/SEO";
 import type { Book } from "@shared/types";
+import { useDashboardSummary } from "@features/analytics";
 import Shelf from "../components/shelf/Shelf";
 import { useBooks } from "../hooks/useBooks";
 import { useShelves } from "../hooks/useShelves";
@@ -12,10 +13,15 @@ import { useShelves } from "../hooks/useShelves";
 export default function ExploreLibraryPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { data: booksResponse } = useBooks();
-    const books = booksResponse?.data?.data || [];
     const { data: shelves = [], isLoading } = useShelves();
+    const { data: summary } = useDashboardSummary();
     const [currentShelf, setCurrentShelf] = useState(0);
+    const currentShelfData = shelves[currentShelf];
+    const { data: booksResponse } = useBooks(
+        { shelf_id: currentShelfData?.id, per_page: 100 },
+        { enabled: !!currentShelfData?.id },
+    );
+    const books = booksResponse?.data?.data || [];
 
     const distributeBooksAcrossShelves = (): Map<string, Book[]> => {
         const distribution = new Map<string, Book[]>();
@@ -57,7 +63,6 @@ export default function ExploreLibraryPage() {
         }
     };
 
-    const currentShelfData = shelves[currentShelf];
     const currentBooks = booksDistribution.get(currentShelfData?.id) || [];
 
     if (isLoading) {
@@ -114,7 +119,7 @@ export default function ExploreLibraryPage() {
                                 "{{shelves}} Shelves · {{books}} Books",
                                 {
                                     shelves: shelves.length,
-                                    books: books.length,
+                                    books: summary?.overview?.total ?? books.length,
                                 },
                             )}
                         </p>

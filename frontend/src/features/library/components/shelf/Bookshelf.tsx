@@ -102,7 +102,10 @@ export default function Bookshelf({
             onEditShelf(shelfId);
             return;
         }
-        openEditShelf(shelfId);
+        const targetShelf = shelves.find((s) => s.id === shelfId);
+        if (targetShelf) {
+            openEditShelf(targetShelf);
+        }
     };
     const handleDeleteShelf = (shelfId: string) => {
         if (onDeleteShelf) {

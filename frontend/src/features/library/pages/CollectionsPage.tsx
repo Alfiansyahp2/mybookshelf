@@ -25,7 +25,13 @@ import CollectionBooksModal from "../components/collections/CollectionBooksModal
 export default function CollectionsPage() {
     const { t } = useTranslation();
     const { data: collections = [], isLoading } = useCollections();
-    const { data: booksResponse } = useBooks({});
+    const [activeCollectionId, setActiveCollectionId] = useState<string | null>(
+        null,
+    );
+    const { data: booksResponse } = useBooks(
+        { per_page: 100 },
+        { enabled: !!activeCollectionId },
+    );
     const createCollection = useCreateCollection();
     const updateCollection = useUpdateCollection();
     const deleteCollection = useDeleteCollection();
@@ -38,9 +44,6 @@ export default function CollectionsPage() {
         [booksResponse],
     );
 
-    const [activeCollectionId, setActiveCollectionId] = useState<string | null>(
-        null,
-    );
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [editingCollection, setEditingCollection] =
         useState<Collection | null>(null);

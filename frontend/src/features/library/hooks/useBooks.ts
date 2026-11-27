@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+    type QueryClient,
+} from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { queryKeys, type BooksFilterKey } from "@shared/api/queryKeys";
 import { useAuthUser } from "@shared/hooks/useAuthSession";
@@ -10,30 +15,39 @@ interface ApiErrorBody {
     message?: string;
 }
 
+function invalidateDerivedAnalytics(queryClient: QueryClient) {
+    queryClient.invalidateQueries({ queryKey: queryKeys.analytics.dashboard() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.statistics.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.achievements.all });
+}
+
 /**
- * Hook to fetch all books with optional filters.
+ * Hook to fetch paginated books with optional server-side filters.
  */
-export function useBooks(filters?: BooksFilterKey) {
+export function useBooks(
+    filters?: BooksFilterKey,
+    options?: { enabled?: boolean },
+) {
     const { data: authData } = useAuthUser();
     const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: queryKeys.books.list(filters),
-        queryFn: () => booksApi.getBooks(filters),
-        enabled: isAuthenticated,
+        queryFn: ({ signal }) => booksApi.getBooks(filters, signal),
+        enabled: isAuthenticated && (options?.enabled ?? true),
     });
 }
 
 /**
  * Hook to fetch a single book.
  */
-export function useBook(id: string) {
+export function useBook(id: string, options?: { enabled?: boolean }) {
     const isDemoBook = !id || id.startsWith("b");
     const { data: authData } = useAuthUser();
     const isAuthenticated = !!authData?.user;
     return useQuery({
         queryKey: queryKeys.books.detail(id),
         queryFn: () => booksApi.getBook(id),
-        enabled: !!id && !isDemoBook && isAuthenticated,
+        enabled: !!id && !isDemoBook && isAuthenticated && (options?.enabled ?? true),
         select: (response) => response.data,
     });
 }
@@ -49,6 +63,7 @@ export function useCreateBook() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.books.all });
             queryClient.invalidateQueries({ queryKey: queryKeys.shelves.all });
+            invalidateDerivedAnalytics(queryClient);
             useNotifications.getState().addNotification({
                 title: "Success",
                 message: "Book added successfully",
@@ -80,6 +95,7 @@ export function useUpdateBook() {
         onSuccess: (_, { id }) => {
             queryClient.invalidateQueries({ queryKey: queryKeys.books.all });
             queryClient.invalidateQueries({ queryKey: queryKeys.books.detail(id) });
+            invalidateDerivedAnalytics(queryClient);
             useNotifications.getState().addNotification({
                 title: "Success",
                 message: "Book updated successfully",
@@ -110,6 +126,7 @@ export function useDeleteBook() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.books.all });
             queryClient.invalidateQueries({ queryKey: queryKeys.shelves.all });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -127,6 +144,7 @@ export function useStartReading() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.detail(bookId),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -144,6 +162,7 @@ export function useFinishReading() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.detail(bookId),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -185,6 +204,7 @@ export function useUpdateProgress() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.detail(variables.id),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -205,6 +225,7 @@ export function useToggleFavorite() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.list({ favorite: true }),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -223,6 +244,7 @@ export function useUpdateNotes() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.detail(variables.id),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -241,6 +263,7 @@ export function useUpdateRating() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.detail(variables.id),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -267,6 +290,7 @@ export function useMoveToShelf() {
                 queryKey: queryKeys.books.detail(variables.id),
             });
             queryClient.invalidateQueries({ queryKey: queryKeys.shelves.all });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -292,6 +316,7 @@ export function useBorrowBook() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.detail(variables.id),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }
@@ -309,6 +334,7 @@ export function useReturnBook() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.books.detail(variables),
             });
+            invalidateDerivedAnalytics(queryClient);
         },
     });
 }

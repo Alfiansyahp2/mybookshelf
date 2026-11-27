@@ -1,8 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+    type QueryClient,
+} from "@tanstack/react-query";
 import { queryKeys } from "@shared/api/queryKeys";
 import { useAuthUser } from "@shared/hooks/useAuthSession";
 import type { Shelf } from "@shared/types";
 import { shelvesApi } from "../api/shelves.api";
+
+function invalidateShelfAnalytics(queryClient: QueryClient) {
+    queryClient.invalidateQueries({ queryKey: queryKeys.analytics.dashboard() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.achievements.all });
+}
 
 export function useShelves() {
     const { data: authData } = useAuthUser();
@@ -22,6 +32,7 @@ export function useCreateShelf() {
             shelvesApi.createShelf(shelfData),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.shelves.all });
+            invalidateShelfAnalytics(queryClient);
         },
     });
 }
@@ -42,6 +53,7 @@ export function useUpdateShelf() {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.shelves.detail(variables.id),
             });
+            invalidateShelfAnalytics(queryClient);
         },
     });
 }
@@ -54,6 +66,7 @@ export function useUpdateShelfLayout() {
             shelvesApi.updateLayout(shelves),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.shelves.all });
+            invalidateShelfAnalytics(queryClient);
         },
     });
 }
@@ -65,6 +78,7 @@ export function useDeleteShelf() {
         mutationFn: (id: string) => shelvesApi.deleteShelf(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.shelves.all });
+            invalidateShelfAnalytics(queryClient);
         },
     });
 }

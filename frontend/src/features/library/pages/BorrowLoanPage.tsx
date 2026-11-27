@@ -1,9 +1,11 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { BookUp2, Plus, Search } from "lucide-react";
 import SEO from "@shared/components/ui/SEO";
+import type { BooksFilterKey } from "@shared/api/queryKeys";
 import type { Book } from "@shared/types";
+import { useDashboardSummary } from "@features/analytics";
 import { useBooks, useBorrowBook, useReturnBook } from "../hooks/useBooks";
 import { useBookstore } from "../store/useBookstore";
 import BorrowStatsGrid from "../components/borrow-loan/BorrowStatsGrid";
@@ -28,61 +30,69 @@ function defaultTomorrowDate(): string {
 
 export default function BorrowLoanPage() {
     const { t } = useTranslation();
-    const { data: booksResponse, isLoading } = useBooks({});
     const borrowBook = useBorrowBook();
     const returnBook = useReturnBook();
     const { setSelectedBookId, toggleBookDetail } = useBookstore();
 
     const [activeTab, setActiveTab] = useState<FilterTab>("borrowed");
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [isLoanModalOpen, setIsLoanModalOpen] = useState(false);
     const [selectedLoanBookId, setSelectedLoanBookId] = useState("");
     const [borrowedBy, setBorrowedBy] = useState("");
     const [dueDate, setDueDate] = useState(defaultTomorrowDate);
 
-    const allBooks = useMemo(
+    useEffect(() => {
+        const trimmed = searchQuery.trim();
+        const timer = setTimeout(() => {
+            setDebouncedSearch(trimmed);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const { data: summary } = useDashboardSummary();
+
+    const listFilters = useMemo<BooksFilterKey>(() => {
+        const searchPart = debouncedSearch ? { search: debouncedSearch } : {};
+        if (activeTab === "borrowed") {
+            return { status: "borrowed", ...searchPart, per_page: 500 };
+        }
+        if (activeTab === "overdue") {
+            return { overdue: true, ...searchPart, per_page: 500 };
+        }
+        return {
+            exclude_statuses: ["borrowed", "wishlist"],
+            ...searchPart,
+            per_page: 500,
+        };
+    }, [activeTab, debouncedSearch]);
+
+    const { data: booksResponse, isLoading } = useBooks(listFilters);
+    const { data: modalBooksResponse } = useBooks(
+        { exclude_statuses: ["borrowed", "wishlist"], per_page: 500 },
+        { enabled: isLoanModalOpen },
+    );
+
+    const displayedBooks = useMemo(
         () => booksResponse?.data?.data || [],
         [booksResponse],
     );
 
-    const borrowedBooks = useMemo(
-        () => allBooks.filter((b) => b.status === "borrowed"),
-        [allBooks],
+    const modalAvailableBooks = useMemo(
+        () => modalBooksResponse?.data?.data || [],
+        [modalBooksResponse],
     );
 
-    const overdueBooks = useMemo(
-        () => borrowedBooks.filter((b) => isBookOverdue(b.dueDate)),
-        [borrowedBooks],
-    );
-
-    const availableBooks = useMemo(
-        () =>
-            allBooks.filter(
-                (b) => b.status !== "borrowed" && b.status !== "wishlist",
-            ),
-        [allBooks],
-    );
-
-    const displayedBooks = useMemo(() => {
-        const source =
-            activeTab === "borrowed"
-                ? borrowedBooks
-                : activeTab === "overdue"
-                  ? overdueBooks
-                  : availableBooks;
-
-        if (!searchQuery.trim()) return source;
-        const q = searchQuery.toLowerCase();
-        return source.filter(
-            (b) =>
-                b.title.toLowerCase().includes(q) ||
-                b.author.toLowerCase().includes(q) ||
-                (b.borrowedBy || "").toLowerCase().includes(q),
-        );
-    }, [activeTab, borrowedBooks, overdueBooks, availableBooks, searchQuery]);
+    const overview = summary?.overview;
+    const borrowedCount = overview?.borrowed ?? 0;
+    const overdueCount = overview?.overdue_count ?? 0;
+    const availableCount =
+        overview?.available_to_loan_count ?? modalAvailableBooks.length;
 
     const openBorrowModal = (preselectedId?: string) => {
-        setSelectedLoanBookId(preselectedId || availableBooks[0]?.id || "");
+        setSelectedLoanBookId(
+            preselectedId || modalAvailableBooks[0]?.id || "",
+        );
         setBorrowedBy("");
         setDueDate(defaultTomorrowDate());
         setIsLoanModalOpen(true);
@@ -193,7 +203,7 @@ export default function BorrowLoanPage() {
                     <button
                         type="button"
                         onClick={() => openBorrowModal()}
-                        disabled={availableBooks.length === 0}
+                        disabled={availableCount === 0}
                         className="px-4 py-2.5 bg-walnut hover:bg-darkBrown text-white rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto disabled:opacity-50"
                     >
                         <Plus size={16} />
@@ -202,9 +212,9 @@ export default function BorrowLoanPage() {
                 </div>
 
                 <BorrowStatsGrid
-                    borrowedCount={borrowedBooks.length}
-                    overdueCount={overdueBooks.length}
-                    availableCount={availableBooks.length}
+                    borrowedCount={borrowedCount}
+                    overdueCount={overdueCount}
+                    availableCount={availableCount}
                 />
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
@@ -213,15 +223,15 @@ export default function BorrowLoanPage() {
                             [
                                 {
                                     key: "borrowed",
-                                    label: `${t("borrow.tab_borrowed", "Dipinjam")} (${borrowedBooks.length})`,
+                                    label: `${t("borrow.tab_borrowed", "Dipinjam")} (${borrowedCount})`,
                                 },
                                 {
                                     key: "overdue",
-                                    label: `${t("borrow.tab_overdue", "Terlambat")} (${overdueBooks.length})`,
+                                    label: `${t("borrow.tab_overdue", "Terlambat")} (${overdueCount})`,
                                 },
                                 {
                                     key: "available",
-                                    label: `${t("borrow.tab_available", "Tersedia")} (${availableBooks.length})`,
+                                    label: `${t("borrow.tab_available", "Tersedia")} (${availableCount})`,
                                 },
                             ] as const
                         ).map((tab) => (
@@ -304,8 +314,8 @@ export default function BorrowLoanPage() {
 
             <BorrowLoanModal
                 isOpen={isLoanModalOpen}
-                availableBooks={availableBooks}
-                selectedLoanBookId={selectedLoanBookId}
+                availableBooks={modalAvailableBooks}
+                selectedLoanBookId={selectedLoanBookId || modalAvailableBooks[0]?.id || ""}
                 borrowedBy={borrowedBy}
                 dueDate={dueDate}
                 isSubmitting={borrowBook.isPending}

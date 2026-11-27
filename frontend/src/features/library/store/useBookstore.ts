@@ -1,12 +1,12 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import type { UIState } from "@shared/types";
+import type { Shelf, UIState } from "@shared/types";
 
 interface BookStore extends UIState {
     // UI-only state (no data persistence)
     selectedBookId: string | null;
     isBookDetailOpen: boolean;
-    editingShelfId: string | null;
+    editingShelf: Shelf | null;
     sidebarCollapsed: boolean;
     searchQuery: string;
     activeFilter: UIState["activeFilter"];
@@ -15,7 +15,7 @@ interface BookStore extends UIState {
     setSelectedBookId: (id: string | null) => void;
     toggleBookDetail: (bookId?: string) => void;
     closeBookDetail: () => void;
-    openEditShelf: (shelfId: string) => void;
+    openEditShelf: (shelf: Shelf) => void;
     closeEditShelf: () => void;
     setSearchQuery: (query: string) => void;
     setActiveFilter: (filter: UIState["activeFilter"]) => void;
@@ -28,7 +28,7 @@ export const useBookstore = create<BookStore>()(
             // Initial UI state
             selectedBookId: null,
             isBookDetailOpen: false,
-            editingShelfId: null,
+            editingShelf: null,
             sidebarCollapsed: false,
             searchQuery: "",
             activeFilter: "all",
@@ -55,9 +55,9 @@ export const useBookstore = create<BookStore>()(
                     selectedBookId: null,
                 }),
 
-            openEditShelf: (shelfId) => set({ editingShelfId: shelfId }),
+            openEditShelf: (shelf) => set({ editingShelf: shelf }),
 
-            closeEditShelf: () => set({ editingShelfId: null }),
+            closeEditShelf: () => set({ editingShelf: null }),
 
             setSearchQuery: (query) => set({ searchQuery: query }),
 

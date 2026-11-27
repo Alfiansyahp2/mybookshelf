@@ -4,6 +4,7 @@ import { BookOpen, Library, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import SEO from "@shared/components/ui/SEO";
+import type { BooksFilterKey } from "@shared/api/queryKeys";
 import type { Book } from "@shared/types";
 import {
     AddBookModal,
@@ -13,6 +14,7 @@ import {
     useShelves,
     useUpdateProgress,
 } from "@features/library";
+import { useDashboardSummary } from "@features/analytics";
 import YearlyTargetCards from "../components/YearlyTargetCards";
 import ActiveReadingCard from "../components/ActiveReadingCard";
 import ReadingKpiStrip from "../components/ReadingKpiStrip";
@@ -21,7 +23,7 @@ import ReadingCollectionSection, {
     type ReadingShelfFilter,
 } from "../components/ReadingCollectionSection";
 import ReadingEmptyState from "../components/ReadingEmptyState";
-import { getBookYears, useYearlyStats } from "../hooks/useYearlyStats";
+import { useYearlyStats } from "../hooks/useYearlyStats";
 
 export default function ReadingPage() {
     const { t } = useTranslation();
@@ -47,64 +49,88 @@ export default function ReadingPage() {
         useState<Book["status"]>("reading");
     const [updatingBookId, setUpdatingBookId] = useState<string | null>(null);
 
-    const { data: allBooksResponse, isLoading } = useBooks({});
+    const { data: summary } = useDashboardSummary();
+    const { yearlyStats } = useYearlyStats();
+
+    const { data: readingFocusResponse, isLoading: readingLoading } = useBooks({
+        status: "reading",
+        per_page: 500,
+    });
+
+    const collectionFilters = useMemo<BooksFilterKey>(
+        () => ({
+            ...(shelfFilter === "reading"
+                ? { status: "reading" }
+                : shelfFilter === "unread"
+                  ? { status: "unread" }
+                  : { statuses: ["reading", "unread"] }),
+            per_page: 500,
+        }),
+        [shelfFilter],
+    );
+    const { data: collectionResponse, isLoading: collectionLoading } =
+        useBooks(collectionFilters);
+
+    const { data: yearBooksResponse } = useBooks(
+        {
+            year: selectedYear ?? undefined,
+            per_page: 500,
+        },
+        { enabled: selectedYear !== null },
+    );
+
     const { data: shelves = [] } = useShelves();
     const updateProgressMutation = useUpdateProgress();
     const finishReadingMutation = useFinishReading();
 
-    const allBooks = useMemo(
-        () => allBooksResponse?.data?.data || [],
-        [allBooksResponse],
-    );
+    const isLoading = readingLoading || collectionLoading;
+
     const readingBooks = useMemo(
-        () => allBooks.filter((book) => book.status === "reading"),
-        [allBooks],
+        () => readingFocusResponse?.data?.data || [],
+        [readingFocusResponse],
     );
-    const unreadBooks = useMemo(
-        () => allBooks.filter((book) => book.status === "unread"),
-        [allBooks],
+    const collectionBooks = useMemo(
+        () => collectionResponse?.data?.data || [],
+        [collectionResponse],
     );
 
-    const totalReadingBooks = readingBooks.length;
-    const totalUnreadBooks = unreadBooks.length;
-    const totalPagesRead = readingBooks.reduce(
-        (sum, book) => sum + (book.currentPage || 0),
-        0,
-    );
-    const totalPages = readingBooks.reduce(
-        (sum, book) => sum + (book.pages || 0),
-        0,
-    );
+    const overview = summary?.overview;
+    const totalReadingBooks =
+        overview?.reading ??
+        readingFocusResponse?.data?.meta?.total ??
+        readingBooks.length;
+    const totalUnreadBooks =
+        overview?.unread ??
+        collectionBooks.filter((b) => b.status === "unread").length;
+    const totalPagesRead =
+        overview?.reading_pages_read ??
+        readingBooks.reduce((sum, book) => sum + (book.currentPage || 0), 0);
+    const totalPages =
+        overview?.reading_total_pages ??
+        readingBooks.reduce((sum, book) => sum + (book.pages || 0), 0);
     const overallProgress =
         totalPages > 0 ? Math.round((totalPagesRead / totalPages) * 100) : 0;
     const remainingPages = Math.max(totalPages - totalPagesRead, 0);
 
-    const { yearlyStats } = useYearlyStats(allBooks);
-
     const selectedYearBooks = useMemo(() => {
         if (!selectedYear) return [];
-        return allBooks
-            .filter((b) => getBookYears(b).includes(selectedYear))
-            .map((b) => ({ ...b, shelfId: "year-shelf" }));
-    }, [allBooks, selectedYear]);
+        return (yearBooksResponse?.data?.data || []).map((b) => ({
+            ...b,
+            shelfId: "year-shelf",
+        }));
+    }, [yearBooksResponse, selectedYear]);
 
     const activeShelfId =
         shelfFilter === "unread" ? "unread-shelf" : "reading-shelf";
 
-    const displayedShelfBooks = useMemo(() => {
-        const items: Book[] = [];
-        if (shelfFilter === "all" || shelfFilter === "reading") {
-            items.push(
-                ...readingBooks.map((b) => ({ ...b, shelfId: activeShelfId })),
-            );
-        }
-        if (shelfFilter === "all" || shelfFilter === "unread") {
-            items.push(
-                ...unreadBooks.map((b) => ({ ...b, shelfId: activeShelfId })),
-            );
-        }
-        return items;
-    }, [activeShelfId, readingBooks, shelfFilter, unreadBooks]);
+    const displayedShelfBooks = useMemo(
+        () =>
+            collectionBooks.map((b) => ({
+                ...b,
+                shelfId: activeShelfId,
+            })),
+        [activeShelfId, collectionBooks],
+    );
 
     const shelfGroups = useMemo(() => {
         if (displayedShelfBooks.length === 0) return [];

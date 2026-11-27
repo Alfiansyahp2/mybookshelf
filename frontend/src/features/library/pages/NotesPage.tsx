@@ -1,9 +1,11 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { StickyNote } from "lucide-react";
 import SEO from "@shared/components/ui/SEO";
+import type { BooksFilterKey } from "@shared/api/queryKeys";
 import type { Book } from "@shared/types";
+import { useDashboardSummary } from "@features/analytics";
 import { useBooks, useUpdateNotes } from "../hooks/useBooks";
 import { useBookstore } from "../store/useBookstore";
 import NotesFilterBar, {
@@ -14,53 +16,50 @@ import NoteEditorModal from "../components/notes/NoteEditorModal";
 
 export default function NotesPage() {
     const { t } = useTranslation();
-    const { data: booksResponse, isLoading } = useBooks({});
     const updateNotes = useUpdateNotes();
     const { setSelectedBookId, toggleBookDetail } = useBookstore();
 
     const [filter, setFilter] = useState<NotesFilter>("with_notes");
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [editingBook, setEditingBook] = useState<Book | null>(null);
     const [draftNotes, setDraftNotes] = useState("");
 
-    const allBooks = useMemo(
+    useEffect(() => {
+        const trimmed = searchQuery.trim();
+        const timer = setTimeout(() => {
+            setDebouncedSearch(trimmed);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const { data: summary } = useDashboardSummary();
+
+    const notesFilters = useMemo<BooksFilterKey>(
+        () => ({
+            ...(filter === "with_notes"
+                ? { has_notes: true }
+                : filter === "without_notes"
+                  ? { has_notes: false }
+                  : {}),
+            ...(debouncedSearch ? { search: debouncedSearch } : {}),
+            per_page: 500,
+        }),
+        [filter, debouncedSearch],
+    );
+
+    const { data: booksResponse, isLoading } = useBooks(notesFilters);
+
+    const displayedBooks = useMemo(
         () => booksResponse?.data?.data || [],
         [booksResponse],
     );
 
-    const booksWithNotes = useMemo(
-        () =>
-            allBooks.filter(
-                (b) => b.personalNotes && b.personalNotes.trim().length > 0,
-            ),
-        [allBooks],
-    );
-
-    const booksWithoutNotes = useMemo(
-        () =>
-            allBooks.filter(
-                (b) => !b.personalNotes || b.personalNotes.trim().length === 0,
-            ),
-        [allBooks],
-    );
-
-    const displayedBooks = useMemo(() => {
-        const list =
-            filter === "with_notes"
-                ? booksWithNotes
-                : filter === "without_notes"
-                  ? booksWithoutNotes
-                  : allBooks;
-
-        if (!searchQuery.trim()) return list;
-        const q = searchQuery.toLowerCase();
-        return list.filter(
-            (b) =>
-                b.title.toLowerCase().includes(q) ||
-                b.author.toLowerCase().includes(q) ||
-                (b.personalNotes || "").toLowerCase().includes(q),
-        );
-    }, [filter, booksWithNotes, booksWithoutNotes, allBooks, searchQuery]);
+    const overview = summary?.overview;
+    const totalCount =
+        overview?.total ?? booksResponse?.data?.meta?.total ?? displayedBooks.length;
+    const withNotesCount = overview?.noted_count ?? 0;
+    const withoutNotesCount = Math.max(0, totalCount - withNotesCount);
 
     const openEditor = (book: Book) => {
         setEditingBook(book);
@@ -130,8 +129,8 @@ export default function NotesPage() {
                             "notes.subtitle",
                             "{{noted}} of {{total}} books include personal reflections.",
                             {
-                                noted: booksWithNotes.length,
-                                total: allBooks.length,
+                                noted: withNotesCount,
+                                total: totalCount,
                             },
                         )}
                     </p>
@@ -140,9 +139,9 @@ export default function NotesPage() {
                 <NotesFilterBar
                     filter={filter}
                     searchQuery={searchQuery}
-                    totalCount={allBooks.length}
-                    withNotesCount={booksWithNotes.length}
-                    withoutNotesCount={booksWithoutNotes.length}
+                    totalCount={totalCount}
+                    withNotesCount={withNotesCount}
+                    withoutNotesCount={withoutNotesCount}
                     onFilterChange={setFilter}
                     onSearchChange={setSearchQuery}
                 />

@@ -9,20 +9,30 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedQuery, setDebouncedQuery] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
-    // Search results (only query when >= 2 chars)
+    useEffect(() => {
+        const trimmed = searchQuery.trim();
+        if (trimmed.length < 2) {
+            setDebouncedQuery("");
+            return;
+        }
+        const timer = setTimeout(() => setDebouncedQuery(trimmed), 300);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Debounced search results (only query when focused & >= 2 chars)
     const { data: searchResults } = useBooks(
-        searchQuery.trim().length >= 2
-            ? { search: searchQuery.trim() }
-            : undefined,
+        { search: debouncedQuery, per_page: 8 },
+        { enabled: isSearchFocused && debouncedQuery.length >= 2 },
     );
 
     const searchBooks =
-        searchQuery.trim().length >= 2
+        debouncedQuery.length >= 2
             ? (searchResults?.data?.data || []).slice(0, 6)
             : [];
 
@@ -135,7 +145,7 @@ export default function SearchBar({ isScrolled = false }: { isScrolled?: boolean
                 </motion.div>
 
                 <AnimatePresence>
-                    {isSearchFocused && searchQuery.trim().length >= 2 && (
+                    {isSearchFocused && debouncedQuery.length >= 2 && (
                         <motion.div
                             initial={{ opacity: 0, y: -6, scale: 0.97 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}

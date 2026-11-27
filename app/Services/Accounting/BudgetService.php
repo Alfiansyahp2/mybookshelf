@@ -2,6 +2,7 @@
 
 namespace App\Services\Accounting;
 
+use App\Events\ExpenseUpdated;
 use App\Models\AccountingTimelineEvent;
 use App\Models\Budget;
 use App\Models\Expense;
@@ -123,6 +124,8 @@ class BudgetService
 
             DB::commit();
 
+            ExpenseUpdated::dispatch($userId);
+
             return $budget->load(['category', 'user']);
         } catch (Exception $e) {
             DB::rollBack();
@@ -155,6 +158,8 @@ class BudgetService
 
             DB::commit();
 
+            ExpenseUpdated::dispatch($userId);
+
             return $budget->fresh(['category', 'user']);
         } catch (Exception $e) {
             DB::rollBack();
@@ -183,6 +188,8 @@ class BudgetService
             }
 
             DB::commit();
+
+            ExpenseUpdated::dispatch($userId);
 
             return true;
         } catch (Exception $e) {
@@ -323,6 +330,8 @@ class BudgetService
             ]);
 
             DB::commit();
+
+            ExpenseUpdated::dispatch($userId);
 
             return $budget->fresh(['category', 'user']);
         } catch (Exception $e) {

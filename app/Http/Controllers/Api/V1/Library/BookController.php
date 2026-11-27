@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Library;
 
+use App\DataTransferObjects\Library\BookFilterData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Library\BookIndexRequest;
 use App\Http\Requests\Api\V1\Library\MoveBookToShelfRequest;
@@ -9,6 +10,7 @@ use App\Http\Requests\Api\V1\Library\StoreBookRequest;
 use App\Http\Requests\Api\V1\Library\UpdateBookNotesRequest;
 use App\Http\Requests\Api\V1\Library\UpdateBookRatingRequest;
 use App\Http\Requests\Api\V1\Library\UpdateBookRequest;
+use App\Http\Resources\Api\V1\Library\BookCollection;
 use App\Http\Resources\Api\V1\Library\BookResource;
 use App\Models\Book;
 use App\Services\Library\BookService;
@@ -28,15 +30,11 @@ class BookController extends Controller
      */
     public function index(BookIndexRequest $request): JsonResponse
     {
-        $filters = [
-            'status' => $request->query('status'),
-            'favorite' => $request->query('favorite'),
-            'search' => $request->query('search'),
-        ];
+        $filters = BookFilterData::fromRequest($request);
 
-        $books = $this->bookService->getAllBooks($filters, false, $request->user()->id);
+        $books = $this->bookService->getAllBooks($filters, true, $request->user()->id);
 
-        return response()->success(BookResource::collection($books), 'Books retrieved successfully');
+        return response()->success(new BookCollection($books), 'Books retrieved successfully');
     }
 
     /**

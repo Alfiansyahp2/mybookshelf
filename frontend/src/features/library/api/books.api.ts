@@ -1,4 +1,5 @@
 import { apiClient } from "@shared/api/apiClient";
+import type { BooksFilterKey } from "@shared/api/queryKeys";
 import type { ApiResponse, Book, BookStatus, TimelineEvent } from "@shared/types";
 
 export interface BooksListResponse {
@@ -111,37 +112,79 @@ export function transformBook(raw: RawBook): Book {
 }
 
 export const booksApi = {
-    async getBooks(filters?: {
-        status?: BookStatus;
-        favorite?: boolean;
-        search?: string;
-    }): Promise<BooksListResponse> {
+    async getBooks(
+        filters?: BooksFilterKey,
+        signal?: AbortSignal,
+    ): Promise<BooksListResponse> {
         const params = new URLSearchParams();
         if (filters?.status) params.append("status", filters.status);
-        if (filters?.favorite !== undefined)
+        if (filters?.statuses && filters.statuses.length > 0) {
+            params.append("statuses", filters.statuses.join(","));
+        }
+        if (filters?.exclude_statuses && filters.exclude_statuses.length > 0) {
+            params.append(
+                "exclude_statuses",
+                filters.exclude_statuses.join(","),
+            );
+        }
+        if (filters?.shelf_id) params.append("shelf_id", filters.shelf_id);
+        if (filters?.favorite !== undefined) {
             params.append("favorite", String(filters.favorite));
+        }
+        if (filters?.is_returned !== undefined) {
+            params.append("is_returned", String(filters.is_returned));
+        }
+        if (filters?.overdue !== undefined) {
+            params.append("overdue", String(filters.overdue));
+        }
+        if (filters?.borrowed_by) {
+            params.append("borrowed_by", filters.borrowed_by);
+        }
+        if (filters?.has_notes !== undefined) {
+            params.append("has_notes", String(filters.has_notes));
+        }
+        if (filters?.genre) params.append("genre", filters.genre);
+        if (filters?.year !== undefined) {
+            params.append("year", String(filters.year));
+        }
         if (filters?.search) params.append("search", filters.search);
+        if (filters?.per_page !== undefined) {
+            params.append("per_page", String(filters.per_page));
+        }
+        if (filters?.page !== undefined) {
+            params.append("page", String(filters.page));
+        }
 
         const queryString = params.toString();
         const url = `/v1/books${queryString ? `?${queryString}` : ""}`;
-        const response = await apiClient.get(url);
-        const booksData: RawBook[] = response.data?.data || response.data || [];
+        const response = await apiClient.get(url, undefined, signal);
+        const payload = response?.data;
+        const booksData: RawBook[] = Array.isArray(payload)
+            ? payload
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : [];
+        const meta =
+            payload && !Array.isArray(payload) ? payload.meta : undefined;
 
         return {
             data: {
                 data: booksData.map(transformBook),
                 meta: {
-                    total: response.data?.total || response.total || 0,
+                    total: meta?.total ?? response?.total ?? booksData.length,
                     per_page:
-                        response.data?.per_page || response.per_page || 15,
+                        meta?.per_page ??
+                        response?.per_page ??
+                        filters?.per_page ??
+                        24,
                     current_page:
-                        response.data?.current_page ||
-                        response.current_page ||
+                        meta?.current_page ??
+                        response?.current_page ??
+                        filters?.page ??
                         1,
-                    last_page:
-                        response.data?.last_page || response.last_page || 1,
-                    from: response.data?.from || response.from,
-                    to: response.data?.to || response.to,
+                    last_page: meta?.last_page ?? response?.last_page ?? 1,
+                    from: meta?.from ?? response?.from,
+                    to: meta?.to ?? response?.to,
                 },
             },
         };

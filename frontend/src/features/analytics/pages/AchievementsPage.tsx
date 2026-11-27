@@ -1,50 +1,22 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import SEO from "@shared/components/ui/SEO";
-import type { Book } from "@shared/types";
-import { useBooks, useShelves } from "@features/library";
-import {
-    useAchievements,
-    useUnlockAchievement,
-} from "../hooks/useAchievements";
+import { useAchievements } from "../hooks/useAchievements";
 import AchievementsOverviewHeader from "../components/achievements/AchievementsOverviewHeader";
 import AchievementCard from "../components/achievements/AchievementCard";
 import {
     ACHIEVEMENT_BRAND,
-    computeLibraryProgressMetrics,
-    mapAchievementsWithProgress,
+    mapApiAchievementsToItems,
 } from "../components/achievements/achievementConfig";
 
 export default function AchievementsPage() {
     const { t } = useTranslation();
-    const { data: booksResponse } = useBooks();
-    const { data: shelves = [] } = useShelves();
-
     const { data: apiAchievements = [], isLoading } = useAchievements();
-    const { mutate: unlockAchievement } = useUnlockAchievement();
-
-    const books = useMemo<Book[]>(
-        () => booksResponse?.data?.data || [],
-        [booksResponse],
-    );
-
-    const stats = useMemo(
-        () => computeLibraryProgressMetrics(books, shelves.length),
-        [books, shelves.length],
-    );
 
     const achievementsList = useMemo(
-        () => mapAchievementsWithProgress(apiAchievements, stats, t),
-        [apiAchievements, stats, t],
+        () => mapApiAchievementsToItems(apiAchievements, t),
+        [apiAchievements, t],
     );
-
-    useEffect(() => {
-        achievementsList.forEach((ach) => {
-            if (!ach.unlocked && ach.progress >= ach.target) {
-                unlockAchievement(ach.id);
-            }
-        });
-    }, [achievementsList, unlockAchievement]);
 
     if (isLoading) {
         return (

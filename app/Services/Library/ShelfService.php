@@ -2,8 +2,10 @@
 
 namespace App\Services\Library;
 
+use App\Events\BookSaved;
 use App\Models\Book;
 use App\Models\Shelf;
+use App\Services\Analytics\AchievementService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +30,12 @@ class ShelfService
     {
         $data['user_id'] = $userId;
 
-        return Shelf::create($data)->load('books');
+        $shelf = Shelf::create($data)->load('books');
+
+        BookSaved::dispatch($userId);
+        app(AchievementService::class)->evaluateForUser($userId);
+
+        return $shelf;
     }
 
     /**
@@ -37,6 +44,8 @@ class ShelfService
     public function updateShelf(Shelf $shelf, array $data): Shelf
     {
         $shelf->update($data);
+
+        BookSaved::dispatch($shelf->user_id);
 
         return $shelf->load('books');
     }
@@ -52,7 +61,7 @@ class ShelfService
             throw new \InvalidArgumentException('Cannot relocate books to the shelf being deleted');
         }
 
-        return DB::transaction(function () use ($shelf, $userId, $targetShelfId): int {
+        $relocatedCount = DB::transaction(function () use ($shelf, $userId, $targetShelfId): int {
             $fallbackShelfId = $targetShelfId ?? Shelf::where('user_id', $userId)
                 ->where('id', '!=', $shelf->id)
                 ->orderBy('order')
@@ -69,6 +78,10 @@ class ShelfService
 
             return $relocatedCount;
         });
+
+        BookSaved::dispatch($userId);
+
+        return $relocatedCount;
     }
 
     /**
@@ -106,5 +119,7 @@ class ShelfService
                     ]);
             }
         });
+
+        BookSaved::dispatch($userId);
     }
 }
