@@ -15,6 +15,9 @@ class AccountingReportService
 
     /**
      * Build the accounting dashboard overview metrics for a user.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
      */
     public function getOverview(string $userId, array $filters): array
     {
@@ -70,6 +73,9 @@ class AccountingReportService
 
     /**
      * Get expenses breakdown grouped by category, optionally filtered to one category.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<int, array<string, mixed>>
      */
     public function getExpensesByCategory(string $userId, array $filters): array
     {
@@ -91,6 +97,9 @@ class AccountingReportService
 
     /**
      * Get expenses aggregated by time bucket (day, week, month, or year).
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<int, array<string, mixed>>
      */
     public function getExpensesByPeriod(string $userId, array $filters): array
     {
@@ -122,11 +131,12 @@ class AccountingReportService
                 'average_expense' => $periodExpenses->avg('amount_base_currency'),
                 'categories' => $periodExpenses->groupBy('category_id')->map(function ($catExpenses): array {
                     $first = $catExpenses->first();
+                    $category = $first?->category;
 
                     return [
-                        'category_id' => $first->category_id,
-                        'category_name' => $first->category?->name ?? 'Uncategorized',
-                        'category_color' => $first->category?->color ?? '#6B7280',
+                        'category_id' => $first?->category_id,
+                        'category_name' => $category !== null ? $category->name : 'Uncategorized',
+                        'category_color' => $category !== null ? $category->color : '#6B7280',
                         'total_amount' => $catExpenses->sum('amount_base_currency'),
                         'expense_count' => $catExpenses->count(),
                     ];
@@ -137,6 +147,9 @@ class AccountingReportService
 
     /**
      * Build budget progress tracking entries paired with budget details.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return list<array<string, mixed>>
      */
     public function getBudgetTracking(string $userId, array $filters): array
     {
@@ -151,11 +164,13 @@ class AccountingReportService
             return array_merge($progress, [
                 'budget_details' => (new BudgetResource($budget))->resolve(),
             ]);
-        })->toArray();
+        })->values()->all();
     }
 
     /**
      * Analyze completed expenses grouped by payment method.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getPaymentMethodsAnalysis(string $userId, ?string $startDate = null, ?string $endDate = null): array
     {
@@ -169,24 +184,28 @@ class AccountingReportService
         }
 
         $paymentMethods = $query->get();
-        $totalAmount = $paymentMethods->sum('total_amount');
+        $totalAmount = (float) $paymentMethods->sum(fn (Expense $item): float => (float) $item->getAttribute('total_amount'));
 
-        return $paymentMethods->map(function ($method) use ($totalAmount): array {
-            $percentage = $totalAmount > 0 ? ($method->total_amount / $totalAmount) * 100 : 0;
+        return $paymentMethods->map(function (Expense $method) use ($totalAmount): array {
+            $methodTotal = (float) $method->getAttribute('total_amount');
+            $expenseCount = (int) $method->getAttribute('expense_count');
+            $percentage = $totalAmount > 0 ? ($methodTotal / $totalAmount) * 100 : 0;
 
             return [
                 'payment_method' => $method->payment_method,
-                'label' => ucfirst(str_replace('_', ' ', $method->payment_method)),
-                'expense_count' => $method->expense_count,
-                'total_amount' => $method->total_amount,
-                'formatted_amount' => 'Rp '.number_format($method->total_amount, 2, ',', '.'),
+                'label' => ucfirst(str_replace('_', ' ', (string) $method->payment_method)),
+                'expense_count' => $expenseCount,
+                'total_amount' => $methodTotal,
+                'formatted_amount' => 'Rp '.number_format($methodTotal, 2, ',', '.'),
                 'percentage' => round($percentage, 2),
             ];
-        })->sortByDesc('total_amount')->values()->toArray();
+        })->sortByDesc('total_amount')->values()->all();
     }
 
     /**
      * Build month-over-month expense comparison series.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getMonthlyComparison(string $userId, int $months = 6): array
     {
@@ -219,6 +238,9 @@ class AccountingReportService
 
     /**
      * Prepare report export payload metadata.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
      */
     public function prepareExport(array $filters): array
     {
@@ -299,10 +321,12 @@ class AccountingReportService
             return $rows;
         }
 
+        $isFirst = true;
         foreach ($payload as $index => $item) {
             if (is_array($item)) {
-                if ($index === 0) {
+                if ($isFirst) {
                     $rows = [array_map('strval', array_keys($item))];
+                    $isFirst = false;
                 }
                 $rows[] = array_map(
                     fn ($v) => is_scalar($v) || $v === null ? $v : json_encode($v),
@@ -318,6 +342,8 @@ class AccountingReportService
 
     /**
      * Compute year-to-date expense totals and linear annual projection.
+     *
+     * @return array<string, mixed>
      */
     public function getYearToDateSummary(string $userId): array
     {
@@ -364,6 +390,7 @@ class AccountingReportService
     /**
      * Resolve start and end date bounds from named period presets or explicit dates.
      *
+     * @param  array<string, mixed>  $filters
      * @return array{0: ?string, 1: ?string}
      */
     private function resolveDateRange(array $filters): array

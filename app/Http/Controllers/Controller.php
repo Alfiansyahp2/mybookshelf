@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 abstract class Controller
@@ -12,6 +12,7 @@ abstract class Controller
     /**
      * Return a standardized paginated response while transforming items through a JsonResource class.
      *
+     * @param  LengthAwarePaginator<int, mixed>  $paginator
      * @param  class-string<JsonResource>  $resourceClass
      */
     protected function paginatedSuccess(

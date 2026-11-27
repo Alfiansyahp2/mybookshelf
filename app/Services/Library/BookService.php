@@ -10,7 +10,9 @@ use App\Models\Book;
 use App\Models\TimelineEvent;
 use App\Services\Analytics\AchievementService;
 use App\Services\Reading\ReadingSessionService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -20,8 +22,9 @@ class BookService
      * Get all books with filtering and pagination
      *
      * @param  array<string, mixed>|BookFilterData  $filters
+     * @return Collection<int, Book>|LengthAwarePaginator<int, Book>
      */
-    public function getAllBooks(array|BookFilterData $filters = [], bool $withPagination = true, ?string $userId = null)
+    public function getAllBooks(array|BookFilterData $filters = [], bool $withPagination = true, ?string $userId = null): Collection|LengthAwarePaginator
     {
         $filterData = $filters instanceof BookFilterData
             ? $filters
@@ -130,8 +133,10 @@ class BookService
 
     /**
      * Create new book
+     *
+     * @param  array<string, mixed>  $data
      */
-    public function createBook(array $data, $userId)
+    public function createBook(array $data, string $userId): Book
     {
         DB::beginTransaction();
         try {
@@ -140,6 +145,9 @@ class BookService
             $data['user_id'] = $userId;
 
             // Set default values
+            $data['genre'] = (is_string($data['genre'] ?? null) && trim($data['genre']) !== '')
+                ? $data['genre']
+                : 'Fiction';
             $data['date_added'] = now();
             $data['last_modified'] = now();
 
@@ -171,7 +179,7 @@ class BookService
     /**
      * Get single book by ID
      */
-    public function getBook($id, $userId = null)
+    public function getBook(string $id, ?string $userId = null): Book
     {
         $query = Book::with(['shelf', 'collections', 'readingSessions', 'timelineEvents', 'expenses.category']);
 
@@ -195,8 +203,10 @@ class BookService
 
     /**
      * Update book
+     *
+     * @param  array<string, mixed>  $data
      */
-    public function updateBook($id, array $data, $userId = null)
+    public function updateBook(string $id, array $data, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -205,7 +215,7 @@ class BookService
 
         // Recalculate progress if pages or current_page changed
         if (isset($data['current_page']) && isset($data['pages'])) {
-            $data['progress'] = $this->calculateProgress($data['current_page'], $data['pages']);
+            $data['progress'] = $this->calculateProgress((int) $data['current_page'], (int) $data['pages']);
         }
 
         $book->update($data);
@@ -216,7 +226,7 @@ class BookService
     /**
      * Delete book (soft delete)
      */
-    public function deleteBook($id, $userId = null)
+    public function deleteBook(string $id, ?string $userId = null): bool
     {
         $book = $this->findOwnedBook($id, $userId);
         $book->delete();
@@ -227,7 +237,7 @@ class BookService
     /**
      * Start reading a book
      */
-    public function startReading($id, $userId = null)
+    public function startReading(string $id, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -246,7 +256,7 @@ class BookService
     /**
      * Finish reading a book
      */
-    public function finishReading($id, $userId = null)
+    public function finishReading(string $id, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -283,7 +293,7 @@ class BookService
     /**
      * Update reading progress
      */
-    public function updateProgress($id, $currentPage, $userId = null)
+    public function updateProgress(string $id, int $currentPage, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -332,7 +342,7 @@ class BookService
     /**
      * Toggle favorite status
      */
-    public function toggleFavorite($id, $userId = null)
+    public function toggleFavorite(string $id, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -356,7 +366,7 @@ class BookService
     /**
      * Update personal notes
      */
-    public function updateNotes($id, $notes, $userId = null)
+    public function updateNotes(string $id, ?string $notes, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -371,7 +381,7 @@ class BookService
     /**
      * Update personal rating
      */
-    public function updateRating($id, $rating, $userId = null)
+    public function updateRating(string $id, float|int|null $rating, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -391,7 +401,7 @@ class BookService
     /**
      * Move book to different shelf
      */
-    public function moveToShelf($id, $shelfId, $position = null, $userId = null)
+    public function moveToShelf(string $id, ?string $shelfId, ?int $position = null, ?string $userId = null): Book
     {
         $book = $this->findOwnedBook($id, $userId);
 
@@ -444,10 +454,10 @@ class BookService
     /**
      * Calculate progress percentage
      */
-    protected function calculateProgress($currentPage, $totalPages)
+    protected function calculateProgress(int $currentPage, int $totalPages): float
     {
         if ($totalPages <= 0) {
-            return 0;
+            return 0.0;
         }
 
         return round(($currentPage / $totalPages) * 100, 2);
@@ -455,8 +465,10 @@ class BookService
 
     /**
      * Create timeline event
+     *
+     * @param  string|array<int|string, mixed>  $description
      */
-    public function createTimelineEvent(Book $book, $type, $description)
+    public function createTimelineEvent(Book $book, string $type, string|array $description): TimelineEvent
     {
         return TimelineEvent::create([
             'id' => Str::uuid()->toString(),
@@ -474,7 +486,7 @@ class BookService
     /**
      * Check progress milestones and create events
      */
-    protected function checkProgressMilestones(Book $book, $newProgress)
+    protected function checkProgressMilestones(Book $book, float $newProgress): void
     {
         $milestones = [25, 50, 75];
 
@@ -492,7 +504,7 @@ class BookService
     /**
      * Update progress of all collections containing this book
      */
-    protected function updateRelatedCollectionProgress(Book $book)
+    protected function updateRelatedCollectionProgress(Book $book): void
     {
         foreach ($book->collections as $collection) {
             $collection->updateProgress();
@@ -502,7 +514,7 @@ class BookService
     /**
      * Read Again - Restart a finished book
      */
-    public function readAgain($id, $userId = null)
+    public function readAgain(string $id, ?string $userId = null): Book
     {
         $query = Book::query();
 
@@ -541,7 +553,7 @@ class BookService
     /**
      * Update book progress based on reading sessions
      */
-    public function syncProgressFromSessions($bookId, $userId)
+    public function syncProgressFromSessions(string $bookId, string $userId): Book
     {
         $book = Book::query()->where('user_id', $userId)->findOrFail($bookId);
 
@@ -593,7 +605,7 @@ class BookService
     /**
      * Get book with reading session statistics
      */
-    public function getBookWithSessionStats($bookId, $userId)
+    public function getBookWithSessionStats(string $bookId, string $userId): Book
     {
         $book = $this->getBook($bookId, $userId);
 
@@ -601,7 +613,7 @@ class BookService
         $sessionStats = $readingSessionService->getBookStatistics($book, $userId);
 
         // Add session statistics to book data
-        $book->session_stats = $sessionStats;
+        $book->setAttribute('session_stats', $sessionStats);
 
         return $book;
     }

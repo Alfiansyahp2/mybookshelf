@@ -30,6 +30,8 @@ class BookCostService
 
     /**
      * Retrieve completed expenses associated with a book.
+     *
+     * @return Collection<int, \App\Models\Expense>
      */
     public function getBookExpenses(Book $book): Collection
     {
@@ -38,6 +40,8 @@ class BookCostService
 
     /**
      * Build a complete cost and investment breakdown for a book.
+     *
+     * @return array<string, mixed>
      */
     public function getCostBreakdown(Book $book): array
     {
@@ -60,7 +64,7 @@ class BookCostService
             'expenses' => $expenses,
             'formatted' => [
                 'purchase_price' => $book->purchase_price
-                    ? 'Rp '.number_format($book->purchase_price, 2, ',', '.')
+                    ? 'Rp '.number_format((float) $book->purchase_price, 2, ',', '.')
                     : 'Not set',
                 'additional_expenses' => 'Rp '.number_format($additionalExpenses, 2, ',', '.'),
                 'total_investment' => 'Rp '.number_format($totalInvestment, 2, ',', '.'),
@@ -70,6 +74,8 @@ class BookCostService
 
     /**
      * Aggregate monthly book purchase totals converted into IDR via CurrencyRateService.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getPurchaseHistory(string $userId, int $months = 12): array
     {
@@ -121,10 +127,9 @@ class BookCostService
         }
 
         foreach ($purchaseHistory as &$month) {
-            if ($month['book_count'] > 0) {
-                $month['average_price'] = $month['total_amount'] / $month['book_count'];
-                $month['formatted_amount'] = 'Rp '.number_format($month['total_amount'], 0, ',', '.');
-            }
+            $bookCount = max(1, (int) $month['book_count']);
+            $month['average_price'] = $month['total_amount'] / $bookCount;
+            $month['formatted_amount'] = 'Rp '.number_format($month['total_amount'], 0, ',', '.');
         }
         unset($month);
 

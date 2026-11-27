@@ -15,6 +15,8 @@ class ReadingSessionService
 {
     /**
      * List all reading sessions for a user, optionally filtered by book_id.
+     *
+     * @return Collection<int, ReadingSession>
      */
     public function listForUser(string $userId, ?string $bookId = null): Collection
     {
@@ -27,6 +29,8 @@ class ReadingSessionService
 
     /**
      * Create a standalone manual reading session record.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function createManualSession(string $userId, array $data): ReadingSession
     {
@@ -43,13 +47,15 @@ class ReadingSessionService
 
     /**
      * End and finalize a manual reading session using an explicit end timestamp.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateManualSession(ReadingSession $session, array $data): ReadingSession
     {
         $endTime = Carbon::parse($data['end_time']);
 
         if ($session->is_paused && $session->last_paused_at) {
-            $session->paused_seconds += Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
+            $session->paused_seconds += (int) Carbon::parse($session->last_paused_at)->diffInSeconds($endTime);
             $session->is_paused = false;
         }
 
@@ -150,6 +156,8 @@ class ReadingSessionService
 
     /**
      * Get all reading sessions for a specific book.
+     *
+     * @return Collection<int, ReadingSession>
      */
     public function getBookSessions(Book $book, string $userId): Collection
     {
@@ -162,6 +170,8 @@ class ReadingSessionService
 
     /**
      * Get reading statistics for a specific book.
+     *
+     * @return array<string, mixed>
      */
     public function getBookStatistics(Book $book, string $userId): array
     {

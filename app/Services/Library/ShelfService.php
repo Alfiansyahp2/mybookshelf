@@ -13,6 +13,8 @@ class ShelfService
 {
     /**
      * List all shelves belonging to a user ordered by shelf layout order.
+     *
+     * @return Collection<int, Shelf>
      */
     public function listForUser(string $userId): Collection
     {
@@ -25,6 +27,8 @@ class ShelfService
 
     /**
      * Create a new shelf for a user.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function createForUser(string $userId, array $data): Shelf
     {
@@ -40,6 +44,8 @@ class ShelfService
 
     /**
      * Update an existing shelf and return it with loaded books.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateShelf(Shelf $shelf, array $data): Shelf
     {
@@ -86,6 +92,8 @@ class ShelfService
 
     /**
      * Calculate occupancy metrics for a shelf.
+     *
+     * @return array<string, mixed>
      */
     public function getOccupancy(Shelf $shelf): array
     {
@@ -106,6 +114,8 @@ class ShelfService
 
     /**
      * Batch update shelf display order and grid spans for a user.
+     *
+     * @param  list<array{id: string, order: int, span: int}>  $shelvesData
      */
     public function updateLayout(string $userId, array $shelvesData): void
     {

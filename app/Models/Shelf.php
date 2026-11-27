@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Shelf extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory, HasUuids;
 
     protected $primaryKey = 'id';
@@ -33,6 +35,9 @@ class Shelf extends Model
         'decorations' => 'array',
     ];
 
+    /**
+     * @return HasMany<Book, $this>
+     */
     public function books(): HasMany
     {
         return $this->hasMany(Book::class)->orderBy('position');
@@ -40,6 +45,8 @@ class Shelf extends Model
 
     /**
      * Get shelf occupancy statistics.
+     *
+     * @return array{shelf_id: string, total: int, occupied: int, available: int, percentage: float|int}
      */
     public function getOccupancyAttribute(): array
     {

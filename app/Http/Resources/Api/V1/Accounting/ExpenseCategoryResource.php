@@ -3,9 +3,13 @@
 namespace App\Http\Resources\Api\V1\Accounting;
 
 use App\Http\Resources\Api\V1\Concerns\FormatsDates;
+use App\Models\ExpenseCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin ExpenseCategory
+ */
 class ExpenseCategoryResource extends JsonResource
 {
     use FormatsDates;

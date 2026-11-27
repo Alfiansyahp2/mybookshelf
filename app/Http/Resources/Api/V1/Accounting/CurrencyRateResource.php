@@ -6,6 +6,9 @@ use App\Http\Resources\Api\V1\Concerns\FormatsDates;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\CurrencyRate
+ */
 class CurrencyRateResource extends JsonResource
 {
     use FormatsDates;
@@ -24,7 +27,7 @@ class CurrencyRateResource extends JsonResource
             'rate' => $this->rate,
             'effective_date' => $this->toIso8601($this->effective_date),
             'expires_at' => $this->toIso8601($this->expires_at),
-            'is_active' => $this->is_active !== null ? (bool) $this->is_active : true,
+            'is_active' => $this->getAttribute('is_active') !== null ? (bool) $this->is_active : true,
             'formatted' => $this->formatted_rate,
             'created_at' => $this->toIso8601($this->created_at),
             'updated_at' => $this->toIso8601($this->updated_at),

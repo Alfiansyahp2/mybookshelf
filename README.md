@@ -33,7 +33,7 @@ A personal library management web application featuring interactive 3D bookshelf
    cd mybookshelf
 
    composer install
-   npm --prefix frontend install
+   npm --prefix frontend ci
    ```
 
 2. **Configure environment & database**

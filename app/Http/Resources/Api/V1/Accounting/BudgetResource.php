@@ -3,9 +3,13 @@
 namespace App\Http\Resources\Api\V1\Accounting;
 
 use App\Http\Resources\Api\V1\Concerns\FormatsDates;
+use App\Models\Budget;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Budget
+ */
 class BudgetResource extends JsonResource
 {
     use FormatsDates;

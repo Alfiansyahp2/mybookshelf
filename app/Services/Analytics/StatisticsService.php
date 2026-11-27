@@ -291,12 +291,15 @@ class StatisticsService
             LIMIT 5
         ", [$userId]);
 
-        return collect($rows)->map(fn (object $r): array => [
+        /** @var list<array<string, mixed>> $items */
+        $items = array_map(fn (object $r): array => [
             'id' => $r->id,
             'name' => $r->name,
             'value' => (int) $r->session_count,
             'duration' => (int) $r->total_duration,
             'color' => $r->color ?: '#8B7355',
-        ]);
+        ], $rows);
+
+        return collect($items);
     }
 }

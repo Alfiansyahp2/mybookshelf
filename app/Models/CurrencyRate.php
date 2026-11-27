@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CurrencyRate extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory, HasUuids;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'id',
@@ -39,8 +42,11 @@ class CurrencyRate extends Model
 
     /**
      * Scope to get active rates.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true)
             ->where('effective_date', '<=', now())
@@ -52,8 +58,11 @@ class CurrencyRate extends Model
 
     /**
      * Scope to filter by currency pair.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeForPair($query, $fromCurrency, $toCurrency = 'IDR')
+    public function scopeForPair(Builder $query, string $fromCurrency, string $toCurrency = 'IDR'): Builder
     {
         return $query->where('from_currency', strtoupper($fromCurrency))
             ->where('to_currency', strtoupper($toCurrency));
@@ -86,7 +95,7 @@ class CurrencyRate extends Model
             return 0;
         }
 
-        return $amount * $rate->rate;
+        return $amount * (float) $rate->rate;
     }
 
     /**
@@ -94,7 +103,7 @@ class CurrencyRate extends Model
      */
     public function getFormattedRateAttribute(): string
     {
-        return '1 '.$this->from_currency.' = '.number_format($this->rate, 4, ',', '.').' '.$this->to_currency;
+        return '1 '.$this->from_currency.' = '.number_format((float) $this->rate, 4, ',', '.').' '.$this->to_currency;
     }
 
     /**

@@ -310,7 +310,7 @@ class DashboardAnalyticsService
     }
 
     /**
-     * @param  callable(Builder): void  $applyQuery
+     * @param  callable(Builder): mixed  $applyQuery
      * @return array<int, array<string, mixed>>
      */
     private function fetchLightBooks(string $userId, callable $applyQuery): array

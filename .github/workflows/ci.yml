@@ -2,11 +2,40 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
 
 jobs:
+  backend-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pgsql, pdo_pgsql, bcmath, intl, redis
+
+      - name: Prepare Environment & Storage Directories
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          mkdir -p storage/framework/{sessions,views,cache} bootstrap/cache
+          chmod -R 777 storage bootstrap/cache
+
+      - name: Install Composer Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Check Code Style (Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Run Static Analysis (Larastan Level 6)
+        run: ./vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+
+      - name: Run Security Audit (Composer)
+        run: composer audit
+
   backend-tests:
     runs-on: ubuntu-latest
     services:
@@ -24,91 +53,174 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
-        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pgsql, pdo_pgsql, bcmath, soap, intl, readline, ldap, msgpack, igbinary, redis, swoole, memcached, pcov, xdebug
-        coverage: pcov
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pgsql, pdo_pgsql, bcmath, intl, redis, pcov
+          coverage: pcov
 
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Prepare Environment & Storage Directories
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          mkdir -p storage/framework/{sessions,views,cache} bootstrap/cache
+          chmod -R 777 storage bootstrap/cache
 
-    - name: Prepare Directory and Permissions
-      run: |
-        mkdir -p storage/framework/{sessions,views,cache}
-        mkdir -p bootstrap/cache
-        chmod -R 777 storage bootstrap/cache
+      - name: Install Composer Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
 
-    - name: Install Dependencies
-      run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+      - name: Wait for Postgres
+        env:
+          PGPASSWORD: password
+        run: |
+          for i in $(seq 1 30); do
+            if pg_isready -h 127.0.0.1 -p 5432 -U root -d testing; then
+              echo "Postgres is ready"
+              break
+            fi
+            echo "Waiting for Postgres..."
+            sleep 1
+          done
 
-    - name: Wait for Postgres
-      env:
-        PGPASSWORD: password
-      run: |
-        for i in $(seq 1 30); do
-          if pg_isready -h 127.0.0.1 -p 5432 -U root -d testing; then
-            echo "Postgres is ready"
-            break
-          fi
-          echo "Waiting for Postgres..."
-          sleep 1
-        done
+      - name: Generate App Key
+        run: php artisan key:generate
 
-    - name: Sanity check vendor
-      run: ls -la vendor/bin || true
+      - name: Run Migrations
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan migrate --force
 
-    - name: Check Code Style (Pint)
-      run: ./vendor/bin/pint --test
+      - name: Execute Backend Test Suite
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan test --compact
 
-    - name: Generate key
-      run: php artisan key:generate
-
-
-    - name: Run Migrations
-      env:
-        DB_CONNECTION: pgsql
-        DB_HOST: 127.0.0.1
-        DB_PORT: 5432
-        DB_DATABASE: testing
-        DB_USERNAME: root
-        DB_PASSWORD: password
-      run: php artisan migrate --force
-
-    - name: Execute tests (Unit and Feature tests)
-      env:
-        DB_CONNECTION: pgsql
-        DB_HOST: 127.0.0.1
-        DB_PORT: 5432
-        DB_DATABASE: testing
-        DB_USERNAME: root
-        DB_PASSWORD: password
-      run: php artisan test
-
-  frontend-build:
+  frontend-quality:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./frontend
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install Frontend Dependencies
+        run: npm ci
 
-    - name: Run linter
-      run: npm run lint
+      - name: Run Strict Linter (oxlint)
+        run: npm run lint
 
-    - name: Run TypeScript typecheck
-      run: npm run typecheck
+      - name: Run TypeScript Typecheck
+        run: npm run typecheck
 
-    - name: Build frontend
-      run: npm run build
+      - name: Execute Unit & Integration Tests (Vitest + MSW)
+        run: npm run test:unit
+
+      - name: Build Production Bundle
+        run: npm run build
+
+      - name: Check Bundle Size Budgets
+        run: npm run check:budget
+
+  e2e-smoke:
+    needs: [backend-quality, backend-tests, frontend-quality]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U root -d testing"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pgsql, pdo_pgsql, bcmath, intl, redis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Prepare Environment & Storage Directories
+        run: |
+          php -r "file_exists('.env') || copy('.env.example', '.env');"
+          mkdir -p storage/framework/{sessions,views,cache} bootstrap/cache
+          chmod -R 777 storage bootstrap/cache
+
+      - name: Install Composer Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        working-directory: ./frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Wait for Postgres
+        env:
+          PGPASSWORD: password
+        run: |
+          for i in $(seq 1 30); do
+            if pg_isready -h 127.0.0.1 -p 5432 -U root -d testing; then
+              echo "Postgres is ready"
+              break
+            fi
+            echo "Waiting for Postgres..."
+            sleep 1
+          done
+
+      - name: Generate App Key
+        run: php artisan key:generate
+
+      - name: Run Playwright E2E Suite
+        working-directory: ./frontend
+        env:
+          E2E_DB_CONNECTION: pgsql
+          E2E_DB_HOST: 127.0.0.1
+          E2E_DB_PORT: 5432
+          E2E_DB_DATABASE: testing
+          E2E_DB_USERNAME: root
+          E2E_DB_PASSWORD: password
+        run: npm run test:e2e
+
+      - name: Upload Playwright Report on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7

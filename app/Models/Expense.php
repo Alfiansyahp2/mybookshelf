@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,12 +13,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Expense extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'id',
@@ -66,6 +69,8 @@ class Expense extends Model
 
     /**
      * Get the user that owns the expense.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -74,6 +79,8 @@ class Expense extends Model
 
     /**
      * Get the book associated with the expense.
+     *
+     * @return BelongsTo<Book, $this>
      */
     public function book(): BelongsTo
     {
@@ -82,6 +89,8 @@ class Expense extends Model
 
     /**
      * Get the category that owns the expense.
+     *
+     * @return BelongsTo<ExpenseCategory, $this>
      */
     public function category(): BelongsTo
     {
@@ -90,6 +99,8 @@ class Expense extends Model
 
     /**
      * Get the parent expense for recurring expenses.
+     *
+     * @return BelongsTo<Expense, $this>
      */
     public function parentExpense(): BelongsTo
     {
@@ -98,6 +109,8 @@ class Expense extends Model
 
     /**
      * Get the recurring expenses generated from this expense.
+     *
+     * @return HasMany<Expense, $this>
      */
     public function recurringExpenses(): HasMany
     {
@@ -106,40 +119,55 @@ class Expense extends Model
 
     /**
      * Scope to only include expenses for a specific user.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeForUser($query, $userId)
+    public function scopeForUser(Builder $query, string $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
     /**
      * Scope to filter by payment method.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeByPaymentMethod($query, $method)
+    public function scopeByPaymentMethod(Builder $query, string $method): Builder
     {
         return $query->where('payment_method', $method);
     }
 
     /**
      * Scope to filter by status.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeByStatus($query, $status)
+    public function scopeByStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
 
     /**
      * Scope to filter by date range.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeInPeriod($query, $startDate, $endDate)
+    public function scopeInPeriod(Builder $query, mixed $startDate, mixed $endDate): Builder
     {
         return $query->whereBetween('expense_date', [$startDate, $endDate]);
     }
 
     /**
      * Scope to only include completed expenses.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeCompleted($query)
+    public function scopeCompleted(Builder $query): Builder
     {
         return $query->where('status', 'completed');
     }
@@ -157,7 +185,7 @@ class Expense extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount, 2, ',', '.').' '.$this->currency;
+        return number_format((float) $this->amount, 2, ',', '.').' '.$this->currency;
     }
 
     /**
@@ -165,6 +193,6 @@ class Expense extends Model
      */
     public function getFormattedBaseAmountAttribute(): string
     {
-        return number_format($this->amount_base_currency, 2, ',', '.').' IDR';
+        return number_format((float) $this->amount_base_currency, 2, ',', '.').' IDR';
     }
 }
