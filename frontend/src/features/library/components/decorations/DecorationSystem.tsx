@@ -1,0 +1,63 @@
+import type {
+    DecorationKind,
+    ShelfDecoration,
+} from "@shared/types";
+import Candle from "./items/Candle";
+import CandlePair from "./items/CandlePair";
+import PlantPot from "./items/PlantPot";
+import PlantHanging from "./items/PlantHanging";
+import VaseTall from "./items/VaseTall";
+import VaseRound from "./items/VaseRound";
+import FramePhoto from "./items/FramePhoto";
+import BookendL from "./items/BookendL";
+import ClockSmall from "./items/ClockSmall";
+import ClockDigital from "./items/ClockDigital";
+import Mug from "./items/Mug";
+import Lantern from "./items/Lantern";
+import Succulent from "./items/Succulent";
+import CatSleep from "./items/CatSleep";
+import CatSit from "./items/CatSit";
+
+export function DecorationItem({
+    item,
+}: {
+    item: ShelfDecoration | DecorationKind;
+}) {
+    const kind = typeof item === "string" ? item : item.kind;
+    const customData = typeof item === "string" ? undefined : item.customData;
+
+    switch (kind) {
+        case "candle":
+            return <Candle />;
+        case "candle_pair":
+            return <CandlePair />;
+        case "plant_pot":
+            return <PlantPot />;
+        case "plant_hanging":
+            return <PlantHanging />;
+        case "vase_tall":
+            return <VaseTall />;
+        case "vase_round":
+            return <VaseRound />;
+        case "frame_photo":
+            return <FramePhoto customData={customData} />;
+        case "bookend_L":
+            return <BookendL />;
+        case "clock_small":
+            return <ClockSmall />;
+        case "clock_digital":
+            return <ClockDigital />;
+        case "mug":
+            return <Mug />;
+        case "lantern":
+            return <Lantern />;
+        case "succulent":
+            return <Succulent />;
+        case "cat_sleep":
+            return <CatSleep />;
+        case "cat_sit":
+            return <CatSit />;
+        default:
+            return null;
+    }
+}

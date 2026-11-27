@@ -1,0 +1,350 @@
+import { motion } from "framer-motion";
+import {
+    ResponsiveContainer,
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    BarChart,
+    CartesianGrid,
+    XAxis,
+    YAxis,
+    Bar,
+} from "recharts";
+import { Card, ChartTooltip } from "./DashboardWidgets";
+import { BRAND, fadeUp } from "../../constants/dashboardTheme";
+import type { DashboardStats } from "../../hooks/useDashboardStats";
+import { BOOK_GENRES } from "@shared/constants/genres";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+
+interface DashboardChartsSectionProps {
+    stats: DashboardStats;
+    genreFilter: string;
+    setGenreFilter: (genre: string) => void;
+}
+
+export default function DashboardChartsSection({
+    stats,
+    genreFilter,
+    setGenreFilter,
+}: DashboardChartsSectionProps) {
+    const { t } = useTranslation();
+
+    const displayedGenres = useMemo(() => {
+        let filtered = stats.genreChart;
+        if (genreFilter !== "Semua") {
+            const category = BOOK_GENRES.find(
+                (c) => c.category === genreFilter,
+            );
+            if (category) {
+                filtered = filtered.filter((g) =>
+                    category.genres.includes(g.name),
+                );
+            }
+        }
+        return filtered.map((g) => ({
+            ...g,
+            displayName:
+                g.name.length > 15 ? g.name.slice(0, 15) + "…" : g.name,
+        }));
+    }, [stats.genreChart, genreFilter]);
+
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <motion.div {...fadeUp(0.5)} style={{ height: "100%" }}>
+                <Card
+                    style={{
+                        height: 272,
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    <div
+                        style={{
+                            padding: "14px 18px 10px",
+                            borderBottom:
+                                "1px solid rgb(var(--color-walnut-rgb) / 0.14)",
+                        }}
+                    >
+                        <h3
+                            style={{
+                                margin: 0,
+                                fontSize: 14,
+                                fontFamily: "'Georgia',serif",
+                                fontWeight: 700,
+                                color: BRAND.darkBrown,
+                            }}
+                        >
+                            {t("dashboard.charts.status_title")}
+                        </h3>
+                    </div>
+                    <div
+                        style={{
+                            padding: "12px 18px 14px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 18,
+                            flex: 1,
+                        }}
+                    >
+                        <ResponsiveContainer width={136} height={136}>
+                            <PieChart>
+                                <Pie
+                                    data={stats.statusPie}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={38}
+                                    outerRadius={60}
+                                    dataKey="value"
+                                    paddingAngle={2}
+                                >
+                                    {stats.statusPie.map((e, i) => (
+                                        <Cell key={i} fill={e.color} />
+                                    ))}
+                                </Pie>
+                                <Tooltip content={<ChartTooltip />} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        <div
+                            style={{
+                                flex: 1,
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "center",
+                                gap: 7,
+                            }}
+                        >
+                            {stats.statusPie.map((d) => (
+                                <div
+                                    key={d.name}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 7,
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: "50%",
+                                            background: d.color,
+                                            flexShrink: 0,
+                                        }}
+                                    />
+                                    <span
+                                        style={{
+                                            fontSize: 11.5,
+                                            color: "rgb(var(--app-ink-rgb) / 0.78)",
+                                            flex: 1,
+                                        }}
+                                    >
+                                        {d.name}
+                                    </span>
+                                    <span
+                                        style={{
+                                            fontSize: 12,
+                                            fontWeight: 700,
+                                            color: BRAND.darkBrown,
+                                        }}
+                                    >
+                                        {d.value}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </Card>
+            </motion.div>
+
+            <motion.div {...fadeUp(0.55)} style={{ height: "100%" }}>
+                <Card
+                    style={{
+                        height: 272,
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    <div
+                        style={{
+                            padding: "14px 18px 8px",
+                            borderBottom:
+                                "1px solid rgb(var(--color-walnut-rgb) / 0.14)",
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                marginBottom: 8,
+                            }}
+                        >
+                            <h3
+                                style={{
+                                    margin: 0,
+                                    fontSize: 14,
+                                    fontFamily: "'Georgia',serif",
+                                    fontWeight: 700,
+                                    color: BRAND.darkBrown,
+                                }}
+                            >
+                                {t("dashboard.charts.genre_title")}
+                            </h3>
+                        </div>
+                        <div
+                            style={{
+                                display: "flex",
+                                gap: 6,
+                                flexWrap: "wrap",
+                                marginBottom: 2,
+                            }}
+                        >
+                            <button
+                                onClick={() => setGenreFilter("Semua")}
+                                style={{
+                                    padding: "4px 8px",
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    borderRadius: 6,
+                                    border: "none",
+                                    cursor: "pointer",
+                                    background:
+                                        genreFilter === "Semua"
+                                            ? BRAND.walnut
+                                            : "rgb(var(--color-walnut-rgb) / 0.16)",
+                                    color:
+                                        genreFilter === "Semua"
+                                            ? "white"
+                                            : "rgb(var(--app-ink-rgb) / 0.78)",
+                                    transition: "all 0.2s",
+                                }}
+                            >
+                                {t("dashboard.charts.all")}
+                            </button>
+                            {BOOK_GENRES.map((g) => (
+                                <button
+                                    key={g.category}
+                                    onClick={() => setGenreFilter(g.category)}
+                                    style={{
+                                        padding: "4px 8px",
+                                        fontSize: 10,
+                                        fontWeight: 600,
+                                        borderRadius: 6,
+                                        border: "none",
+                                        cursor: "pointer",
+                                        background:
+                                            genreFilter === g.category
+                                                ? BRAND.walnut
+                                                : "rgb(var(--color-walnut-rgb) / 0.16)",
+                                        color:
+                                            genreFilter === g.category
+                                                ? "white"
+                                                : "rgb(var(--app-ink-rgb) / 0.78)",
+                                        transition: "all 0.2s",
+                                    }}
+                                    title={g.category}
+                                >
+                                    {g.category.split(" ")[0]}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div
+                        style={{
+                            padding: "10px 14px 12px",
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            minHeight: 0,
+                        }}
+                    >
+                        {displayedGenres.length === 0 ? (
+                            <div
+                                style={{
+                                    textAlign: "center",
+                                    padding: "20px 0",
+                                    color: "rgb(var(--app-ink-rgb) / 0.5)",
+                                    fontSize: 12,
+                                }}
+                            >
+                                {t("dashboard.charts.no_genre")}
+                            </div>
+                        ) : (
+                            <div
+                                style={{
+                                    overflowY: "auto",
+                                    flex: 1,
+                                    paddingRight: 4,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                }}
+                                className="hide-scrollbar"
+                            >
+                                <div
+                                    style={{
+                                        minHeight: Math.max(
+                                            150,
+                                            displayedGenres.length * 28,
+                                        ),
+                                        flex: 1,
+                                    }}
+                                >
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
+                                    >
+                                        <BarChart
+                                            data={displayedGenres}
+                                            layout="vertical"
+                                            margin={{
+                                                left: 4,
+                                                right: 16,
+                                                top: 0,
+                                                bottom: 0,
+                                            }}
+                                        >
+                                            <CartesianGrid
+                                                strokeDasharray="3 3"
+                                                stroke="rgb(var(--color-walnut-rgb) / 0.14)"
+                                                horizontal={false}
+                                            />
+                                            <XAxis type="number" hide />
+                                            <YAxis
+                                                type="category"
+                                                dataKey="displayName"
+                                                tick={{
+                                                    fontSize: 10.5,
+                                                    fill: "rgb(var(--app-ink-rgb) / 0.78)",
+                                                }}
+                                                axisLine={false}
+                                                tickLine={false}
+                                                width={88}
+                                            />
+                                            <Tooltip
+                                                content={<ChartTooltip />}
+                                                cursor={{
+                                                    fill: "rgb(var(--color-walnut-rgb) / 0.1)",
+                                                }}
+                                            />
+                                            <Bar
+                                                dataKey="count"
+                                                name={t(
+                                                    "dashboard.charts.books",
+                                                )}
+                                                fill={BRAND.walnut}
+                                                radius={[0, 4, 4, 0]}
+                                                barSize={14}
+                                            />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </Card>
+            </motion.div>
+        </div>
+    );
+}
