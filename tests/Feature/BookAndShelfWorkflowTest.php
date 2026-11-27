@@ -6,7 +6,6 @@ use App\Models\Achievement;
 use App\Models\Book;
 use App\Models\CurrencyRate;
 use App\Models\Expense;
-use App\Models\Room;
 use App\Models\Shelf;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -240,13 +239,6 @@ class BookAndShelfWorkflowTest extends TestCase
         $otherShelf = Shelf::create([
             'id' => Str::uuid()->toString(),
             'user_id' => $otherUser->id,
-            'room_id' => Room::create([
-                'id' => Str::uuid()->toString(),
-                'user_id' => $otherUser->id,
-                'name' => 'Other Room',
-                'order' => 0,
-                'unlocked' => true,
-            ])->id,
             'name' => 'Other Shelf',
             'capacity' => 10,
             'order' => 5,

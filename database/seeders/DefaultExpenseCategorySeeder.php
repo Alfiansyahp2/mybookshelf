@@ -15,7 +15,6 @@ class DefaultExpenseCategorySeeder extends Seeder
     {
         $categories = [
             [
-                'id' => Str::uuid()->toString(),
                 'name' => 'Book Purchases',
                 'description' => 'Pembelian buku baru dan bekas',
                 'icon' => '📚',
@@ -25,7 +24,6 @@ class DefaultExpenseCategorySeeder extends Seeder
                 'is_default' => true,
             ],
             [
-                'id' => Str::uuid()->toString(),
                 'name' => 'Shipping & Handling',
                 'description' => 'Biaya pengiriman dan penanganan',
                 'icon' => '📦',
@@ -35,7 +33,6 @@ class DefaultExpenseCategorySeeder extends Seeder
                 'is_default' => true,
             ],
             [
-                'id' => Str::uuid()->toString(),
                 'name' => 'Book Maintenance',
                 'description' => 'Perawatan, repair, dan aksesori buku',
                 'icon' => '🔧',
@@ -45,7 +42,6 @@ class DefaultExpenseCategorySeeder extends Seeder
                 'is_default' => true,
             ],
             [
-                'id' => Str::uuid()->toString(),
                 'name' => 'Gifts & Donations',
                 'description' => 'Buku sebagai hadiah atau donasi',
                 'icon' => '🎁',
@@ -55,7 +51,6 @@ class DefaultExpenseCategorySeeder extends Seeder
                 'is_default' => true,
             ],
             [
-                'id' => Str::uuid()->toString(),
                 'name' => 'Other Expenses',
                 'description' => 'Pengeluaran lain terkait buku',
                 'icon' => '📝',
@@ -66,18 +61,24 @@ class DefaultExpenseCategorySeeder extends Seeder
             ],
         ];
 
-        // These will be inserted per user when they register, not globally
-        // This seeder is for testing purposes
-        $testUserId = DB::table('users')->first()?->id;
+        $users = DB::table('users')->select('id')->get();
 
-        if ($testUserId) {
+        foreach ($users as $user) {
             foreach ($categories as $category) {
-                DB::table('expense_categories')->insert([
-                    ...$category,
-                    'user_id' => $testUserId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                $exists = DB::table('expense_categories')
+                    ->where('user_id', $user->id)
+                    ->where('name', $category['name'])
+                    ->exists();
+
+                if (! $exists) {
+                    DB::table('expense_categories')->insert([
+                        ...$category,
+                        'id' => Str::uuid()->toString(),
+                        'user_id' => $user->id,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
             }
         }
     }

@@ -2,31 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Exists;
-use Illuminate\Validation\ValidationException;
 
 abstract class Controller
 {
     /**
-     * Build a Rule::exists scoped to the authenticated user's records.
+     * Return a standardized paginated response while transforming items through a JsonResource class.
+     *
+     * @param  class-string<JsonResource>  $resourceClass
      */
-    protected function ownedRule(string $table, ?string $userId = null): Exists
-    {
-        return Rule::exists($table, 'id')->where(
-            'user_id',
-            $userId ?? auth()->id()
-        );
-    }
+    protected function paginatedSuccess(
+        LengthAwarePaginator $paginator,
+        string $resourceClass,
+        string $message = 'Success',
+        int $statusCode = 200
+    ): JsonResponse {
+        $payload = $paginator->toArray();
+        $payload['data'] = $resourceClass::collection($paginator->getCollection())->resolve(request());
 
-    /**
-     * Return a standardized 422 validation error response.
-     */
-    protected function validationErrorResponse(ValidationException $e): JsonResponse
-    {
-        return response()->error('Validation failed', $e->errors(), 422);
+        return response()->success($payload, $message, $statusCode);
     }
 
     /**
