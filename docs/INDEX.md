@@ -62,4 +62,5 @@ Seluruh dokumen di bawah ini ditulis secara spesifik berdasarkan basis kode aktu
 * 🔒 **[Log Perbaikan Autentikasi](technical/Authentication_Fix_Log.md)** — Catatan perbaikan alur login SPA dan proteksi rute.
 * 🗃️ **[Panduan Data Seeder](technical/Book_Seeder_Guide.md)** — Panduan injeksi dataset buku statis (*seeding*).
 * 🛠️ **[Panduan Perintah Operasional & Generator CLI](technical/Operational_Commands_Guide.md)** — Referensi perintah OpenAPI/TypeScript generator, queue worker, scheduler, linting, testing, migrasi, dan maintenance CLI.
+* 🚀 **[Runbook Cutover Produksi & Rollback](technical/Production_Cutover_Runbook.md)** — Panduan topologi terpisah (*decoupled*), probe `/up` & `/api/health`, cutover kontrak skema `rooms`, dan prosedur rollback darurat.
 * 🚧 **[Rencana Refactoring (Agustus 2026)](history/Refactoring_Plan_Agustus.md)** & 📈 **[Laporan Progres & Arsitektur](history/Progress_Report.md)** — Catatan historis modularisasi komponen.

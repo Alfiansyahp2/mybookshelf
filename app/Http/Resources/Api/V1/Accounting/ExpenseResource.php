@@ -4,9 +4,13 @@ namespace App\Http\Resources\Api\V1\Accounting;
 
 use App\Http\Resources\Api\V1\Concerns\FormatsDates;
 use App\Http\Resources\Api\V1\Library\BookResource;
+use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Expense
+ */
 class ExpenseResource extends JsonResource
 {
     use FormatsDates;

@@ -48,6 +48,8 @@ class CurrencyRateService
 
     /**
      * Set or update exchange rate.
+     *
+     * @param  array<string, mixed>  $options
      */
     public function setRate(string $fromCurrency, string $toCurrency, float $rate, array $options = []): CurrencyRate
     {
@@ -85,6 +87,8 @@ class CurrencyRateService
 
     /**
      * Convert amount from one currency to another.
+     *
+     * @return array<string, mixed>
      */
     public function convertAmount(float $amount, string $fromCurrency, string $toCurrency = 'IDR'): array
     {
@@ -111,14 +115,14 @@ class CurrencyRateService
             throw new Exception("No exchange rate found for {$fromCurrency} to {$toCurrency}");
         }
 
-        $convertedAmount = $amount * $rate->rate;
+        $convertedAmount = $amount * (float) $rate->rate;
 
         return [
             'original_amount' => $amount,
             'converted_amount' => round($convertedAmount, 2),
             'from_currency' => $fromCurrency,
             'to_currency' => $toCurrency,
-            'rate' => $rate->rate,
+            'rate' => (float) $rate->rate,
             'rate_date' => $rate->effective_date,
             'converted_at' => now(),
         ];
@@ -126,6 +130,8 @@ class CurrencyRateService
 
     /**
      * Get all active rates.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getAllActiveRates(): array
     {
@@ -152,6 +158,8 @@ class CurrencyRateService
 
     /**
      * Sync live currency rates from external provider or safe fallback rates.
+     *
+     * @return list<array<string, mixed>>
      */
     public function syncLiveRates(): array
     {
@@ -207,6 +215,8 @@ class CurrencyRateService
 
     /**
      * Get historical rates for a currency pair.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getHistoricalRates(string $fromCurrency, string $toCurrency = 'IDR', ?string $date = null): array
     {
@@ -276,6 +286,9 @@ class CurrencyRateService
 
     /**
      * Bulk create or update rates.
+     *
+     * @param  list<array{from_currency: string, to_currency?: string, rate: float|int, options?: array<string, mixed>}>  $ratesData
+     * @return list<array<string, mixed>>
      */
     public function bulkUpsertRates(array $ratesData): array
     {
@@ -311,6 +324,8 @@ class CurrencyRateService
 
     /**
      * Get supported currencies list.
+     *
+     * @return list<array{code: string, name: string, symbol: string}>
      */
     public function getSupportedCurrencies(): array
     {
@@ -361,6 +376,8 @@ class CurrencyRateService
 
     /**
      * Get currency info by code.
+     *
+     * @return array{code: string, name: string, symbol: string}|null
      */
     public function getCurrencyInfo(string $currencyCode): ?array
     {

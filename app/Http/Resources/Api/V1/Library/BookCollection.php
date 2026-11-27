@@ -2,8 +2,13 @@
 
 namespace App\Http\Resources\Api\V1\Library;
 
+use App\Models\Book;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * @mixin LengthAwarePaginator<int, Book>
+ */
 class BookCollection extends ResourceCollection
 {
     public $collects = BookResource::class;

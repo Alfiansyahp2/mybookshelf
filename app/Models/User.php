@@ -7,6 +7,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -50,19 +52,28 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function achievements()
+    /**
+     * @return BelongsToMany<Achievement, $this>
+     */
+    public function achievements(): BelongsToMany
     {
         return $this->belongsToMany(Achievement::class, 'user_achievements')
             ->withPivot('current', 'unlocked', 'unlocked_date')
             ->withTimestamps();
     }
 
-    public function books()
+    /**
+     * @return HasMany<Book, $this>
+     */
+    public function books(): HasMany
     {
         return $this->hasMany(Book::class);
     }
 
-    public function collections()
+    /**
+     * @return HasMany<Collection, $this>
+     */
+    public function collections(): HasMany
     {
         return $this->hasMany(Collection::class);
     }

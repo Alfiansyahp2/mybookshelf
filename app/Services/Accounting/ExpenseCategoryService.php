@@ -10,6 +10,9 @@ class ExpenseCategoryService
 {
     /**
      * List expense categories for a user with optional default/custom filtering and sorting.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return Collection<int, ExpenseCategory>
      */
     public function listForUser(string $userId, array $filters = []): Collection
     {
@@ -31,6 +34,8 @@ class ExpenseCategoryService
 
     /**
      * Create a new custom expense category for a user.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function createForUser(string $userId, array $data): ExpenseCategory
     {
@@ -49,6 +54,8 @@ class ExpenseCategoryService
 
     /**
      * Update an existing expense category while preserving is_default on built-in categories.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateCategory(ExpenseCategory $category, array $data): ExpenseCategory
     {
@@ -77,6 +84,8 @@ class ExpenseCategoryService
 
     /**
      * Canonical default expense category definitions for new users.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getDefaultDefinitions(): array
     {
@@ -127,6 +136,8 @@ class ExpenseCategoryService
     /**
      * Seed default expense categories for a user who does not yet have any.
      *
+     * @return Collection<int, ExpenseCategory>
+     *
      * @throws \InvalidArgumentException
      */
     public function initializeDefaultsForUser(string $userId): Collection
@@ -148,6 +159,8 @@ class ExpenseCategoryService
 
     /**
      * Build statistics and recent completed expenses for a category.
+     *
+     * @return array<string, mixed>
      */
     public function getStatistics(ExpenseCategory $category): array
     {

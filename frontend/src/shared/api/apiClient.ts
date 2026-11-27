@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import { reportClientError, setLastRequestId } from "@shared/lib/telemetry";
 
 // API base URL - in production this should come from environment variables
 const API_BASE_URL =
@@ -41,12 +42,30 @@ class ApiClient {
             (error) => Promise.reject(error),
         );
 
-        // Response interceptor - clear cached user profile on unauthorized responses
+        // Response interceptor - track request ID, report 5xx, clear stale user profile on 401
         this.client.interceptors.response.use(
-            (response) => response,
+            (response) => {
+                const requestId = response.headers?.["x-request-id"];
+                if (typeof requestId === "string") {
+                    setLastRequestId(requestId);
+                }
+                return response;
+            },
             (error: AxiosError) => {
-                if (error.response?.status === 401) {
+                const requestId = error.response?.headers?.["x-request-id"];
+                if (typeof requestId === "string") {
+                    setLastRequestId(requestId);
+                }
+                const status = error.response?.status;
+                if (status === 401) {
                     localStorage.removeItem("user");
+                }
+                if (status !== undefined && status >= 500) {
+                    reportClientError(error, {
+                        status,
+                        url: error.config?.url,
+                        method: error.config?.method,
+                    });
                 }
                 return Promise.reject(error);
             },

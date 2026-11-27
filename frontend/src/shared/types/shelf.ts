@@ -8,18 +8,8 @@ export interface Shelf {
     capacity: number;
     order: number;
     span?: number;
-    roomId?: string;
     decorations?: ShelfDecoration[];
     books?: Book[];
-}
-
-export interface Room {
-    id: string;
-    name: string;
-    description: string;
-    shelves: Shelf[];
-    order: number;
-    unlocked: boolean; // Unlock when collection reaches certain size
 }
 
 export interface ShelfOccupancy {

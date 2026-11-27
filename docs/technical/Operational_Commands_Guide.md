@@ -119,6 +119,12 @@ Jalankan rangkaian pemeriksaan berikut sebelum membuat commit atau pull request:
 # Memperbaiki formatting kode PHP secara otomatis
 ./vendor/bin/pint
 
+# Static analysis dengan Larastan (PHPStan Level 6)
+composer analyse
+
+# Audit kerentanan keamanan paket Composer
+composer audit
+
 # Menjalankan test suite backend (membersihkan config cache terlebih dahulu)
 composer test
 
@@ -135,11 +141,23 @@ npm --prefix frontend run lint
 # Pemeriksaan tipe TypeScript
 npm --prefix frontend run typecheck
 
+# Unit & integration test (Vitest + Testing Library + MSW)
+npm --prefix frontend run test:unit
+
 # Build produksi frontend (menjalankan typecheck + vite build)
 npm --prefix frontend run build
 
+# Memvalidasi batas ukuran bundle produksi (gzip)
+npm --prefix frontend run check:budget
+
 # Pratinjau hasil build produksi secara lokal
 npm --prefix frontend run preview
+
+# Install browser Chromium untuk Playwright E2E (cukup sekali per mesin)
+npm --prefix frontend exec playwright -- install chromium
+
+# Menjalankan E2E smoke suite dengan server terisolasi (port 8010 + DB testing)
+npm --prefix frontend run test:e2e
 ```
 
 ---

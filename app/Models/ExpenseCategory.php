@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,12 +13,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ExpenseCategory extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'id',
@@ -42,6 +45,8 @@ class ExpenseCategory extends Model
 
     /**
      * Get the user that owns the category.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -50,6 +55,8 @@ class ExpenseCategory extends Model
 
     /**
      * Get the expenses for the category.
+     *
+     * @return HasMany<Expense, $this>
      */
     public function expenses(): HasMany
     {
@@ -58,6 +65,8 @@ class ExpenseCategory extends Model
 
     /**
      * Get the budgets for the category.
+     *
+     * @return HasMany<Budget, $this>
      */
     public function budgets(): HasMany
     {
@@ -66,24 +75,33 @@ class ExpenseCategory extends Model
 
     /**
      * Scope to only include categories for a specific user.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeForUser($query, $userId)
+    public function scopeForUser(Builder $query, string $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
     /**
      * Scope to only include default categories.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }
 
     /**
      * Scope to only include custom categories.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeCustom($query)
+    public function scopeCustom(Builder $query): Builder
     {
         return $query->where('is_default', false);
     }
@@ -105,7 +123,7 @@ class ExpenseCategory extends Model
             return 'Not set';
         }
 
-        return number_format($this->monthly_budget, 2, ',', '.').' '.$this->budget_currency;
+        return number_format((float) $this->monthly_budget, 2, ',', '.').' '.$this->budget_currency;
     }
 
     /**
@@ -113,13 +131,13 @@ class ExpenseCategory extends Model
      */
     public function getBudgetUsagePercentageAttribute(): float
     {
-        if (! $this->monthly_budget || $this->monthly_budget <= 0) {
+        if (! $this->monthly_budget || (float) $this->monthly_budget <= 0) {
             return 0;
         }
 
         $totalExpenses = $this->getTotalExpensesAttribute();
 
-        return ($totalExpenses / $this->monthly_budget) * 100;
+        return ($totalExpenses / (float) $this->monthly_budget) * 100;
     }
 
     /**

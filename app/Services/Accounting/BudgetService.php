@@ -9,6 +9,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -22,8 +23,11 @@ class BudgetService
 
     /**
      * Get all budgets for a user.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Budget>
      */
-    public function getAllBudgets(string $userId, array $filters = [])
+    public function getAllBudgets(string $userId, array $filters = []): LengthAwarePaginator
     {
         $query = Budget::with(['category', 'user'])
             ->forUser($userId);
@@ -64,6 +68,8 @@ class BudgetService
 
     /**
      * Get budget progress information.
+     *
+     * @return array<string, mixed>
      */
     public function getBudgetProgress(string $budgetId, string $userId): array
     {
@@ -94,6 +100,8 @@ class BudgetService
 
     /**
      * Create a new budget.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function createBudget(array $data, string $userId): Budget
     {
@@ -135,6 +143,8 @@ class BudgetService
 
     /**
      * Update an existing budget.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateBudget(string $budgetId, array $data, string $userId): Budget
     {
@@ -145,8 +155,8 @@ class BudgetService
 
             // Update currency conversion if amount changed
             if (isset($data['amount']) || isset($data['currency'])) {
-                $amount = $data['amount'] ?? $budget->amount;
-                $currency = $data['currency'] ?? $budget->currency;
+                $amount = (float) ($data['amount'] ?? $budget->amount);
+                $currency = (string) ($data['currency'] ?? $budget->currency);
 
                 $data['amount_base_currency'] = $this->convertToBaseCurrency($amount, $currency);
             }
@@ -200,8 +210,11 @@ class BudgetService
 
     /**
      * Get expenses for a budget.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Expense>
      */
-    public function getExpensesForBudget(string $budgetId, string $userId, array $filters = [])
+    public function getExpensesForBudget(string $budgetId, string $userId, array $filters = []): LengthAwarePaginator
     {
         $budget = $this->getBudget($budgetId, $userId);
 
@@ -233,6 +246,8 @@ class BudgetService
 
     /**
      * Check all budget alerts for a user.
+     *
+     * @return list<array<string, mixed>>
      */
     public function checkBudgetAlerts(string $userId): array
     {
@@ -255,6 +270,8 @@ class BudgetService
 
     /**
      * Check if a single budget needs alerts.
+     *
+     * @return array<string, mixed>|null
      */
     public function checkSingleBudgetAlert(Budget $budget): ?array
     {
@@ -390,6 +407,8 @@ class BudgetService
 
     /**
      * Get budget summary for dashboard.
+     *
+     * @return array<string, mixed>
      */
     public function getBudgetSummary(?string $userId): array
     {
@@ -437,6 +456,8 @@ class BudgetService
 
     /**
      * Get empty budget summary when user is not authenticated or no data exists.
+     *
+     * @return array<string, float|int>
      */
     protected function getEmptyBudgetSummary(): array
     {
@@ -454,6 +475,8 @@ class BudgetService
 
     /**
      * Get top spending categories for a budget period.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getTopSpendingCategories(string $userId, ?string $startDate = null, ?string $endDate = null, int $limit = 5): array
     {
@@ -473,18 +496,18 @@ class BudgetService
 
         $results = $query->get();
 
-        return $results->map(function ($result) {
+        return $results->map(function (Expense $result): array {
             $category = ExpenseCategory::find($result->category_id);
 
             return [
                 'category_id' => $result->category_id,
-                'category_name' => $category?->name ?? 'Unknown',
-                'category_color' => $category?->color ?? '#6B7280',
-                'category_icon' => $category?->icon ?? '📊',
-                'total_amount' => $result->total_amount,
-                'expense_count' => $result->expense_count,
+                'category_name' => $category !== null ? $category->name : 'Unknown',
+                'category_color' => $category !== null ? $category->color : '#6B7280',
+                'category_icon' => $category !== null ? $category->icon : '📊',
+                'total_amount' => (float) $result->getAttribute('total_amount'),
+                'expense_count' => (int) $result->getAttribute('expense_count'),
             ];
-        })->toArray();
+        })->values()->all();
     }
 
     /**
@@ -499,6 +522,8 @@ class BudgetService
 
     /**
      * Get budget performance trends.
+     *
+     * @return array<string, mixed>
      */
     public function getBudgetPerformanceTrends(string $budgetId, string $userId): array
     {
@@ -520,12 +545,12 @@ class BudgetService
             'budget_amount' => $budget->amount_base_currency,
             'period_start' => $budget->start_date->format('Y-m-d'),
             'period_end' => $budget->end_date?->format('Y-m-d'),
-            'daily_spending' => $expenses->map(function ($expense) {
+            'daily_spending' => $expenses->map(function (Expense $expense): array {
                 return [
-                    'date' => $expense->date,
-                    'amount' => $expense->daily_total,
+                    'date' => $expense->getAttribute('date'),
+                    'amount' => (float) $expense->getAttribute('daily_total'),
                 ];
-            })->toArray(),
+            })->values()->all(),
         ];
     }
 }

@@ -3,9 +3,13 @@
 namespace App\Http\Resources\Api\V1\Library;
 
 use App\Http\Resources\Api\V1\Concerns\FormatsDates;
+use App\Models\Shelf;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Shelf
+ */
 class ShelfResource extends JsonResource
 {
     use FormatsDates;

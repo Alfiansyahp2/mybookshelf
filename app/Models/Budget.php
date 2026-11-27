@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,12 +12,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Budget extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'id',
@@ -49,6 +52,8 @@ class Budget extends Model
 
     /**
      * Get the user that owns the budget.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -57,6 +62,8 @@ class Budget extends Model
 
     /**
      * Get the category associated with the budget.
+     *
+     * @return BelongsTo<ExpenseCategory, $this>
      */
     public function category(): BelongsTo
     {
@@ -65,32 +72,44 @@ class Budget extends Model
 
     /**
      * Scope to only include budgets for a specific user.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeForUser($query, $userId)
+    public function scopeForUser(Builder $query, string $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
     /**
      * Scope to only include active budgets.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
     /**
      * Scope to filter by period.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeByPeriod($query, $period)
+    public function scopeByPeriod(Builder $query, string $period): Builder
     {
         return $query->where('period', $period);
     }
 
     /**
      * Scope to get current budgets (based on date).
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeCurrent($query)
+    public function scopeCurrent(Builder $query): Builder
     {
         $now = now();
 
@@ -127,7 +146,7 @@ class Budget extends Model
      */
     public function getRemainingAmountAttribute(): float
     {
-        return max(0, $this->amount_base_currency - $this->getTotalSpentAttribute());
+        return max(0, (float) $this->amount_base_currency - $this->getTotalSpentAttribute());
     }
 
     /**
@@ -135,11 +154,11 @@ class Budget extends Model
      */
     public function getUsagePercentageAttribute(): float
     {
-        if ($this->amount_base_currency <= 0) {
+        if ((float) $this->amount_base_currency <= 0) {
             return 0;
         }
 
-        return ($this->getTotalSpentAttribute() / $this->amount_base_currency) * 100;
+        return ($this->getTotalSpentAttribute() / (float) $this->amount_base_currency) * 100;
     }
 
     /**
@@ -157,7 +176,7 @@ class Budget extends Model
     {
         $usage = $this->getUsagePercentageAttribute();
 
-        return $usage >= $this->alert_threshold && $usage <= 100;
+        return $usage >= (float) $this->alert_threshold && $usage <= 100;
     }
 
     /**
@@ -165,7 +184,7 @@ class Budget extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount_base_currency, 2, ',', '.').' IDR';
+        return number_format((float) $this->amount_base_currency, 2, ',', '.').' IDR';
     }
 
     /**

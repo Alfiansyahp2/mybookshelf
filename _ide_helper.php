@@ -5,7 +5,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 12.62.0.
+ * Generated for Laravel 12.74.0.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -2116,6 +2116,19 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the registered command instance with the given name, if any.
+         *
+         * @param string $name
+         * @return \Symfony\Component\Console\Command\Command|null
+         * @static
+         */
+        public static function findCommand($name)
+        {
+            /** @var \Illuminate\Foundation\Console\Kernel $instance */
+            return $instance->findCommand($name);
+        }
+
+        /**
          * Get all of the commands registered with the console.
          *
          * @return array
@@ -3350,6 +3363,19 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Get the path to the compiled version of a view.
+         *
+         * @param string $path
+         * @return string
+         * @static
+         */
+        public static function getCompiledPath($path)
+        {
+            /** @var \Illuminate\View\Compilers\BladeCompiler $instance */
+            return $instance->getCompiledPath($path);
+        }
+
+        /**
          * Execute the given callback using a custom echo format.
          *
          * @param string $format
@@ -3410,20 +3436,6 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\View\Compilers\BladeCompiler $instance */
             $instance->withoutComponentTags();
-        }
-
-        /**
-         * Get the path to the compiled version of a view.
-         *
-         * @param string $path
-         * @return string
-         * @static
-         */
-        public static function getCompiledPath($path)
-        {
-            //Method inherited from \Illuminate\View\Compilers\Compiler 
-            /** @var \Illuminate\View\Compilers\BladeCompiler $instance */
-            return $instance->getCompiledPath($path);
         }
 
         /**
@@ -5283,6 +5295,21 @@ namespace Illuminate\Support\Facades {
         {
             /** @var \Illuminate\Cache\FileStore $instance */
             return $instance->restoreLock($name, $owner);
+        }
+
+        /**
+         * Atomically refresh the expiration of a cache key if it matches the expected owner.
+         *
+         * @param string $key
+         * @param mixed $expectedOwner
+         * @param int $seconds
+         * @return bool
+         * @static
+         */
+        public static function refreshIfOwned($key, $expectedOwner, $seconds)
+        {
+            /** @var \Illuminate\Cache\FileStore $instance */
+            return $instance->refreshIfOwned($key, $expectedOwner, $seconds);
         }
 
         /**
@@ -10344,6 +10371,20 @@ namespace Illuminate\Support\Facades {
         }
 
         /**
+         * Execute a callback while requests are created without global middleware or global options.
+         *
+         * @template TReturn
+         * @param (\Closure(): TReturn) $callback
+         * @return TReturn
+         * @static
+         */
+        public static function withoutGlobalConfiguration($callback)
+        {
+            /** @var \Illuminate\Http\Client\Factory $instance */
+            return $instance->withoutGlobalConfiguration($callback);
+        }
+
+        /**
          * Create a new response instance for use during stubbing.
          *
          * @param array|string|null $body
@@ -14819,7 +14860,7 @@ namespace Illuminate\Support\Facades {
          *
          * You should only list the reverse proxies that you manage directly.
          *
-         * @param array $proxies A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR'] and 'PRIVATE_SUBNETS' by IpUtils::PRIVATE_SUBNETS
+         * @param array $proxies A list of trusted proxies, the string 'REMOTE_ADDR' will be replaced with $_SERVER['REMOTE_ADDR'], and 'private_ranges' or 'PRIVATE_SUBNETS' by IpUtils::PRIVATE_RANGES
          * @param int-mask-of<Request::HEADER_*> $trustedHeaderSet A bit field to set which headers to trust from your proxies
          * @static
          */
@@ -23337,6 +23378,256 @@ namespace Illuminate\Support\Facades {
             }
     }
 
+namespace Sentry\Laravel {
+    /**
+     * @see \Sentry\State\HubInterface
+     */
+    class Facade {
+        /**
+         * Gets the client bound to the top of the stack.
+         *
+         * @static
+         */
+        public static function getClient()
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->getClient();
+        }
+
+        /**
+         * Gets the ID of the last captured event.
+         *
+         * @static
+         */
+        public static function getLastEventId()
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->getLastEventId();
+        }
+
+        /**
+         * Creates a new scope to store context information that will be layered on
+         * top of the current one. It is isolated, i.e. all breadcrumbs and context
+         * information added to this scope will be removed once the scope ends. Be
+         * sure to always remove this scope with {@see Hub::popScope} when the
+         * operation finishes or throws.
+         *
+         * @static
+         */
+        public static function pushScope()
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->pushScope();
+        }
+
+        /**
+         * Removes a previously pushed scope from the stack. This restores the state
+         * before the scope was pushed. All breadcrumbs and context information added
+         * since the last call to {@see Hub::pushScope} are discarded.
+         *
+         * @static
+         */
+        public static function popScope()
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->popScope();
+        }
+
+        /**
+         * Creates a new scope with and executes the given operation within. The scope
+         * is automatically removed once the operation finishes or throws.
+         *
+         * @param callable $callback The callback to be executed
+         * @phpstan-template T
+         * @phpstan-param callable(Scope): T $callback
+         * @return mixed|void The callback's return value, upon successful execution
+         * @phpstan-return T
+         * @static
+         */
+        public static function withScope($callback)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->withScope($callback);
+        }
+
+        /**
+         * Calls the given callback passing to it the current scope so that any
+         * operation can be run within its context.
+         *
+         * @static
+         */
+        public static function configureScope($callback)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->configureScope($callback);
+        }
+
+        /**
+         * Binds the given client to the current scope.
+         *
+         * @static
+         */
+        public static function bindClient($client)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->bindClient($client);
+        }
+
+        /**
+         * Captures a message event and sends it to Sentry.
+         *
+         * @static
+         */
+        public static function captureMessage($message, $level = null, $hint = null)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->captureMessage($message, $level, $hint);
+        }
+
+        /**
+         * Captures an exception event and sends it to Sentry.
+         *
+         * @static
+         */
+        public static function captureException($exception, $hint = null)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->captureException($exception, $hint);
+        }
+
+        /**
+         * Captures a new event using the provided data.
+         *
+         * @static
+         */
+        public static function captureEvent($event, $hint = null)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->captureEvent($event, $hint);
+        }
+
+        /**
+         * Captures an event that logs the last occurred error.
+         *
+         * @static
+         */
+        public static function captureLastError($hint = null)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->captureLastError($hint);
+        }
+
+        /**
+         * Captures a check-in.
+         *
+         * @param int|float|null $duration
+         * @param int|float|null $duration
+         * @static
+         */
+        public static function captureCheckIn($slug, $status, $duration = null, $monitorConfig = null, $checkInId = null)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->captureCheckIn($slug, $status, $duration, $monitorConfig, $checkInId);
+        }
+
+        /**
+         * Records a new breadcrumb which will be attached to future events. They
+         * will be added to subsequent events to provide more context on user's
+         * actions prior to an error or crash.
+         *
+         * @static
+         */
+        public static function addBreadcrumb($breadcrumb)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->addBreadcrumb($breadcrumb);
+        }
+
+        /**
+         * @static
+         */
+        public static function addAttachment($attachment)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->addAttachment($attachment);
+        }
+
+        /**
+         * Gets the integration whose FQCN matches the given one if it's available on the current client.
+         *
+         * @param string $className The FQCN of the integration
+         * @phpstan-template T of IntegrationInterface
+         * @phpstan-param class-string<T> $className
+         * @phpstan-return T|null
+         * @static
+         */
+        public static function getIntegration($className)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->getIntegration($className);
+        }
+
+        /**
+         * Starts a new `Transaction` and returns it. This is the entry point to manual
+         * tracing instrumentation.
+         *
+         * A tree structure can be built by adding child spans to the transaction, and
+         * child spans to other spans. To start a new child span within the transaction
+         * or any span, call the respective `startChild()` method.
+         *
+         * Every child span must be finished before the transaction is finished,
+         * otherwise the unfinished spans are discarded.
+         *
+         * The transaction must be finished with a call to its `finish()` method, at
+         * which point the transaction with all its finished child spans will be sent to
+         * Sentry.
+         *
+         * @param array<string, mixed> $customSamplingContext Additional context that will be passed to the {@see SamplingContext}
+         * @param array<string, mixed> $customSamplingContext Additional context that will be passed to the {@see SamplingContext}
+         * @static
+         */
+        public static function startTransaction($context, $customSamplingContext = [])
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->startTransaction($context, $customSamplingContext);
+        }
+
+        /**
+         * Returns the transaction that is on the Hub.
+         *
+         * @static
+         */
+        public static function getTransaction()
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->getTransaction();
+        }
+
+        /**
+         * Sets the span on the Hub.
+         *
+         * @static
+         */
+        public static function setSpan($span)
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->setSpan($span);
+        }
+
+        /**
+         * Returns the span that is on the Hub.
+         *
+         * @static
+         */
+        public static function getSpan()
+        {
+            /** @var \Sentry\State\Hub $instance */
+            return $instance->getSpan();
+        }
+
+            }
+    }
+
 namespace Illuminate\Http {
     /**
      */
@@ -23404,6 +23695,33 @@ namespace Illuminate\Http {
             return \Illuminate\Http\Request::hasValidRelativeSignatureWhileIgnoring($ignoreQuery);
         }
 
+            }
+    }
+
+namespace Illuminate\Console\Scheduling {
+    /**
+     */
+    class Event {
+        /**
+         * @see \Sentry\Laravel\Features\ConsoleSchedulingIntegration::register()
+         * @param string|null $monitorSlug
+         * @param int|null $checkInMargin
+         * @param int|null $maxRuntime
+         * @param bool $updateMonitorConfig
+         * @param int|null $failureIssueThreshold
+         * @param int|null $recoveryThreshold
+         * @param string|null $schedule
+         * @static
+         */
+        public static function sentryMonitor($monitorSlug = null, $checkInMargin = null, $maxRuntime = null, $updateMonitorConfig = true, $failureIssueThreshold = null, $recoveryThreshold = null, $schedule = null)
+        {
+            return \Illuminate\Console\Scheduling\Event::sentryMonitor($monitorSlug, $checkInMargin, $maxRuntime, $updateMonitorConfig, $failureIssueThreshold, $recoveryThreshold, $schedule);
+        }
+
+            }
+    /**
+     */
+    class CallbackEvent extends \Illuminate\Console\Scheduling\Event {
             }
     }
 
@@ -23573,7 +23891,6 @@ namespace  {
          * @param (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression $column
          * @param mixed $operator
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -23589,7 +23906,6 @@ namespace  {
          * @param (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression $column
          * @param mixed $operator
          * @param mixed $value
-         * @param string $boolean
          * @return TModel|null
          * @static
          */
@@ -23620,7 +23936,6 @@ namespace  {
          * @param (\Closure(static): mixed)|string|array|\Illuminate\Contracts\Database\Query\Expression $column
          * @param mixed $operator
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -23902,9 +24217,6 @@ namespace  {
          * Create a record matching the attributes, or increment the existing record.
          *
          * @param array $attributes
-         * @param string $column
-         * @param int|float $default
-         * @param int|float $step
          * @param array $extra
          * @return TModel
          * @static
@@ -24097,7 +24409,6 @@ namespace  {
          *
          * @param int|null|\Closure $perPage
          * @param array|string $columns
-         * @param string $pageName
          * @param int|null $page
          * @param \Closure|int|null $total
          * @return \Illuminate\Pagination\LengthAwarePaginator<int, TModel>
@@ -24115,7 +24426,6 @@ namespace  {
          *
          * @param int|null $perPage
          * @param array|string $columns
-         * @param string $pageName
          * @param int|null $page
          * @return \Illuminate\Pagination\Paginator<int, TModel>
          * @static
@@ -24131,7 +24441,6 @@ namespace  {
          *
          * @param int|null $perPage
          * @param array|string $columns
-         * @param string $cursorName
          * @param \Illuminate\Pagination\Cursor|string|null $cursor
          * @return \Illuminate\Pagination\CursorPaginator<int, TModel>
          * @static
@@ -24293,7 +24602,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|array|string $attributes
          * @param mixed $value
-         * @param bool $asConditions
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -24561,7 +24869,6 @@ namespace  {
          *
          * @template TReturn
          * @param callable(TValue):  TReturn  $callback
-         * @param int $count
          * @return \Illuminate\Support\Collection<int, TReturn>
          * @static
          */
@@ -24575,7 +24882,6 @@ namespace  {
          * Execute a callback over each item while chunking.
          *
          * @param callable(TValue, int):  mixed  $callback
-         * @param int $count
          * @return bool
          * @throws \RuntimeException
          * @static
@@ -24625,7 +24931,6 @@ namespace  {
          * @param callable(\Illuminate\Support\Collection<int, TValue>, int):  mixed  $callback
          * @param string|null $column
          * @param string|null $alias
-         * @param bool $descending
          * @return bool
          * @throws \RuntimeException
          * @static
@@ -24640,7 +24945,6 @@ namespace  {
          * Execute a callback over each item while chunking by ID.
          *
          * @param callable(TValue, int):  mixed  $callback
-         * @param int $count
          * @param string|null $column
          * @param string|null $alias
          * @return bool
@@ -24655,7 +24959,6 @@ namespace  {
         /**
          * Query lazily, by chunks of the given size.
          *
-         * @param int $chunkSize
          * @return \Illuminate\Support\LazyCollection<int, TValue>
          * @throws \InvalidArgumentException
          * @static
@@ -24669,7 +24972,6 @@ namespace  {
         /**
          * Query lazily, by chunking the results of a query by comparing IDs.
          *
-         * @param int $chunkSize
          * @param string|null $column
          * @param string|null $alias
          * @return \Illuminate\Support\LazyCollection<int, TValue>
@@ -24685,7 +24987,6 @@ namespace  {
         /**
          * Query lazily, by chunking the results of a query by comparing IDs in descending order.
          *
-         * @param int $chunkSize
          * @param string|null $column
          * @param string|null $alias
          * @return \Illuminate\Support\LazyCollection<int, TValue>
@@ -24792,9 +25093,6 @@ namespace  {
          *
          * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
          * @param \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string $relation
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
-         * @param string $boolean
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null $callback
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \RuntimeException
@@ -24810,8 +25108,6 @@ namespace  {
          * Add a relationship count / exists condition to the query with an "or".
          *
          * @param \Illuminate\Database\Eloquent\Relations\Relation<*, *, *>|string $relation
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -24826,7 +25122,6 @@ namespace  {
          *
          * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
          * @param \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string $relation
-         * @param string $boolean
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null $callback
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
@@ -24856,8 +25151,6 @@ namespace  {
          * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
          * @param \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string $relation
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null $callback
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -24874,8 +25167,6 @@ namespace  {
          *
          * @param string $relation
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Database\Eloquent\Relations\Relation<*, *, *>): mixed)|null $callback
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -24891,8 +25182,6 @@ namespace  {
          * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
          * @param \Illuminate\Database\Eloquent\Relations\Relation<TRelatedModel, *, *>|string $relation
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>): mixed)|null $callback
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -24938,9 +25227,6 @@ namespace  {
          * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
          * @param \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string $relation
          * @param string|array<int, string> $types
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
-         * @param string $boolean
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null $callback
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
@@ -24956,8 +25242,6 @@ namespace  {
          *
          * @param \Illuminate\Database\Eloquent\Relations\MorphTo<*, *>|string $relation
          * @param string|array<int, string> $types
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -24973,7 +25257,6 @@ namespace  {
          * @template TRelatedModel of \Illuminate\Database\Eloquent\Model
          * @param \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string $relation
          * @param string|array<int, string> $types
-         * @param string $boolean
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null $callback
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
@@ -25005,8 +25288,6 @@ namespace  {
          * @param \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string $relation
          * @param string|array<int, string> $types
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null $callback
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25023,8 +25304,6 @@ namespace  {
          * @param \Illuminate\Database\Eloquent\Relations\MorphTo<TRelatedModel, *>|string $relation
          * @param string|array<int, string> $types
          * @param (\Closure(\Illuminate\Database\Eloquent\Builder<TRelatedModel>, string): mixed)|null $callback
-         * @param string $operator
-         * @param \Illuminate\Contracts\Database\Query\Expression|int $count
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25285,7 +25564,6 @@ namespace  {
          *
          * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $related
          * @param string|null $relationshipName
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
          * @static
@@ -25316,7 +25594,6 @@ namespace  {
          *
          * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection<int, \Illuminate\Database\Eloquent\Model> $related
          * @param string|null $relationshipName
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \Illuminate\Database\Eloquent\RelationNotFoundException
          * @static
@@ -25636,8 +25913,6 @@ namespace  {
          * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
          * @param string|null $operator
          * @param \Illuminate\Contracts\Database\Query\Expression|string|null $second
-         * @param string $type
-         * @param bool $where
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25654,7 +25929,6 @@ namespace  {
          * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
          * @param string $operator
          * @param \Illuminate\Contracts\Database\Query\Expression|string $second
-         * @param string $type
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25672,8 +25946,6 @@ namespace  {
          * @param \Closure|\Illuminate\Contracts\Database\Query\Expression|string $first
          * @param string|null $operator
          * @param \Illuminate\Contracts\Database\Query\Expression|string|null $second
-         * @param string $type
-         * @param bool $where
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \InvalidArgumentException
          * @static
@@ -25857,7 +26129,6 @@ namespace  {
          *
          * @param string $value
          * @param string $operator
-         * @param bool $useDefault
          * @return array
          * @throws \InvalidArgumentException
          * @static
@@ -25874,7 +26145,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|string|array $first
          * @param string|null $operator
          * @param string|null $second
-         * @param string|null $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25904,8 +26174,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string $vector
-         * @param float $minSimilarity A value between 0.0 and 1.0, where 1.0 is identical.
-         * @param bool $order
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25921,7 +26189,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param \Illuminate\Support\Collection<int, float>|\Illuminate\Contracts\Support\Arrayable|array<int, float>|string $vector
          * @param float $maxDistance
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25951,7 +26218,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $sql
          * @param mixed $bindings
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25980,9 +26246,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param string $value
-         * @param bool $caseSensitive
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -25997,7 +26260,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param string $value
-         * @param bool $caseSensitive
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26012,8 +26274,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param string $value
-         * @param bool $caseSensitive
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26028,7 +26288,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param string $value
-         * @param bool $caseSensitive
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26043,7 +26302,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26072,8 +26330,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param mixed $values
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26102,7 +26358,6 @@ namespace  {
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param mixed $values
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26131,8 +26386,6 @@ namespace  {
          *
          * @param string $column
          * @param \Illuminate\Contracts\Support\Arrayable|array $values
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26161,7 +26414,6 @@ namespace  {
          *
          * @param string $column
          * @param \Illuminate\Contracts\Support\Arrayable|array $values
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26189,8 +26441,6 @@ namespace  {
          * Add a "where null" clause to the query.
          *
          * @param string|array|\Illuminate\Contracts\Database\Query\Expression $columns
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26217,7 +26467,6 @@ namespace  {
          * Add a "where not null" clause to the query.
          *
          * @param string|array|\Illuminate\Contracts\Database\Query\Expression $columns
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26231,8 +26480,6 @@ namespace  {
          * Add a "where between" statement to the query.
          *
          * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string $column
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26246,8 +26493,6 @@ namespace  {
          * Add a "where between" statement using columns to the query.
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26287,7 +26532,6 @@ namespace  {
          * Add a "where not between" statement to the query.
          *
          * @param \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string $column
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26301,7 +26545,6 @@ namespace  {
          * Add a "where not between" statement using columns to the query.
          *
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26342,8 +26585,6 @@ namespace  {
          *
          * @param mixed $value
          * @param array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string} $columns
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26372,7 +26613,6 @@ namespace  {
          *
          * @param mixed $value
          * @param array{\Illuminate\Contracts\Database\Query\Expression|string, \Illuminate\Contracts\Database\Query\Expression|string} $columns
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26415,7 +26655,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param \DateTimeInterface|string|null $operator
          * @param \DateTimeInterface|string|null $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26446,7 +26685,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param \DateTimeInterface|string|null $operator
          * @param \DateTimeInterface|string|null $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26477,7 +26715,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param \DateTimeInterface|string|int|null $operator
          * @param \DateTimeInterface|string|int|null $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26508,7 +26745,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param \DateTimeInterface|string|int|null $operator
          * @param \DateTimeInterface|string|int|null $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26539,7 +26775,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|string $column
          * @param \DateTimeInterface|string|int|null $operator
          * @param \DateTimeInterface|string|int|null $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26567,7 +26802,6 @@ namespace  {
         /**
          * Add a nested "where" statement to the query.
          *
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26593,7 +26827,6 @@ namespace  {
          * Add another query builder as a nested where to the query builder.
          *
          * @param \Illuminate\Database\Query\Builder $query
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26607,8 +26840,6 @@ namespace  {
          * Add an "exists" clause to the query.
          *
          * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $callback
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26622,7 +26853,6 @@ namespace  {
          * Add an "or where exists" clause to the query.
          *
          * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $callback
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26636,7 +26866,6 @@ namespace  {
          * Add a "where not exists" clause to the query.
          *
          * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $callback
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26662,8 +26891,6 @@ namespace  {
         /**
          * Add an "exists" clause to the query.
          *
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26679,7 +26906,6 @@ namespace  {
          * @param array $columns
          * @param string $operator
          * @param array $values
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \InvalidArgumentException
          * @static
@@ -26710,8 +26936,6 @@ namespace  {
          *
          * @param string $column
          * @param mixed $value
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26740,7 +26964,6 @@ namespace  {
          *
          * @param string $column
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26769,8 +26992,6 @@ namespace  {
          *
          * @param string $column
          * @param mixed $value
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26799,7 +27020,6 @@ namespace  {
          *
          * @param string $column
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26827,8 +27047,6 @@ namespace  {
          * Add a clause that determines if a JSON path exists to the query.
          *
          * @param string $column
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26855,7 +27073,6 @@ namespace  {
          * Add a clause that determines if a JSON path does not exist to the query.
          *
          * @param string $column
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26884,7 +27101,6 @@ namespace  {
          * @param string $column
          * @param mixed $operator
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26928,7 +27144,6 @@ namespace  {
          *
          * @param string|string[] $columns
          * @param string $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26958,7 +27173,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[] $columns
          * @param mixed $operator
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -26989,7 +27203,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[] $columns
          * @param mixed $operator
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27020,7 +27233,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression[]|\Closure[]|string[] $columns
          * @param mixed $operator
          * @param mixed $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27077,7 +27289,6 @@ namespace  {
          * @param \Illuminate\Contracts\Database\Query\Expression|\Closure|string $column
          * @param \DateTimeInterface|string|int|float|null $operator
          * @param \Illuminate\Contracts\Database\Query\Expression|\DateTimeInterface|string|int|float|null $value
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27105,7 +27316,6 @@ namespace  {
         /**
          * Add a nested "having" statement to the query.
          *
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27119,7 +27329,6 @@ namespace  {
          * Add another query builder as a nested having to the query builder.
          *
          * @param \Illuminate\Database\Query\Builder $query
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27133,8 +27342,6 @@ namespace  {
          * Add a "having null" clause to the query.
          *
          * @param array|string $columns
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27161,7 +27368,6 @@ namespace  {
          * Add a "having not null" clause to the query.
          *
          * @param array|string $columns
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27188,8 +27394,6 @@ namespace  {
          * Add a "having between" clause to the query.
          *
          * @param string $column
-         * @param string $boolean
-         * @param bool $not
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27204,7 +27408,6 @@ namespace  {
          *
          * @param string $column
          * @param iterable $values
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27246,7 +27449,6 @@ namespace  {
          * Add a raw "having" clause to the query.
          *
          * @param string $sql
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27273,7 +27475,6 @@ namespace  {
          * Add an "order by" clause to the query.
          *
          * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*>|\Illuminate\Contracts\Database\Query\Expression|string $column
-         * @param string $direction
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \InvalidArgumentException
          * @static
@@ -27314,7 +27515,6 @@ namespace  {
         /**
          * Put the query's results in random order.
          *
-         * @param string|int $seed
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27422,7 +27622,6 @@ namespace  {
          * Set the limit and offset for a given page.
          *
          * @param int $page
-         * @param int $perPage
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27435,9 +27634,6 @@ namespace  {
         /**
          * Constrain the query to the previous "page" of results before a given ID.
          *
-         * @param int $perPage
-         * @param int|null $lastId
-         * @param string $column
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27450,9 +27646,6 @@ namespace  {
         /**
          * Constrain the query to the next "page" of results after a given ID.
          *
-         * @param int $perPage
-         * @param int|null $lastId
-         * @param string $column
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27466,7 +27659,6 @@ namespace  {
          * Remove all existing orders and optionally add a new order.
          *
          * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string|null $column
-         * @param string $direction
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27493,7 +27685,6 @@ namespace  {
          * Add a "union" statement to the query.
          *
          * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder<*> $query
-         * @param bool $all
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27519,7 +27710,6 @@ namespace  {
         /**
          * Lock the selected rows in the table.
          *
-         * @param string|bool $value
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -27644,7 +27834,6 @@ namespace  {
          * Concatenate values of a given column as a string.
          *
          * @param string $column
-         * @param string $glue
          * @return string
          * @static
          */
@@ -27705,7 +27894,6 @@ namespace  {
         /**
          * Retrieve the "count" result of the query.
          *
-         * @param \Illuminate\Contracts\Database\Query\Expression|string $columns
          * @return int<0, max>
          * @static
          */
@@ -27896,36 +28084,6 @@ namespace  {
         }
 
         /**
-         * Increment the given column's values by the given amounts.
-         *
-         * @param array<string, float|int|numeric-string> $columns
-         * @param array<string, mixed> $extra
-         * @return int<0, max>
-         * @throws \InvalidArgumentException
-         * @static
-         */
-        public static function incrementEach($columns, $extra = [])
-        {
-            /** @var \Illuminate\Database\Query\Builder $instance */
-            return $instance->incrementEach($columns, $extra);
-        }
-
-        /**
-         * Decrement the given column's values by the given amounts.
-         *
-         * @param array<string, float|int|numeric-string> $columns
-         * @param array<string, mixed> $extra
-         * @return int<0, max>
-         * @throws \InvalidArgumentException
-         * @static
-         */
-        public static function decrementEach($columns, $extra = [])
-        {
-            /** @var \Illuminate\Database\Query\Builder $instance */
-            return $instance->decrementEach($columns, $extra);
-        }
-
-        /**
          * Run a "truncate" statement on the table.
          *
          * @return void
@@ -27999,7 +28157,6 @@ namespace  {
          * Set the bindings on the query builder.
          *
          * @param list<mixed> $bindings
-         * @param "select"|"from"|"join"|"where"|"groupBy"|"having"|"order"|"union"|"unionOrder" $type
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \InvalidArgumentException
          * @static
@@ -28014,7 +28171,6 @@ namespace  {
          * Add a binding to the query.
          *
          * @param mixed $value
-         * @param "select"|"from"|"join"|"where"|"groupBy"|"having"|"order"|"union"|"unionOrder" $type
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @throws \InvalidArgumentException
          * @static
@@ -28281,7 +28437,6 @@ namespace  {
          * Add a "where date" clause to determine if a "date" column is today to the query.
          *
          * @param array|string $columns
-         * @param string $boolean
          * @return \Illuminate\Database\Eloquent\Builder<static>
          * @static
          */
@@ -28438,7 +28593,6 @@ namespace  {
          * Mix another object into the class.
          *
          * @param object $mixin
-         * @param bool $replace
          * @return void
          * @throws \ReflectionException
          * @static
@@ -28504,6 +28658,7 @@ namespace  {
     class Validator extends \Illuminate\Support\Facades\Validator {}
     class View extends \Illuminate\Support\Facades\View {}
     class Vite extends \Illuminate\Support\Facades\Vite {}
+    class Sentry extends \Sentry\Laravel\Facade {}
 }
 
 

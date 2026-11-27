@@ -10,6 +10,8 @@ class ProfileService
 {
     /**
      * Update the authenticated user's profile attributes.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateProfile(User $user, array $data): User
     {

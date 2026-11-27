@@ -3,9 +3,13 @@
 namespace App\Http\Resources\Api\V1\Library;
 
 use App\Http\Resources\Api\V1\Concerns\FormatsDates;
+use App\Models\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin Collection
+ */
 class CollectionResource extends JsonResource
 {
     use FormatsDates;

@@ -28,13 +28,13 @@ namespace App\Models{
  * @property-read string $formatted_date
  * @property-read string $type_label
  * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent byType($type)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent forUser($userId)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent inPeriod($startDate, $endDate)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent byType(string $type)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent forUser(string $userId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent inPeriod(?mixed $startDate, ?mixed $endDate)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent recent($days = 30)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent recent(int $days = 30)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent whereBudgetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccountingTimelineEvent whereDescription($value)
@@ -125,7 +125,7 @@ namespace App\Models{
  * @property-read int|null $collections_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Expense> $expenses
  * @property-read int|null $expenses_count
- * @property-read array $spine_colors
+ * @property-read list<string|null> $spine_colors
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReadingSession> $readingSessions
  * @property-read int|null $reading_sessions_count
  * @property-read \App\Models\Shelf|null $shelf
@@ -178,7 +178,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Book whereThickness($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Book whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Book whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Book withStatus($status)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Book withStatus(string $status)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Book withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Book withoutTrashed()
  */
@@ -213,9 +213,9 @@ namespace App\Models{
  * @property-read float $usage_percentage
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget byPeriod($period)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget byPeriod(string $period)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget current()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget forUser($userId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget forUser(string $userId)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Budget onlyTrashed()
@@ -290,7 +290,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read string $formatted_rate
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CurrencyRate active()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|CurrencyRate forPair($fromCurrency, $toCurrency = 'IDR')
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|CurrencyRate forPair(string $fromCurrency, string $toCurrency = 'IDR')
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CurrencyRate newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CurrencyRate newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CurrencyRate query()
@@ -337,6 +337,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $receipt_path
  * @property-read \App\Models\Book|null $book
  * @property-read \App\Models\ExpenseCategory|null $category
  * @property-read string $formatted_amount
@@ -345,11 +346,11 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Expense> $recurringExpenses
  * @property-read int|null $recurring_expenses_count
  * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense byPaymentMethod($method)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense byStatus($status)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense byPaymentMethod(string $method)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense byStatus(string $status)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense completed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense forUser($userId)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense inPeriod($startDate, $endDate)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense forUser(string $userId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense inPeriod(?mixed $startDate, ?mixed $endDate)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense onlyTrashed()
@@ -374,6 +375,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense whereReceiptData($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense whereReceiptFilename($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense whereReceiptMimeType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense whereReceiptPath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense whereRecurringPeriod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense whereReminderDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Expense whereReminderSent($value)
@@ -412,7 +414,7 @@ namespace App\Models{
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExpenseCategory custom()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExpenseCategory default()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ExpenseCategory forUser($userId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ExpenseCategory forUser(string $userId)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExpenseCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExpenseCategory newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ExpenseCategory onlyTrashed()
@@ -481,7 +483,7 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property string $id
- * @property string $room_id
+ * @property string|null $room_id
  * @property string $name
  * @property int $capacity
  * @property int $order
@@ -492,7 +494,7 @@ namespace App\Models{
  * @property array<array-key, mixed>|null $decorations
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Book> $books
  * @property-read int|null $books_count
- * @property-read array $occupancy
+ * @property-read \App\Models\array{shelf_id: $occupancy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shelf newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shelf newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Shelf query()
@@ -569,6 +571,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  */
-	class User extends \Eloquent {}
+	class User extends \Eloquent implements \Illuminate\Contracts\Auth\MustVerifyEmail {}
 }
 

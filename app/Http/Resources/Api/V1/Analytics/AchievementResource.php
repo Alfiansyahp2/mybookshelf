@@ -6,6 +6,9 @@ use App\Http\Resources\Api\V1\Concerns\FormatsDates;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\Achievement
+ */
 class AchievementResource extends JsonResource
 {
     use FormatsDates;
@@ -17,7 +20,10 @@ class AchievementResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        /** @var \App\Models\User|null $userAchievement */
         $userAchievement = $this->users->first();
+        /** @var \Illuminate\Database\Eloquent\Relations\Pivot|null $pivot */
+        $pivot = $userAchievement?->getRelationValue('pivot');
 
         return [
             'id' => $this->id,
@@ -28,9 +34,9 @@ class AchievementResource extends JsonResource
             'category' => $this->category,
             'rarity' => $this->rarity,
             'user_progress' => [
-                'current' => (int) ($this->getAttribute('computed_current') ?? $userAchievement?->pivot->current ?? 0),
-                'unlocked' => (bool) ($userAchievement?->pivot->unlocked ?? false),
-                'unlocked_date' => $this->toIso8601($userAchievement?->pivot->unlocked_date),
+                'current' => (int) ($this->getAttribute('computed_current') ?? $pivot?->getAttribute('current') ?? 0),
+                'unlocked' => (bool) ($pivot?->getAttribute('unlocked') ?? false),
+                'unlocked_date' => $this->toIso8601($pivot?->getAttribute('unlocked_date')),
             ],
         ];
     }

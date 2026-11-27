@@ -4,9 +4,13 @@ namespace App\Http\Resources\Api\V1\Reading;
 
 use App\Http\Resources\Api\V1\Concerns\FormatsDates;
 use App\Http\Resources\Api\V1\Library\BookResource;
+use App\Models\ReadingSession;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin ReadingSession
+ */
 class ReadingSessionResource extends JsonResource
 {
     use FormatsDates;

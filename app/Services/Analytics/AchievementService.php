@@ -12,6 +12,8 @@ class AchievementService
 {
     /**
      * Retrieve all achievements with live server-computed user progress and persisted unlock state.
+     *
+     * @return Collection<int, Achievement>
      */
     public function listForUser(User $user): Collection
     {
@@ -70,7 +72,9 @@ class AchievementService
 
         foreach ($achievements as $achievement) {
             $pivotUser = $achievement->users->first();
-            $alreadyUnlocked = (bool) ($pivotUser?->pivot->unlocked ?? false);
+            /** @var \Illuminate\Database\Eloquent\Relations\Pivot|null $pivot */
+            $pivot = $pivotUser?->getRelationValue('pivot');
+            $alreadyUnlocked = (bool) ($pivot?->getAttribute('unlocked') ?? false);
             $current = $this->resolveMetricForAchievement($achievement, $metrics);
             $met = $current >= $achievement->requirement;
 
@@ -110,7 +114,9 @@ class AchievementService
         $achievement = Achievement::findOrFail($achievementId);
 
         $existingPivot = $user->achievements()->where('achievements.id', $achievementId)->first();
-        if ($existingPivot && $existingPivot->pivot->unlocked) {
+        /** @var \Illuminate\Database\Eloquent\Relations\Pivot|null $pivot */
+        $pivot = $existingPivot?->getRelationValue('pivot');
+        if ($pivot !== null && $pivot->getAttribute('unlocked')) {
             return ['status' => 'already_unlocked'];
         }
 

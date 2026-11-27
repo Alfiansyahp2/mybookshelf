@@ -225,6 +225,8 @@ temp/
 /docs/api/
 /openapi.json
 /coverage/
+/frontend/playwright-report/
+/frontend/test-results/
 
 # Asset optimization
 /public/css/*.css

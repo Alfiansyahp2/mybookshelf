@@ -180,7 +180,7 @@ class ExpenseController extends Controller
 
         try {
             $conversion = $this->currencyRateService->convertAmount(
-                $expense->amount,
+                (float) $expense->amount,
                 $expense->currency,
                 $request->validated('target_currency')
             );

@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
+import { reportClientError } from "@shared/lib/telemetry";
 
 interface InnerErrorBoundaryProps {
     children: ReactNode;
@@ -27,7 +28,11 @@ class InnerErrorBoundary extends Component<
         };
     }
 
-    componentDidCatch(_error: Error, _info: ErrorInfo): void {}
+    componentDidCatch(error: Error, info: ErrorInfo): void {
+        reportClientError(error, {
+            componentStack: info.componentStack,
+        });
+    }
 
     private handleRetry = (): void => {
         this.props.onResetQueries();

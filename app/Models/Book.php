@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Book extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $primaryKey = 'id';
@@ -100,6 +103,8 @@ class Book extends Model
 
     /**
      * Get the user that owns the book.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -108,6 +113,8 @@ class Book extends Model
 
     /**
      * Get the shelf that the book belongs to.
+     *
+     * @return BelongsTo<Shelf, $this>
      */
     public function shelf(): BelongsTo
     {
@@ -116,6 +123,8 @@ class Book extends Model
 
     /**
      * Get the collections that the book belongs to.
+     *
+     * @return BelongsToMany<Collection, $this>
      */
     public function collections(): BelongsToMany
     {
@@ -125,6 +134,8 @@ class Book extends Model
 
     /**
      * Get all reading sessions for the book.
+     *
+     * @return HasMany<ReadingSession, $this>
      */
     public function readingSessions(): HasMany
     {
@@ -133,6 +144,8 @@ class Book extends Model
 
     /**
      * Get all timeline events for the book.
+     *
+     * @return HasMany<TimelineEvent, $this>
      */
     public function timelineEvents(): HasMany
     {
@@ -141,6 +154,8 @@ class Book extends Model
 
     /**
      * Get all expenses associated with the book.
+     *
+     * @return HasMany<Expense, $this>
      */
     public function expenses(): HasMany
     {
@@ -153,11 +168,11 @@ class Book extends Model
     public function getTotalInvestment(): float
     {
         // Base purchase price
-        $total = $this->purchase_price ?: 0;
+        $total = (float) ($this->purchase_price ?: 0);
 
         // Add all related expenses (shipping, maintenance, etc.)
         foreach ($this->expenses as $expense) {
-            $total += $expense->amount_base_currency;
+            $total += (float) $expense->amount_base_currency;
         }
 
         return $total;
@@ -168,7 +183,7 @@ class Book extends Model
      */
     public function getAdditionalExpenses(): float
     {
-        return $this->expenses->sum('amount_base_currency');
+        return (float) $this->expenses->sum('amount_base_currency');
     }
 
     /**
@@ -189,6 +204,8 @@ class Book extends Model
 
     /**
      * Get the cost breakdown of the book.
+     *
+     * @return array<string, mixed>
      */
     public function getCostBreakdown(): array
     {
@@ -204,22 +221,30 @@ class Book extends Model
 
     /**
      * Scope a query to only include favorite books.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeFavorite($query)
+    public function scopeFavorite(Builder $query): Builder
     {
         return $query->where('favorite', true);
     }
 
     /**
      * Scope a query to only include books with a given status.
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
-    public function scopeWithStatus($query, $status)
+    public function scopeWithStatus(Builder $query, string $status): Builder
     {
         return $query->where('status', $status);
     }
 
     /**
      * Get the spine colors as an array.
+     *
+     * @return list<string|null>
      */
     public function getSpineColorsAttribute(): array
     {

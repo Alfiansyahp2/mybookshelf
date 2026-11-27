@@ -12,6 +12,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use Exception;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -19,8 +20,11 @@ class ExpenseService
 {
     /**
      * Get all expenses for a user with optional filters.
+     *
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Expense>
      */
-    public function getAllExpenses(array $filters, string $userId)
+    public function getAllExpenses(array $filters, string $userId): LengthAwarePaginator
     {
         $query = Expense::with(['category', 'book'])
             ->forUser($userId);
@@ -73,6 +77,8 @@ class ExpenseService
 
     /**
      * Create a new expense.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function createExpense(array $data, string $userId): Expense
     {
@@ -144,6 +150,8 @@ class ExpenseService
 
     /**
      * Update an existing expense.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateExpense(string $expenseId, array $data, string $userId): Expense
     {
@@ -154,8 +162,8 @@ class ExpenseService
 
             // Update currency conversion if amount or currency changed
             if (isset($data['amount']) || isset($data['currency'])) {
-                $amount = $data['amount'] ?? $expense->amount;
-                $currency = $data['currency'] ?? $expense->currency;
+                $amount = (float) ($data['amount'] ?? $expense->amount);
+                $currency = (string) ($data['currency'] ?? $expense->currency);
 
                 $data['amount_base_currency'] = $this->convertToBaseCurrency($amount, $currency);
                 $data['exchange_rate'] = $this->getExchangeRate($currency);
@@ -227,6 +235,8 @@ class ExpenseService
 
     /**
      * Upload or update receipt for an expense onto configured media storage.
+     *
+     * @param  array<string, mixed>  $receiptData
      */
     public function uploadReceipt(
         string $expenseId,
@@ -246,6 +256,8 @@ class ExpenseService
 
     /**
      * Get temporary signed receipt URL (5 minutes) or fallback metadata for an expense.
+     *
+     * @return array<string, mixed>
      */
     public function getReceipt(string $expenseId, string $userId): array
     {
@@ -353,7 +365,7 @@ class ExpenseService
             return $amount;
         }
 
-        return $amount * $rate->rate;
+        return $amount * (float) $rate->rate;
     }
 
     /**
@@ -367,7 +379,7 @@ class ExpenseService
 
         $rate = CurrencyRate::getLatestRate($currency, 'IDR');
 
-        return $rate ? $rate->rate : 1.0;
+        return $rate ? (float) $rate->rate : 1.0;
     }
 
     /**
@@ -492,7 +504,7 @@ class ExpenseService
     /**
      * Check budget alerts after expense creation/update.
      */
-    protected function checkBudgetAlertsAfterExpense(string $userId, $expenseDate): void
+    protected function checkBudgetAlertsAfterExpense(string $userId, mixed $expenseDate): void
     {
         $budgets = Budget::forUser($userId)
             ->active()
@@ -522,10 +534,12 @@ class ExpenseService
 
     /**
      * Get expenses by category for a user.
+     *
+     * @return list<array<string, mixed>>
      */
     public function getExpensesByCategory(string $userId, ?string $startDate = null, ?string $endDate = null): array
     {
-        $query = Expense::forUser($userId)->completed();
+        $query = Expense::forUser($userId)->with('category')->completed();
 
         if ($startDate && $endDate) {
             $query->inPeriod($startDate, $endDate);
@@ -535,11 +549,12 @@ class ExpenseService
 
         $result = [];
         foreach ($expenses as $categoryId => $categoryExpenses) {
-            $category = $categoryExpenses->first()->category;
+            $first = $categoryExpenses->first();
+            $category = $first?->category;
             $result[] = [
                 'category_id' => $categoryId,
-                'category_name' => $category?->name ?? 'Uncategorized',
-                'category_color' => $category?->color ?? '#6B7280',
+                'category_name' => $category !== null ? $category->name : 'Uncategorized',
+                'category_color' => $category !== null ? $category->color : '#6B7280',
                 'total_amount' => $categoryExpenses->sum('amount_base_currency'),
                 'expense_count' => $categoryExpenses->count(),
             ];

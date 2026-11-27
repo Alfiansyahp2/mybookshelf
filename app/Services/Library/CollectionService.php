@@ -12,6 +12,8 @@ class CollectionService
 {
     /**
      * List all collections belonging to a user with embedded books.
+     *
+     * @return EloquentCollection<int, Collection>
      */
     public function listForUser(string $userId): EloquentCollection
     {
@@ -22,6 +24,8 @@ class CollectionService
 
     /**
      * Create a new collection for a user.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function createForUser(string $userId, array $data): Collection
     {
@@ -40,6 +44,8 @@ class CollectionService
 
     /**
      * Update an existing collection and return it with loaded books.
+     *
+     * @param  array<string, mixed>  $data
      */
     public function updateCollection(Collection $collection, array $data): Collection
     {

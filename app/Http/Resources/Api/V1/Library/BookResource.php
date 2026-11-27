@@ -7,6 +7,14 @@ use App\Http\Resources\Api\V1\Concerns\FormatsDates;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\Book
+ *
+ * @property-read mixed $created_at
+ * @property-read mixed $updated_at
+ * @property-read array<string, mixed>|null $session_stats
+ * @property-read \Illuminate\Database\Eloquent\Relations\Pivot|null $pivot
+ */
 class BookResource extends JsonResource
 {
     use FormatsDates;
@@ -78,10 +86,10 @@ class BookResource extends JsonResource
             'session_stats' => $this->when(isset($this->session_stats), fn () => $this->session_stats),
 
             'pivot' => $this->whenPivotLoaded('collection_book', fn () => [
-                'collection_id' => $this->pivot->collection_id,
-                'book_id' => $this->pivot->book_id,
-                'order' => $this->pivot->order,
-                'added_at' => $this->pivot->added_at,
+                'collection_id' => $this->pivot?->getAttribute('collection_id'),
+                'book_id' => $this->pivot?->getAttribute('book_id'),
+                'order' => $this->pivot?->getAttribute('order'),
+                'added_at' => $this->pivot?->getAttribute('added_at'),
             ]),
 
             'shelf' => $this->whenLoaded('shelf', fn () => new ShelfResource($this->shelf)),

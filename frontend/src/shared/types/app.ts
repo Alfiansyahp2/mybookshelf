@@ -1,5 +1,5 @@
 import type { Book } from "./book";
-import type { Shelf, Room } from "./shelf";
+import type { Shelf } from "./shelf";
 import type { Collection, Achievement, ReadingStatistics } from "./collection";
 import type { ReadingSession } from "./book";
 
@@ -7,7 +7,6 @@ import type { ReadingSession } from "./book";
 export interface AppState {
     books: Book[];
     shelves: Shelf[];
-    rooms: Room[];
     collections: Collection[];
     achievements: Achievement[];
     readingSessions: ReadingSession[];
